@@ -59,18 +59,19 @@ namespace DarkTowerTron.Combat
             // 3. Hit ENEMY (Must be reflected first)
             if (!isHostile && other.CompareTag("Enemy"))
             {
-                Debug.Log("-> Attempting to damage Enemy...");
                 Enemy enemy = other.GetComponent<Enemy>();
-
                 if (enemy != null)
                 {
-                    Debug.Log("<color=green>-> HIT CONFIRMED! Dealing Stagger.</color>");
+                    // BREAK SHIELD
+                    if (enemy.isShielded)
+                    {
+                        enemy.isShielded = false;
+                        Debug.Log("SHIELD BROKEN!");
+                    }
+
+                    // Apply massive stagger
                     enemy.TakeHit(50f, 100f, direction);
                     Destroy(gameObject);
-                }
-                else
-                {
-                    Debug.LogError("-> Hit object tagged 'Enemy' but found NO 'Enemy.cs' script!");
                 }
                 return;
             }

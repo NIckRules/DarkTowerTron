@@ -14,6 +14,9 @@ namespace DarkTowerTron.Player
         public float energyDecayRate = 5f; // Drops 5 per second
         public float energyGainPerKill = 30f;
 
+        [Header("Status")]
+        public bool isInvincible = false; // NEW
+
         void Start()
         {
             currentHealth = maxHealth;
@@ -48,13 +51,13 @@ namespace DarkTowerTron.Player
 
         public void TakeDamage(int dmg)
         {
+            // NEW: Ignore damage if invincible
+            if (isInvincible) return;
+
             currentHealth -= dmg;
             Debug.Log($"<color=red>OUCH! HP: {currentHealth}</color>");
 
-            if (currentHealth <= 0)
-            {
-                Die();
-            }
+            if (currentHealth <= 0) Die();
         }
 
         void Die()

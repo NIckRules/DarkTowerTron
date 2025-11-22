@@ -18,6 +18,9 @@ namespace DarkTowerTron.Combat
         public float staggerDuration = 3f;
         public bool isStaggered = false;
 
+        [Header("Shields")]
+        public bool isShielded = false; // Check this TRUE for Turrets in Inspector
+
         [Header("Visuals")]
         public Renderer meshRenderer;
         public Color normalColor = Color.red;
@@ -38,6 +41,14 @@ namespace DarkTowerTron.Combat
             if (isStaggered)
             {
                 Execute();
+                return;
+            }
+
+            // NEW: Shield Logic
+            if (isShielded)
+            {
+                Debug.Log("<color=cyan>BLOCKED BY SHIELD!</color>");
+                // Optional: Play a "Clang" sound or spark
                 return;
             }
 
