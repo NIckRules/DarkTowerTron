@@ -15,7 +15,7 @@ namespace DarkTowerTron.Player
 
         [Header("Focus (Energy)")]
         // 0-100. Decays over time. Spent on Blitz.
-        public float currentFocus = 0f;
+        public float currentFocus = 100f;
         public float maxFocus = 100f;
         public float focusDecayRate = 5f;
 

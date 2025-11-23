@@ -26,7 +26,7 @@ namespace DarkTowerTron.Player
         void Update()
         {
             // 1. If Input GetButtonDown("Jump") (Spacebar).
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump"))
             {
                 AttemptBlitz();
             }

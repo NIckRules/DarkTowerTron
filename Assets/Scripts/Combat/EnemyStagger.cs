@@ -9,6 +9,7 @@ namespace DarkTowerTron.Combat
         public float staggerResistance = 1.0f; // Max meter value (usually 1)
         public float currentStagger = 0f;
         public float decayRate = 2.0f; // How fast meter drops (Design: 2/s)
+        public float decayMultiplier = 1.0f; // Modifier for special states (e.g. Gatling firing)
         public float staggerDuration = 1.5f; // How long they stay vulnerable
 
         [Header("State")]
@@ -40,8 +41,8 @@ namespace DarkTowerTron.Combat
             // 2. If isStaggered is false AND currentStagger > 0:
             if (currentStagger > 0)
             {
-                // Subtract decayRate * deltaTime.
-                currentStagger -= decayRate * Time.deltaTime;
+                // Subtract decayRate * deltaTime * multiplier.
+                currentStagger -= decayRate * decayMultiplier * Time.deltaTime;
 
                 // Clamp to 0.
                 if (currentStagger < 0) currentStagger = 0;

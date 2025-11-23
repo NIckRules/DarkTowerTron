@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5273355152539851023}
   - component: {fileID: 3679193057092717322}
   - component: {fileID: 2363996398939191876}
+  - component: {fileID: 3192267441433652676}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -167,7 +168,7 @@ MonoBehaviour:
   currentGrit: 2
   maxGrit: 2
   wound: 0
-  currentFocus: 0
+  currentFocus: 100
   maxFocus: 100
   focusDecayRate: 5
   focusSlider: {fileID: 0}
@@ -196,8 +197,24 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
-  spearPhantomPrefab: {fileID: 0}
+  spearPhantomPrefab: {fileID: 8075320546300113070, guid: 6a9e3974b0c4a2b48bf2a622ad8fa0f0,
+    type: 3}
   firePoint: {fileID: 7563707290386954356}
+--- !u!114 &3192267441433652676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2481105054647766228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff173360d1a342142908850f883252e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blitzCost: 50
+  blitzDistance: 3
+  invulnDuration: 0.2
 --- !u!1 &7071463231373223170
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +240,7 @@ Transform:
   m_GameObject: {fileID: 7071463231373223170}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalPosition: {x: 0.5, y: 0, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

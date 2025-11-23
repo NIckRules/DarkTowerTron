@@ -3,54 +3,79 @@ using DarkTowerTron.Player;
 
 namespace DarkTowerTron.Combat
 {
-    [RequireComponent(typeof(Rigidbody))]
     public class Projectile : MonoBehaviour
     {
         [Header("Stats")]
-        public float speed = 10f; // Default (Pebble speed)
-        public int damage = 1;    // Usually 1 Grit
+        public float speed = 10f;
         public float lifetime = 5f;
+        public LayerMask hitLayers; // Everything but Projectile
 
-        private Rigidbody rb;
+        private Vector3 direction;
 
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.velocity = transform.forward * speed;
             Destroy(gameObject, lifetime);
         }
 
-        void OnTriggerEnter(Collider other)
+        public void Initialize(Vector3 dir)
         {
+            direction = dir.normalized;
+        }
+
+        void Update()
+        {
+            // Raycast Movement (Anti-Tunneling).
+            // 1. Move distance = speed * deltaTime.
+            float distance = speed * Time.deltaTime;
+
+            // 2. Raycast forward.
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, direction, out hit, distance, hitLayers))
+            {
+                // 3. If Hit -> HandleHit(hit.collider).
+                HandleHit(hit.collider);
+            }
+            else
+            {
+                // 4. Else -> transform.position += direction * distance.
+                transform.position += direction * distance;
+            }
+        }
+
+        void HandleHit(Collider other)
+        {
+            // 1. If Tag "Player":
             if (other.CompareTag("Player"))
             {
-                // 1. Get Player Components
-                var grit = other.GetComponent<GritAndFocus>();
-                var blitz = other.GetComponent<Blitz>();
+                //    - Get Blitz component.
+                Blitz blitz = other.GetComponent<Blitz>();
 
-                // 2. CHECK: Is Player Blitzing (Invulnerable)?
+                //    - If Blitz.IsInvulnerable() -> Reward Focus (Perfect Dodge) & Destroy.
                 if (blitz != null && blitz.IsInvulnerable())
                 {
-                    // PERFECT DODGE!
-                    Debug.Log("<color=cyan>PERFECT DODGE! +30 Focus</color>");
-                    if (grit) grit.AddFocus(30f);
+                    blitz.OnPerfectDodge();
+                    Destroy(gameObject);
+                    return;
+                }
 
-                    // Destroy bullet (or reflect later)
-                    Destroy(gameObject);
-                }
-                else
+                //    - Else -> GritAndFocus.TakeDamage() & Destroy.
+                GritAndFocus grit = other.GetComponent<GritAndFocus>();
+                if (grit != null)
                 {
-                    // HIT!
-                    if (grit) grit.TakeDamage();
-                    Destroy(gameObject);
+                    grit.TakeDamage();
                 }
-            }
-            else if (!other.CompareTag("Enemy") && !other.CompareTag("Projectile"))
-            {
-                // Hit Wall
                 Destroy(gameObject);
+                return;
             }
+
+            // 2. If Tag "Enemy": Ignore (bullets pass through enemies for now).
+            if (other.CompareTag("Enemy"))
+            {
+                return;
+            }
+
+            // 3. If Wall/Default: Destroy.
+            Destroy(gameObject);
         }
     }
 }
