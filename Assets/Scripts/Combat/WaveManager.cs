@@ -7,94 +7,74 @@ namespace DarkTowerTron.Combat
     public class WaveManager : MonoBehaviour
     {
         [System.Serializable]
-        public class Wave
+        public class WaveAction
         {
-            public string waveName = "Wave 1";
-            public int chaserCount;
-            public int turretCount;
+            public GameObject enemyPrefab; // Drag Pebble/Sniper here
+            public Transform spawnPoint;   // Drag Spawn_N/S/E/W here
+            public float delayAfter = 1f;  // Wait before next spawn?
         }
 
-        [Header("Configuration")]
-        public List<Transform> spawnPoints;
-        public GameObject chaserPrefab;
-        public GameObject turretPrefab;
-        public float timeBetweenWaves = 2f;
+        [System.Serializable]
+        public class Wave
+        {
+            public string waveName;
+            public List<WaveAction> spawns;
+        }
 
-        [Header("Waves")]
+        [Header("Level Config")]
         public List<Wave> waves;
+        public float timeBetweenWaves = 3f;
 
         private int currentWaveIndex = 0;
         private bool isWaveActive = false;
-        private bool gameFinished = false;
 
         void Start()
         {
-            if (spawnPoints.Count == 0)
-            {
-                Debug.LogError("No Spawn Points assigned!");
-                return;
-            }
-
-            // Start the first wave after a short delay
-            StartCoroutine(StartNextWave());
+            if (waves.Count > 0)
+                StartCoroutine(RunWave(waves[0]));
         }
 
         void Update()
         {
-            if (gameFinished || !isWaveActive) return;
+            if (!isWaveActive) return;
 
-            // Check if all enemies are dead
-            // (Optimization: In a real game, count kills. For prototype, Find is okay.)
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
-            if (enemies.Length == 0)
+            // Check for Wave Clear
+            // (Simple tag check is fine for prototype)
+            if (GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
             {
-                Debug.Log("<color=green>WAVE CLEARED!</color>");
+                Debug.Log("<color=green>WAVE CLEARED</color>");
                 isWaveActive = false;
-                StartCoroutine(StartNextWave());
+
+                // Next Wave
+                currentWaveIndex++;
+                if (currentWaveIndex < waves.Count)
+                {
+                    StartCoroutine(RunWave(waves[currentWaveIndex]));
+                }
+                else
+                {
+                    Debug.Log("<color=gold>VICTORY - ALL WAVES CLEARED</color>");
+                }
             }
         }
 
-        IEnumerator StartNextWave()
+        IEnumerator RunWave(Wave wave)
         {
+            Debug.Log($"STARTING WAVE: {wave.waveName}");
             yield return new WaitForSeconds(timeBetweenWaves);
 
-            if (currentWaveIndex >= waves.Count)
-            {
-                Debug.Log("<color=gold>ALL WAVES COMPLETE! YOU SURVIVED.</color>");
-                gameFinished = true;
-                yield break;
-            }
-
-            Wave wave = waves[currentWaveIndex];
-            Debug.Log($"STARTING: {wave.waveName}");
-
-            SpawnEnemies(wave);
-
-            currentWaveIndex++;
             isWaveActive = true;
-        }
 
-        void SpawnEnemies(Wave wave)
-        {
-            // Spawn Chasers
-            for (int i = 0; i < wave.chaserCount; i++)
+            foreach (var action in wave.spawns)
             {
-                Transform sp = GetRandomSpawn();
-                Instantiate(chaserPrefab, sp.position, Quaternion.identity);
-            }
+                if (action.enemyPrefab != null && action.spawnPoint != null)
+                {
+                    Instantiate(action.enemyPrefab, action.spawnPoint.position, Quaternion.identity);
+                }
 
-            // Spawn Turrets
-            for (int i = 0; i < wave.turretCount; i++)
-            {
-                Transform sp = GetRandomSpawn();
-                Instantiate(turretPrefab, sp.position, Quaternion.identity);
+                if (action.delayAfter > 0)
+                    yield return new WaitForSeconds(action.delayAfter);
             }
-        }
-
-        Transform GetRandomSpawn()
-        {
-            return spawnPoints[Random.Range(0, spawnPoints.Count)];
         }
     }
 }
