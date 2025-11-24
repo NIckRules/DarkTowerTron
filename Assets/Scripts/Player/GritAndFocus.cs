@@ -30,35 +30,42 @@ namespace DarkTowerTron.Player
 
         void Start()
         {
+            if (this.woundIcon == null) Debug.LogWarning("WoundIcon is not assigned in GritAndFocus!");
+
             // Initialize UI. Hide Wound icon. Update visual pips.
-            if (focusSlider != null) focusSlider.maxValue = maxFocus;
+            if (this.focusSlider != null) this.focusSlider.maxValue = this.maxFocus;
             UpdateUI();
         }
 
         void Update()
         {
             // Handle Focus decay. 
-            if (currentFocus > 0)
+            if (this.currentFocus > 0)
             {
-                currentFocus -= focusDecayRate * Time.deltaTime;
-                if (currentFocus < 0) currentFocus = 0;
+                this.currentFocus -= this.focusDecayRate * Time.deltaTime;
+                if (this.currentFocus < 0) this.currentFocus = 0;
 
-                if (focusSlider != null)
-                    focusSlider.value = currentFocus;
+                if (this.focusSlider != null)
+                    this.focusSlider.value = this.currentFocus;
             }
         }
 
         public void TakeDamage()
         {
+
+            Debug.Log("PLAYER HIT!");
+
             // 1. If Grit > 0, decrement Grit.
-            if (currentGrit > 0)
+            if (this.currentGrit > 0)
             {
-                currentGrit--;
+                Debug.Log($"Grit lost! Remaining: {this.currentGrit - 1}");
+
+                this.currentGrit--;
             }
             // 2. If Grit == 0 (and no wound), grant Wound (set wound=1)
-            else if (wound == 0)
+            else if (this.wound == 0)
             {
-                wound = 1;
+                this.wound = 1;
                 Debug.Log("<color=red>WOUNDED! Next hit is fatal.</color>");
             }
             // 3. If Grit == 0 (and HAS wound), call Die().
@@ -73,12 +80,12 @@ namespace DarkTowerTron.Player
         public void HealGrit()
         {
             // 1. If Wound is active, do NOT heal Grit (Wounds are permanent).
-            if (wound == 0)
+            if (this.wound == 0)
             {
                 // 2. Else, increment Grit (max 2).
-                if (currentGrit < maxGrit)
+                if (this.currentGrit < this.maxGrit)
                 {
-                    currentGrit++;
+                    this.currentGrit++;
                 }
             }
 
@@ -91,12 +98,12 @@ namespace DarkTowerTron.Player
         public void AddFocus(float amount)
         {
             // 1. Add amount.
-            currentFocus += amount;
+            this.currentFocus += amount;
 
             // 2. If Focus >= 100, trigger Overheat().
-            if (currentFocus >= maxFocus)
+            if (this.currentFocus >= this.maxFocus)
             {
-                currentFocus = maxFocus;
+                this.currentFocus = this.maxFocus;
                 Overheat();
             }
             else
@@ -108,9 +115,9 @@ namespace DarkTowerTron.Player
         public bool SpendFocus(float amount)
         {
             // 1. If current >= amount, subtract and return true.
-            if (currentFocus >= amount)
+            if (this.currentFocus >= amount)
             {
-                currentFocus -= amount;
+                this.currentFocus -= amount;
                 UpdateUI();
                 return true;
             }
@@ -124,16 +131,16 @@ namespace DarkTowerTron.Player
             Debug.Log("<color=orange>OVERHEAT! Focus Reset. Grit Damaged.</color>");
 
             // 1. Reset Focus to 0.
-            currentFocus = 0f;
+            this.currentFocus = 0f;
 
             // 2. Set Grit to 1 (if currently 2). Punishment for greed!
-            if (currentGrit > 1)
+            if (this.currentGrit > 1)
             {
-                currentGrit = 1;
+                this.currentGrit = 1;
             }
 
             // 3. Invoke OnOverheat event (for explosion VFX).
-            OnOverheat.Invoke();
+            this.OnOverheat.Invoke();
 
             // 4. UpdateUI().
             UpdateUI();
@@ -142,35 +149,39 @@ namespace DarkTowerTron.Player
         void Die()
         {
             Debug.Log("PLAYER DIED");
-            OnDeath.Invoke();
+            this.OnDeath.Invoke();
             // Disable player control?
             gameObject.SetActive(false);
         }
 
         void UpdateUI()
         {
+
+            Debug.Log("Updating Grit and Focus UI");
+
             // 1. Loop through gritPips: enable/disable based on currentGrit.
-            if (gritPips != null)
+            if (this.gritPips != null)
             {
-                for (int i = 0; i < gritPips.Length; i++)
+                for (int i = 0; i < this.gritPips.Length; i++)
                 {
-                    if (gritPips[i] != null)
+                    if (this.gritPips[i] != null)
                     {
-                        gritPips[i].enabled = (i < currentGrit);
+                        this.gritPips[i].enabled = (i < this.currentGrit);
                     }
                 }
             }
 
             // 2. Enable woundIcon if wound > 0.
-            if (woundIcon != null)
+            if (this.woundIcon != null)
             {
-                woundIcon.enabled = (wound > 0);
+                // Use SetActive to ensure visibility even if the GameObject was disabled
+                this.woundIcon.gameObject.SetActive(this.wound > 0);
             }
 
             // 3. Update Slider.
-            if (focusSlider != null)
+            if (this.focusSlider != null)
             {
-                focusSlider.value = currentFocus;
+                this.focusSlider.value = this.currentFocus;
             }
         }
     }
