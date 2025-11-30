@@ -1,25 +1,25 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using DarkTowerTron.Player;
+using DarkTowerTron.Player; // Access Player namespace
 
 namespace DarkTowerTron.Combat
 {
     public class WaveManager : MonoBehaviour
     {
         [System.Serializable]
-        public class WaveAction
-        {
-            public GameObject enemyPrefab;
-            public Transform spawnPoint;
-            public float delayAfter = 1f;
+        public class WaveAction 
+        { 
+            public GameObject enemyPrefab; 
+            public Transform spawnPoint; 
+            public float delayAfter = 1f; 
         }
 
         [System.Serializable]
-        public class Wave
-        {
-            public string name;
-            public List<WaveAction> spawns;
+        public class Wave 
+        { 
+            public string name; 
+            public List<WaveAction> spawns; 
         }
 
         public List<Wave> waves;
@@ -28,80 +28,46 @@ namespace DarkTowerTron.Combat
 
         void Start()
         {
-            var player = FindObjectOfType<GritAndFocus>();
-            if (player != null)
-            {
-                player.OnDeath.AddListener(LogMetrics);
-            }
-
             if (waves.Count > 0) StartCoroutine(RunWave(waves[0]));
         }
 
         void Update()
         {
-            // Check for clear.
-            // 1. If !isWaveActive return.
             if (!isWaveActive) return;
 
-            // 2. If GameObject.FindGameObjectsWithTag("Enemy").Length == 0:
             if (GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
             {
-                //    - isWaveActive = false.
                 isWaveActive = false;
+                Debug.Log("<color=green>WAVE CLEARED</color>");
 
-                //    - StartCoroutine(RunWave(nextWave)).
+                // NEW: Stop Decay
+                var player = FindObjectOfType<GritAndFocus>();
+                if(player) player.SetCombatState(false);
+
                 currentWaveIndex++;
-                if (currentWaveIndex < waves.Count)
-                {
-                    StartCoroutine(RunWave(waves[currentWaveIndex]));
-                }
-                else
-                {
-                    Debug.Log("ALL WAVES CLEARED! VICTORY!");
-                }
+                if (currentWaveIndex < waves.Count) StartCoroutine(RunWave(waves[currentWaveIndex]));
+                else Debug.Log("VICTORY");
             }
         }
 
         IEnumerator RunWave(Wave wave)
         {
-            // Spawn logic.
-            // 1. Wait 2 seconds (breathing room).
-            yield return new WaitForSeconds(2f);
+            Debug.Log($"STARTING WAVE: {wave.name}");
+            yield return new WaitForSeconds(2f); // Breathing room
 
-            // 2. isWaveActive = true.
             isWaveActive = true;
-            Debug.Log($"Starting Wave {currentWaveIndex + 1}: {wave.name}");
 
-            // 3. Foreach action in wave.spawns:
+            // NEW: Start Decay
+            var player = FindObjectOfType<GritAndFocus>();
+            if(player) player.SetCombatState(true);
+
             foreach (var action in wave.spawns)
             {
-                //    - Instantiate enemy.
-                if (action.enemyPrefab != null)
-                {
-                    Vector3 spawnPos = action.spawnPoint != null ? action.spawnPoint.position : Vector3.zero;
-                    Quaternion spawnRot = action.spawnPoint != null ? action.spawnPoint.rotation : Quaternion.identity;
-                    Instantiate(action.enemyPrefab, spawnPos, spawnRot);
-                }
-
-                //    - Yield Wait(action.delayAfter).
-                yield return new WaitForSeconds(action.delayAfter);
+                if (action.enemyPrefab && action.spawnPoint)
+                    Instantiate(action.enemyPrefab, action.spawnPoint.position, action.spawnPoint.rotation);
+                
+                if(action.delayAfter > 0) yield return new WaitForSeconds(action.delayAfter);
             }
-        }
-
-        public void LogMetrics()
-        {
-            // Outputs TTFD, FDE, SWR on player death
-            // DEATH | Wave:X | T:XX.Xs | Focus:XX | Grit:X | Wound:X | FDE:X.XX | SWR:XX %
-            
-            // Note: FDE and SWR require MetricsLogger which is not yet implemented.
-            // Logging basic info for now.
-            
-            var player = FindObjectOfType<GritAndFocus>();
-            float focus = player != null ? player.currentFocus : 0;
-            int grit = player != null ? player.currentGrit : 0;
-            int wound = player != null ? player.wound : 0;
-
-            Debug.Log($"DEATH | Wave:{currentWaveIndex + 1} | T:{Time.time:F1}s | Focus:{focus:F0} | Grit:{grit} | Wound:{wound}");
         }
     }
 }

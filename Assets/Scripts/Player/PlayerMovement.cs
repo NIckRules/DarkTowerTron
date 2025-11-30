@@ -6,7 +6,8 @@ namespace DarkTowerTron.Player
     public class PlayerMovement : MonoBehaviour
     {
         [Header("Settings")]
-        public float moveSpeed = 6f; // "Instant 6 u/s velocity" per design doc
+        public float moveSpeed = 11f;     // Increased from 6
+        public float acceleration = 50f;  // High = snappy, Low = ice skating. 50 is a good "heavy" spot.
 
         private Rigidbody rb;
         private Camera cam;
@@ -25,49 +26,34 @@ namespace DarkTowerTron.Player
 
         void HandleMovement()
         {
-            // 1. GetAxisRaw Horizontal & Vertical.
+            // 1. Input
             float x = Input.GetAxisRaw("Horizontal");
             float z = Input.GetAxisRaw("Vertical");
+            Vector3 inputDir = new Vector3(x, 0, z).normalized;
 
-            // 2. Camera-Relative Direction
-            // We project camera vectors onto the ground plane (y=0)
-            Vector3 camForward = cam.transform.forward;
-            Vector3 camRight = cam.transform.right;
+            // 2. Calculate Target Velocity
+            Vector3 targetVel = inputDir * moveSpeed;
 
-            camForward.y = 0;
-            camRight.y = 0;
-            camForward.Normalize();
-            camRight.Normalize();
-
-            // 3. Combine and Normalize
-            Vector3 moveDir = (camForward * z + camRight * x).normalized;
-
-            // 4. Set rb.velocity = direction * moveSpeed. (No acceleration/smoothing).
-            // We preserve Y velocity for gravity if needed, though usually 0 in this prototype.
-            rb.velocity = new Vector3(moveDir.x * moveSpeed, rb.velocity.y, moveDir.z * moveSpeed);
+            // 3. Apply Acceleration (The "Weight")
+            // Instead of snapping instantly, we move towards the target speed over time.
+            rb.velocity = Vector3.MoveTowards(rb.velocity, targetVel, acceleration * Time.fixedDeltaTime);
         }
 
         void HandleRotation()
         {
-            // 1. Raycast from Camera to GroundPlane.
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero); // Plane at Y=0
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
             float rayDistance;
 
             if (groundPlane.Raycast(ray, out rayDistance))
             {
-                // 2. Get point.
                 Vector3 point = ray.GetPoint(rayDistance);
-
-                // 3. Calculate lookDir (point - transform.position).
                 Vector3 lookDir = point - transform.position;
-                lookDir.y = 0; // Keep it flat
-
-                // 4. Set rotation
-                if (lookDir.sqrMagnitude > 0.001f)
+                lookDir.y = 0; 
+                
+                if (lookDir != Vector3.zero)
                 {
-                    Quaternion targetRotation = Quaternion.LookRotation(lookDir);
-                    rb.MoveRotation(targetRotation);
+                    rb.MoveRotation(Quaternion.LookRotation(lookDir));
                 }
             }
         }

@@ -24,6 +24,8 @@ namespace DarkTowerTron.Combat
 
         void Update()
         {
+            if (this == null) return; // Safety check
+
             // Raycast Movement (Anti-Tunneling).
             // 1. Move distance = speed * deltaTime.
             float distance = speed * Time.deltaTime;
@@ -44,13 +46,17 @@ namespace DarkTowerTron.Combat
 
         void HandleHit(Collider other)
         {
-            // 1. If Tag "Player":
+            // 1. Hit PLAYER
             if (other.CompareTag("Player"))
             {
-                //    - Get Blitz component.
-                Blitz blitz = other.GetComponent<Blitz>();
 
-                //    - If Blitz.IsInvulnerable() -> Reward Focus (Perfect Dodge) & Destroy.
+                Debug.Log("<color=red>COLLISION</color>");
+
+                // CHANGE: Use GetComponentInParent to find Blitz on the main body
+                // even if we hit the "BlitzCatcher" child.
+                var blitz = other.GetComponentInParent<Blitz>();
+                var grit = other.GetComponentInParent<GritAndFocus>();
+
                 if (blitz != null && blitz.IsInvulnerable())
                 {
                     blitz.OnPerfectDodge();
@@ -58,12 +64,7 @@ namespace DarkTowerTron.Combat
                     return;
                 }
 
-                //    - Else -> GritAndFocus.TakeDamage() & Destroy.
-                GritAndFocus grit = other.GetComponent<GritAndFocus>();
-                if (grit != null)
-                {
-                    grit.TakeDamage();
-                }
+                if (grit != null) grit.TakeDamage();
                 Destroy(gameObject);
                 return;
             }

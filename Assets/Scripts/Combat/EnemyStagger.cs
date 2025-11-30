@@ -1,130 +1,123 @@
 using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 namespace DarkTowerTron.Combat
 {
     public class EnemyStagger : MonoBehaviour
     {
         [Header("Settings")]
-        public float staggerResistance = 1.0f; // Max meter value (usually 1)
+        public float staggerResistance = 1.0f;
         public float currentStagger = 0f;
-        public float decayRate = 2.0f; // How fast meter drops (Design: 2/s)
-        public float decayMultiplier = 1.0f; // Modifier for special states (e.g. Gatling firing)
-        public float staggerDuration = 1.5f; // How long they stay vulnerable
+        public float decayRate = 0.5f;
+        public float decayDelay = 1.0f;
+        public float staggerDuration = 1.5f;
 
-        [Header("State")]
+        [Header("Knockback")]
+        public float knockbackDistance = 3.0f; // Adjusted to 3m for better feel
+        public float knockbackDuration = 0.2f; // Snappy slide
+        
+        [HideInInspector] public float decayMultiplier = 1.0f; 
+
         public bool isStaggered = false;
-
-        [Header("Visuals")]
         public Renderer meshRenderer;
-        public Color normalColor = Color.red;
-        public Color staggerColor = Color.cyan; // Design: Cyan pulse
+        
+        // --- RESTORED PUBLIC VARIABLE ---
+        public Color normalColor = Color.red; 
+        // --------------------------------
 
-        private Coroutine staggerCoroutine;
+        private Color staggerColor = Color.yellow;
+        private Color flashColor = Color.white;
+        
+        private float lastHitTime = 0f;
 
         void Start()
         {
-            // Cache components and set initial color.
             if (meshRenderer == null) meshRenderer = GetComponent<Renderer>();
-            if (meshRenderer != null)
-            {
-                meshRenderer.material.color = normalColor;
-            }
+            
+            // Sync the script color with the actual material color at start
+            if (meshRenderer != null) normalColor = meshRenderer.material.color;
         }
 
         void Update()
         {
-            // Handle decay.
-            // 1. If isStaggered is true, do nothing (handled by coroutine).
-            if (isStaggered) return;
+            decayMultiplier = 1.0f;
 
-            // 2. If isStaggered is false AND currentStagger > 0:
-            if (currentStagger > 0)
+            if (!isStaggered && currentStagger > 0)
             {
-                // Subtract decayRate * deltaTime * multiplier.
-                currentStagger -= decayRate * decayMultiplier * Time.deltaTime;
-
-                // Clamp to 0.
-                if (currentStagger < 0) currentStagger = 0;
+                if (Time.time > lastHitTime + decayDelay)
+                {
+                    float finalDecay = decayRate * decayMultiplier * Time.deltaTime;
+                    currentStagger -= finalDecay;
+                    if (currentStagger < 0) currentStagger = 0;
+                }
             }
         }
 
         public void AddStagger(float amount)
         {
-            // 1. If already isStaggered, return (don't add to full meter).
             if (isStaggered) return;
 
-            // 2. Add amount to currentStagger.
+            lastHitTime = Time.time;
             currentStagger += amount;
+            
+            StopCoroutine("FlashFeedback"); 
+            StartCoroutine("FlashFeedback");
 
-            // 3. Flash white for feedback (optional).
-            if (meshRenderer != null)
-            {
-                StartCoroutine(FlashFeedback());
-            }
-
-            // 4. If currentStagger >= staggerResistance:
             if (currentStagger >= staggerResistance)
             {
-                EnterStaggerState();
+                EnterStagger();
             }
         }
 
-        void EnterStaggerState()
+        void EnterStagger()
         {
-            // 1. Set isStaggered = true.
             isStaggered = true;
-            currentStagger = staggerResistance; // Cap it visually
+            StopCoroutine("FlashFeedback"); 
+            
+            if(meshRenderer) meshRenderer.material.color = staggerColor;
 
-            // 2. Change color to staggerColor.
-            if (meshRenderer != null)
+            // --- KNOCKBACK LOGIC ---
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
             {
-                meshRenderer.material.color = staggerColor;
+                // Calculate direction AWAY from player
+                Vector3 pushDir = (transform.position - player.transform.position).normalized;
+                pushDir.y = 0; 
+
+                // Target position
+                Vector3 targetPos = transform.position + (pushDir * knockbackDistance);
+
+                // Wall check
+                if (Physics.Raycast(transform.position, pushDir, out RaycastHit hit, knockbackDistance))
+                {
+                    targetPos = hit.point - (pushDir * 0.5f);
+                }
+
+                transform.DOMove(targetPos, knockbackDuration).SetEase(Ease.OutCubic);
             }
-
-            Debug.Log($"<color=cyan>STAGGERED! {name} is vulnerable!</color>");
-
-            // 3. StartCoroutine(StaggerTimer()).
-            if (staggerCoroutine != null) StopCoroutine(staggerCoroutine);
-            staggerCoroutine = StartCoroutine(StaggerTimer());
+            // -----------------------
+            
+            StartCoroutine(StaggerTimer());
         }
 
-        IEnumerator StaggerTimer()
+        System.Collections.IEnumerator StaggerTimer()
         {
-            // 1. Yield wait for staggerDuration.
             yield return new WaitForSeconds(staggerDuration);
-
-            // 2. Set isStaggered = false.
-            isStaggered = false;
-
-            // 3. currentStagger = 0.
-            currentStagger = 0;
-
-            // 4. Reset color to normalColor.
-            if (meshRenderer != null)
-            {
-                meshRenderer.material.color = normalColor;
-            }
             
-            Debug.Log($"<color=grey>{name} recovered from stagger.</color>");
+            isStaggered = false;
+            currentStagger = 0;
+            if(meshRenderer) meshRenderer.material.color = normalColor;
         }
 
-        IEnumerator FlashFeedback()
+        System.Collections.IEnumerator FlashFeedback()
         {
-            if (meshRenderer == null) yield break;
-            
-            Color prevColor = meshRenderer.material.color;
-            meshRenderer.material.color = Color.white;
+            if(meshRenderer) meshRenderer.material.color = flashColor;
             yield return new WaitForSeconds(0.1f);
             
-            // Only revert if we haven't entered stagger state during the flash
-            if (!isStaggered)
+            if (!isStaggered && meshRenderer) 
             {
-                meshRenderer.material.color = prevColor;
-            }
-            else
-            {
-                meshRenderer.material.color = staggerColor;
+                meshRenderer.material.color = normalColor;
             }
         }
     }

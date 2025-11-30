@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace DarkTowerTron.Combat
 {
-    public class GatlingAttack : MonoBehaviour
+    public class GatlingAttack : EnemyAttack
     {
         public GameObject projectilePrefab;
         public int burstCount = 5;
@@ -26,6 +26,7 @@ namespace DarkTowerTron.Combat
             while (true)
             {
                 // 2. Spin Up (Telegraph).
+                BeginTelegraph();
                 float telegraphDuration = 0.3f;
                 float timer = 0f;
 
@@ -47,6 +48,8 @@ namespace DarkTowerTron.Combat
                     timer += Time.deltaTime;
                     yield return null;
                 }
+                
+                EndTelegraph();
 
                 // Check if Staggered (Break/Restart if true).
                 if (stagger != null && stagger.isStaggered)
@@ -64,7 +67,7 @@ namespace DarkTowerTron.Combat
                     if (stagger != null && stagger.isStaggered) break;
 
                     // Fire bullet.
-                    FireProjectile();
+                    Fire();
 
                     // Wait(timeBetweenShots).
                     yield return new WaitForSeconds(timeBetweenShots);
@@ -78,7 +81,7 @@ namespace DarkTowerTron.Combat
             }
         }
 
-        void FireProjectile()
+        public override void Fire()
         {
             if (projectilePrefab != null)
             {

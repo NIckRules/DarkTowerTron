@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace DarkTowerTron.Combat
 {
-    public class SniperAttack : MonoBehaviour
+    public class SniperAttack : EnemyAttack
     {
         public GameObject projectilePrefab;
         public LineRenderer laser;
@@ -48,6 +48,7 @@ namespace DarkTowerTron.Combat
                 if (player == null) continue;
 
                 // 2. Telegraph Phase (1s)
+                BeginTelegraph();
                 if (laser != null) laser.enabled = true;
                 
                 float telegraphDuration = 1.0f;
@@ -86,6 +87,7 @@ namespace DarkTowerTron.Combat
                 }
 
                 if (laser != null) laser.enabled = false;
+                EndTelegraph();
 
                 // If staggered during telegraph, restart loop
                 if (stagger != null && stagger.isStaggered)
@@ -95,11 +97,11 @@ namespace DarkTowerTron.Combat
                 }
 
                 // 3. Fire Phase
-                FireProjectile();
+                Fire();
             }
         }
 
-        void FireProjectile()
+        public override void Fire()
         {
             if (projectilePrefab != null)
             {

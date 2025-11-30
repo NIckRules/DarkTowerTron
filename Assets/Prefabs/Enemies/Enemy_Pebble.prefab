@@ -103,7 +103,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -151,12 +151,14 @@ MonoBehaviour:
   staggerResistance: 1
   currentStagger: 0
   decayRate: 2
-  decayMultiplier: 1
+  decayDelay: 1
   staggerDuration: 1.5
+  knockbackDistance: 3
+  knockbackDuration: 0.2
+  decayMultiplier: 1
   isStaggered: 0
   meshRenderer: {fileID: 0}
   normalColor: {r: 1, g: 0, b: 0, a: 1}
-  staggerColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!114 &3942470741679489039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,3 +187,4 @@ MonoBehaviour:
     type: 3}
   fireRate: 2
   telegraphTime: 0.5
+  telegraphColor: {r: 0.5660378, g: 0, b: 0.30279908, a: 1}

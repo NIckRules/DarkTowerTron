@@ -151,7 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   staggerResistance: 3
   currentStagger: 0
-  decayRate: 2
+  decayRate: 1
   decayMultiplier: 1
   staggerDuration: 1.5
   isStaggered: 0

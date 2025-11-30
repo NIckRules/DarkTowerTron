@@ -1,5 +1,7 @@
 using UnityEngine;
-using System.Collections;
+using DG.Tweening; // Needed for the slide
+using DarkTowerTron.Player;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Player
 {
@@ -8,61 +10,133 @@ namespace DarkTowerTron.Player
     public class Blitz : MonoBehaviour
     {
         [Header("Settings")]
-        public float blitzCost = 50f;
-        public float blitzDistance = 3f;
-        public float invulnDuration = 0.2f;
+        public float blitzCost = 25f;
+        public float blitzDistance = 6f; 
+        public float blitzFocusGain = 20f; 
 
-        [Header("Components")]
+        [Header("Feel")]
+        public float chargeTime = 0.08f; // The "Anticipation" freeze
+        public float dashDuration = 0.15f; // The "Slide" speed
+        
+        [Header("Visuals")]
+        public Transform blitzGhost; // The target indicator
+        public GameObject blitzCatcher; // The Big Hitbox
+        public TrailRenderer dashTrail; // Drag the trail here
+
         private GritAndFocus resource;
         private Rigidbody rb;
+        private Camera cam;
         private bool isInvuln = false;
+        private bool isDashing = false; // Prevents double input
+        private Vector3 targetPosition;
 
         void Start()
         {
             resource = GetComponent<GritAndFocus>();
             rb = GetComponent<Rigidbody>();
+            cam = Camera.main;
+            
+            // Ensure Catcher is off
+            if(blitzCatcher) blitzCatcher.SetActive(false);
+            if(dashTrail) dashTrail.emitting = false;
         }
 
         void Update()
         {
-            // 1. If Input GetButtonDown("Jump") (Spacebar).
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump"))
+            if (isDashing)
+            {
+                ActiveIntercept();
+                return; 
+            }
+
+            HandleGhost();
+
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 AttemptBlitz();
             }
         }
 
+        void HandleGhost()
+        {
+            if (blitzGhost == null) return;
+
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+            float rayDistance;
+
+            if (groundPlane.Raycast(ray, out rayDistance))
+            {
+                Vector3 mousePoint = ray.GetPoint(rayDistance);
+                Vector3 dir = (mousePoint - transform.position).normalized;
+                dir.y = 0;
+
+                // Raycast check to stop ghost going through walls
+                if (Physics.Raycast(transform.position + Vector3.up, dir, out RaycastHit hit, blitzDistance))
+                {
+                    targetPosition = hit.point - (dir * 0.5f); // Stop before wall
+                }
+                else
+                {
+                    targetPosition = transform.position + (dir * blitzDistance);
+                }
+                
+                targetPosition.y = 0.1f; 
+                blitzGhost.position = targetPosition;
+                
+                bool canAfford = resource.currentFocus >= blitzCost;
+                blitzGhost.gameObject.SetActive(canAfford);
+            }
+        }
+
         void AttemptBlitz()
         {
-            // 1. Check if resource.SpendFocus(blitzCost) is true.
+            if (isDashing) return;
+
             if (resource.SpendFocus(blitzCost))
             {
-                // Determine direction: Input direction if moving, else Model forward
-                float x = Input.GetAxisRaw("Horizontal");
-                float z = Input.GetAxisRaw("Vertical");
-                Vector3 inputDir = new Vector3(x, 0, z).normalized;
-
-                // If no input, use current facing direction
-                Vector3 blinkDir = inputDir.sqrMagnitude > 0.1f ? inputDir : transform.forward;
-
-                // 2. Calculate blink position
-                Vector3 blinkPos = transform.position + (blinkDir * blitzDistance);
-
-                // MovePosition(blinkPos).
-                // Using transform.position for instant teleport feel.
-                transform.position = blinkPos;
-
-                // 3. StartCoroutine(InvulnWindow()).
-                StartCoroutine(InvulnWindow());
-
-                // Optional: Leave AfterImage (we'll add this later).
-                Debug.Log("<color=cyan>BLITZ!</color>");
+                StartCoroutine(BlitzSequence());
             }
-            else
-            {
-                // Feedback for failed blitz
-                Debug.Log("<color=grey>Not enough Focus for Blitz!</color>");
-            }
+        }
+
+        System.Collections.IEnumerator BlitzSequence()
+        {
+            isDashing = true;
+            isInvuln = true; // Invuln starts during charge
+            
+            // 1. CHARGE PHASE (Anticipation)
+            // Squash the player slightly?
+            transform.localScale = new Vector3(1.2f, 0.8f, 1.2f);
+            
+            yield return new WaitForSeconds(chargeTime);
+
+            // 2. DASH PHASE (Movement)
+            transform.localScale = Vector3.one; // Reset shape
+            if(blitzCatcher) blitzCatcher.SetActive(true); // Activate Big Hitbox
+            if(dashTrail) dashTrail.emitting = true;
+
+            // Use Rigidbody DOMove for physics-safe sliding
+            Vector3 finalPos = targetPosition;
+            finalPos.y = rb.position.y;
+            
+            // DOTween handles the velocity curve
+            rb.DOMove(finalPos, dashDuration).SetEase(Ease.OutExpo);
+            
+            // Audio Juice
+            Debug.Log("<color=cyan>BLITZ!</color>");
+            if(GameFeel.instance) GameFeel.instance.CameraShake(0.1f, 0.1f);
+
+            yield return new WaitForSeconds(dashDuration);
+
+            // 3. RECOVERY
+            if(blitzCatcher) blitzCatcher.SetActive(false);
+            if(dashTrail) dashTrail.emitting = false;
+            
+            // Keep invuln for a tiny split second after stopping
+            yield return new WaitForSeconds(0.05f);
+            
+            isInvuln = false;
+            isDashing = false;
         }
 
         public bool IsInvulnerable()
@@ -70,28 +144,43 @@ namespace DarkTowerTron.Player
             return isInvuln;
         }
 
-        IEnumerator InvulnWindow()
-        {
-            // 1. isInvuln = true;
-            isInvuln = true;
-
-            // 2. Wait for invulnDuration.
-            yield return new WaitForSeconds(invulnDuration);
-
-            // 3. isInvuln = false;
-            isInvuln = false;
-        }
-
-        /// <summary>
-        /// Called when a projectile hits us during invulnerability (or specific parry window).
-        /// </summary>
         public void OnPerfectDodge()
         {
-            // +30 Focus reward
-            if (resource != null)
+            Debug.Log("<color=cyan>PERFECT DODGE! +" + this.blitzFocusGain + " Focus</color>");
+            resource.AddFocus(this.blitzFocusGain);
+            if (GameFeel.instance) GameFeel.instance.HitStop(0.1f);
+        }
+
+        // Call this inside the Update loop ONLY when dashing
+        void ActiveIntercept()
+        {
+            if (!isDashing) return;
+
+            // Use the position of the Ghost/Catcher or just Player Center
+            Vector3 center = transform.position;
+            float radius = 2.0f; // Big munching radius
+            
+            // Find projectiles
+            Collider[] hits = Physics.OverlapSphere(center, radius);
+            
+            foreach (Collider hit in hits)
             {
-                resource.AddFocus(30f);
-                Debug.Log("<color=green>PERFECT DODGE! +30 Focus</color>");
+                // Check if it's a projectile (using Component check is safer than Tag sometimes)
+                // We use GetComponent because we need to check if we already ate it
+                DarkTowerTron.Combat.Projectile proj = hit.GetComponent<DarkTowerTron.Combat.Projectile>();
+                
+                if (proj != null)
+                {
+                    Debug.Log("<color=cyan>INTERCEPTED!</color>");
+                    
+                    // 1. Reward
+                    OnPerfectDodge(); 
+                    
+                    // 2. Destroy Bullet
+                    Destroy(hit.gameObject);
+                    
+                    // 3. Optional: Spawn a "Spark" particle here later
+                }
             }
         }
     }

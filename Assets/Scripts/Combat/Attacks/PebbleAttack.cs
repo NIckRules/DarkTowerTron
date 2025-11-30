@@ -3,11 +3,12 @@ using System.Collections;
 
 namespace DarkTowerTron.Combat
 {
-    public class PebbleAttack : MonoBehaviour
+    public class PebbleAttack : EnemyAttack
     {
         public GameObject projectilePrefab;
         public float fireRate = 2f;
         public float telegraphTime = 0.5f;
+        public Color telegraphColor = Color.yellow;
         
         private EnemyStagger stagger;
         private Transform player;
@@ -41,7 +42,8 @@ namespace DarkTowerTron.Combat
                 if (player == null) continue;
 
                 // 3. Telegraph (Scale up / Change Color).
-                if (rend) rend.material.color = Color.yellow;
+                BeginTelegraph();
+                if (rend) rend.material.color = telegraphColor;
                 transform.localScale = originalScale * 1.2f;
 
                 float timer = 0f;
@@ -73,15 +75,16 @@ namespace DarkTowerTron.Combat
                 }
 
                 // 4. Fire Projectile towards player.
-                FireProjectile();
+                Fire();
 
                 // 5. Reset Visuals.
+                EndTelegraph();
                 transform.localScale = originalScale;
                 if (rend && stagger != null) rend.material.color = stagger.normalColor;
             }
         }
 
-        void FireProjectile()
+        public override void Fire()
         {
             if (projectilePrefab != null)
             {
