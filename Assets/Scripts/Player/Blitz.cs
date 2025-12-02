@@ -156,30 +156,30 @@ namespace DarkTowerTron.Player
         {
             if (!isDashing) return;
 
-            // Use the position of the Ghost/Catcher or just Player Center
             Vector3 center = transform.position;
-            float radius = 2.0f; // Big munching radius
+            float radius = 2.0f; 
             
-            // Find projectiles
             Collider[] hits = Physics.OverlapSphere(center, radius);
             
             foreach (Collider hit in hits)
             {
-                // Check if it's a projectile (using Component check is safer than Tag sometimes)
-                // We use GetComponent because we need to check if we already ate it
+                // Check for Projectile
                 DarkTowerTron.Combat.Projectile proj = hit.GetComponent<DarkTowerTron.Combat.Projectile>();
                 
-                if (proj != null)
+                // Only redirect if it's currently HOSTILE (don't redirect your own bullets repeatedly)
+                if (proj != null && proj.isHostile)
                 {
-                    Debug.Log("<color=cyan>INTERCEPTED!</color>");
+                    Debug.Log("<color=cyan>REDIRECTING!</color>");
                     
-                    // 1. Reward
+                    // 1. Reward Focus
                     OnPerfectDodge(); 
                     
-                    // 2. Destroy Bullet
-                    Destroy(hit.gameObject);
-                    
-                    // 3. Optional: Spawn a "Spark" particle here later
+                    // 2. Redirect in DASH DIRECTION
+                    // We use the Rigidbody velocity or Transform forward to determine where we are going
+                    Vector3 dashDir = rb.velocity.normalized;
+                    if (dashDir == Vector3.zero) dashDir = transform.forward;
+
+                    proj.Redirect(dashDir);
                 }
             }
         }

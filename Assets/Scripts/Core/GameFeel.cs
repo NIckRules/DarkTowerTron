@@ -12,6 +12,8 @@ namespace DarkTowerTron.Core
         public AudioSource source;
         public AudioClip hitClip;  // Drag your "Thwack" sound here
         public AudioClip killClip; // Drag your "Boom" sound here
+        public AudioClip swingClip; // NEW
+        public AudioClip playerHurtClip; // NEW: Player Ouch
 
         void Awake()
         {
@@ -49,9 +51,24 @@ namespace DarkTowerTron.Core
             if(hitClip && source) source.PlayOneShot(hitClip);
         }
 
+        public void PlaySwing()
+        {
+            if (swingClip && source)
+            {
+                // Slight pitch randomization makes it sound organic
+                source.pitch = Random.Range(0.9f, 1.1f);
+                source.PlayOneShot(swingClip);
+            }
+        }
+
         public void PlayKill()
         {
             if(killClip && source) source.PlayOneShot(killClip);
+        }
+
+        public void PlayPlayerHurt()
+        {
+            if(playerHurtClip && source) source.PlayOneShot(playerHurtClip);
         }
     }
 }

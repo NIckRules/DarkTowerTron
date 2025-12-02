@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Player
 {
@@ -53,13 +54,37 @@ namespace DarkTowerTron.Player
         // ... (Keep TakeDamage, HealGrit, AddFocus, SpendFocus, Die as they were) ...
         // If you need me to repost those methods, let me know, otherwise keep existing logic.
         
-        public void TakeDamage() 
+        public void TakeDamage(Vector3 hitDirection) // <--- Changed Signature
         {
-             // Use the "Logic Check" version from our previous fix
-             if (currentGrit > 0) currentGrit--;
-             else if (!hasWound) hasWound = true;
-             else Die();
-             UpdateUI();
+            // 1. Feedback (Sound, Shake, Jolt)
+            if (GameFeel.instance) 
+            {
+                GameFeel.instance.PlayPlayerHurt();
+                GameFeel.instance.CameraShake(0.2f, 0.5f);
+            }
+
+            var movement = GetComponent<PlayerMovement>();
+            if (movement != null)
+            {
+                movement.ApplyKnockback(hitDirection, 15f); // 15f is the push force
+            }
+
+            // 2. Logic
+            Debug.Log("PLAYER HIT!");
+            if (currentGrit > 0) 
+            {
+                currentGrit--;
+            }
+            else if (!hasWound) 
+            {
+                hasWound = true;
+            }
+            else 
+            {
+                Die();
+            }
+
+            UpdateUI();
         }
         
         public void HealGrit()

@@ -16,11 +16,14 @@ namespace DarkTowerTron.Utils
         [Header("Game References")]
         public GameObject player;
         public WaveManager waveManager;
+        public MusicControl music;
 
         private bool isGameRunning = false;
 
         void Start()
         {
+            if (music) music.OnRestart();
+
             // 1. Setup Initial State
             Time.timeScale = 0; // Pause everything immediately
             startPanel.SetActive(true);
@@ -51,6 +54,8 @@ namespace DarkTowerTron.Utils
         {
             if (!isGameRunning) return;
             isGameRunning = false;
+
+            if (music) music.OnGameOver();
 
             Debug.Log("GAME OVER TRIGGERED");
 

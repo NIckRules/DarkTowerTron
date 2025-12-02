@@ -11,6 +11,7 @@ namespace DarkTowerTron.Player
 
         private Rigidbody rb;
         private Camera cam;
+        private Vector3 externalImpact = Vector3.zero; // Stores the push
 
         void Start()
         {
@@ -22,21 +23,19 @@ namespace DarkTowerTron.Player
         {
             HandleMovement();
             HandleRotation();
+            HandleImpactDecay(); // NEW
         }
 
         void HandleMovement()
         {
-            // 1. Input
             float x = Input.GetAxisRaw("Horizontal");
             float z = Input.GetAxisRaw("Vertical");
             Vector3 inputDir = new Vector3(x, 0, z).normalized;
-
-            // 2. Calculate Target Velocity
             Vector3 targetVel = inputDir * moveSpeed;
 
-            // 3. Apply Acceleration (The "Weight")
-            // Instead of snapping instantly, we move towards the target speed over time.
-            rb.velocity = Vector3.MoveTowards(rb.velocity, targetVel, acceleration * Time.fixedDeltaTime);
+            // NEW: Add the impact vector to your movement
+            Vector3 finalVelocity = Vector3.MoveTowards(rb.velocity, targetVel, acceleration * Time.fixedDeltaTime);
+            rb.velocity = finalVelocity + externalImpact;
         }
 
         void HandleRotation()
@@ -55,6 +54,26 @@ namespace DarkTowerTron.Player
                 {
                     rb.MoveRotation(Quaternion.LookRotation(lookDir));
                 }
+            }
+        }
+
+        // NEW Method to apply the jolt
+        public void ApplyKnockback(Vector3 direction, float force)
+        {
+            direction.y = 0; // Keep it flat
+            externalImpact += direction.normalized * force;
+        }
+
+        void HandleImpactDecay()
+        {
+            // Smoothly reduce the impact to zero (Damping)
+            if (externalImpact.magnitude > 0.2f)
+            {
+                externalImpact = Vector3.Lerp(externalImpact, Vector3.zero, 5f * Time.fixedDeltaTime);
+            }
+            else
+            {
+                externalImpact = Vector3.zero;
             }
         }
     }

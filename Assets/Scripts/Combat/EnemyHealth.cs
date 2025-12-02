@@ -7,6 +7,7 @@ namespace DarkTowerTron.Combat
     public class EnemyHealth : MonoBehaviour
     {
         private EnemyStagger staggerComp;
+        public bool isShielded = false;
 
         void Start()
         {
@@ -25,6 +26,14 @@ namespace DarkTowerTron.Combat
             {
                 // 3. If FALSE: Logic Gate
                 Debug.Log("<color=grey>ARMOR DEFLECTED! Stagger them first!</color>");
+            }
+        }
+
+        public void TakeHit(float damage, float stagger, Vector3 direction)
+        {
+            if (staggerComp != null)
+            {
+                staggerComp.AddStagger(stagger);
             }
         }
 
