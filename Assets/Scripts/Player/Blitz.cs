@@ -1,185 +1,154 @@
 using UnityEngine;
-using DG.Tweening; // Needed for the slide
-using DarkTowerTron.Player;
+using System.Collections;
 using DarkTowerTron.Core;
+using DarkTowerTron.Physics;
 
 namespace DarkTowerTron.Player
 {
+    [RequireComponent(typeof(KinematicMover))]
     [RequireComponent(typeof(GritAndFocus))]
-    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(PlayerMovement))]
     public class Blitz : MonoBehaviour
     {
         [Header("Settings")]
-        public float blitzCost = 25f;
-        public float blitzDistance = 6f; 
-        public float blitzFocusGain = 20f; 
+        public float focusCost = 25f;
+        public float dashDistance = 8f; // This is your variable distance!
+        public float dashDuration = 0.15f;
+        public LayerMask projectileLayer;
 
-        [Header("Feel")]
-        public float chargeTime = 0.08f; // The "Anticipation" freeze
-        public float dashDuration = 0.15f; // The "Slide" speed
-        
         [Header("Visuals")]
-        public Transform blitzGhost; // The target indicator
-        public GameObject blitzCatcher; // The Big Hitbox
-        public TrailRenderer dashTrail; // Drag the trail here
+        public GameObject afterImagePrefab;
+        public Transform indicatorRef;
+        public bool showIndicator = true;
+        public LayerMask wallLayer;
 
-        private GritAndFocus resource;
-        private Rigidbody rb;
-        private Camera cam;
-        private bool isInvuln = false;
-        private bool isDashing = false; // Prevents double input
-        private Vector3 targetPosition;
+        [Header("Indicator Feedback")]
+        public Renderer indicatorRenderer; // Assign the Cylinder's MeshRenderer here
+        public Material readyMat;    // Cyan/Solid
+        public Material notReadyMat; // Red/Transparent/Grey
 
-        void Start()
+        public bool IsInvulnerable { get; private set; }
+
+        private KinematicMover _mover;
+        private GritAndFocus _stats;
+        private PlayerMovement _movement;
+        private bool _isDashing;
+
+        private void Awake()
         {
-            resource = GetComponent<GritAndFocus>();
-            rb = GetComponent<Rigidbody>();
-            cam = Camera.main;
-            
-            // Ensure Catcher is off
-            if(blitzCatcher) blitzCatcher.SetActive(false);
-            if(dashTrail) dashTrail.emitting = false;
+            _mover = GetComponent<KinematicMover>();
+            _stats = GetComponent<GritAndFocus>();
+            _movement = GetComponent<PlayerMovement>();
+
+            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
         }
 
-        void Update()
+        private void Update()
         {
-            if (isDashing)
-            {
-                ActiveIntercept();
-                return; 
-            }
+            HandleIndicator();
+            // REMOVED: Input check
+        }
 
-            HandleGhost();
+        // Called by PlayerController via Event
+        public void TryBlitz()
+        {
+            if (_isDashing) return;
 
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (_stats.SpendFocus(focusCost))
             {
-                AttemptBlitz();
+                StartCoroutine(DoBlitz());
             }
         }
 
-        void HandleGhost()
+        private void HandleIndicator()
         {
-            if (blitzGhost == null) return;
+            if (!indicatorRef) return;
 
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-            float rayDistance;
-
-            if (groundPlane.Raycast(ray, out rayDistance))
+            // Hide if dashing or disabled
+            if (!showIndicator || _isDashing)
             {
-                Vector3 mousePoint = ray.GetPoint(rayDistance);
-                Vector3 dir = (mousePoint - transform.position).normalized;
-                dir.y = 0;
+                indicatorRef.gameObject.SetActive(false);
+                return;
+            }
 
-                // Raycast check to stop ghost going through walls
-                if (Physics.Raycast(transform.position + Vector3.up, dir, out RaycastHit hit, blitzDistance))
+            indicatorRef.gameObject.SetActive(true);
+
+            // 1. Calculate Direction
+            Vector3 dir;
+            if (_movement.MoveInput.sqrMagnitude > 0.1f) dir = _movement.MoveInput.normalized;
+            else dir = transform.forward;
+
+            // 2. Raycast using 'dashDistance' variable
+            Vector3 targetPos;
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, dashDistance, wallLayer))
+            {
+                targetPos = hit.point - (dir * 0.5f);
+            }
+            else
+            {
+                targetPos = transform.position + (dir * dashDistance);
+            }
+
+            // 3. Position Visuals
+            targetPos.y = 0.1f;
+            indicatorRef.position = targetPos;
+            indicatorRef.rotation = Quaternion.identity;
+
+            // 4. Material Swapping (Visual Feedback)
+            if (indicatorRenderer && readyMat && notReadyMat)
+            {
+                bool canAfford = _stats.HasFocus(focusCost);
+                // Only swap if changed to prevent overhead (optimization)
+                Material targetMat = canAfford ? readyMat : notReadyMat;
+                if (indicatorRenderer.sharedMaterial != targetMat)
                 {
-                    targetPosition = hit.point - (dir * 0.5f); // Stop before wall
+                    indicatorRenderer.sharedMaterial = targetMat;
                 }
-                else
-                {
-                    targetPosition = transform.position + (dir * blitzDistance);
-                }
-                
-                targetPosition.y = 0.1f; 
-                blitzGhost.position = targetPosition;
-                
-                bool canAfford = resource.currentFocus >= blitzCost;
-                blitzGhost.gameObject.SetActive(canAfford);
             }
         }
 
-        void AttemptBlitz()
+        private IEnumerator DoBlitz()
         {
-            if (isDashing) return;
+            _isDashing = true;
+            IsInvulnerable = true;
+            if (indicatorRef) indicatorRef.gameObject.SetActive(false);
 
-            if (resource.SpendFocus(blitzCost))
+            if (afterImagePrefab) Instantiate(afterImagePrefab, transform.position, transform.rotation);
+
+            Vector3 dashDir;
+            if (_movement.MoveInput.sqrMagnitude > 0.1f) dashDir = _movement.MoveInput.normalized;
+            else dashDir = transform.forward;
+
+            float speed = dashDistance / dashDuration;
+            float timer = 0f;
+
+            while (timer < dashDuration)
             {
-                StartCoroutine(BlitzSequence());
+                float dt = Time.deltaTime;
+                timer += dt;
+                _mover.Move(dashDir * speed * dt);
+                CatchProjectiles();
+                yield return null;
             }
-        }
 
-        System.Collections.IEnumerator BlitzSequence()
-        {
-            isDashing = true;
-            isInvuln = true; // Invuln starts during charge
-            
-            // 1. CHARGE PHASE (Anticipation)
-            // Squash the player slightly?
-            transform.localScale = new Vector3(1.2f, 0.8f, 1.2f);
-            
-            yield return new WaitForSeconds(chargeTime);
-
-            // 2. DASH PHASE (Movement)
-            transform.localScale = Vector3.one; // Reset shape
-            if(blitzCatcher) blitzCatcher.SetActive(true); // Activate Big Hitbox
-            if(dashTrail) dashTrail.emitting = true;
-
-            // Use Rigidbody DOMove for physics-safe sliding
-            Vector3 finalPos = targetPosition;
-            finalPos.y = rb.position.y;
-            
-            // DOTween handles the velocity curve
-            rb.DOMove(finalPos, dashDuration).SetEase(Ease.OutExpo);
-            
-            // Audio Juice
-            Debug.Log("<color=cyan>BLITZ!</color>");
-            if(GameFeel.instance) GameFeel.instance.CameraShake(0.1f, 0.1f);
-
-            yield return new WaitForSeconds(dashDuration);
-
-            // 3. RECOVERY
-            if(blitzCatcher) blitzCatcher.SetActive(false);
-            if(dashTrail) dashTrail.emitting = false;
-            
-            // Keep invuln for a tiny split second after stopping
             yield return new WaitForSeconds(0.05f);
-            
-            isInvuln = false;
-            isDashing = false;
+
+            IsInvulnerable = false;
+            _isDashing = false;
         }
 
-        public bool IsInvulnerable()
+        private void CatchProjectiles()
         {
-            return isInvuln;
-        }
-
-        public void OnPerfectDodge()
-        {
-            Debug.Log("<color=cyan>PERFECT DODGE! +" + this.blitzFocusGain + " Focus</color>");
-            resource.AddFocus(this.blitzFocusGain);
-            if (GameFeel.instance) GameFeel.instance.HitStop(0.1f);
-        }
-
-        // Call this inside the Update loop ONLY when dashing
-        void ActiveIntercept()
-        {
-            if (!isDashing) return;
-
-            Vector3 center = transform.position;
-            float radius = 2.0f; 
-            
-            Collider[] hits = Physics.OverlapSphere(center, radius);
-            
-            foreach (Collider hit in hits)
+            Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, projectileLayer);
+            foreach (var hit in hits)
             {
-                // Check for Projectile
-                DarkTowerTron.Combat.Projectile proj = hit.GetComponent<DarkTowerTron.Combat.Projectile>();
-                
-                // Only redirect if it's currently HOSTILE (don't redirect your own bullets repeatedly)
-                if (proj != null && proj.isHostile)
-                {
-                    Debug.Log("<color=cyan>REDIRECTING!</color>");
-                    
-                    // 1. Reward Focus
-                    OnPerfectDodge(); 
-                    
-                    // 2. Redirect in DASH DIRECTION
-                    // We use the Rigidbody velocity or Transform forward to determine where we are going
-                    Vector3 dashDir = rb.velocity.normalized;
-                    if (dashDir == Vector3.zero) dashDir = transform.forward;
+                IReflectable proj = hit.GetComponent<IReflectable>();
+                var pScript = hit.GetComponent<DarkTowerTron.Combat.Projectile>();
 
-                    proj.Redirect(dashDir);
+                if (proj != null && pScript != null && pScript.isHostile)
+                {
+                    proj.Redirect(transform.forward, gameObject);
+                    _stats.AddFocus(20f);
                 }
             }
         }

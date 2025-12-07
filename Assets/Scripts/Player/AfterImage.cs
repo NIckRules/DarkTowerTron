@@ -1,30 +1,34 @@
 using UnityEngine;
-using DG.Tweening; // Assuming DOTween is available based on file list
+using DarkTowerTron.Core;
+using DG.Tweening;
 
 namespace DarkTowerTron.Player
 {
     public class AfterImage : MonoBehaviour
     {
-        public float duration = 1f;
-        
-        public void Initialize(Vector3 pos, Quaternion rot)
+        public float lifetime = 1.0f; // Decoy lasts 1 second (longer than dash)
+
+        private void Start()
         {
-            transform.position = pos;
-            transform.rotation = rot;
-            
-            // Visuals: Shrink and fade
-            // Using DOTween if available, otherwise manual coroutine
-            // Based on file list, DOTween is present.
-            
-            transform.DOScale(Vector3.zero, duration).SetEase(Ease.InQuad);
-            
-            Renderer rend = GetComponent<Renderer>();
-            if (rend != null)
+            // 1. Notify Enemies: "Look at me!"
+            GameEvents.OnDecoySpawned?.Invoke(transform);
+
+            // 2. Visual Fade
+            Renderer rend = GetComponentInChildren<Renderer>();
+            if (rend)
             {
-                rend.material.DOFade(0f, duration);
+                // Fade alpha to 0
+                rend.material.DOFade(0f, lifetime).SetEase(Ease.Linear);
             }
 
-            Destroy(gameObject, duration);
+            // 3. Self Destruct
+            Destroy(gameObject, lifetime);
+        }
+
+        private void OnDestroy()
+        {
+            // 4. Notify Enemies: "I'm dead, look at Player!"
+            GameEvents.OnDecoyExpired?.Invoke();
         }
     }
 }

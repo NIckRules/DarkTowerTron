@@ -1,79 +1,103 @@
 using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Physics; // This causes the name collision
 
 namespace DarkTowerTron.Player
 {
-    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(KinematicMover))]
     public class PlayerMovement : MonoBehaviour
     {
+
+        public Vector3 MoveInput => _inputDir;
+
         [Header("Settings")]
-        public float moveSpeed = 11f;     // Increased from 6
-        public float acceleration = 50f;  // High = snappy, Low = ice skating. 50 is a good "heavy" spot.
+        public float moveSpeed = 12f;
+        public float acceleration = 60f;
+        public float deceleration = 40f;
+        public float rotationSpeed = 25f;
 
-        private Rigidbody rb;
-        private Camera cam;
-        private Vector3 externalImpact = Vector3.zero; // Stores the push
+        private KinematicMover _mover;
+        private Camera _cam;
+        
+        private Vector3 _inputDir;
+        private Vector3 _currentVelocity;
+        private Vector3 _externalForce;
 
-        void Start()
+        private void Awake()
         {
-            rb = GetComponent<Rigidbody>();
-            cam = Camera.main;
+            _mover = GetComponent<KinematicMover>();
+            _cam = Camera.main;
         }
 
-        void FixedUpdate()
+        public void SetMoveInput(Vector3 dir)
         {
-            HandleMovement();
-            HandleRotation();
-            HandleImpactDecay(); // NEW
+            _inputDir = dir;
         }
 
-        void HandleMovement()
+        public void ApplyKnockback(Vector3 force)
         {
-            float x = Input.GetAxisRaw("Horizontal");
-            float z = Input.GetAxisRaw("Vertical");
-            Vector3 inputDir = new Vector3(x, 0, z).normalized;
-            Vector3 targetVel = inputDir * moveSpeed;
-
-            // NEW: Add the impact vector to your movement
-            Vector3 finalVelocity = Vector3.MoveTowards(rb.velocity, targetVel, acceleration * Time.fixedDeltaTime);
-            rb.velocity = finalVelocity + externalImpact;
+            force.y = 0;
+            _externalForce += force;
         }
 
-        void HandleRotation()
+        private void Update()
         {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-            float rayDistance;
+            HandleVelocity();
+        }
 
-            if (groundPlane.Raycast(ray, out rayDistance))
+        private void HandleVelocity()
+        {
+            float dt = Time.deltaTime;
+
+            // 1. Calculate Target
+            Vector3 targetVel = _inputDir * moveSpeed;
+
+            // 2. Accelerate/Decelerate
+            if (_inputDir.magnitude > 0.1f)
             {
-                Vector3 point = ray.GetPoint(rayDistance);
-                Vector3 lookDir = point - transform.position;
-                lookDir.y = 0; 
-                
-                if (lookDir != Vector3.zero)
-                {
-                    rb.MoveRotation(Quaternion.LookRotation(lookDir));
-                }
-            }
-        }
-
-        // NEW Method to apply the jolt
-        public void ApplyKnockback(Vector3 direction, float force)
-        {
-            direction.y = 0; // Keep it flat
-            externalImpact += direction.normalized * force;
-        }
-
-        void HandleImpactDecay()
-        {
-            // Smoothly reduce the impact to zero (Damping)
-            if (externalImpact.magnitude > 0.2f)
-            {
-                externalImpact = Vector3.Lerp(externalImpact, Vector3.zero, 5f * Time.fixedDeltaTime);
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, acceleration * dt);
             }
             else
             {
-                externalImpact = Vector3.zero;
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, deceleration * dt);
+                // Snap to zero to prevent float drift
+                if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
+            }
+
+            // 3. External Forces (Friction)
+            if (_externalForce.magnitude > 0.1f)
+            {
+                _externalForce = Vector3.Lerp(_externalForce, Vector3.zero, 5f * dt);
+            }
+            else
+            {
+                _externalForce = Vector3.zero;
+            }
+
+            // 4. Move
+            Vector3 finalMotion = (_currentVelocity + _externalForce) * dt;
+            _mover.Move(finalMotion);
+        }
+
+        // Keep this for Mouse
+        public void LookAtMouse(Vector2 mouseScreenPos)
+        {
+            Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
+            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
+            {
+                Vector3 lookDir = hit.point - transform.position;
+                LookAtDirection(lookDir); // Reuse the logic below
+            }
+        }
+
+        // ADD THIS: Direct Vector rotation (for Gamepad)
+        public void LookAtDirection(Vector3 direction)
+        {
+            direction.y = 0;
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
             }
         }
     }

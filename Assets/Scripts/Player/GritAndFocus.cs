@@ -1,148 +1,131 @@
 using UnityEngine;
-using UnityEngine.UI;
 using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Player
 {
-    public class GritAndFocus : MonoBehaviour
+    public class GritAndFocus : MonoBehaviour, IDamageable
     {
-        [Header("Grit (Health)")]
-        public int currentGrit = 2;
+        [Header("Stats")]
         public int maxGrit = 2;
-        public bool hasWound = false;
-
-        [Header("Focus (Energy)")]
-        public float currentFocus = 100f;
         public float maxFocus = 100f;
         public float focusDecayRate = 5f;
-        
-        // NEW: Fairness toggle
-        public bool isCombatActive = false; 
 
-        [Header("UI Bindings")]
-        public Slider focusSlider;
-        public Image[] gritPips; 
-        public Image woundIcon; 
+        [Header("Rewards")]
+        public float focusOnKill = 30f; // Configurable in Inspector now
 
-        void Start()
+        private int _currentGrit;
+        private float _currentFocus;
+        private bool _isDead;
+
+        private void Start()
         {
-            currentFocus = 100f;
-            currentGrit = maxGrit;
+            _currentGrit = maxGrit;
+            _currentFocus = maxFocus;
+            
+            GameEvents.OnEnemyKilled += OnEnemyKilled;
+            
             UpdateUI();
         }
 
-        void Update()
+        private void OnDestroy() { GameEvents.OnEnemyKilled -= OnEnemyKilled; }
+
+        private void Update()
         {
-            // NEW: Only decay if combat is ON
-            if (isCombatActive && currentFocus > 0)
+            if (_isDead) return;
+
+            // Focus Decay Logic
+            if (_currentFocus > 0)
             {
-                float decay = focusDecayRate * Time.deltaTime;
-                currentFocus -= decay;
-                if (currentFocus < 0) currentFocus = 0;
+                _currentFocus -= focusDecayRate * Time.deltaTime;
+                if (_currentFocus < 0) _currentFocus = 0;
                 
-                // Update slider every frame during decay for smoothness
-                if(focusSlider) focusSlider.value = currentFocus;
+                GameEvents.OnFocusChanged?.Invoke(_currentFocus, maxFocus);
             }
         }
 
-        // Called by WaveManager
-        public void SetCombatState(bool state)
+        // --- IDamageable Implementation ---
+        public bool TakeDamage(DamageInfo info)
         {
-            isCombatActive = state;
-        }
+            if (_isDead) return false;
 
-        // ... (Keep TakeDamage, HealGrit, AddFocus, SpendFocus, Die as they were) ...
-        // If you need me to repost those methods, let me know, otherwise keep existing logic.
-        
-        public void TakeDamage(Vector3 hitDirection) // <--- Changed Signature
-        {
-            // 1. Feedback (Sound, Shake, Jolt)
-            if (GameFeel.instance) 
+            // 1. Apply Logic
+            if (_currentGrit > 0)
             {
-                GameFeel.instance.PlayPlayerHurt();
-                GameFeel.instance.CameraShake(0.2f, 0.5f);
+                _currentGrit--;
+                // Feedback
+                GameEvents.OnPlayerHit?.Invoke();
+                
+                // Physics Knockback
+                var move = GetComponent<PlayerMovement>();
+                if (move) move.ApplyKnockback(info.pushDirection * info.pushForce);
             }
-
-            var movement = GetComponent<PlayerMovement>();
-            if (movement != null)
-            {
-                movement.ApplyKnockback(hitDirection, 15f); // 15f is the push force
-            }
-
-            // 2. Logic
-            Debug.Log("PLAYER HIT!");
-            if (currentGrit > 0) 
-            {
-                currentGrit--;
-            }
-            else if (!hasWound) 
-            {
-                hasWound = true;
-            }
-            else 
+            else
             {
                 Die();
             }
 
             UpdateUI();
+            return true;
         }
-        
-        public void HealGrit()
-            {
-                if(!hasWound) currentGrit = Mathf.Min(currentGrit + 1, maxGrit);
-                
-                // REWARD BUFF:
-                // Old: +20 Focus (Not even 1 dash)
-                // New: +40 Focus (Almost 2 dashes)
-                // This encourages "Dash -> Kill -> Dash" loops.
-                AddFocus(40f); 
-                
-                UpdateUI();
-            }
-            
-        public void AddFocus(float amount)
+
+        public void Kill(bool instant)
         {
-            currentFocus += amount;
-            // Clamp (Future: Trigger Overheat here)
-            if (currentFocus > maxFocus) currentFocus = maxFocus;
-            UpdateUI();
+            Die();
+        }
+        // ----------------------------------
+
+        /// <summary>
+        /// Checks if the player has enough focus for an action.
+        /// </summary>
+        public bool HasFocus(float amount)
+        {
+            return _currentFocus >= amount;
         }
 
         public bool SpendFocus(float amount)
         {
-            if (currentFocus >= amount)
+            if (_currentFocus >= amount)
             {
-                currentFocus -= amount;
+                _currentFocus -= amount;
                 UpdateUI();
                 return true;
             }
             return false;
         }
 
-        void Die()
+        /// <summary>
+        /// Generic method to add focus from any source (Blitz, Items, etc.)
+        /// </summary>
+        public void AddFocus(float amount)
         {
-            Debug.Log("<color=red>PLAYER DIED</color>");
-            
-            // Find the session manager and trigger game over
-            var session = FindObjectOfType<DarkTowerTron.Utils.GameSession>();
-            if (session != null)
-            {
-                session.TriggerGameOver();
-            }
+            _currentFocus += amount;
+            if (_currentFocus > maxFocus) _currentFocus = maxFocus;
+            UpdateUI();
         }
 
-        void UpdateUI()
+        // Event Listener: Automatic reward when an enemy dies
+        private void OnEnemyKilled(Vector3 position)
         {
-            if (gritPips != null)
-            {
-                Color active = Color.white;
-                Color inactive = new Color(0.2f, 0.2f, 0.2f, 0.5f);
-                
-                if (gritPips.Length > 0) gritPips[0].color = (currentGrit >= 1) ? active : inactive;
-                if (gritPips.Length > 1) gritPips[1].color = (currentGrit >= 2) ? active : inactive;
-            }
-            if (woundIcon) woundIcon.gameObject.SetActive(hasWound);
-            if (focusSlider) focusSlider.value = currentFocus;
+            // Heal 1 Grit
+            if (_currentGrit < maxGrit) _currentGrit++;
+            
+            // Gain Configurable Focus
+            AddFocus(focusOnKill);
+            
+            UpdateUI();
+        }
+
+        private void Die()
+        {
+            _isDead = true;
+            Debug.Log("PLAYER DEAD");
+            GameEvents.OnPlayerDied?.Invoke();
+        }
+
+        private void UpdateUI()
+        {
+            GameEvents.OnGritChanged?.Invoke(_currentGrit);
+            GameEvents.OnFocusChanged?.Invoke(_currentFocus, maxFocus);
         }
     }
 }
