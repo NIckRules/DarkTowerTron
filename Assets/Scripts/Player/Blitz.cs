@@ -133,6 +133,12 @@ namespace DarkTowerTron.Player
             var health = GetComponent<PlayerHealth>();
             if (health) health.HealGrit();
 
+            // NEW: SCORE BONUS
+            if (Managers.ScoreManager.Instance) 
+            {
+                Managers.ScoreManager.Instance.TriggerGloryKillBonus();
+            }
+
             // 4. Juice
             if (GameFeel.Instance)
             {

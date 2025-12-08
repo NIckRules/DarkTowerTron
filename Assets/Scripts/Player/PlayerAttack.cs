@@ -1,90 +1,74 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DG.Tweening;
+using DG.Tweening; 
 
 namespace DarkTowerTron.Player
 {
-    // Added IWeapon
-    public class PlayerAttack : MonoBehaviour, IWeapon
+    public class PlayerAttack : WeaponBase
     {
-        [Header("Beam Config")]
+        [Header("Beam Specifics")]
         public float range = 7f;
-        public float beamRadius = 0.5f;
-        public float cooldown = 0.4f;
+        public float beamRadius = 0.5f; 
         public float selfRecoil = 15f;
-        public LayerMask hitLayers;
+        public LayerMask hitLayers; 
+        public GameObject beamVisualPrefab; 
 
-        [Header("Visuals")]
-        public Transform firePoint;
-        public GameObject beamVisualPrefab;
-
-        private float _timer;
         private PlayerMovement _movement;
-        private TargetScanner _scanner; // Add reference
-        private bool _isFiring; // State from controller
 
-        private void Awake()
+        // We override Awake to get the Movement reference, 
+        // but we must call base.Awake() to get the Scanner too!
+        protected override void Awake()
         {
+            base.Awake(); 
             _movement = GetComponent<PlayerMovement>();
-            _scanner = GetComponent<TargetScanner>(); // Auto-find scanner
         }
 
-        // Interface Implementation
-        public void SetFiring(bool state)
+        protected override void Fire()
         {
-            _isFiring = state;
-        }
+            // 1. Get Aim
+            Vector3 fireDir = GetAimDirection();
+            float beamLength = range;
 
-        private void Update()
-        {
-            if (_timer > 0) _timer -= Time.deltaTime;
+            // 2. Hit Detection (Moved up to determine beam length)
+            RaycastHit hit;
+            bool hasHit = UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out hit, range, hitLayers);
 
-            if (_isFiring && _timer <= 0)
+            if (hasHit)
             {
-                FireBeam();
+                // NEW: Stop visual beam at the hit point
+                // Calculate actual distance to hit
+                beamLength = hit.distance;
             }
-        }
 
-        private void FireBeam()
-        {
-            _timer = cooldown;
-
-            // --- AUTO AIM LOGIC ---
-            Vector3 fireDir = firePoint.forward;
-            float finalRange = range;
-
-            // If we have a scanner and a target, snap to it!
-            if (_scanner != null && _scanner.CurrentTarget != null)
-            {
-                Vector3 dirToTarget = (_scanner.CurrentTarget.transform.position - firePoint.position).normalized;
-                fireDir = dirToTarget;
-                
-                // Adjust FirePoint rotation temporarily for the instantiation?
-                firePoint.rotation = Quaternion.LookRotation(fireDir);
-            }
-            // ----------------------
-
+            // 3. Visuals
             if (beamVisualPrefab)
             {
-                GameObject beam = Instantiate(beamVisualPrefab, firePoint.position, firePoint.rotation, firePoint);
+                // We rotate the firepoint momentarily so the instantiated child aligns perfectly
+                Quaternion targetRot = Quaternion.LookRotation(fireDir);
+                GameObject beam = Instantiate(beamVisualPrefab, firePoint.position, targetRot, firePoint);
+                
+                // Scale Correction Logic
                 Vector3 parentScale = firePoint.lossyScale;
-                float compensatedRadiusX = beamRadius / parentScale.x;
-                float compensatedRadiusY = beamRadius / parentScale.y;
-                float compensatedLength = range / parentScale.z;
+                float compX = beamRadius / parentScale.x;
+                float compY = beamRadius / parentScale.y; 
+                float compZ  = beamLength / parentScale.z; // Use calculated length
 
-                beam.transform.localScale = new Vector3(compensatedRadiusX, compensatedRadiusY, 0f);
-                beam.transform.DOScaleZ(compensatedLength, 0.1f).OnComplete(() => Destroy(beam, 0.1f));
+                beam.transform.localScale = new Vector3(compX, compY, 0f);
+                beam.transform.DOScaleZ(compZ, 0.1f).OnComplete(() => Destroy(beam, 0.1f));
             }
 
+            // 4. Recoil
             if (_movement)
             {
                 _movement.ApplyKnockback(-fireDir * selfRecoil);
             }
 
-            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, hitLayers))
+            // 5. Apply Damage
+            if (hasHit)
             {
-                IDamageable target = hit.collider.GetComponent<IDamageable>();
-
+                // LOGIC CHECK:
+                IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
+                
                 if (target != null)
                 {
                     DamageInfo info = new DamageInfo
@@ -97,7 +81,12 @@ namespace DarkTowerTron.Player
                     };
 
                     target.TakeDamage(info);
-                    GameEvents.OnPlayerHit?.Invoke();
+                    GameEvents.OnPlayerHit?.Invoke(); 
+                }
+                else
+                {
+                    // We hit a wall (No IDamageable). 
+                    // The visual beam should stop here.
                 }
             }
         }

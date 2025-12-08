@@ -157,8 +157,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.114542544, g: 0.1347088, b: 0.735849, a: 0.5882353}
-      key1: {r: 0.03404235, g: 0.349339, b: 0.8018868, a: 0.5882353}
+      key0: {r: 0.114542544, g: 0.1347088, b: 0.735849, a: 0.78431374}
+      key1: {r: 0.03404235, g: 0.349339, b: 0.8018868, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -815,9 +815,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 3200
+    m_Bits: 2049
   _skinWidth: 0.015
-  gravity: 20
+  gravity: 0
 --- !u!114 &8588073913637015239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -834,6 +834,11 @@ MonoBehaviour:
   acceleration: 60
   deceleration: 40
   rotationSpeed: 25
+  wallBuffer: 0.7
+  repulsionForce: 120
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!114 &6949509784031142000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -934,10 +939,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07184ec7d777ba2459feab10aeb6bf89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
-    type: 3}
   firePoint: {fileID: 8608103599068932834}
   fireRate: 0.3
+  bulletPrefab: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
+    type: 3}
+  bulletSpeed: 45
 --- !u!114 &3406123499475282924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -950,14 +956,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7430c062d1d144b9292b4648b893b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  firePoint: {fileID: 8608103599068932834}
+  fireRate: 0.2
   range: 7
   beamRadius: 0.5
-  cooldown: 0.4
   selfRecoil: 15
   hitLayers:
     serializedVersion: 2
-    m_Bits: 128
-  firePoint: {fileID: 8608103599068932834}
+    m_Bits: 2177
   beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
     type: 3}
 --- !u!1 &8799886156076035042

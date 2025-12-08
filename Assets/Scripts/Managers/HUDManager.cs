@@ -20,10 +20,29 @@ namespace DarkTowerTron.Managers
         [Header("System")]
         public TMPro.TextMeshProUGUI waveText;
 
+        [Header("Score UI")]
+        public TMPro.TextMeshProUGUI scoreText;
+        public TMPro.TextMeshProUGUI multiplierText;
+        public TMPro.TextMeshProUGUI timerText;
+
+        private void Update()
+        {
+            // Simple Timer Update
+            if (timerText && Managers.ScoreManager.Instance)
+            {
+                float t = Managers.ScoreManager.Instance.GameTime;
+                // Format 00:00
+                string minutes = Mathf.Floor(t / 60).ToString("00");
+                string seconds = (t % 60).ToString("00");
+                timerText.text = $"{minutes}:{seconds}";
+            }
+        }
+
         private void OnEnable()
         {
             GameEvents.OnFocusChanged += UpdateFocus;
             GameEvents.OnGritChanged += UpdateGrit;
+            GameEvents.OnScoreChanged += UpdateScoreUI;
             // Optional: Listen for wave changes if we added that event
         }
 
@@ -31,6 +50,7 @@ namespace DarkTowerTron.Managers
         {
             GameEvents.OnFocusChanged -= UpdateFocus;
             GameEvents.OnGritChanged -= UpdateGrit;
+            GameEvents.OnScoreChanged -= UpdateScoreUI;
         }
 
         private void UpdateFocus(float current, float max)
@@ -62,6 +82,12 @@ namespace DarkTowerTron.Managers
                     pipImg.color = (i < currentGrit) ? activePipColor : inactivePipColor;
                 }
             }
+        }
+
+        private void UpdateScoreUI(int score, int multiplier)
+        {
+            if (scoreText) scoreText.text = score.ToString("N0"); // "N0" adds commas (1,000)
+            if (multiplierText) multiplierText.text = $"x{multiplier}";
         }
     }
 }

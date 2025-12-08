@@ -5,12 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/DTT_Scene_1.unity
-    guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/DTT_Scene_3.unity
-    guid: f7420dbde4741de4095ff7b9b1a81f35
+    path: Assets/Scenes/DTT_Scene_4.unity
+    guid: f7da5b74457deec46bcbbd1d9eff08cb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 14745409b882ae041994aad506d6aebb,
       type: 3}

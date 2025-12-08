@@ -11,6 +11,7 @@ namespace DarkTowerTron.Managers
         public GameObject startPanel;
         public GameObject hudPanel;
         public GameObject gameOverPanel;
+        public GameObject victoryPanel; // NEW SLOT
 
         [Header("Scene References")]
         public PlayerController player;
@@ -26,17 +27,21 @@ namespace DarkTowerTron.Managers
             if (startPanel) startPanel.SetActive(true);
             if (hudPanel) hudPanel.SetActive(false);
             if (gameOverPanel) gameOverPanel.SetActive(false);
+            if (victoryPanel) victoryPanel.SetActive(false);
 
             // Lock Player Input
             if (player) player.ToggleInput(false);
 
             // Listen for Death
             GameEvents.OnPlayerDied += TriggerGameOver;
+            // LISTEN FOR VICTORY
+            GameEvents.OnGameVictory += TriggerVictory;
         }
 
         private void OnDestroy()
         {
             GameEvents.OnPlayerDied -= TriggerGameOver;
+            GameEvents.OnGameVictory -= TriggerVictory;
         }
 
         // --- UI BUTTONS HOOKS ---
@@ -80,6 +85,21 @@ namespace DarkTowerTron.Managers
 
             if (hudPanel) hudPanel.SetActive(false);
             if (gameOverPanel) gameOverPanel.SetActive(true);
+
+            // Lock Input
+            if (player) player.ToggleInput(false);
+        }
+
+        private void TriggerVictory()
+        {
+            if (!_isGameRunning) return;
+            _isGameRunning = false;
+
+            // Slow mo finish
+            Time.timeScale = 0.5f; 
+
+            if(hudPanel) hudPanel.SetActive(false);
+            if(victoryPanel) victoryPanel.SetActive(true);
 
             // Lock Input
             if (player) player.ToggleInput(false);

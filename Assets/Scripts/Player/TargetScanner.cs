@@ -31,8 +31,12 @@ namespace DarkTowerTron.Player
         // Called by PlayerController every frame
         public void UpdateScanner(Vector3 aimDirection)
         {
+            // FIX: Lift origin up by 1.0f (Chest height)
+            Vector3 origin = transform.position + Vector3.up * 1.0f;
+
             // 1. SphereCast along the Aim Direction
-            if (UnityEngine.Physics.SphereCast(transform.position, scanRadius, aimDirection, out RaycastHit hit, scanRange, enemyLayer))
+            // Note: We scan for 'scanRange', but we might need to mask out Walls so we don't target through them
+            if (UnityEngine.Physics.SphereCast(origin, scanRadius, aimDirection, out RaycastHit hit, scanRange, enemyLayer))
             {
                 EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
                 if (enemy != null)

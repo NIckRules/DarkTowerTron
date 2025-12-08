@@ -1,37 +1,69 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Physics; // This causes the name collision
+using DarkTowerTron.Physics;
 
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(KinematicMover))]
     public class PlayerMovement : MonoBehaviour
     {
-
-        public Vector3 MoveInput => _inputDir;
-
-        [Header("Settings")]
+        [Header("Motion Settings")]
         public float moveSpeed = 12f;
         public float acceleration = 60f;
         public float deceleration = 40f;
         public float rotationSpeed = 25f;
 
+        [Header("Wall Repulsion (Anti-Stick)")]
+        public float wallBuffer = 0.6f; // How close before we push back (0.5 is player radius)
+        public float repulsionForce = 5f; // How hard we push
+        public LayerMask wallLayer;
+
+        // Expose input for Blitz
+        public Vector3 MoveInput => _inputDir;
+
         private KinematicMover _mover;
         private Camera _cam;
-        
+
         private Vector3 _inputDir;
         private Vector3 _currentVelocity;
         private Vector3 _externalForce;
+
+        // Cache for optimization
+        private Collider[] _wallBuffer = new Collider[5];
 
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
             _cam = Camera.main;
+
+            // Default mask if not set
+            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
         }
 
         public void SetMoveInput(Vector3 dir)
         {
             _inputDir = dir;
+        }
+
+        public void LookAtDirection(Vector3 direction)
+        {
+            direction.y = 0;
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+            }
+        }
+
+        public void LookAtMouse(Vector2 mouseScreenPos)
+        {
+            Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
+            // Use UnityEngine.Physics to disambiguate
+            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
+            {
+                Vector3 lookDir = hit.point - transform.position;
+                LookAtDirection(lookDir);
+            }
         }
 
         public void ApplyKnockback(Vector3 force)
@@ -52,7 +84,12 @@ namespace DarkTowerTron.Player
             // 1. Calculate Target
             Vector3 targetVel = _inputDir * moveSpeed;
 
-            // 2. Accelerate/Decelerate
+            // 2. Wall Repulsion (The "Magnetic" Effect)
+            // We add a tiny push away from nearby walls to prevent sticking
+            Vector3 wallPush = CalculateWallRepulsion();
+            targetVel += wallPush;
+
+            // 3. Accelerate/Decelerate
             if (_inputDir.magnitude > 0.1f)
             {
                 _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, acceleration * dt);
@@ -60,11 +97,10 @@ namespace DarkTowerTron.Player
             else
             {
                 _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, deceleration * dt);
-                // Snap to zero to prevent float drift
                 if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
             }
 
-            // 3. External Forces (Friction)
+            // 4. External Forces (Friction)
             if (_externalForce.magnitude > 0.1f)
             {
                 _externalForce = Vector3.Lerp(_externalForce, Vector3.zero, 5f * dt);
@@ -74,31 +110,42 @@ namespace DarkTowerTron.Player
                 _externalForce = Vector3.zero;
             }
 
-            // 4. Move
+            // 5. Move
             Vector3 finalMotion = (_currentVelocity + _externalForce) * dt;
             _mover.Move(finalMotion);
         }
 
-        // Keep this for Mouse
-        public void LookAtMouse(Vector2 mouseScreenPos)
+        private Vector3 CalculateWallRepulsion()
         {
-            Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
-            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
-            {
-                Vector3 lookDir = hit.point - transform.position;
-                LookAtDirection(lookDir); // Reuse the logic below
-            }
-        }
+            Vector3 push = Vector3.zero;
 
-        // ADD THIS: Direct Vector rotation (for Gamepad)
-        public void LookAtDirection(Vector3 direction)
-        {
-            direction.y = 0;
-            if (direction.sqrMagnitude > 0.001f)
+            // Find walls within buffer range
+            // We use the player's position + slight up offset (center of mass)
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, _wallBuffer, wallLayer);
+
+            for (int i = 0; i < count; i++)
             {
-                Quaternion targetRot = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+                Collider wall = _wallBuffer[i];
+
+                // Find the closest point on the wall's surface to the player
+                Vector3 closestPoint = wall.ClosestPoint(transform.position + Vector3.up);
+
+                // Calculate direction AWAY from wall
+                Vector3 dir = (transform.position - closestPoint);
+                dir.y = 0; // Keep it flat
+
+                float dist = dir.magnitude;
+
+                // If we are actually inside/touching/near the wall
+                if (dist < wallBuffer)
+                {
+                    // The closer we are, the stronger the push
+                    // Normalized push * strength
+                    push += dir.normalized * repulsionForce;
+                }
             }
+
+            return push;
         }
     }
 }

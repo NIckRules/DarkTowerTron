@@ -1,64 +1,32 @@
 using UnityEngine;
-using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Player
 {
-    [RequireComponent(typeof(TargetScanner))]
-    public class PlayerGun : MonoBehaviour, IWeapon
+    // Inherits from WeaponBase instead of MonoBehaviour
+    public class PlayerGun : WeaponBase 
     {
-        [Header("Gun Stats")]
+        [Header("Gun Specifics")]
         public GameObject bulletPrefab;
-        public Transform firePoint;
-        public float fireRate = 0.15f;
+        public float bulletSpeed = 25f;
 
-        private float _timer;
-        private bool _isFiring;
-        private TargetScanner _scanner;
-
-        private void Awake()
+        protected override void Fire()
         {
-            _scanner = GetComponent<TargetScanner>();
-        }
-
-        public void SetFiring(bool state)
-        {
-            _isFiring = state;
-        }
-
-        private void Update()
-        {
-            if (_timer > 0) _timer -= Time.deltaTime;
-
-            if (_isFiring && _timer <= 0)
-            {
-                Fire();
-            }
-        }
-
-        private void Fire()
-        {
-            _timer = fireRate;
-
             if (bulletPrefab && firePoint)
             {
-                // Default Aim: Forward
-                Vector3 aimDir = firePoint.forward;
+                // 1. Get Aim (Handled by Base)
+                Vector3 aimDir = GetAimDirection();
 
-                // Auto-Aim Override
-                if (_scanner.CurrentTarget != null)
-                {
-                    aimDir = (_scanner.CurrentTarget.transform.position - firePoint.position).normalized;
-                }
-
+                // 2. Spawn
                 GameObject p = PoolManager.Instance.Spawn(bulletPrefab, firePoint.position, Quaternion.LookRotation(aimDir));
-
+                
+                // 3. Setup
                 Projectile proj = p.GetComponent<Projectile>();
                 if (proj)
                 {
-                    proj.speed = 20f;
-                    proj.isHostile = false;
+                    proj.speed = bulletSpeed;
+                    proj.isHostile = false; // Player bullet
                     proj.Initialize(aimDir);
                 }
             }

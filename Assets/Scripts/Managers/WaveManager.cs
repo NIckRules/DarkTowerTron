@@ -56,22 +56,47 @@ namespace DarkTowerTron.Managers
         {
             if (index >= waves.Count)
             {
-                Debug.Log("ALL WAVES CLEARED - VICTORY");
-                // Optional: GameEvents.OnVictory?.Invoke();
+                Debug.Log("VICTORY");
+                GameEvents.OnGameVictory?.Invoke();
                 yield break;
             }
 
             Wave wave = waves[index];
-            Debug.Log($"STARTING WAVE: {wave.waveName}");
+            Debug.Log($"PREPARING WAVE: {wave.waveName}");
+
+            // --- COUNTDOWN SEQUENCE ---
+            
+            // 1. Announce Wave
+            GameEvents.OnWaveAnnounce?.Invoke(index);
+            yield return new WaitForSeconds(1.0f); // Let the title sit for a second
+
+            // 2. Count 3.. 2.. 1..
+            int count = 3;
+            while (count > 0)
+            {
+                GameEvents.OnCountdownChange?.Invoke(count.ToString());
+                // Optional: Play "Beep" sound here via GameFeel
+                yield return new WaitForSeconds(1.0f);
+                count--;
+            }
+
+            // 3. GO!
+            GameEvents.OnCountdownChange?.Invoke("ENGAGE");
+            // Optional: Play "Go" sound
+            yield return new WaitForSeconds(0.5f);
+            
+            // 4. Clear UI
+            GameEvents.OnCountdownChange?.Invoke(""); // Empty string hides UI
+
+            // --------------------------
+
             _isSpawning = true;
 
             foreach (var entry in wave.entries)
             {
                 for (int i = 0; i < entry.count; i++)
                 {
-                    // Pass the manual index to the spawner
                     SpawnEnemy(entry.enemyPrefab, entry.spawnPointIndex);
-
                     _enemiesAlive++;
                     yield return new WaitForSeconds(entry.rate);
                 }
