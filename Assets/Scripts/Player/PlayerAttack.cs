@@ -4,7 +4,8 @@ using DG.Tweening;
 
 namespace DarkTowerTron.Player
 {
-    public class PlayerAttack : MonoBehaviour
+    // Added IWeapon
+    public class PlayerAttack : MonoBehaviour, IWeapon
     {
         [Header("Beam Config")]
         public float range = 7f;
@@ -18,14 +19,17 @@ namespace DarkTowerTron.Player
         public GameObject beamVisualPrefab;
 
         private float _timer;
-        private bool _isFiring;
         private PlayerMovement _movement;
+        private TargetScanner _scanner; // Add reference
+        private bool _isFiring; // State from controller
 
         private void Awake()
         {
             _movement = GetComponent<PlayerMovement>();
+            _scanner = GetComponent<TargetScanner>(); // Auto-find scanner
         }
 
+        // Interface Implementation
         public void SetFiring(bool state)
         {
             _isFiring = state;
@@ -35,7 +39,6 @@ namespace DarkTowerTron.Player
         {
             if (_timer > 0) _timer -= Time.deltaTime;
 
-            // Logic driven by boolean state, not Input.GetButton
             if (_isFiring && _timer <= 0)
             {
                 FireBeam();
@@ -46,37 +49,39 @@ namespace DarkTowerTron.Player
         {
             _timer = cooldown;
 
-            // 1. Visual Effect
+            // --- AUTO AIM LOGIC ---
+            Vector3 fireDir = firePoint.forward;
+            float finalRange = range;
+
+            // If we have a scanner and a target, snap to it!
+            if (_scanner != null && _scanner.CurrentTarget != null)
+            {
+                Vector3 dirToTarget = (_scanner.CurrentTarget.transform.position - firePoint.position).normalized;
+                fireDir = dirToTarget;
+                
+                // Adjust FirePoint rotation temporarily for the instantiation?
+                firePoint.rotation = Quaternion.LookRotation(fireDir);
+            }
+            // ----------------------
+
             if (beamVisualPrefab)
             {
-                // Instantiate as CHILD of firePoint
                 GameObject beam = Instantiate(beamVisualPrefab, firePoint.position, firePoint.rotation, firePoint);
-
-                // --- SCALE CORRECTION ---
                 Vector3 parentScale = firePoint.lossyScale;
-
-                // Calculate local scale needed to keep the beam round
-                // We divide by parent scale to counteract distortion
                 float compensatedRadiusX = beamRadius / parentScale.x;
                 float compensatedRadiusY = beamRadius / parentScale.y;
                 float compensatedLength = range / parentScale.z;
 
-                // FIX: Set X and Y to radius (Thickness), set Z to 0 (Start length)
-                // Previously, Y was 0, which made it flat.
                 beam.transform.localScale = new Vector3(compensatedRadiusX, compensatedRadiusY, 0f);
-
-                // Animate Length (Z)
                 beam.transform.DOScaleZ(compensatedLength, 0.1f).OnComplete(() => Destroy(beam, 0.1f));
             }
 
-            // 2. Recoil (Physics)
             if (_movement)
             {
-                _movement.ApplyKnockback(-firePoint.forward * selfRecoil);
+                _movement.ApplyKnockback(-fireDir * selfRecoil);
             }
 
-            // 3. Hit Detection (SphereCast)
-            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, firePoint.forward, out RaycastHit hit, range, hitLayers))
+            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, hitLayers))
             {
                 IDamageable target = hit.collider.GetComponent<IDamageable>();
 
@@ -86,7 +91,7 @@ namespace DarkTowerTron.Player
                     {
                         damageAmount = 10f,
                         staggerAmount = 0.4f,
-                        pushDirection = firePoint.forward,
+                        pushDirection = fireDir,
                         pushForce = 10f,
                         source = gameObject
                     };

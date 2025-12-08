@@ -6,33 +6,67 @@ namespace DarkTowerTron.Physics
     public class KinematicMover : MonoBehaviour
     {
         [Header("Settings")]
-        public LayerMask obstacleMask; // Assign 'Wall' and 'Default'
+        public LayerMask obstacleMask;
         [SerializeField] private float _skinWidth = 0.015f;
-        
+
+        [Header("Gravity")]
+        public float gravity = 20f; // Default gravity for ground units
+
         private Collider _collider;
         private RaycastHit[] _hitBuffer = new RaycastHit[5];
+        private bool _isGrounded;
+
+        // Public Property to check state
+        public bool IsGrounded => _isGrounded;
 
         private void Awake()
         {
             _collider = GetComponent<Collider>();
-            
-            // Auto-configure mask if empty
-            if (obstacleMask == 0) 
+
+            if (obstacleMask == 0)
             {
-                // Exclude Player, Projectile, Ground, AfterImage
-                // Include Default, Wall
                 obstacleMask = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
             }
         }
 
-        /// <summary>
-        /// Moves the object, sliding along obstacles.
-        /// </summary>
-        /// <param name="motion">Delta movement (Velocity * deltaTime)</param>
         public void Move(Vector3 motion, float bounciness = 0f)
         {
+            float dt = Time.deltaTime;
+
+            // 1. Apply Gravity (If enabled)
+            // We verify ground status first to avoid infinite accumulation
+            CheckGround();
+
+            if (gravity > 0)
+            {
+                if (!_isGrounded)
+                {
+                    // Fall
+                    motion.y -= gravity * dt;
+                }
+                else if (motion.y <= 0)
+                {
+                    // Snap to ground (prevents micro-bouncing)
+                    motion.y = -2f * dt;
+                }
+            }
+
+            // 2. Resolve Collisions
             Vector3 finalMotion = ResolveCollisions(motion, bounciness);
+
+            // 3. Apply
             transform.Translate(finalMotion, Space.World);
+        }
+
+        private void CheckGround()
+        {
+            // Simple SphereCast down to see if we are standing on something
+            Vector3 p1, p2;
+            float radius;
+            GetCapsulePoints(out p1, out p2, out radius);
+
+            // Cast slightly down
+            _isGrounded = UnityEngine.Physics.SphereCast(p1, radius * 0.9f, Vector3.down, out RaycastHit hit, 0.1f, obstacleMask);
         }
 
         private Vector3 ResolveCollisions(Vector3 desiredMotion, float bounciness)
@@ -45,20 +79,18 @@ namespace DarkTowerTron.Physics
             float radius;
             GetCapsulePoints(out p1, out p2, out radius);
 
-            // Cast forward to find walls
             int hits = UnityEngine.Physics.CapsuleCastNonAlloc(
                 p1, p2, radius, direction, _hitBuffer, distance + _skinWidth, obstacleMask
             );
 
-            // Find closest valid hit
             RaycastHit closestHit = new RaycastHit();
             float closestDist = float.MaxValue;
             bool hitFound = false;
 
             for (int i = 0; i < hits; i++)
             {
-                if (_hitBuffer[i].transform == transform) continue; // Skip self
-                if (_hitBuffer[i].collider.isTrigger) continue;     // Skip triggers
+                if (_hitBuffer[i].transform == transform) continue;
+                if (_hitBuffer[i].collider.isTrigger) continue;
 
                 if (_hitBuffer[i].distance < closestDist)
                 {
@@ -70,22 +102,17 @@ namespace DarkTowerTron.Physics
 
             if (hitFound)
             {
-                // Snap to wall
                 float snapDist = Mathf.Max(0, closestDist - _skinWidth);
                 Vector3 moveSnap = direction * snapDist;
-                
-                // Calculate remainder
                 Vector3 remaining = desiredMotion - (direction * closestDist);
 
                 if (bounciness > 0)
                 {
-                    // Bounce
                     Vector3 reflect = Vector3.Reflect(remaining, closestHit.normal);
                     return moveSnap + (reflect * bounciness);
                 }
                 else
                 {
-                    // Slide
                     Vector3 slide = Vector3.ProjectOnPlane(remaining, closestHit.normal);
                     return moveSnap + slide;
                 }
@@ -107,7 +134,7 @@ namespace DarkTowerTron.Physics
             {
                 radius = 0.5f;
                 p1 = transform.position;
-                p2 = transform.position;
+                p2 = p1;
             }
         }
     }

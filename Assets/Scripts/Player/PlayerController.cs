@@ -1,33 +1,61 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Required for InputAction types
+using UnityEngine.InputSystem;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
-    [RequireComponent(typeof(PlayerAttack))]
     [RequireComponent(typeof(Blitz))]
     public class PlayerController : MonoBehaviour
     {
         private PlayerMovement _movement;
-        private PlayerAttack _attack;
         private Blitz _blitz;
 
-        // This is the class generated from your asset
+        // Weapon References
+        private PlayerAttack _beamWeapon;
+        private PlayerGun _gunWeapon;
+
         private GameControls _controls;
         private bool _inputEnabled = true;
+        private Camera _cam;
+
+        // Cache actions to avoid lookups in Update
+        private InputAction _moveAction;
+        private InputAction _lookPadAction;
+        private InputAction _lookMouseAction;
+        private InputAction _fireBeamAction;
+        private InputAction _fireGunAction;
 
         private void Awake()
         {
             _movement = GetComponent<PlayerMovement>();
-            _attack = GetComponent<PlayerAttack>();
             _blitz = GetComponent<Blitz>();
+            _cam = Camera.main;
 
-            // Initialize the generated class
+            _beamWeapon = GetComponent<PlayerAttack>();
+            _gunWeapon = GetComponent<PlayerGun>();
+
             _controls = new GameControls();
 
-            // Subscribe to One-Shot events (Blitz)
-            // Note: Ensure your Action is named 'Blitz' in the asset, or change this line
-            _controls.Gameplay.Blitz.performed += ctx => OnBlitz();
+            // --- CACHE ACTIONS ---
+            // We look them up once. If they don't exist, these variables will be null.
+            _moveAction = _controls.Gameplay.Move;
+            _lookPadAction = _controls.Gameplay.LookGamepad;
+            _lookMouseAction = _controls.Gameplay.LookMouse;
+
+            // Safely find actions even if you renamed them slightly differently
+            _fireBeamAction = _controls.asset.FindAction("Melee");
+            _fireGunAction = _controls.asset.FindAction("Gun");
+
+            // --- BINDINGS ---
+            // 1. Dodge (Space / RB)
+            // Use FindAction to be safe, or direct access if you are sure
+            var dodgeAction = _controls.asset.FindAction("Blitz");
+            if (dodgeAction != null) dodgeAction.performed += ctx => OnDodge();
+
+            // 2. Glory Kill (E / LB)
+            var killAction = _controls.asset.FindAction("GloryKill");
+            if (killAction != null) killAction.performed += ctx => OnGloryKill();
         }
 
         private void OnEnable()
@@ -45,51 +73,93 @@ namespace DarkTowerTron.Player
             if (!_inputEnabled) return;
 
             HandleMovement();
-            HandleAiming();
+            HandleAimingAndScanning();
             HandleFiring();
         }
 
         private void HandleMovement()
         {
-            // Reads WASD or Left Stick
-            Vector2 input = _controls.Gameplay.Move.ReadValue<Vector2>();
-            Vector3 dir = new Vector3(input.x, 0, input.y).normalized;
+            if (_moveAction == null) return;
 
+            Vector2 input = _moveAction.ReadValue<Vector2>();
+            Vector3 dir = new Vector3(input.x, 0, input.y).normalized;
             _movement.SetMoveInput(dir);
         }
 
-        private void HandleAiming()
+        private void HandleAimingAndScanning()
         {
-            // 1. Check Right Stick (Gamepad)
-            // Ensure you named the action "LookGamepad" in your input asset
-            Vector2 stickInput = _controls.Gameplay.LookGamepad.ReadValue<Vector2>();
+            Vector3 aimDir = transform.forward;
 
-            // If stick is moving, it overrides mouse
-            if (stickInput.sqrMagnitude > 0.05f)
+            // 1. Gamepad Stick
+            if (_lookPadAction != null)
             {
-                Vector3 lookDir = new Vector3(stickInput.x, 0, stickInput.y);
-                _movement.LookAtDirection(lookDir);
+                Vector2 stickInput = _lookPadAction.ReadValue<Vector2>();
+                if (stickInput.sqrMagnitude > 0.05f)
+                {
+                    aimDir = new Vector3(stickInput.x, 0, stickInput.y).normalized;
+                    _movement.LookAtDirection(aimDir);
+                    UpdateScanner(aimDir); // Helper function
+                    return; // Exit early if using stick
+                }
             }
-            // 2. Fallback to Mouse
-            else
+
+            // 2. Mouse
+            if (_lookMouseAction != null)
             {
-                // Ensure you named the action "LookMouse" in your input asset
-                Vector2 mouseScreenPos = _controls.Gameplay.LookMouse.ReadValue<Vector2>();
-                _movement.LookAtMouse(mouseScreenPos);
+                Vector2 mousePos = _lookMouseAction.ReadValue<Vector2>();
+                Ray ray = _cam.ScreenPointToRay(mousePos);
+                Plane ground = new Plane(Vector3.up, Vector3.zero);
+
+                if (ground.Raycast(ray, out float enter))
+                {
+                    Vector3 worldPoint = ray.GetPoint(enter);
+                    Vector3 lookDir = (worldPoint - transform.position);
+                    lookDir.y = 0;
+
+                    if (lookDir != Vector3.zero)
+                    {
+                        aimDir = lookDir.normalized;
+                        _movement.LookAtDirection(aimDir);
+                    }
+                }
             }
+
+            UpdateScanner(aimDir);
+        }
+
+        private void UpdateScanner(Vector3 dir)
+        {
+            var scanner = GetComponent<TargetScanner>();
+            if (scanner != null) scanner.UpdateScanner(dir);
         }
 
         private void HandleFiring()
         {
-            // Reads "Fire" button (Mouse Left or Right Trigger)
-            // Using ReadValue<float>() handles Triggers (0 to 1) and Buttons (0 or 1)
-            bool isFiring = _controls.Gameplay.Fire.ReadValue<float>() > 0.5f;
-            _attack.SetFiring(isFiring);
+            // 1. Handle BEAM
+            if (_beamWeapon != null && _fireBeamAction != null)
+            {
+                bool isBeam = _fireBeamAction.ReadValue<float>() > 0.5f;
+                _beamWeapon.SetFiring(isBeam);
+            }
+
+            // 2. Handle GUN
+            if (_gunWeapon != null && _fireGunAction != null)
+            {
+                bool isGun = _fireGunAction.ReadValue<float>() > 0.5f;
+                _gunWeapon.SetFiring(isGun);
+            }
         }
 
-        private void OnBlitz()
+        // --- ACTION HANDLERS ---
+
+        private void OnDodge()
         {
-            if (_inputEnabled) _blitz.TryBlitz();
+            if (_inputEnabled) _blitz.PerformDodge();
+        }
+
+        private void OnGloryKill()
+        {
+            if (_inputEnabled) _blitz.PerformGloryKill();
         }
 
         public void ToggleInput(bool state)
@@ -101,7 +171,8 @@ namespace DarkTowerTron.Player
             if (!state)
             {
                 _movement.SetMoveInput(Vector3.zero);
-                _attack.SetFiring(false);
+                if (_beamWeapon != null) _beamWeapon.SetFiring(false);
+                if (_gunWeapon != null) _gunWeapon.SetFiring(false);
             }
         }
     }

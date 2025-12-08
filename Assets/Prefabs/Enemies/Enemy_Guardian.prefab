@@ -74,6 +74,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3072
   _skinWidth: 0.015
+  gravity: 20
 --- !u!114 &4055007547804138338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,6 +90,8 @@ MonoBehaviour:
   moveSpeed: 8
   rotationSpeed: 10
   acceleration: 20
+  rideHeight: 0.2
+  verticalSmoothTime: 0.5
 --- !u!114 &940291227875785411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,7 +128,7 @@ MonoBehaviour:
   fireInterval: 3
   burstCount: 5
   burstRate: 0.1
-  projectilePrefab: {fileID: 242634337553124766, guid: 76f00c17ad4a8084ea651230ec9ebb55,
+  projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
     type: 3}
   firePoint: {fileID: 2727545481032966752}
 --- !u!1 &4627178880318046138

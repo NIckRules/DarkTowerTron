@@ -129,9 +129,27 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Fire"",
+                    ""name"": ""Melee"",
                     ""type"": ""Button"",
-                    ""id"": ""837a9fe1-ed9f-458f-965d-fe78b3983243"",
+                    ""id"": ""95cc781a-8b52-4453-b931-1d458b54978e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Gun"",
+                    ""type"": ""Button"",
+                    ""id"": ""72c1260c-56a9-425f-880d-5f3baf72debc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""GloryKill"",
+                    ""type"": ""Button"",
+                    ""id"": ""73ce170c-58c5-420d-834e-ce717bd74632"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -218,17 +236,6 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7f03493a-1fb5-4add-8bb4-d956a8386aec"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Blitz"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""d78eba57-6f66-4ad3-8693-df98bc2bdd76"",
                     ""path"": ""<Gamepad>/leftShoulder"",
                     ""interactions"": """",
@@ -262,23 +269,67 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e6f470e7-1b6b-4d8a-a1a7-df8d99307b59"",
+                    ""id"": ""39e5d2c1-8663-49ae-83ae-5d81fe56a441"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Fire"",
+                    ""action"": ""Melee"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""8e089cce-51e0-4130-9887-f08462b186a8"",
+                    ""id"": ""470bf5dc-e5fa-474f-9295-f1654a20101d"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Melee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dfa2e1db-19f7-40b5-a204-66a3702d849d"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dab654ae-9082-4990-8cdb-d09e8bc370ba"",
                     ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Fire"",
+                    ""action"": ""Gun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ccc53f18-ff1c-409f-97c2-09a5a308014b"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""GloryKill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f12b5a25-3d1f-4684-9986-04bb0a05e3c5"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""GloryKill"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -293,7 +344,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         m_Gameplay_Blitz = m_Gameplay.FindAction("Blitz", throwIfNotFound: true);
         m_Gameplay_LookMouse = m_Gameplay.FindAction("LookMouse", throwIfNotFound: true);
         m_Gameplay_LookGamepad = m_Gameplay.FindAction("LookGamepad", throwIfNotFound: true);
-        m_Gameplay_Fire = m_Gameplay.FindAction("Fire", throwIfNotFound: true);
+        m_Gameplay_Melee = m_Gameplay.FindAction("Melee", throwIfNotFound: true);
+        m_Gameplay_Gun = m_Gameplay.FindAction("Gun", throwIfNotFound: true);
+        m_Gameplay_GloryKill = m_Gameplay.FindAction("GloryKill", throwIfNotFound: true);
     }
 
     ~@GameControls()
@@ -378,7 +431,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Blitz;
     private readonly InputAction m_Gameplay_LookMouse;
     private readonly InputAction m_Gameplay_LookGamepad;
-    private readonly InputAction m_Gameplay_Fire;
+    private readonly InputAction m_Gameplay_Melee;
+    private readonly InputAction m_Gameplay_Gun;
+    private readonly InputAction m_Gameplay_GloryKill;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -407,9 +462,17 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @LookGamepad => m_Wrapper.m_Gameplay_LookGamepad;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/Fire".
+        /// Provides access to the underlying input action "Gameplay/Melee".
         /// </summary>
-        public InputAction @Fire => m_Wrapper.m_Gameplay_Fire;
+        public InputAction @Melee => m_Wrapper.m_Gameplay_Melee;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Gun".
+        /// </summary>
+        public InputAction @Gun => m_Wrapper.m_Gameplay_Gun;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/GloryKill".
+        /// </summary>
+        public InputAction @GloryKill => m_Wrapper.m_Gameplay_GloryKill;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -448,9 +511,15 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @LookGamepad.started += instance.OnLookGamepad;
             @LookGamepad.performed += instance.OnLookGamepad;
             @LookGamepad.canceled += instance.OnLookGamepad;
-            @Fire.started += instance.OnFire;
-            @Fire.performed += instance.OnFire;
-            @Fire.canceled += instance.OnFire;
+            @Melee.started += instance.OnMelee;
+            @Melee.performed += instance.OnMelee;
+            @Melee.canceled += instance.OnMelee;
+            @Gun.started += instance.OnGun;
+            @Gun.performed += instance.OnGun;
+            @Gun.canceled += instance.OnGun;
+            @GloryKill.started += instance.OnGloryKill;
+            @GloryKill.performed += instance.OnGloryKill;
+            @GloryKill.canceled += instance.OnGloryKill;
         }
 
         /// <summary>
@@ -474,9 +543,15 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @LookGamepad.started -= instance.OnLookGamepad;
             @LookGamepad.performed -= instance.OnLookGamepad;
             @LookGamepad.canceled -= instance.OnLookGamepad;
-            @Fire.started -= instance.OnFire;
-            @Fire.performed -= instance.OnFire;
-            @Fire.canceled -= instance.OnFire;
+            @Melee.started -= instance.OnMelee;
+            @Melee.performed -= instance.OnMelee;
+            @Melee.canceled -= instance.OnMelee;
+            @Gun.started -= instance.OnGun;
+            @Gun.performed -= instance.OnGun;
+            @Gun.canceled -= instance.OnGun;
+            @GloryKill.started -= instance.OnGloryKill;
+            @GloryKill.performed -= instance.OnGloryKill;
+            @GloryKill.canceled -= instance.OnGloryKill;
         }
 
         /// <summary>
@@ -546,11 +621,25 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLookGamepad(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Fire" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Melee" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnFire(InputAction.CallbackContext context);
+        void OnMelee(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Gun" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnGun(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "GloryKill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnGloryKill(InputAction.CallbackContext context);
     }
 }

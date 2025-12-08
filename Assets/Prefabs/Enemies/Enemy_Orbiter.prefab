@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 1695730014863775712}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -158,6 +158,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3072
   _skinWidth: 0.015
+  gravity: 0
 --- !u!114 &2541409147942260029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,6 +174,8 @@ MonoBehaviour:
   moveSpeed: 8
   rotationSpeed: 10
   acceleration: 20
+  rideHeight: 1
+  verticalSmoothTime: 0.5
 --- !u!114 &1212059287548495218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,8 +209,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clockwise: 1
-  idealDistance: 6
-  projectilePrefab: {fileID: 242634337553124766, guid: 76f00c17ad4a8084ea651230ec9ebb55,
+  idealDistance: 5
+  projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
     type: 3}
   firePoint: {fileID: 9189882538648999800}
   fireInterval: 2.5
@@ -238,7 +241,7 @@ Transform:
   m_GameObject: {fileID: 4710311676832444623}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

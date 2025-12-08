@@ -6,39 +6,44 @@ using DarkTowerTron.Physics;
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(KinematicMover))]
-    [RequireComponent(typeof(GritAndFocus))]
+    [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerMovement))]
     public class Blitz : MonoBehaviour
     {
-        [Header("Settings")]
-        public float focusCost = 25f;
-        public float dashDistance = 8f; // This is your variable distance!
+        [Header("Dodge Settings")]
+        public float dodgeCost = 25f;
+        public float dashDistance = 8f;
         public float dashDuration = 0.15f;
-        public LayerMask projectileLayer;
 
-        [Header("Visuals")]
+        [Header("Glory Kill Settings")]
+        public float killRewardFocus = 50f;
+
+        [Header("References")]
+        public LayerMask projectileLayer;
+        public LayerMask wallLayer;
         public GameObject afterImagePrefab;
+
+        // Indicator refs
         public Transform indicatorRef;
         public bool showIndicator = true;
-        public LayerMask wallLayer;
-
-        [Header("Indicator Feedback")]
-        public Renderer indicatorRenderer; // Assign the Cylinder's MeshRenderer here
-        public Material readyMat;    // Cyan/Solid
-        public Material notReadyMat; // Red/Transparent/Grey
+        public Renderer indicatorRenderer;
+        public Material readyMat;
+        public Material notReadyMat;
 
         public bool IsInvulnerable { get; private set; }
 
         private KinematicMover _mover;
-        private GritAndFocus _stats;
+        private PlayerEnergy _energy;
         private PlayerMovement _movement;
-        private bool _isDashing;
+        private TargetScanner _scanner;
+        private bool _isActionBusy; // Locks both Dodge and Kill
 
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
-            _stats = GetComponent<GritAndFocus>();
+            _energy = GetComponent<PlayerEnergy>();
             _movement = GetComponent<PlayerMovement>();
+            _scanner = GetComponent<TargetScanner>();
 
             if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
         }
@@ -46,26 +51,109 @@ namespace DarkTowerTron.Player
         private void Update()
         {
             HandleIndicator();
-            // REMOVED: Input check
         }
 
-        // Called by PlayerController via Event
-        public void TryBlitz()
+        // --- ACTION 1: DODGE (Survival) ---
+        public void PerformDodge()
         {
-            if (_isDashing) return;
+            if (_isActionBusy) return;
 
-            if (_stats.SpendFocus(focusCost))
+            // Dodge costs Focus
+            if (_energy.SpendFocus(dodgeCost))
             {
-                StartCoroutine(DoBlitz());
+                StartCoroutine(DodgeRoutine());
             }
+        }
+
+        // --- ACTION 2: GLORY KILL (Execution) ---
+        public void PerformGloryKill()
+        {
+            if (_isActionBusy) return;
+
+            // Logic Check: Do we have a valid target?
+            if (_scanner != null && _scanner.CurrentTarget != null && _scanner.CurrentTarget.IsStaggered)
+            {
+                StartCoroutine(GloryKillRoutine(_scanner.CurrentTarget));
+            }
+            else
+            {
+                // Feedback: Failed execution (Sound or Shake?)
+                Debug.Log("No valid target for Glory Kill!");
+            }
+        }
+
+        private IEnumerator DodgeRoutine()
+        {
+            _isActionBusy = true;
+            IsInvulnerable = true;
+            if (indicatorRef) indicatorRef.gameObject.SetActive(false);
+
+            // Visuals
+            if (afterImagePrefab) Instantiate(afterImagePrefab, transform.position, transform.rotation);
+
+            // Direction Logic
+            Vector3 dashDir;
+            if (_movement.MoveInput.sqrMagnitude > 0.1f) dashDir = _movement.MoveInput.normalized;
+            else dashDir = transform.forward;
+
+            // Physics Loop
+            float speed = dashDistance / dashDuration;
+            float timer = 0f;
+            while (timer < dashDuration)
+            {
+                float dt = Time.deltaTime;
+                timer += dt;
+                _mover.Move(dashDir * speed * dt);
+                CatchProjectiles();
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(0.05f); // Recovery frame
+
+            IsInvulnerable = false;
+            _isActionBusy = false;
+        }
+
+        private IEnumerator GloryKillRoutine(DarkTowerTron.Enemy.EnemyController target)
+        {
+            _isActionBusy = true;
+            IsInvulnerable = true; // Invuln during animation
+
+            // 1. Teleport
+            Vector3 enemyPos = target.transform.position;
+            // Land slightly in front of them (based on look direction)
+            Vector3 attackPos = enemyPos - (transform.forward * 1.0f);
+            transform.position = attackPos;
+
+            // 2. Kill
+            target.Kill(false);
+
+            // 3. Reward
+            _energy.AddFocus(killRewardFocus);
+            var health = GetComponent<PlayerHealth>();
+            if (health) health.HealGrit();
+
+            // 4. Juice
+            if (GameFeel.Instance)
+            {
+                GameFeel.Instance.HitStop(0.2f);
+                GameFeel.Instance.CameraShake(0.3f, 0.8f);
+            }
+
+            // Brief pause to sell the impact
+            yield return new WaitForSeconds(0.15f);
+
+            IsInvulnerable = false;
+            _isActionBusy = false;
         }
 
         private void HandleIndicator()
         {
+            // Indicator logic remains mostly the same, 
+            // but now it specifically visualizes the DODGE capability.
             if (!indicatorRef) return;
 
-            // Hide if dashing or disabled
-            if (!showIndicator || _isDashing)
+            if (!showIndicator || _isActionBusy)
             {
                 indicatorRef.gameObject.SetActive(false);
                 return;
@@ -73,12 +161,10 @@ namespace DarkTowerTron.Player
 
             indicatorRef.gameObject.SetActive(true);
 
-            // 1. Calculate Direction
             Vector3 dir;
             if (_movement.MoveInput.sqrMagnitude > 0.1f) dir = _movement.MoveInput.normalized;
             else dir = transform.forward;
 
-            // 2. Raycast using 'dashDistance' variable
             Vector3 targetPos;
             if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, dashDistance, wallLayer))
             {
@@ -89,52 +175,19 @@ namespace DarkTowerTron.Player
                 targetPos = transform.position + (dir * dashDistance);
             }
 
-            // 3. Position Visuals
             targetPos.y = 0.1f;
             indicatorRef.position = targetPos;
             indicatorRef.rotation = Quaternion.identity;
 
-            // 4. Material Swapping (Visual Feedback)
             if (indicatorRenderer && readyMat && notReadyMat)
             {
-                bool canAfford = _stats.HasFocus(focusCost);
-                // Only swap if changed to prevent overhead (optimization)
+                bool canAfford = _energy.HasFocus(dodgeCost);
                 Material targetMat = canAfford ? readyMat : notReadyMat;
                 if (indicatorRenderer.sharedMaterial != targetMat)
                 {
                     indicatorRenderer.sharedMaterial = targetMat;
                 }
             }
-        }
-
-        private IEnumerator DoBlitz()
-        {
-            _isDashing = true;
-            IsInvulnerable = true;
-            if (indicatorRef) indicatorRef.gameObject.SetActive(false);
-
-            if (afterImagePrefab) Instantiate(afterImagePrefab, transform.position, transform.rotation);
-
-            Vector3 dashDir;
-            if (_movement.MoveInput.sqrMagnitude > 0.1f) dashDir = _movement.MoveInput.normalized;
-            else dashDir = transform.forward;
-
-            float speed = dashDistance / dashDuration;
-            float timer = 0f;
-
-            while (timer < dashDuration)
-            {
-                float dt = Time.deltaTime;
-                timer += dt;
-                _mover.Move(dashDir * speed * dt);
-                CatchProjectiles();
-                yield return null;
-            }
-
-            yield return new WaitForSeconds(0.05f);
-
-            IsInvulnerable = false;
-            _isDashing = false;
         }
 
         private void CatchProjectiles()
@@ -148,7 +201,7 @@ namespace DarkTowerTron.Player
                 if (proj != null && pScript != null && pScript.isHostile)
                 {
                     proj.Redirect(transform.forward, gameObject);
-                    _stats.AddFocus(20f);
+                    _energy.AddFocus(20f);
                 }
             }
         }

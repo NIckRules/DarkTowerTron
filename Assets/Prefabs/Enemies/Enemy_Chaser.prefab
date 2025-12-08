@@ -74,6 +74,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3072
   _skinWidth: 0.015
+  gravity: 0
 --- !u!114 &6980652786400845697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,6 +90,8 @@ MonoBehaviour:
   moveSpeed: 8
   rotationSpeed: 10
   acceleration: 20
+  rideHeight: 1
+  verticalSmoothTime: 0.5
 --- !u!114 &5182594018108175379
 MonoBehaviour:
   m_ObjectHideFlags: 0

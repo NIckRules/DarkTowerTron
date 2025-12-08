@@ -9,7 +9,7 @@ namespace DarkTowerTron.Core
         public Vector3 pushDirection;
         public float pushForce;
         public GameObject source;
-        public bool isRedirected; 
+        public bool isRedirected;
     }
 
     public interface IDamageable
@@ -21,5 +21,11 @@ namespace DarkTowerTron.Core
     public interface IReflectable
     {
         void Redirect(Vector3 newDirection, GameObject newOwner);
+    }
+
+    // NEW: Standardizes input for any weapon (Beam, Gun, Sword)
+    public interface IWeapon
+    {
+        void SetFiring(bool isFiring);
     }
 }
