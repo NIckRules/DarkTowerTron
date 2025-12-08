@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Enemy
 {
@@ -52,9 +53,9 @@ namespace DarkTowerTron.Enemy
                 if (projectilePrefab)
                 {
                     Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
-                    GameObject p = Instantiate(projectilePrefab, spawnPos, transform.rotation);
-                    var projScript = p.GetComponent<Projectile>();
-                    if (projScript) projScript.Initialize(transform.forward);
+                    
+                    // Fire
+                    FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 15f); // 15f is default speed
                 }
 
                 yield return new WaitForSeconds(burstRate);

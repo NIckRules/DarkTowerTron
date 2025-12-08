@@ -1,5 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Combat;
+using DarkTowerTron.Managers; // Needed for PoolManager
 
 namespace DarkTowerTron.Enemy
 {
@@ -7,11 +9,10 @@ namespace DarkTowerTron.Enemy
     [RequireComponent(typeof(EnemyController))]
     public abstract class EnemyBaseAI : MonoBehaviour
     {
-        // Protected = Accessible by Child scripts
         protected EnemyMotor _motor;
         protected EnemyController _controller;
-        protected Transform _player;       // The real player
-        protected Transform _currentTarget; // The active target (Player or Decoy)
+        protected Transform _player;
+        protected Transform _currentTarget;
 
         protected virtual void Awake()
         {
@@ -21,7 +22,6 @@ namespace DarkTowerTron.Enemy
 
         protected virtual void Start()
         {
-            // 1. Find Player
             GameObject p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
             if (p)
             {
@@ -29,7 +29,6 @@ namespace DarkTowerTron.Enemy
                 _currentTarget = _player;
             }
 
-            // 2. Subscribe to Decoy Events
             GameEvents.OnDecoySpawned += OnDecoySpawned;
             GameEvents.OnDecoyExpired += OnDecoyExpired;
         }
@@ -42,30 +41,39 @@ namespace DarkTowerTron.Enemy
 
         private void Update()
         {
-            // Safety Checks
             if (_player == null) return;
             if (_currentTarget == null) _currentTarget = _player;
-
-            // GLOBAL RULE: If staggered, AI stops thinking
             if (_controller.IsStaggered) return;
 
-            // Run Child Logic
             RunAI();
         }
 
-        // Abstract = Children MUST implement this
         protected abstract void RunAI();
 
-        // --- Event Handlers ---
-        private void OnDecoySpawned(Transform decoy)
+        // --- HELPER METHODS ---
+
+        /// <summary>
+        /// Centralized logic to spawn, reset, and fire a hostile projectile.
+        /// </summary>
+        protected void FireProjectile(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 direction, float speed)
         {
-            _currentTarget = decoy;
+            if (prefab == null) return;
+
+            // 1. Spawn via Pool
+            GameObject p = PoolManager.Instance.Spawn(prefab, position, rotation);
+
+            // 2. Setup Logic
+            Projectile proj = p.GetComponent<Projectile>();
+            if (proj != null)
+            {
+                proj.ResetHostility(true); // Enemies always shoot hostile
+                proj.speed = speed;
+                proj.Initialize(direction);
+            }
         }
 
-        private void OnDecoyExpired()
-        {
-            // Revert to player if they are still alive
-            if (_player != null) _currentTarget = _player;
-        }
+        // --- EVENTS ---
+        private void OnDecoySpawned(Transform decoy) { _currentTarget = decoy; }
+        private void OnDecoyExpired() { if (_player != null) _currentTarget = _player; }
     }
 }

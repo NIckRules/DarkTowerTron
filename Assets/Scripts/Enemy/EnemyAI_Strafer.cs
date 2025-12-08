@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Core;
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Enemy
 {
@@ -68,19 +69,11 @@ namespace DarkTowerTron.Enemy
 
                 if (projectilePrefab)
                 {
-                    // Use FirePoint if assigned, otherwise fallback to Root + Offset
                     Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward * 1.0f;
                     Quaternion spawnRot = firePoint ? firePoint.rotation : transform.rotation;
 
-                    GameObject p = Instantiate(projectilePrefab, spawnPos, spawnRot);
-
-                    var proj = p.GetComponent<Projectile>();
-                    if (proj)
-                    {
-                        proj.speed = 12f;
-                        // Use the aim direction of the firepoint (which should be facing the target)
-                        proj.Initialize(transform.forward);
-                    }
+                    // Fire
+                    FireProjectile(projectilePrefab, spawnPos, spawnRot, transform.forward, 12f);
                 }
                 yield return new WaitForSeconds(burstRate);
             }

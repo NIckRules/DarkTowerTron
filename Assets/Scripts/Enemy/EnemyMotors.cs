@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Physics;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Enemy
 {
@@ -16,6 +17,14 @@ namespace DarkTowerTron.Enemy
         public float rideHeight = 0f;
         public float verticalSmoothTime = 0.5f; // How fast they float up
 
+        [Header("Separation (Flocking)")]
+        public float separationRadius = 1.2f;
+        public float separationForce = 5f;
+        public LayerMask allyLayer; // Set to 'Enemy'
+
+        // Cache collider array to avoid GC
+        private Collider[] _neighbors = new Collider[10];
+
         private KinematicMover _mover;
         private Vector3 _currentVelocity;
         private Vector3 _knockbackForce;
@@ -24,6 +33,9 @@ namespace DarkTowerTron.Enemy
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
+
+            // Default Ally Layer
+            if (allyLayer == 0) allyLayer = LayerMask.GetMask(GameConstants.LAYER_ENEMY);
 
             // AUTO-CONFIGURATION:
             // If this unit flies, disable the physics gravity so it doesn't fall.
@@ -40,7 +52,13 @@ namespace DarkTowerTron.Enemy
             float dt = Time.deltaTime;
             Vector3 targetVel = desiredDirection * moveSpeed;
 
-            // 1. Horizontal Movement (Inertia)
+            // 1. Separation Logic (Soft Collision)
+            Vector3 separationPush = CalculateSeparation();
+            
+            // Add separation to the target velocity (influence it)
+            targetVel += separationPush;
+
+            // 2. Inertia
             _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, acceleration * dt);
 
             // 2. Knockback Decay
@@ -65,6 +83,37 @@ namespace DarkTowerTron.Enemy
 
             // 5. Execute
             _mover.Move(finalMotion);
+        }
+
+        private Vector3 CalculateSeparation()
+        {
+            // Only separate if we are moving or intended to move
+            // Static turrets (speed 0) shouldn't slide around
+            if (moveSpeed <= 0.1f) return Vector3.zero;
+
+            Vector3 pushVector = Vector3.zero;
+            
+            // NonAlloc Physics check
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, separationRadius, _neighbors, allyLayer);
+
+            for (int i = 0; i < count; i++)
+            {
+                var neighbor = _neighbors[i];
+                // Ignore self
+                if (neighbor.gameObject == gameObject) continue;
+
+                // Calculate push away vector
+                Vector3 direction = transform.position - neighbor.transform.position;
+                float dist = direction.magnitude;
+
+                // Stronger push if closer
+                if (dist < 0.01f) direction = Random.insideUnitSphere; // Prevent division by zero / stacking
+                
+                // Weight by distance (1/dist)
+                pushVector += direction.normalized / (dist + 0.1f);
+            }
+
+            return pushVector * separationForce;
         }
 
         public void FaceTarget(Vector3 targetPosition)

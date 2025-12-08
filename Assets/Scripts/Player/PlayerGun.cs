@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Player
 {
@@ -51,7 +52,7 @@ namespace DarkTowerTron.Player
                     aimDir = (_scanner.CurrentTarget.transform.position - firePoint.position).normalized;
                 }
 
-                GameObject p = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(aimDir));
+                GameObject p = PoolManager.Instance.Spawn(bulletPrefab, firePoint.position, Quaternion.LookRotation(aimDir));
 
                 Projectile proj = p.GetComponent<Projectile>();
                 if (proj)

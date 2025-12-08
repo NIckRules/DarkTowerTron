@@ -3,6 +3,7 @@ using System.Collections;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Core;
 using DarkTowerTron.Physics; // For LayerMasks
+using DarkTowerTron.Managers;
 using DG.Tweening;
 
 namespace DarkTowerTron.Enemy
@@ -133,15 +134,9 @@ namespace DarkTowerTron.Enemy
             if (projectilePrefab && !_controller.IsStaggered)
             {
                 Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
-                GameObject p = Instantiate(projectilePrefab, spawnPos, transform.rotation);
-
-                // IMPORTANT: Initialize logic
-                Projectile proj = p.GetComponent<Projectile>();
-                if (proj)
-                {
-                    proj.speed = 30f;
-                    proj.Initialize(transform.forward);
-                }
+                
+                // ONE LINE TO RULE THEM ALL
+                FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 30f);
             }
 
             _fireTimer = fireRate;
