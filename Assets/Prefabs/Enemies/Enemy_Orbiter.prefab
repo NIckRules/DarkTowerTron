@@ -171,11 +171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33be3f323b5a4e94ab00f9c5187b5563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
-  rotationSpeed: 10
-  acceleration: 20
-  rideHeight: 1
-  verticalSmoothTime: 0.5
+  stats: {fileID: 11400000, guid: cc0a6717566fad04484abcefff70db74, type: 2}
+  allyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &1212059287548495218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,14 +187,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a7603a9ffd76d345ba02c3982101b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxStagger: 1
-  staggerDecay: 0.5
-  hasFrontalShield: 0
-  shieldAngle: 0.5
   meshRenderer: {fileID: 3834379093864157853}
   normalColor: {r: 1, g: 0, b: 0, a: 1}
   staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flashColor: {r: 1, g: 1, b: 1, a: 1}
+  staggerClip: {fileID: 8300000, guid: 8825eac8c60f4bf439a3043099071044, type: 3}
 --- !u!114 &1583908802994271245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7620f9a11b8c1bc498cc0cb592c1a2a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clockwise: 1
+  clockwise: 0
   idealDistance: 5
   projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
     type: 3}

@@ -87,11 +87,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33be3f323b5a4e94ab00f9c5187b5563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
-  rotationSpeed: 10
-  acceleration: 20
-  rideHeight: 0.2
-  verticalSmoothTime: 0.5
+  stats: {fileID: 11400000, guid: fddb9b3ad0381d74180dc1db1d0ef7b2, type: 2}
+  allyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &940291227875785411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,14 +103,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a7603a9ffd76d345ba02c3982101b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxStagger: 1
-  staggerDecay: 0.5
-  hasFrontalShield: 1
-  shieldAngle: 0.5
   meshRenderer: {fileID: 7105195301462925413}
   normalColor: {r: 1, g: 0, b: 0, a: 1}
   staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flashColor: {r: 1, g: 1, b: 1, a: 1}
+  staggerClip: {fileID: 8300000, guid: 8825eac8c60f4bf439a3043099071044, type: 3}
 --- !u!114 &4936109789802043882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,7 +120,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18c94b6bc61217643807126822ec770c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 0.4
   fireInterval: 3
   burstCount: 5
   burstRate: 0.1

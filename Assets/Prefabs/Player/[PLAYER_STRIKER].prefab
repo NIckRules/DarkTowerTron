@@ -717,12 +717,13 @@ GameObject:
   - component: {fileID: 6365553688910257222}
   - component: {fileID: 8588073913637015239}
   - component: {fileID: 6949509784031142000}
-  - component: {fileID: 1753184478305451525}
   - component: {fileID: 7548255836402914066}
   - component: {fileID: 3146043007839357323}
   - component: {fileID: 1722693863214666388}
   - component: {fileID: 441507639296113179}
   - component: {fileID: 3406123499475282924}
+  - component: {fileID: 5466856792935116601}
+  - component: {fileID: 8853776279611051482}
   m_Layer: 6
   m_Name: '[PLAYER_STRIKER]'
   m_TagString: Player
@@ -851,35 +852,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e5f440b2737114418b3ca265853fa24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1753184478305451525
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5e5b8ac926b2a44e961d4920beea443, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dodgeCost: 25
-  dashDistance: 4
-  dashDuration: 0.2
-  killRewardFocus: 50
-  projectileLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  afterImagePrefab: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
-    type: 3}
-  indicatorRef: {fileID: 192944804307636621}
-  showIndicator: 1
-  indicatorRenderer: {fileID: 8626066530795315162}
-  readyMat: {fileID: 2100000, guid: 24306aa8b0e3eee4a84f9603d5d3bf1a, type: 2}
-  notReadyMat: {fileID: 2100000, guid: cc19ea74c476bab4daeeff447d45cbc9, type: 2}
 --- !u!114 &7548255836402914066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,8 +878,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxFocus: 100
-  decayRate: 6
-  focusOnKill: 30
+  decayRate: 3
+  focusOnKill: 33
 --- !u!114 &1722693863214666388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,13 +892,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20549bf1521c4194fb2c644db7c18579, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanRange: 10
-  scanRadius: 2
+  scanRange: 35
+  scanRadius: 3
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
   reticlePrefab: {fileID: 5938182085543417046}
   reticleOffset: {x: 0, y: 0.1, z: 0}
+  lockedColor: {r: 0, g: 1, b: 1, a: 1}
+  executionColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!114 &441507639296113179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -941,6 +915,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
   fireRate: 0.3
+  fireClip: {fileID: 8300000, guid: f16c082ad078e8943990c633ba1ea8b4, type: 3}
+  volume: 0.8
   bulletPrefab: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
     type: 3}
   bulletSpeed: 45
@@ -958,6 +934,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
   fireRate: 0.2
+  fireClip: {fileID: 8300000, guid: 550cd03e285900e40b4fc9ce12aa32cb, type: 3}
+  volume: 0.8
   range: 7
   beamRadius: 0.5
   selfRecoil: 15
@@ -966,6 +944,48 @@ MonoBehaviour:
     m_Bits: 2177
   beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
     type: 3}
+--- !u!114 &5466856792935116601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a613d45a4de2b84e9b8c6e96f0e8b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  focusCost: 22
+  dashDistance: 8
+  dashDuration: 0.15
+  projectileLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  dashClip: {fileID: 8300000, guid: 11a67d7cfc51a7a47aa5638e3bfd7826, type: 3}
+  afterImagePrefab: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
+    type: 3}
+  indicatorRef: {fileID: 192944804307636621}
+  indicatorRenderer: {fileID: 4811700125883332067}
+  readyMat: {fileID: 2100000, guid: 24306aa8b0e3eee4a84f9603d5d3bf1a, type: 2}
+  notReadyMat: {fileID: 2100000, guid: cc19ea74c476bab4daeeff447d45cbc9, type: 2}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+--- !u!114 &8853776279611051482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be01441c03af92543876bc1721da12c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  killRewardFocus: 50
+  executeClip: {fileID: 8300000, guid: 3a8204bbfd76b4c44a30dbced9b6a021, type: 3}
 --- !u!1 &8799886156076035042
 GameObject:
   m_ObjectHideFlags: 0

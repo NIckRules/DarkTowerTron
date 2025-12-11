@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data; // Access Data namespace
 using DG.Tweening;
 
 namespace DarkTowerTron.Enemy
@@ -7,13 +8,10 @@ namespace DarkTowerTron.Enemy
     [RequireComponent(typeof(EnemyMotor))]
     public class EnemyController : MonoBehaviour, IDamageable
     {
-        [Header("Stats")]
-        public float maxStagger = 1.0f;
-        public float staggerDecay = 0.5f;
-
-        [Header("Defenses")]
-        public bool hasFrontalShield = false; // TURRET: Set this to TRUE
-        [Range(0f, 1f)] public float shieldAngle = 0.5f; // 0.5 = 90 degree protection arc
+        // Reference the SAME stats object from Motor to keep things synced
+        // Or expose it here if Motor is hidden.
+        // Better yet: Get it from the Motor to ensure they share the same brain.
+        private EnemyStatsSO _stats;
 
         [Header("Visuals")]
         public Renderer meshRenderer;
@@ -21,9 +19,13 @@ namespace DarkTowerTron.Enemy
         public Color staggerColor = Color.yellow;
         public Color flashColor = Color.white;
 
+        [Header("Audio")]
+        public AudioClip staggerClip; // NEW: Drag your sound here
+
         private EnemyMotor _motor;
         private float _currentStagger;
         private float _lastHitTime;
+        private Tween _flashTween; // Store reference to stop it later
         public bool IsStaggered { get; private set; }
 
         private void Awake()
@@ -33,14 +35,24 @@ namespace DarkTowerTron.Enemy
             if (meshRenderer) normalColor = meshRenderer.material.color;
         }
 
+        private void Start()
+        {
+            // Pull stats from Motor so we don't need to assign it twice in Inspector
+            if (_motor != null) _stats = _motor.stats;
+
+            if (_stats == null) Debug.LogError($"{name} is missing EnemyStatsSO on EnemyMotor!");
+        }
+
         private void Update()
         {
-            // Decay stagger
+            if (_stats == null) return;
+
+            // Decay
             if (!IsStaggered && _currentStagger > 0)
             {
                 if (Time.time > _lastHitTime + 1.0f)
                 {
-                    _currentStagger -= staggerDecay * Time.deltaTime;
+                    _currentStagger -= _stats.staggerDecay * Time.deltaTime;
                     if (_currentStagger < 0) _currentStagger = 0;
                 }
             }
@@ -48,40 +60,40 @@ namespace DarkTowerTron.Enemy
 
         public bool TakeDamage(DamageInfo info)
         {
+            if (_stats == null) return false;
+
             _lastHitTime = Time.time;
 
-            // 1. Redirected Projectiles pierce everything (Reward for Blitz)
+            // 1. Redirected Kill
             if (info.isRedirected)
             {
                 Kill(true);
                 return true;
             }
 
-            // 2. Shield Logic (Math-based)
-            if (hasFrontalShield && !IsStaggered)
+            // 3. Shield Logic
+            if (_stats.hasFrontalShield && !IsStaggered)
             {
-                // Dot Product: 1 = Hit front, -1 = Hit back
-                // info.pushDirection is usually the direction the bullet traveled (towards enemy)
-                // transform.forward is enemy facing
-                // If they oppose each other, it's a frontal hit.
-
                 Vector3 incomingDir = info.pushDirection.normalized;
                 float impactAngle = Vector3.Dot(transform.forward, -incomingDir);
 
-                if (impactAngle > shieldAngle)
+                if (impactAngle > _stats.shieldAngle)
                 {
-                    // BLOCKED!
-                    Debug.Log("SHIELD BLOCKED!");
-                    // Optional: Play "Clang" sound
-                    // Optional: Visual feedback (Shield flash)
-                    return false; // Damage ignored
+                    // FIRE EVENT: BLOCKED
+                    GameEvents.OnPopupText?.Invoke(transform.position, "BLOCKED");
+                    return false; 
                 }
             }
 
-            // 3. Apply Knockback
+            // 3. Knockback
             _motor.ApplyKnockback(info.pushDirection * info.pushForce);
 
-            // 4. Stagger / Kill
+            // FIRE EVENT: DAMAGE
+            // Check if it's a kill shot (optional logic for Crit) or just Redirected
+            bool isBigHit = info.isRedirected || IsStaggered;
+            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, isBigHit);
+
+            // 4. Stagger Logic
             if (IsStaggered)
             {
                 if (info.damageAmount > 0) Kill(false);
@@ -98,7 +110,7 @@ namespace DarkTowerTron.Enemy
         private void AddStagger(float amount)
         {
             _currentStagger += amount;
-            if (_currentStagger >= maxStagger)
+            if (_currentStagger >= _stats.maxStagger)
             {
                 EnterStaggerState();
             }
@@ -107,7 +119,31 @@ namespace DarkTowerTron.Enemy
         private void EnterStaggerState()
         {
             IsStaggered = true;
-            if (meshRenderer) meshRenderer.material.color = staggerColor;
+            
+            // FIRE EVENT: STAGGER
+            GameEvents.OnPopupText?.Invoke(transform.position, "STAGGER");
+
+            // --- AUDIO FEEDBACK ---
+            if (GameFeel.Instance && staggerClip)
+            {
+                // Play with random pitch so groups don't sound robotic
+                GameFeel.Instance.PlaySound(staggerClip, 1f, true);
+            }
+            // ----------------------
+
+            if (meshRenderer) 
+            {
+                // Kill any previous tween on this material
+                meshRenderer.material.DOKill();
+
+                // Start Yellow -> Red -> Yellow Pulse
+                // Loops infinitely (-1), Yoyo style, fast (0.2s)
+                _flashTween = meshRenderer.material.DOColor(Color.red, 0.2f)
+                    .From(staggerColor)
+                    .SetLoops(-1, LoopType.Yoyo)
+                    .SetEase(Ease.Linear);
+            }
+            
             DOVirtual.DelayedCall(2.0f, ExitStaggerState);
         }
 
@@ -115,6 +151,11 @@ namespace DarkTowerTron.Enemy
         {
             if (this == null) return;
             IsStaggered = false;
+            
+            // Stop Flashing
+            if (_flashTween != null) _flashTween.Kill();
+            meshRenderer.material.DOKill(); 
+
             _currentStagger = 0;
             if (meshRenderer) meshRenderer.material.color = normalColor;
         }
@@ -133,19 +174,9 @@ namespace DarkTowerTron.Enemy
         public void Kill(bool instant)
         {
             GameEvents.OnEnemyKilled?.Invoke(transform.position);
-
-            // --- EDITOR FIX START ---
-            // If we are in the Unity Editor and this object is selected, deselect it.
-            // This prevents the "SerializedObjectNotCreatableException" errors.
 #if UNITY_EDITOR
-            if (UnityEditor.Selection.activeGameObject == gameObject)
-            {
-                UnityEditor.Selection.activeGameObject = null;
-            }
+            if (UnityEditor.Selection.activeGameObject == gameObject) UnityEditor.Selection.activeGameObject = null;
 #endif
-            // --- EDITOR FIX END ---
-
-            // Destroy with a tiny delay (0 frame) to allow the frame to finish cleanly
             Destroy(gameObject);
         }
     }

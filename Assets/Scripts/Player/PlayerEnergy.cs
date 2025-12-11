@@ -13,7 +13,10 @@ namespace DarkTowerTron.Player
         public float focusOnKill = 30f;
 
         private float _currentFocus;
-        private bool _isDead; // To stop decay on death
+        private bool _isDead;
+
+        // NEW: State Flag
+        private bool _isCombatActive = false;
 
         private void Start()
         {
@@ -22,6 +25,11 @@ namespace DarkTowerTron.Player
             GameEvents.OnEnemyKilled += OnEnemyKilled;
             GameEvents.OnPlayerDied += OnPlayerDied;
 
+            // NEW: Listen for Combat State
+            GameEvents.OnWaveCombatStarted += EnableDecay;
+            GameEvents.OnWaveCleared += DisableDecay;
+            GameEvents.OnGameVictory += DisableDecay;
+
             UpdateUI();
         }
 
@@ -29,14 +37,19 @@ namespace DarkTowerTron.Player
         {
             GameEvents.OnEnemyKilled -= OnEnemyKilled;
             GameEvents.OnPlayerDied -= OnPlayerDied;
+
+            GameEvents.OnWaveCombatStarted -= EnableDecay;
+            GameEvents.OnWaveCleared -= DisableDecay;
+            GameEvents.OnGameVictory -= DisableDecay;
         }
 
         private void Update()
         {
             if (_isDead) return;
 
-            // Decay Logic
-            if (_currentFocus > 0)
+            // NEW: Logic Check
+            // Only decay if we are actually fighting
+            if (_isCombatActive && _currentFocus > 0)
             {
                 _currentFocus -= decayRate * Time.deltaTime;
                 if (_currentFocus < 0) _currentFocus = 0;
@@ -45,7 +58,11 @@ namespace DarkTowerTron.Player
             }
         }
 
-        // --- API used by Abilities (Blitz) ---
+        // --- STATE HANDLERS ---
+        private void EnableDecay() { _isCombatActive = true; }
+        private void DisableDecay() { _isCombatActive = false; }
+
+        // --- API (Spending still works even if decay is paused) ---
         public bool HasFocus(float amount)
         {
             return _currentFocus >= amount;
@@ -68,7 +85,6 @@ namespace DarkTowerTron.Player
             if (_currentFocus > maxFocus) _currentFocus = maxFocus;
             UpdateUI();
         }
-        // -------------------------------------
 
         private void OnEnemyKilled(Vector3 pos)
         {

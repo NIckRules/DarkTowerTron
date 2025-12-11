@@ -82,6 +82,11 @@ namespace DarkTowerTron.Managers
 
             // 3. GO!
             GameEvents.OnCountdownChange?.Invoke("ENGAGE");
+            
+            // --- NEW: TELL SYSTEM COMBAT HAS STARTED ---
+            GameEvents.OnWaveCombatStarted?.Invoke();
+            // -------------------------------------------
+
             // Optional: Play "Go" sound
             yield return new WaitForSeconds(0.5f);
             

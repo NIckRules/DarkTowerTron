@@ -10,7 +10,11 @@ namespace DarkTowerTron.Player
     {
         [Header("Weapon Base Stats")]
         public Transform firePoint;
-        public float fireRate = 0.2f; // Time between shots
+        public float fireRate = 0.2f;
+        
+        [Header("Audio")]
+        public AudioClip fireClip; // NEW: Drag sound here
+        [Range(0f, 1f)] public float volume = 0.8f;
 
         protected float _timer;
         protected bool _isFiring;
@@ -33,12 +37,22 @@ namespace DarkTowerTron.Player
             if (_isFiring && _timer <= 0)
             {
                 Fire();
-                _timer = fireRate; // Reset timer automatically
+                PlayFireSound(); // NEW
+                _timer = fireRate;
             }
         }
 
-        // Children MUST implement this (The "Bang")
         protected abstract void Fire();
+
+        // NEW HELPER
+        protected void PlayFireSound()
+        {
+            if (fireClip && GameFeel.Instance)
+            {
+                // Randomize pitch slightly for realism
+                GameFeel.Instance.PlaySound(fireClip, volume, true); 
+            }
+        }
 
         // --- SHARED HELPER METHODS ---
 

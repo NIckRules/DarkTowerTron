@@ -5,11 +5,14 @@ using DarkTowerTron.Core;
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
-    [RequireComponent(typeof(Blitz))]
+    // [RequireComponent(typeof(Blitz))] <-- REMOVE THIS
     public class PlayerController : MonoBehaviour
     {
         private PlayerMovement _movement;
-        private Blitz _blitz;
+        
+        // NEW REFERENCES
+        private PlayerDodge _dodgeAbility;
+        private PlayerExecution _executionAbility;
 
         // Weapon References
         private PlayerAttack _beamWeapon;
@@ -29,7 +32,11 @@ namespace DarkTowerTron.Player
         private void Awake()
         {
             _movement = GetComponent<PlayerMovement>();
-            _blitz = GetComponent<Blitz>();
+            
+            // FIND NEW COMPONENTS
+            _dodgeAbility = GetComponent<PlayerDodge>();
+            _executionAbility = GetComponent<PlayerExecution>();
+            
             _cam = Camera.main;
 
             _beamWeapon = GetComponent<PlayerAttack>();
@@ -154,12 +161,12 @@ namespace DarkTowerTron.Player
 
         private void OnDodge()
         {
-            if (_inputEnabled) _blitz.PerformDodge();
+            if (_inputEnabled && _dodgeAbility) _dodgeAbility.PerformDodge();
         }
 
         private void OnGloryKill()
         {
-            if (_inputEnabled) _blitz.PerformGloryKill();
+            if (_inputEnabled && _executionAbility) _executionAbility.PerformGloryKill();
         }
 
         public void ToggleInput(bool state)

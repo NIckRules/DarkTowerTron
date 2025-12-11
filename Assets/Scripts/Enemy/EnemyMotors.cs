@@ -1,136 +1,126 @@
 using UnityEngine;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
 
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(KinematicMover))]
     public class EnemyMotor : MonoBehaviour
     {
-        [Header("Movement Settings")]
-        public float moveSpeed = 8f;
-        public float rotationSpeed = 10f;
-        public float acceleration = 20f;
+        [Header("Data Profile")]
+        public EnemyStatsSO stats;
 
-        [Header("Flight Settings")]
-        [Tooltip("Height above ground. Set 0 for ground units.")]
-        public float rideHeight = 0f;
-        public float verticalSmoothTime = 0.5f; // How fast they float up
-
-        [Header("Separation (Flocking)")]
-        public float separationRadius = 1.2f;
-        public float separationForce = 5f;
-        public LayerMask allyLayer; // Set to 'Enemy'
-
-        // Cache collider array to avoid GC
-        private Collider[] _neighbors = new Collider[10];
+        [Header("Layers")]
+        public LayerMask allyLayer;
 
         private KinematicMover _mover;
         private Vector3 _currentVelocity;
         private Vector3 _knockbackForce;
-        private float _currentVerticalSpeed; // For SmoothDamp
+        private float _currentVerticalSpeed;
+        private Collider[] _neighbors = new Collider[10];
 
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
-
-            // Default Ally Layer
             if (allyLayer == 0) allyLayer = LayerMask.GetMask(GameConstants.LAYER_ENEMY);
-
-            // AUTO-CONFIGURATION:
-            // If this unit flies, disable the physics gravity so it doesn't fall.
-            // We assume KinematicMover exposes gravity or we just fight it.
-            // Since KinematicMover gravity is private, we will rely on the "Hover" logic
-            // providing enough force to counteract it, OR ideally, you set Gravity 0 in Inspector.
-
-            // Note: For this to work perfectly, ensure KinematicMover Gravity is 0 on the Prefab
-            // OR we can fight it here. Let's fight it mathematically.
         }
+
+        // --- THE FIXED METHOD ---
+        private void OnEnable()
+        {
+            _currentVelocity = Vector3.zero;
+            _knockbackForce = Vector3.zero;
+            _currentVerticalSpeed = 0f;
+
+            // Fix: Check stats.rideHeight instead of local variable
+            if (stats != null && stats.rideHeight > 0)
+            {
+                Vector3 startPos = transform.position;
+                startPos.y = 0; // Snap to floor so we can rise up
+                transform.position = startPos;
+            }
+        }
+        // ------------------------
 
         public void Move(Vector3 desiredDirection)
         {
-            float dt = Time.deltaTime;
-            Vector3 targetVel = desiredDirection * moveSpeed;
+            if (stats == null) return;
 
-            // 1. Separation Logic (Soft Collision)
-            Vector3 separationPush = CalculateSeparation();
-            
-            // Add separation to the target velocity (influence it)
-            targetVel += separationPush;
+            float dt = Time.deltaTime;
+            Vector3 targetVel = desiredDirection * stats.moveSpeed;
+
+            // 1. Separation
+            if (stats.moveSpeed > 0.1f)
+            {
+                Vector3 separationPush = CalculateSeparation();
+                targetVel += separationPush;
+            }
 
             // 2. Inertia
-            _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, acceleration * dt);
+            _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, stats.acceleration * dt);
 
-            // 2. Knockback Decay
+            // 3. Knockback
             if (_knockbackForce.magnitude > 0.1f)
             {
                 _knockbackForce = Vector3.Lerp(_knockbackForce, Vector3.zero, 5f * dt);
             }
 
-            // 3. FLIGHT LOGIC (Ride Height)
-            // We calculate the Y velocity needed to reach rideHeight
+            // 4. Flight Logic
             float currentY = transform.position.y;
-            float targetY = rideHeight;
-            float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, verticalSmoothTime);
-
-            // Calculate delta needed this frame
+            float targetY = stats.rideHeight; // Access via stats
+            float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime); // Access via stats
             float verticalMotion = newY - currentY;
 
-            // 4. Combine
-            // We flatten the physics/knockback Y and replace it with our calculated Hover Y
+            // 5. Execute
             Vector3 finalMotion = (_currentVelocity + _knockbackForce) * dt;
             finalMotion.y = verticalMotion;
 
-            // 5. Execute
             _mover.Move(finalMotion);
         }
 
         private Vector3 CalculateSeparation()
         {
-            // Only separate if we are moving or intended to move
-            // Static turrets (speed 0) shouldn't slide around
-            if (moveSpeed <= 0.1f) return Vector3.zero;
-
             Vector3 pushVector = Vector3.zero;
-            
-            // NonAlloc Physics check
-            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, separationRadius, _neighbors, allyLayer);
+
+            // Use stats.separationRadius
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, stats.separationRadius, _neighbors, allyLayer);
 
             for (int i = 0; i < count; i++)
             {
                 var neighbor = _neighbors[i];
-                // Ignore self
                 if (neighbor.gameObject == gameObject) continue;
 
-                // Calculate push away vector
                 Vector3 direction = transform.position - neighbor.transform.position;
                 float dist = direction.magnitude;
 
-                // Stronger push if closer
-                if (dist < 0.01f) direction = Random.insideUnitSphere; // Prevent division by zero / stacking
-                
-                // Weight by distance (1/dist)
+                if (dist < 0.01f) direction = Random.insideUnitSphere;
+
                 pushVector += direction.normalized / (dist + 0.1f);
             }
 
-            return pushVector * separationForce;
+            // Use stats.separationForce
+            return pushVector * stats.separationForce;
         }
 
         public void FaceTarget(Vector3 targetPosition)
         {
+            if (stats == null) return;
+
             Vector3 dir = targetPosition - transform.position;
             dir.y = 0;
 
             if (dir != Vector3.zero)
             {
                 Quaternion targetRot = Quaternion.LookRotation(dir);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+                // Use stats.rotationSpeed
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, stats.rotationSpeed * Time.deltaTime);
             }
         }
 
         public void ApplyKnockback(Vector3 force)
         {
-            force.y = 0; // Ensure knockback is flat
+            force.y = 0;
             _knockbackForce += force;
         }
     }

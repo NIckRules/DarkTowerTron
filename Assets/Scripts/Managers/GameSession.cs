@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player; // To access PlayerController
+using DarkTowerTron.Player;
 
 namespace DarkTowerTron.Managers
 {
@@ -9,32 +9,45 @@ namespace DarkTowerTron.Managers
     {
         [Header("UI References")]
         public GameObject startPanel;
+        public GameObject tutorialPanel;
         public GameObject hudPanel;
         public GameObject gameOverPanel;
-        public GameObject victoryPanel; // NEW SLOT
+        public GameObject victoryPanel;
+        public GameObject pausePanel; // NEW
 
         [Header("Scene References")]
         public PlayerController player;
         public WaveManager waveManager;
 
         private bool _isGameRunning = false;
+        private bool _isPaused = false;
+        private GameControls _controls; // To read ESC input
+
+        private void Awake()
+        {
+            _controls = new GameControls();
+            // Listen for Pause button
+            _controls.Gameplay.Pause.performed += ctx => TogglePause();
+        }
+
+        private void OnEnable()
+        {
+            _controls.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _controls.Disable();
+        }
 
         private void Start()
         {
-            // Initial State
-            Time.timeScale = 1f; // Ensure time is running
+            Time.timeScale = 1f;
+            SetPanelActive(startPanel);
 
-            if (startPanel) startPanel.SetActive(true);
-            if (hudPanel) hudPanel.SetActive(false);
-            if (gameOverPanel) gameOverPanel.SetActive(false);
-            if (victoryPanel) victoryPanel.SetActive(false);
-
-            // Lock Player Input
             if (player) player.ToggleInput(false);
 
-            // Listen for Death
             GameEvents.OnPlayerDied += TriggerGameOver;
-            // LISTEN FOR VICTORY
             GameEvents.OnGameVictory += TriggerVictory;
         }
 
@@ -44,49 +57,69 @@ namespace DarkTowerTron.Managers
             GameEvents.OnGameVictory -= TriggerVictory;
         }
 
-        // --- UI BUTTONS HOOKS ---
+        // --- PAUSE LOGIC ---
+
+        public void TogglePause()
+        {
+            if (!_isGameRunning) return;
+
+            _isPaused = !_isPaused;
+
+            if (_isPaused)
+            {
+                // PAUSE
+                Time.timeScale = 0f;
+                pausePanel.SetActive(true);
+                hudPanel.SetActive(false); // <--- Add This (Hide HUD)
+                if (player) player.ToggleInput(false);
+            }
+            else
+            {
+                // RESUME
+                Time.timeScale = 1f;
+                pausePanel.SetActive(false);
+                hudPanel.SetActive(true); // <--- Add This (Show HUD)
+                if (player) player.ToggleInput(true);
+            }
+        }
+
+        // --- PUBLIC UI FUNCTIONS ---
 
         public void BeginGame()
         {
-
             _isGameRunning = true;
+            _isPaused = false;
+            SetPanelActive(hudPanel);
 
-            if (startPanel) startPanel.SetActive(false);
-            if (hudPanel) hudPanel.SetActive(true);
-
-            // Unlock Player
             if (player) player.ToggleInput(true);
-
-            // Start Waves
             if (waveManager) waveManager.StartGame();
         }
 
+        public void OpenTutorial() { SetPanelActive(tutorialPanel); }
+        public void BackToMenu() { SetPanelActive(startPanel); }
+
         public void RestartGame()
         {
-            Time.timeScale = 1f; // Reset time in case it was slowed
-            // Reload current scene
+            Time.timeScale = 1f;
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         public void QuitGame()
         {
             Application.Quit();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
 
-        // --- LOGIC ---
+        // --- INTERNAL ---
 
         private void TriggerGameOver()
         {
             if (!_isGameRunning) return;
             _isGameRunning = false;
-
-            // Slow motion death effect
             Time.timeScale = 0.2f;
-
-            if (hudPanel) hudPanel.SetActive(false);
-            if (gameOverPanel) gameOverPanel.SetActive(true);
-
-            // Lock Input
+            SetPanelActive(gameOverPanel);
             if (player) player.ToggleInput(false);
         }
 
@@ -94,15 +127,23 @@ namespace DarkTowerTron.Managers
         {
             if (!_isGameRunning) return;
             _isGameRunning = false;
-
-            // Slow mo finish
-            Time.timeScale = 0.5f; 
-
-            if(hudPanel) hudPanel.SetActive(false);
-            if(victoryPanel) victoryPanel.SetActive(true);
-
-            // Lock Input
+            Time.timeScale = 0.5f;
+            SetPanelActive(victoryPanel);
             if (player) player.ToggleInput(false);
+        }
+
+        private void SetPanelActive(GameObject activePanel)
+        {
+            // Hide all
+            if (startPanel) startPanel.SetActive(false);
+            if (tutorialPanel) tutorialPanel.SetActive(false);
+            if (hudPanel) hudPanel.SetActive(false);
+            if (gameOverPanel) gameOverPanel.SetActive(false);
+            if (victoryPanel) victoryPanel.SetActive(false);
+            if (pausePanel) pausePanel.SetActive(false);
+
+            // Show one
+            if (activePanel) activePanel.SetActive(true);
         }
     }
 }

@@ -1,7 +1,8 @@
 using UnityEngine;
+using DG.Tweening; // Logic relies on Tweening
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
-using DarkTowerTron.Managers; // Needed for PoolManager
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Enemy
 {
@@ -14,10 +15,27 @@ namespace DarkTowerTron.Enemy
         protected Transform _player;
         protected Transform _currentTarget;
 
+        // NEW: State Flag
+        protected bool _isSpawning = true; 
+
         protected virtual void Awake()
         {
             _motor = GetComponent<EnemyMotor>();
             _controller = GetComponent<EnemyController>();
+        }
+
+        // NEW: OnEnable handles the Spawn Logic (Runs every time it comes from Pool)
+        protected virtual void OnEnable()
+        {
+            _isSpawning = true;
+            transform.localScale = Vector3.zero;
+
+            // FIRE SPAWN EVENT
+            GameEvents.OnEnemySpawned?.Invoke(transform.position);
+
+            transform.DOScale(Vector3.one, 0.8f)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() => _isSpawning = false);
         }
 
         protected virtual void Start()
@@ -41,6 +59,9 @@ namespace DarkTowerTron.Enemy
 
         private void Update()
         {
+            // BLOCK LOGIC IF SPAWNING
+            if (_isSpawning) return;
+
             if (_player == null) return;
             if (_currentTarget == null) _currentTarget = _player;
             if (_controller.IsStaggered) return;

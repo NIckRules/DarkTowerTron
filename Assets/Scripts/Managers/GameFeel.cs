@@ -11,7 +11,6 @@ namespace DarkTowerTron.Core
         [SerializeField] private AudioSource _sfxSource;
         [SerializeField] private AudioClip _hitClip;
         [SerializeField] private AudioClip _killClip;
-        [SerializeField] private AudioClip _dashClip;
         [SerializeField] private AudioClip _playerHurtClip;
 
         private Camera _childCam; // The camera we shake (Child of Rig)
@@ -54,9 +53,21 @@ namespace DarkTowerTron.Core
             StartCoroutine(DoHitStop(duration));
         }
 
-        public void PlaySound(AudioClip clip, float volume = 1f)
+        // Updated API: Added 'randomizePitch' bool
+        public void PlaySound(AudioClip clip, float volume = 1f, bool randomizePitch = false)
         {
-            if (clip && _sfxSource) _sfxSource.PlayOneShot(clip, volume);
+            if (!clip || !_sfxSource) return;
+
+            if (randomizePitch)
+            {
+                _sfxSource.pitch = Random.Range(0.9f, 1.1f);
+            }
+            else
+            {
+                _sfxSource.pitch = 1.0f;
+            }
+
+            _sfxSource.PlayOneShot(clip, volume);
         }
 
         // --- EVENT HANDLERS ---
