@@ -135,18 +135,30 @@ namespace DarkTowerTron.Enemy
             return pushVector * stats.separationForce;
         }
 
+        // Standard Face Target (Uses Navigation Speed)
         public void FaceTarget(Vector3 targetPosition)
         {
             if (stats == null) return;
+            RotateTowards(targetPosition, stats.rotationSpeed);
+        }
 
+        // Combat Face Target (Uses Slower Combat Speed)
+        public void FaceCombatTarget(Vector3 targetPosition)
+        {
+            if (stats == null) return;
+            RotateTowards(targetPosition, stats.combatRotationSpeed);
+        }
+
+        // Helper to avoid duplicate code
+        private void RotateTowards(Vector3 targetPosition, float speed)
+        {
             Vector3 dir = targetPosition - transform.position;
-            dir.y = 0;
-
+            dir.y = 0; 
+            
             if (dir != Vector3.zero)
             {
                 Quaternion targetRot = Quaternion.LookRotation(dir);
-                // Use stats.rotationSpeed
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, stats.rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, speed * Time.deltaTime);
             }
         }
 

@@ -17,9 +17,10 @@ MonoBehaviour:
   focusReward: 30
   healsGrit: 1
   gritRewardAmount: 1
-  moveSpeed: 0
-  rotationSpeed: 2.7
-  acceleration: 0.1
+  moveSpeed: 5
+  rotationSpeed: 25
+  combatRotationSpeed: 3
+  acceleration: 60
   rideHeight: 1
   verticalSmoothTime: 0.5
   separationRadius: 1.5

@@ -6,8 +6,18 @@ namespace DarkTowerTron.AI.Core.Behaviors // Note: Sub-namespace optional but cl
     [CreateAssetMenu(fileName = "Beh_Seek", menuName = "DarkTowerTron/AI/Behaviors/Seek")]
     public class SeekBehavior : SteeringBehavior
     {
+        private Collider ownerCollider;
+
+        public void Initialize(Collider owner)
+        {
+            ownerCollider = owner;
+        }
+
         public override void GetSteering(float[] interest, float[] danger, AIData aiData)
         {
+            // Call Initialize if it hasn't been called yet
+            if (ownerCollider == null) Initialize(aiData.GetComponent<Collider>());
+
             // If no target, do nothing
             if (aiData.currentTarget == null) return;
 

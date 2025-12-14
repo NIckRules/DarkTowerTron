@@ -16,8 +16,9 @@ GameObject:
   - component: {fileID: 940291227875785411}
   - component: {fileID: 9104580854497166427}
   - component: {fileID: 852908296871562534}
-  - component: {fileID: 912923482393072704}
-  - component: {fileID: 4104228317881277130}
+  - component: {fileID: 3962461874279498121}
+  - component: {fileID: 4368561175701528667}
+  - component: {fileID: 413201274170582421}
   m_Layer: 7
   m_Name: ENE_Guardian
   m_TagString: Enemy
@@ -168,9 +169,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behaviors: []
   detectors:
-  - {fileID: 4104228317881277130}
+  - {fileID: 413201274170582421}
   showGizmos: 1
---- !u!114 &912923482393072704
+--- !u!114 &3962461874279498121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8a3acdcf7b73d44964b4bbc4743a18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4368561175701528667
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,13 +195,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e6e2fc1fcccb184ca4f51dadb93d439, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectilePrefab: {fileID: 4044515353307923508, guid: 4af09f738c9220641892c2820a0e78c0,
+  waypointTolerance: 1
+  moveBehaviors:
+  - {fileID: 11400000, guid: a9aa5036245d66e408d847a7f9f7750e, type: 2}
+  - {fileID: 11400000, guid: b1e853f3913cd434ca7f324824d176f1, type: 2}
+  projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
     type: 3}
   firePoint: {fileID: 2727545481032966752}
-  fireInterval: 3
-  burstCount: 5
-  burstRate: 0.1
---- !u!114 &4104228317881277130
+  attackPatterns:
+  - {fileID: 11400000, guid: ead5bf89e297b6449843b262826d546f, type: 2}
+  - {fileID: 11400000, guid: 5fbf3fd672e4ba246ad5e10215cb41e3, type: 2}
+  - {fileID: 11400000, guid: bc9335a264b15b7498ea8e8e23bc444c, type: 2}
+--- !u!114 &413201274170582421
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -197,14 +215,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4608774935982201577}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d558570723de654498a09f560c44cc66, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f13137f182b75c41899ad3069ef5741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 20
-  targetLayer:
+  detectionRadius: 2
+  obstacleMask:
     serializedVersion: 2
-    m_Bits: 64
-  showGizmos: 0
+    m_Bits: 3136
+  showGizmos: 1
 --- !u!1 &4627178880318046138
 GameObject:
   m_ObjectHideFlags: 0

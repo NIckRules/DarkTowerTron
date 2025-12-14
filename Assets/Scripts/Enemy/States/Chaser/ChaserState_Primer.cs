@@ -48,7 +48,7 @@ namespace DarkTowerTron.Enemy.States.Chaser
 
             if (_timer <= 0)
             {
-                _agent.Detonate();
+                _agent.DeployMine(); // CHANGED: Was Detonate()
             }
         }
 

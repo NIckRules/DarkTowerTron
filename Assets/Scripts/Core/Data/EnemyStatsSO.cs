@@ -16,7 +16,8 @@ namespace DarkTowerTron.Core.Data
 
         [Header("Movement")]
         public float moveSpeed = 8f;
-        public float rotationSpeed = 10f;
+        public float rotationSpeed = 10f; // Fast, for navigation
+        public float combatRotationSpeed = 3f; // Slow, for aiming at player
         public float acceleration = 20f;
 
         [Header("Flight (Set 0 for Ground)")]
@@ -42,6 +43,7 @@ namespace DarkTowerTron.Core.Data
             // Prevent negative movement
             moveSpeed = Mathf.Max(0f, moveSpeed);
             rotationSpeed = Mathf.Max(0f, rotationSpeed);
+            combatRotationSpeed = Mathf.Max(0.1f, combatRotationSpeed);
             acceleration = Mathf.Max(0.1f, acceleration); // 0 accel = infinite stuck
 
             // Prevent negative rewards

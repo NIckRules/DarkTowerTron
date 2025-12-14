@@ -17,10 +17,13 @@ namespace DarkTowerTron.AI.Core
         private float[] _interestMap = new float[8];
         private float[] _dangerMap = new float[8];
         private AIData _aiData;
+        private Collider _ownerCollider;
 
         private void Awake()
         {
             _aiData = GetComponent<AIData>();
+            // Get the AI's own collider (usually on the root)
+            _ownerCollider = GetComponent<Collider>();
         }
 
         public Vector3 GetDirectionToMove()

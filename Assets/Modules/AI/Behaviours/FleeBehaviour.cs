@@ -8,8 +8,18 @@ namespace DarkTowerTron.AI.Core.Behaviors
     {
         public float fleeDistance = 10f; // Only flee if target is closer than this
 
+        private Collider ownerCollider;
+
+        public void Initialize(Collider owner)
+        {
+            ownerCollider = owner;
+        }
+
         public override void GetSteering(float[] interest, float[] danger, AIData aiData)
         {
+            // Call Initialize if it hasn't been called yet
+            if (ownerCollider == null) Initialize(aiData.GetComponent<Collider>());
+
             if (aiData.currentTarget == null) return;
 
             Vector3 vectorToTarget = aiData.currentTarget.position - aiData.transform.position;

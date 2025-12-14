@@ -1,6 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Managers; // Needed for PoolManager
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Combat
 {
@@ -12,36 +12,34 @@ namespace DarkTowerTron.Combat
         public float speed = 15f;
         public float lifetime = 5f;
         public bool isHostile = true;
+        
+        [Header("Safety")]
+        public float gracePeriod = 0.05f; // Ignore hits for first 0.05s
+        public LayerMask wallLayer;
 
         [Header("Damage Stats")]
         public float damage = 10f;
         public float stagger = 0f;
 
         [Header("Visuals")]
-        public Renderer meshRenderer;
+        public Renderer meshRenderer; 
         public Material friendlyMaterial;
 
-        [Header("Safety")]
-        public LayerMask wallLayer; // Explicit LayerMask
-
         private Material _originalMaterial;
-
         private Vector3 _direction;
         private bool _isInitialized = false;
-        private bool _isRedirected = false;
+        private bool _isRedirected = false; 
         private float _lifeTimer;
+        private float _graceTimer;
 
         private void Awake()
         {
-            if (meshRenderer) _originalMaterial = meshRenderer.sharedMaterial; // sharedMaterial is safer for caching origin
-
-            // Default mask if not set
+            if (meshRenderer) _originalMaterial = meshRenderer.sharedMaterial;
             if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
         }
 
         public void OnSpawn()
         {
-            // Reset logic happens in Initialize, but we can safety reset here too
             _lifeTimer = lifetime;
         }
 
@@ -56,39 +54,35 @@ namespace DarkTowerTron.Combat
             _direction = dir.normalized;
             _isInitialized = true;
             _lifeTimer = lifetime;
-
-            _isRedirected = false; // Reset status
-
-            // Restore visual
+            _graceTimer = gracePeriod; // RESET TIMER
+            _isRedirected = false; 
+            
             if (meshRenderer && _originalMaterial) meshRenderer.material = _originalMaterial;
         }
 
-        // RESET LOGIC WHEN PULLED FROM POOL
-        public void ResetHostility(bool startHostile)
-        {
-            isHostile = startHostile;
-        }
+        public void ResetHostility(bool startHostile) { isHostile = startHostile; }
 
         private void Update()
         {
             if (!_isInitialized) return;
+            
+            // Countdown Grace Period
+            if (_graceTimer > 0) _graceTimer -= Time.deltaTime;
 
             transform.Translate(_direction * speed * Time.deltaTime, Space.World);
 
-            // Manual Lifetime check
             _lifeTimer -= Time.deltaTime;
-            if (_lifeTimer <= 0)
-            {
-                Despawn();
-            }
+            if (_lifeTimer <= 0) Despawn();
         }
 
         private void OnTriggerEnter(Collider other)
         {
+            // SAFETY CHECK: If grace period active, ignore everything
+            if (_graceTimer > 0) return;
+
             if (other.isTrigger) return;
 
-            // OPTIMIZATION: Bitwise check against LayerMask
-            // This is significantly faster than comparing strings or layer indices manually
+            // Wall Check
             if ((wallLayer.value & (1 << other.gameObject.layer)) > 0)
             {
                 Despawn();
@@ -108,7 +102,7 @@ namespace DarkTowerTron.Combat
                     pushDirection = _direction,
                     pushForce = 5f,
                     source = gameObject,
-                    isRedirected = this._isRedirected
+                    isRedirected = this._isRedirected 
                 };
 
                 if (target.TakeDamage(info)) Despawn();
@@ -117,15 +111,13 @@ namespace DarkTowerTron.Combat
 
         public void Redirect(Vector3 newDirection, GameObject newOwner)
         {
-            isHostile = false;
+            isHostile = false; 
             _isRedirected = true;
             _direction = newDirection.normalized;
-            speed *= 1.5f;
-
+            speed *= 1.5f; 
             if (meshRenderer && friendlyMaterial) meshRenderer.material = friendlyMaterial;
             else if (meshRenderer) meshRenderer.material.color = Color.cyan;
-
-            _lifeTimer = 3.0f; // Renew lifetime
+            _lifeTimer = 3.0f; 
         }
 
         private void Despawn()

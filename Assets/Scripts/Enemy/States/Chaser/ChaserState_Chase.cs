@@ -29,12 +29,13 @@ namespace DarkTowerTron.Enemy.States.Chaser
             if (moveDir.sqrMagnitude > 0.1f)
                 _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
 
-            // 2. Transition -> Priming
+            // 2. Transition
             float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
 
             if (dist <= _agent.attackRange)
             {
-                _stateMachine.ChangeState(_agent.StatePriming);
+                // DELEGATE DECISION TO AGENT
+                _agent.TriggerAttack();
             }
         }
     }
