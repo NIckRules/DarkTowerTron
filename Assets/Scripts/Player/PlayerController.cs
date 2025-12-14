@@ -44,36 +44,35 @@ namespace DarkTowerTron.Player
 
             _controls = new GameControls();
 
-            // --- CACHE ACTIONS ---
-            // We look them up once. If they don't exist, these variables will be null.
+            // --- STRICT BINDING (No Strings) ---
+            // Direct access ensures compile-time errors if names change.
+
+            // Cache actions once (no FindAction lookups)
             _moveAction = _controls.Gameplay.Move;
             _lookPadAction = _controls.Gameplay.LookGamepad;
             _lookMouseAction = _controls.Gameplay.LookMouse;
-
-            // Safely find actions even if you renamed them slightly differently
-            _fireBeamAction = _controls.asset.FindAction("Melee");
-            _fireGunAction = _controls.asset.FindAction("Gun");
-
-            // --- BINDINGS ---
-            // 1. Dodge (Space / RB)
-            // Use FindAction to be safe, or direct access if you are sure
-            var dodgeAction = _controls.asset.FindAction("Blitz");
-            if (dodgeAction != null) dodgeAction.performed += ctx => OnDodge();
-
-            // 2. Glory Kill (E / LB)
-            var killAction = _controls.asset.FindAction("GloryKill");
-            if (killAction != null) killAction.performed += ctx => OnGloryKill();
+            _fireBeamAction = _controls.Gameplay.Melee;
+            _fireGunAction = _controls.Gameplay.Gun;
         }
 
         private void OnEnable()
         {
+            _controls.Gameplay.Blitz.performed += OnBlitzPerformed;
+            _controls.Gameplay.GloryKill.performed += OnGloryKillPerformed;
+
             if (_inputEnabled) _controls.Enable();
         }
 
         private void OnDisable()
         {
+            _controls.Gameplay.Blitz.performed -= OnBlitzPerformed;
+            _controls.Gameplay.GloryKill.performed -= OnGloryKillPerformed;
+
             _controls.Disable();
         }
+
+        private void OnBlitzPerformed(InputAction.CallbackContext ctx) => OnDodge();
+        private void OnGloryKillPerformed(InputAction.CallbackContext ctx) => OnGloryKill();
 
         private void Update()
         {
@@ -143,16 +142,17 @@ namespace DarkTowerTron.Player
         private void HandleFiring()
         {
             // 1. Handle BEAM
-            if (_beamWeapon != null && _fireBeamAction != null)
+            if (_beamWeapon != null)
             {
-                bool isBeam = _fireBeamAction.ReadValue<float>() > 0.5f;
+                // Direct access via generated class
+                bool isBeam = _controls.Gameplay.Melee.ReadValue<float>() > 0.5f;
                 _beamWeapon.SetFiring(isBeam);
             }
 
             // 2. Handle GUN
-            if (_gunWeapon != null && _fireGunAction != null)
+            if (_gunWeapon != null)
             {
-                bool isGun = _fireGunAction.ReadValue<float>() > 0.5f;
+                bool isGun = _controls.Gameplay.Gun.ReadValue<float>() > 0.5f;
                 _gunWeapon.SetFiring(isGun);
             }
         }

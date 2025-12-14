@@ -38,8 +38,6 @@ namespace DarkTowerTron.Managers
                 // CRITICAL FIX: Move it BEFORE waking it up
                 objectToSpawn.transform.position = position;
                 objectToSpawn.transform.rotation = rotation;
-
-                objectToSpawn.SetActive(true); // Now OnEnable fires at the correct location
             }
             // 2. NEW OBJECT
             else
@@ -49,9 +47,10 @@ namespace DarkTowerTron.Managers
                 // OnEnable fires immediately here, but position is already correct
             }
 
-            // NEW: Interface Call
-            var poolable = objectToSpawn.GetComponent<IPoolable>();
-            if (poolable != null) poolable.OnSpawn();
+            // Interface Call (root + children)
+            objectToSpawn.SetActive(true);
+            var poolables = objectToSpawn.GetComponentsInChildren<IPoolable>(true);
+            foreach (var p in poolables) p.OnSpawn();
 
             // 3. Track it
             int instanceKey = objectToSpawn.GetInstanceID();
@@ -70,9 +69,9 @@ namespace DarkTowerTron.Managers
             // Only pool objects we know about; otherwise destroy them
             if (_spawnedObjectsParentId.ContainsKey(instanceKey))
             {
-                // NEW: Interface Call
-                var poolable = obj.GetComponent<IPoolable>();
-                if (poolable != null) poolable.OnDespawn();
+                // Interface Call (root + children)
+                var poolables = obj.GetComponentsInChildren<IPoolable>(true);
+                foreach (var p in poolables) p.OnDespawn();
 
                 int poolKey = _spawnedObjectsParentId[instanceKey];
 

@@ -22,7 +22,7 @@ namespace DarkTowerTron.Managers
         }
 
         // Update the signature to match the new Event
-        private void PlayDeathVFX(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats)
+        private void PlayDeathVFX(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats, bool rewardPlayer)
         {
             if (explosionPrefab && PoolManager.Instance)
             {

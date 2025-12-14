@@ -80,7 +80,7 @@ namespace DarkTowerTron.Core
         }
 
         // Update the signature
-        private void OnEnemyKilled(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats, bool rewardPlayer)
         {
             PlaySound(_killClip, 0.8f);
             CameraShake(0.15f, 0.2f); 

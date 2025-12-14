@@ -6,7 +6,7 @@ using DarkTowerTron.Core.Data;
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(KinematicMover))]
-    public class EnemyMotor : MonoBehaviour
+    public class EnemyMotor : MonoBehaviour, IPoolable
     {
         [Header("Data Profile")]
         public EnemyStatsSO stats;
@@ -26,22 +26,34 @@ namespace DarkTowerTron.Enemy
             if (allyLayer == 0) allyLayer = LayerMask.GetMask(GameConstants.LAYER_ENEMY);
         }
 
-        // --- THE FIXED METHOD ---
         private void OnEnable()
         {
+            // Keep existing behavior even when not spawned via pool
+            OnSpawn();
+        }
+
+        // --- IPoolable ---
+        public void OnSpawn()
+        {
+            // Reset Physics State
             _currentVelocity = Vector3.zero;
             _knockbackForce = Vector3.zero;
             _currentVerticalSpeed = 0f;
 
-            // Fix: Check stats.rideHeight instead of local variable
+            // Reset Position logic
             if (stats != null && stats.rideHeight > 0)
             {
                 Vector3 startPos = transform.position;
-                startPos.y = 0; // Snap to floor so we can rise up
+                startPos.y = 0;
                 transform.position = startPos;
             }
         }
-        // ------------------------
+
+        public void OnDespawn()
+        {
+            // Stop moving immediately so we don't drift while in the pool
+            _currentVelocity = Vector3.zero;
+        }
 
         public void Move(Vector3 desiredDirection)
         {

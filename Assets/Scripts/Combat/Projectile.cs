@@ -87,8 +87,9 @@ namespace DarkTowerTron.Combat
         {
             if (other.isTrigger) return;
 
-            // Wall Check using Bitmask Math (Faster & Safer than string compare)
-            if (((1 << other.gameObject.layer) & wallLayer.value) != 0)
+            // OPTIMIZATION: Bitwise check against LayerMask
+            // This is significantly faster than comparing strings or layer indices manually
+            if ((wallLayer.value & (1 << other.gameObject.layer)) > 0)
             {
                 Despawn();
                 return;

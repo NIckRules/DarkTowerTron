@@ -54,8 +54,10 @@ namespace DarkTowerTron.Player
         }
 
         // --- FIXED SIGNATURE ---
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
+            if (!rewardPlayer) return;
+
             // Use specific reward if available, otherwise default
             float reward = (stats != null) ? stats.focusReward : defaultFocusOnKill;
             AddFocus(reward);

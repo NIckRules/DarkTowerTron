@@ -47,8 +47,10 @@ namespace DarkTowerTron.Managers
         }
 
         // --- FIXED METHOD SIGNATURE ---
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
+            if (!rewardPlayer) return;
+
             // Determine score from Stats asset, or use default if missing
             int scoreValue = (stats != null) ? stats.scoreValue : baseScorePerKill;
 

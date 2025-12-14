@@ -59,7 +59,7 @@ namespace DarkTowerTron.Managers
             if (GameTime.Instance) GameTime.Instance.HitStop(0.1f);
         }
 
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             // 1. Audio
             if (AudioManager.Instance) AudioManager.Instance.PlaySound(killClip, 0.8f);

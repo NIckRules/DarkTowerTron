@@ -1,64 +1,65 @@
 using UnityEngine;
+using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.AI.Core;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.States.Chaser; // Sub-namespace
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.Agents
 {
+    [RequireComponent(typeof(StateMachine))]
     [RequireComponent(typeof(ContextSolver))]
     [RequireComponent(typeof(AIData))]
     public class EnemyAgent_Chaser : EnemyBaseAI
     {
         [Header("Kamikaze Settings")]
         public float attackRange = 1.5f;
+        public float fuseDuration = 0.5f; // Time before boom
         public float damage = 1f;
         public float explosionForce = 20f;
 
-        private ContextSolver _brain;
+        [Header("Steering Profiles")]
+        public List<SteeringBehavior> chaseBehaviors; // Seek + AvoidWalls
+
+        // -- COMPONENTS --
+        public ContextSolver Brain { get; private set; }
+        public StateMachine FSM { get; private set; }
+
+        // -- STATES --
+        public ChaserState_Chase StateChase { get; private set; }
+        public ChaserState_Priming StatePriming { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
-            _brain = GetComponent<ContextSolver>();
+            Brain = GetComponent<ContextSolver>();
+            FSM = GetComponent<StateMachine>();
+
+            // Initialize States
+            StateChase = new ChaserState_Chase(this);
+            StatePriming = new ChaserState_Priming(this);
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            FSM.Initialize(StateChase);
         }
 
         protected override void RunAI()
         {
-            // 1. Navigation
-            Vector3 smartDir = _brain.GetDirectionToMove();
-            _motor.Move(smartDir);
-
-            if (smartDir.sqrMagnitude > 0.1f)
-                _motor.FaceTarget(transform.position + smartDir);
-
-            // 2. Attack Check
-            float dist = Vector3.Distance(transform.position, _currentTarget.position);
-
-            if (dist <= attackRange)
-            {
-                Detonate();
-            }
+            // Logic delegated to FSM
         }
 
-        private void Detonate()
+        // --- HELPER FOR EXPLOSION ---
+        public void Detonate()
         {
-            // LOG 1: Who are we hitting?
-            Debug.Log($"[DEBUG CHASER] Detonate Triggered! Distance was close enough. Target is: {_currentTarget.name}");
+            if (_currentTarget == null) return;
 
-            // 2. Try to find Health Component
             IDamageable targetHealth = _currentTarget.GetComponentInParent<IDamageable>();
 
-            // Fallback check
-            if (targetHealth == null)
-            {
-                Debug.LogWarning($"[DEBUG CHASER] GetComponentInParent<IDamageable> failed on {_currentTarget.name}. Trying GetComponentInChildren...");
-                targetHealth = _currentTarget.GetComponentInChildren<IDamageable>();
-            }
-
-            // 3. Apply Damage
             if (targetHealth != null)
             {
-                Debug.Log($"[DEBUG CHASER] Script FOUND on {targetHealth}. Sending {damage} damage.");
-
                 DamageInfo info = new DamageInfo
                 {
                     damageAmount = damage,
@@ -66,17 +67,27 @@ namespace DarkTowerTron.Enemy
                     pushForce = explosionForce,
                     source = gameObject
                 };
-
-                bool result = targetHealth.TakeDamage(info);
-                Debug.Log($"[DEBUG CHASER] TakeDamage returned: {result}");
+                targetHealth.TakeDamage(info);
+                _controller.SelfDestruct();
             }
             else
             {
-                Debug.LogError($"[DEBUG CHASER] CRITICAL FAILURE: Target '{_currentTarget.name}' has NO IDamageable script on Parent or Children!");
+                // Hit Decoy? Reward. Hit Wall? No Reward.
+                if (_currentTarget.name.Contains("AfterImage") || _currentTarget.CompareTag("Untagged"))
+                    _controller.Kill(true);
+                else
+                    _controller.SelfDestruct();
             }
+        }
 
-            // 4. Die
-            _controller.Kill(true);
+        public Transform GetTarget() => _currentTarget;
+        public EnemyController GetController() => _controller;
+        public EnemyMotor GetMotor() => _motor;
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
         }
     }
 }

@@ -144,7 +144,7 @@ namespace DarkTowerTron.Managers
             else _gruntsAlive++;
         }
 
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!_gameStarted) return;
 

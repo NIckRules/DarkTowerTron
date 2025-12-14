@@ -201,21 +201,34 @@ namespace DarkTowerTron.Enemy
             }
         }
 
+        // Standard Kill (Player wins)
         public void Kill(bool instant)
         {
-            // --- FIXED: Pass the stats so the Event System knows what died ---
-            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats);
-            // ---------------------------------------------------------------
+            // Pass 'true' for reward
+            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats, true);
+            SafeDestroy();
+        }
 
-            // CRITICAL FIX: Use Pool instead of Destroy
+        // Suicide / Hazard Death (Player gets nothing)
+        public void SelfDestruct()
+        {
+            // Pass 'false' for reward
+            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats, false);
+            SafeDestroy();
+        }
+
+        private void SafeDestroy()
+        {
+#if UNITY_EDITOR
+            if (UnityEditor.Selection.activeGameObject == gameObject)
+                UnityEditor.Selection.activeGameObject = null;
+#endif
+
+            // Use Pool if IPoolable, otherwise Destroy
             if (PoolManager.Instance)
-            {
                 PoolManager.Instance.Despawn(gameObject);
-            }
             else
-            {
                 Destroy(gameObject);
-            }
         }
     }
 }

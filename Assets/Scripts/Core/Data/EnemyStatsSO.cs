@@ -11,9 +11,8 @@ namespace DarkTowerTron.Core.Data
         [Header("Rewards")]
         public int scoreValue = 100;
         public float focusReward = 30f;
-
         public bool healsGrit = true;
-        [Min(1)] public int gritRewardAmount = 1; // NEW: Default to 1
+        [Min(1)] public int gritRewardAmount = 1;
 
         [Header("Movement")]
         public float moveSpeed = 8f;
@@ -35,5 +34,27 @@ namespace DarkTowerTron.Core.Data
         [Header("Defenses")]
         public bool hasFrontalShield = false;
         [Range(0f, 1f)] public float shieldAngle = 0.5f;
+
+        // --- NEW: VALIDATION LOGIC ---
+        // This runs automatically whenever you change a value in the Inspector
+        private void OnValidate()
+        {
+            // Prevent negative movement
+            moveSpeed = Mathf.Max(0f, moveSpeed);
+            rotationSpeed = Mathf.Max(0f, rotationSpeed);
+            acceleration = Mathf.Max(0.1f, acceleration); // 0 accel = infinite stuck
+
+            // Prevent negative rewards
+            scoreValue = Mathf.Max(0, scoreValue);
+            focusReward = Mathf.Max(0f, focusReward);
+            gritRewardAmount = Mathf.Max(1, gritRewardAmount);
+
+            // Prevent divide-by-zero or weird logic in Stagger
+            maxStagger = Mathf.Max(0.1f, maxStagger);
+            staggerDecay = Mathf.Max(0.1f, staggerDecay);
+
+            // Flocking safety
+            separationRadius = Mathf.Max(0.1f, separationRadius);
+        }
     }
 }

@@ -9,8 +9,8 @@ namespace DarkTowerTron.Core
         // --- COMBAT ---
         // OLD: public static Action<Vector3> OnEnemyKilled;
 
-        // NEW: Passes Position AND Stats (to check if essential)
-        public static Action<Vector3, EnemyStatsSO> OnEnemyKilled;
+        // Updated Signature: Vector3 pos, Stats, bool rewardPlayer
+        public static Action<Vector3, EnemyStatsSO, bool> OnEnemyKilled;
 
         public static Action OnPlayerHit;
         public static Action OnPlayerDied;

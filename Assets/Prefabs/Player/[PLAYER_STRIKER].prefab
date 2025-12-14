@@ -821,6 +821,8 @@ MonoBehaviour:
   _maxStepHeight: 0.3
   _maxSlopeAngle: 45
   _groundSnapDistance: 0.3
+  useCulling: 1
+  cullingDistance: 40
 --- !u!114 &8588073913637015239
 MonoBehaviour:
   m_ObjectHideFlags: 0

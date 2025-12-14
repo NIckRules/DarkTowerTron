@@ -96,8 +96,10 @@ namespace DarkTowerTron.Player
             UpdateUI();
         }
 
-        private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
+            if (!rewardPlayer) return;
+
             // Only heal if allowed
             if (stats != null)
             {
