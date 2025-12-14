@@ -48,6 +48,7 @@ namespace DarkTowerTron.Enemy
             if (stats == null) return;
 
             float dt = Time.deltaTime;
+            if (dt < 1e-5f) return;
             Vector3 targetVel = desiredDirection * stats.moveSpeed;
 
             // 1. Separation
@@ -66,17 +67,36 @@ namespace DarkTowerTron.Enemy
                 _knockbackForce = Vector3.Lerp(_knockbackForce, Vector3.zero, 5f * dt);
             }
 
-            // 4. Flight Logic
-            float currentY = transform.position.y;
-            float targetY = stats.rideHeight; // Access via stats
-            float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime); // Access via stats
-            float verticalMotion = newY - currentY;
+            // 4. COMBINE
+            Vector3 finalVelocity = _currentVelocity + _knockbackForce;
 
-            // 5. Execute
-            Vector3 finalMotion = (_currentVelocity + _knockbackForce) * dt;
-            finalMotion.y = verticalMotion;
+            // 5. VERTICAL LOGIC (Flight vs Gravity)
+            if (stats.rideHeight > 0)
+            {
+                // FLYING: Calculate vertical velocity to reach height
+                float currentY = transform.position.y;
+                float targetY = stats.rideHeight;
+                float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime);
 
-            _mover.Move(finalMotion);
+                // Convert distance delta back to velocity for the motor
+                float verticalVel = (newY - currentY) / dt;
+                finalVelocity.y = verticalVel;
+            }
+            else
+            {
+                // WALKING: Apply Gravity if not grounded
+                if (!_mover.IsGrounded)
+                {
+                    finalVelocity.y -= 20f; // Standard gravity
+                }
+                else
+                {
+                    finalVelocity.y = -2f; // Stick
+                }
+            }
+
+            // 6. EXECUTE
+            _mover.Move(finalVelocity);
         }
 
         private Vector3 CalculateSeparation()

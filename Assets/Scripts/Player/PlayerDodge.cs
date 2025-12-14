@@ -77,6 +77,7 @@ namespace DarkTowerTron.Player
             else dashDir = transform.forward;
 
             // Physics Loop
+            // Speed in meters/second
             float speed = dashDistance / dashDuration;
             float timer = 0f;
 
@@ -84,7 +85,9 @@ namespace DarkTowerTron.Player
             {
                 float dt = Time.deltaTime;
                 timer += dt;
-                _mover.Move(dashDir * speed * dt);
+                // Do not multiply by dt here.
+                // KinematicMover.Move(Velocity) applies (Velocity * dt) internally.
+                _mover.Move(dashDir * speed);
                 CatchProjectiles();
                 yield return null;
             }

@@ -17,6 +17,11 @@ namespace DarkTowerTron.Managers
         public Color activePipColor = Color.white;
         public Color inactivePipColor = new Color(1, 1, 1, 0.2f); // Faded
 
+        [Header("Hull / Wound")]
+        public Image hullIcon; // Assign the Wound Image
+        public Color hullActiveColor = Color.cyan; // Shield is UP
+        public Color hullBrokenColor = new Color(1, 0, 0, 0.3f); // Shield BROKEN (Red/Transparent)
+
         [Header("System")]
         public TMPro.TextMeshProUGUI waveText;
 
@@ -43,6 +48,7 @@ namespace DarkTowerTron.Managers
             GameEvents.OnFocusChanged += UpdateFocus;
             GameEvents.OnGritChanged += UpdateGrit;
             GameEvents.OnScoreChanged += UpdateScoreUI;
+            GameEvents.OnHullStateChanged += UpdateHull;
             // Optional: Listen for wave changes if we added that event
         }
 
@@ -51,6 +57,25 @@ namespace DarkTowerTron.Managers
             GameEvents.OnFocusChanged -= UpdateFocus;
             GameEvents.OnGritChanged -= UpdateGrit;
             GameEvents.OnScoreChanged -= UpdateScoreUI;
+            GameEvents.OnHullStateChanged -= UpdateHull;
+        }
+
+        private void UpdateHull(bool hasHull)
+        {
+            if (!hullIcon) return;
+
+            if (hasHull)
+            {
+                // Hull is intact
+                hullIcon.color = hullActiveColor;
+                // Optional: hullIcon.sprite = shieldSprite;
+            }
+            else
+            {
+                // Hull is gone (Danger State)
+                hullIcon.color = hullBrokenColor;
+                // Optional: hullIcon.sprite = brokenSkullSprite;
+            }
         }
 
         private void UpdateFocus(float current, float max)
@@ -69,15 +94,25 @@ namespace DarkTowerTron.Managers
 
         private void UpdateGrit(int currentGrit)
         {
+
+            Debug.Log($"[DEBUG HUD] Updating Grit UI: {currentGrit}");
+
             if (gritPips == null) return;
+
+            Debug.Log($"[DEBUG HUD] Grit Pips Length: {gritPips.Length}");
 
             for (int i = 0; i < gritPips.Length; i++)
             {
                 if (gritPips[i] == null) continue;
 
+                Debug.Log($"[DEBUG HUD] Updating Pip {i}");
+
                 Image pipImg = gritPips[i].GetComponent<Image>();
                 if (pipImg)
                 {
+
+                    Debug.Log($"[DEBUG HUD] Setting Pip {i} Color");
+
                     // If currentGrit is 2, pips 0 and 1 are active.
                     pipImg.color = (i < currentGrit) ? activePipColor : inactivePipColor;
                 }

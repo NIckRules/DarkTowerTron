@@ -203,7 +203,10 @@ MonoBehaviour:
   speed: 15
   lifetime: 5
   isHostile: 1
-  damage: 10
+  damage: 1
   stagger: 0
   meshRenderer: {fileID: 7853976462343550844}
   friendlyMaterial: {fileID: 2100000, guid: cf01d22f2a790404ab04b7f9db4fdc89, type: 2}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0

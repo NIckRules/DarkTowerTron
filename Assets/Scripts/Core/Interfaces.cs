@@ -28,4 +28,10 @@ namespace DarkTowerTron.Core
     {
         void SetFiring(bool isFiring);
     }
+
+    public interface IPoolable
+    {
+        void OnSpawn();
+        void OnDespawn();
+    }
 }

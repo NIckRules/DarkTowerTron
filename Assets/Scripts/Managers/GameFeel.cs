@@ -79,10 +79,11 @@ namespace DarkTowerTron.Core
             HitStop(0.1f);
         }
 
-        private void OnEnemyKilled(Vector3 pos)
+        // Update the signature
+        private void OnEnemyKilled(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats)
         {
             PlaySound(_killClip, 0.8f);
-            CameraShake(0.15f, 0.2f); // Light shake on kill
+            CameraShake(0.15f, 0.2f); 
         }
 
         // --- INTERNAL ---

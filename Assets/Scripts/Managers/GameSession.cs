@@ -13,36 +13,30 @@ namespace DarkTowerTron.Managers
         public GameObject hudPanel;
         public GameObject gameOverPanel;
         public GameObject victoryPanel;
-        public GameObject pausePanel; // NEW
+        public GameObject pausePanel;
 
         [Header("Scene References")]
         public PlayerController player;
-        public WaveManager waveManager;
+        
+        // CHANGED: Was WaveManager, now WaveDirector
+        public WaveDirector waveDirector; 
 
         private bool _isGameRunning = false;
         private bool _isPaused = false;
-        private GameControls _controls; // To read ESC input
+        private GameControls _controls;
 
         private void Awake()
         {
             _controls = new GameControls();
-            // Listen for Pause button
             _controls.Gameplay.Pause.performed += ctx => TogglePause();
         }
 
-        private void OnEnable()
-        {
-            _controls.Enable();
-        }
-
-        private void OnDisable()
-        {
-            _controls.Disable();
-        }
+        private void OnEnable() => _controls.Enable();
+        private void OnDisable() => _controls.Disable();
 
         private void Start()
         {
-            Time.timeScale = 1f;
+            Time.timeScale = 1f; 
             SetPanelActive(startPanel);
 
             if (player) player.ToggleInput(false);
@@ -53,34 +47,12 @@ namespace DarkTowerTron.Managers
 
         private void OnDestroy()
         {
+            // Existing unsubscriptions
             GameEvents.OnPlayerDied -= TriggerGameOver;
             GameEvents.OnGameVictory -= TriggerVictory;
-        }
 
-        // --- PAUSE LOGIC ---
-
-        public void TogglePause()
-        {
-            if (!_isGameRunning) return;
-
-            _isPaused = !_isPaused;
-
-            if (_isPaused)
-            {
-                // PAUSE
-                Time.timeScale = 0f;
-                pausePanel.SetActive(true);
-                hudPanel.SetActive(false); // <--- Add This (Hide HUD)
-                if (player) player.ToggleInput(false);
-            }
-            else
-            {
-                // RESUME
-                Time.timeScale = 1f;
-                pausePanel.SetActive(false);
-                hudPanel.SetActive(true); // <--- Add This (Show HUD)
-                if (player) player.ToggleInput(true);
-            }
+            // CRITICAL: Wipe static listeners
+            GameEvents.Cleanup();
         }
 
         // --- PUBLIC UI FUNCTIONS ---
@@ -92,7 +64,29 @@ namespace DarkTowerTron.Managers
             SetPanelActive(hudPanel);
 
             if (player) player.ToggleInput(true);
-            if (waveManager) waveManager.StartGame();
+            
+            // UPDATED CALL
+            if (waveDirector) waveDirector.StartGame();
+        }
+
+        public void TogglePause()
+        {
+            if (!_isGameRunning) return;
+
+            _isPaused = !_isPaused;
+
+            if (_isPaused)
+            {
+                Time.timeScale = 0f;
+                pausePanel.SetActive(true);
+                if (player) player.ToggleInput(false);
+            }
+            else
+            {
+                Time.timeScale = 1f;
+                pausePanel.SetActive(false);
+                if (player) player.ToggleInput(true);
+            }
         }
 
         public void OpenTutorial() { SetPanelActive(tutorialPanel); }
@@ -112,13 +106,11 @@ namespace DarkTowerTron.Managers
 #endif
         }
 
-        // --- INTERNAL ---
-
         private void TriggerGameOver()
         {
             if (!_isGameRunning) return;
             _isGameRunning = false;
-            Time.timeScale = 0.2f;
+            Time.timeScale = 0.2f; 
             SetPanelActive(gameOverPanel);
             if (player) player.ToggleInput(false);
         }
@@ -127,22 +119,20 @@ namespace DarkTowerTron.Managers
         {
             if (!_isGameRunning) return;
             _isGameRunning = false;
-            Time.timeScale = 0.5f;
+            Time.timeScale = 0.5f; 
             SetPanelActive(victoryPanel);
             if (player) player.ToggleInput(false);
         }
 
         private void SetPanelActive(GameObject activePanel)
         {
-            // Hide all
-            if (startPanel) startPanel.SetActive(false);
-            if (tutorialPanel) tutorialPanel.SetActive(false);
-            if (hudPanel) hudPanel.SetActive(false);
-            if (gameOverPanel) gameOverPanel.SetActive(false);
-            if (victoryPanel) victoryPanel.SetActive(false);
-            if (pausePanel) pausePanel.SetActive(false);
+            if(startPanel) startPanel.SetActive(false);
+            if(tutorialPanel) tutorialPanel.SetActive(false);
+            if(hudPanel) hudPanel.SetActive(false);
+            if(gameOverPanel) gameOverPanel.SetActive(false);
+            if(victoryPanel) victoryPanel.SetActive(false);
+            if(pausePanel) pausePanel.SetActive(false);
 
-            // Show one
             if (activePanel) activePanel.SetActive(true);
         }
     }

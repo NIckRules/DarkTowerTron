@@ -1,0 +1,67 @@
+# ============================================================
+# Codebase Markdown Exporter — Unity Profile
+# Project: DarkTowerTron
+# ============================================================
+
+profile: unity
+
+output:
+  directory: docs\export
+  filename: codebase.md
+  overwrite: true
+
+profiles:
+  unity:
+    # Root folders scanned (relative to project root)
+    roots:
+      - Assets\Scripts
+
+    # Source files only
+    include_extensions:
+      - .cs
+      - .shader
+      - .hlsl
+      - .compute
+      - .json
+      - .md
+
+    # Unity-generated / irrelevant folders
+    exclude_dirs:
+      - Library
+      - Temp
+      - Obj
+      - Build
+      - Builds
+      - Logs
+      - UserSettings
+
+    # Optional: ignore specific files
+    exclude_files:
+      - "*.meta"
+
+    # Language mapping for Markdown fences
+    languages:
+      .cs: csharp
+      .shader: hlsl
+      .hlsl: hlsl
+      .compute: hlsl
+      .json: json
+      .md: markdown
+
+markdown:
+  include_tree: true
+  include_metadata: true
+
+llm:
+  estimate_tokens: true
+  tokenizer: gpt-4
+  max_tokens_warning: 120000
+
+git:
+  respect_gitignore: true
+
+security:
+  # Add more if needed (Unity usually has none)
+  redact_patterns:
+    - "(?i)password\\s*=\\s*.+"
+    - "(?i)secret\\s*=\\s*.+"

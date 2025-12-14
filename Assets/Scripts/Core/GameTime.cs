@@ -6,7 +6,6 @@ namespace DarkTowerTron.Core
     public class GameTime : MonoBehaviour
     {
         public static GameTime Instance;
-        private float _defaultScale = 1.0f;
         private bool _isFrozen = false;
 
         private void Awake()
@@ -24,9 +23,12 @@ namespace DarkTowerTron.Core
         private IEnumerator DoHitStop(float duration)
         {
             _isFrozen = true;
+            float originalScale = Time.timeScale;
+
             Time.timeScale = 0.0f;
             yield return new WaitForSecondsRealtime(duration);
-            Time.timeScale = _defaultScale;
+
+            Time.timeScale = originalScale;
             _isFrozen = false;
         }
     }

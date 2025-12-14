@@ -2,9 +2,19 @@ using UnityEngine;
 
 namespace DarkTowerTron.Core.Data
 {
-    [CreateAssetMenu(fileName = "EnemyStats_New", menuName = "DarkTowerTron/Enemy Stats")]
+    [CreateAssetMenu(fileName = "NewEnemyStats", menuName = "DarkTowerTron/Enemy Stats")]
     public class EnemyStatsSO : ScriptableObject
     {
+        [Header("Wave Logic")]
+        public bool isEssential = true;
+
+        [Header("Rewards")]
+        public int scoreValue = 100;
+        public float focusReward = 30f;
+
+        public bool healsGrit = true;
+        [Min(1)] public int gritRewardAmount = 1; // NEW: Default to 1
+
         [Header("Movement")]
         public float moveSpeed = 8f;
         public float rotationSpeed = 10f;

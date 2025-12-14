@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 723082918043367499}
   - component: {fileID: 1369080987920047305}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AferImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 6368881491019199300}
   - component: {fileID: 6370030462567589499}
   - component: {fileID: 9156137676136654401}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}

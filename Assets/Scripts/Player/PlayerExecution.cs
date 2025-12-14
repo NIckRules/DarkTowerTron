@@ -56,6 +56,7 @@ namespace DarkTowerTron.Player
             transform.position = attackPos;
 
             // 2. Kill
+            // This fires 'OnEnemyKilled', which PlayerHealth listens to for the heal.
             target.Kill(false);
 
             // PLAY SOUND
@@ -63,8 +64,9 @@ namespace DarkTowerTron.Player
                 GameFeel.Instance.PlaySound(executeClip, 1f);
 
             // 3. Rewards
+            // Only handle Focus manually here (as a bonus for the move).
+            // Health is handled by the Global Event "OnEnemyKilled".
             _energy.AddFocus(killRewardFocus);
-            _health.HealGrit();
 
             if (ScoreManager.Instance)
                 ScoreManager.Instance.TriggerGloryKillBonus();

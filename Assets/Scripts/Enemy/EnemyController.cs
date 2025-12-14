@@ -1,16 +1,14 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // Access Data namespace
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Managers;
 using DG.Tweening;
 
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(EnemyMotor))]
-    public class EnemyController : MonoBehaviour, IDamageable
+    public class EnemyController : MonoBehaviour, IDamageable, IPoolable
     {
-        // Reference the SAME stats object from Motor to keep things synced
-        // Or expose it here if Motor is hidden.
-        // Better yet: Get it from the Motor to ensure they share the same brain.
         private EnemyStatsSO _stats;
 
         [Header("Visuals")]
@@ -20,34 +18,67 @@ namespace DarkTowerTron.Enemy
         public Color flashColor = Color.white;
 
         [Header("Audio")]
-        public AudioClip staggerClip; // NEW: Drag your sound here
+        public AudioClip staggerClip;
 
         private EnemyMotor _motor;
         private float _currentStagger;
         private float _lastHitTime;
-        private Tween _flashTween; // Store reference to stop it later
         public bool IsStaggered { get; private set; }
+
+        // OPTIMIZATION: Property Block to avoid Material Instancing
+        private MaterialPropertyBlock _propBlock;
+        private Tween _flashTween;
+        private int _colorPropID;
 
         private void Awake()
         {
             _motor = GetComponent<EnemyMotor>();
             if (meshRenderer == null) meshRenderer = GetComponent<Renderer>();
-            if (meshRenderer) normalColor = meshRenderer.material.color;
+
+            // Setup Property Block
+            _propBlock = new MaterialPropertyBlock();
+            // URP usually uses "_BaseColor", Built-in uses "_Color"
+            _colorPropID = Shader.PropertyToID("_BaseColor");
         }
+
+        // --- IPoolable Implementation ---
+        public void OnSpawn()
+        {
+            if (_motor != null) _stats = _motor.stats;
+            ResetState();
+        }
+
+        public void OnDespawn()
+        {
+            // Kill tweens safely
+            transform.DOKill();
+            if (_flashTween != null) _flashTween.Kill();
+
+            // Reset color immediately so it doesn't spawn flashing next time
+            SetColor(normalColor);
+        }
+        // --------------------------------
 
         private void Start()
         {
-            // Pull stats from Motor so we don't need to assign it twice in Inspector
-            if (_motor != null) _stats = _motor.stats;
+            // Initial color set
+            SetColor(normalColor);
 
-            if (_stats == null) Debug.LogError($"{name} is missing EnemyStatsSO on EnemyMotor!");
+            // Fallback for non-pooled usage
+            if (_motor != null && _stats == null) _stats = _motor.stats;
+        }
+
+        private void ResetState()
+        {
+            IsStaggered = false;
+            _currentStagger = 0;
+            SetColor(normalColor);
         }
 
         private void Update()
         {
             if (_stats == null) return;
 
-            // Decay
             if (!IsStaggered && _currentStagger > 0)
             {
                 if (Time.time > _lastHitTime + 1.0f)
@@ -64,14 +95,12 @@ namespace DarkTowerTron.Enemy
 
             _lastHitTime = Time.time;
 
-            // 1. Redirected Kill
             if (info.isRedirected)
             {
                 Kill(true);
                 return true;
             }
 
-            // 3. Shield Logic
             if (_stats.hasFrontalShield && !IsStaggered)
             {
                 Vector3 incomingDir = info.pushDirection.normalized;
@@ -79,21 +108,16 @@ namespace DarkTowerTron.Enemy
 
                 if (impactAngle > _stats.shieldAngle)
                 {
-                    // FIRE EVENT: BLOCKED
                     GameEvents.OnPopupText?.Invoke(transform.position, "BLOCKED");
-                    return false; 
+                    return false;
                 }
             }
 
-            // 3. Knockback
             _motor.ApplyKnockback(info.pushDirection * info.pushForce);
 
-            // FIRE EVENT: DAMAGE
-            // Check if it's a kill shot (optional logic for Crit) or just Redirected
             bool isBigHit = info.isRedirected || IsStaggered;
             GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, isBigHit);
 
-            // 4. Stagger Logic
             if (IsStaggered)
             {
                 if (info.damageAmount > 0) Kill(false);
@@ -119,65 +143,79 @@ namespace DarkTowerTron.Enemy
         private void EnterStaggerState()
         {
             IsStaggered = true;
-            
-            // FIRE EVENT: STAGGER
             GameEvents.OnPopupText?.Invoke(transform.position, "STAGGER");
 
-            // --- AUDIO FEEDBACK ---
             if (GameFeel.Instance && staggerClip)
-            {
-                // Play with random pitch so groups don't sound robotic
                 GameFeel.Instance.PlaySound(staggerClip, 1f, true);
-            }
-            // ----------------------
 
-            if (meshRenderer) 
-            {
-                // Kill any previous tween on this material
-                meshRenderer.material.DOKill();
+            // Start Flashing via Tween that updates PropertyBlock
+            if (_flashTween != null) _flashTween.Kill();
 
-                // Start Yellow -> Red -> Yellow Pulse
-                // Loops infinitely (-1), Yoyo style, fast (0.2s)
-                _flashTween = meshRenderer.material.DOColor(Color.red, 0.2f)
-                    .From(staggerColor)
-                    .SetLoops(-1, LoopType.Yoyo)
-                    .SetEase(Ease.Linear);
-            }
-            
-            DOVirtual.DelayedCall(2.0f, ExitStaggerState);
+            // We tween a dummy value to drive the update loop
+            float flashLerp = 0f;
+            _flashTween = DOTween.To(() => flashLerp, x => flashLerp = x, 1f, 0.2f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.Linear)
+                .OnUpdate(() =>
+                {
+                    // Manually Lerp color and apply block
+                    Color c = Color.Lerp(staggerColor, Color.red, flashLerp);
+                    SetColor(c);
+                });
+
+            DOVirtual.DelayedCall(2.0f, ExitStaggerState).SetId(gameObject); // ID for DOKill
         }
 
         private void ExitStaggerState()
         {
             if (this == null) return;
             IsStaggered = false;
-            
-            // Stop Flashing
-            if (_flashTween != null) _flashTween.Kill();
-            meshRenderer.material.DOKill(); 
 
+            if (_flashTween != null) _flashTween.Kill();
             _currentStagger = 0;
-            if (meshRenderer) meshRenderer.material.color = normalColor;
+            SetColor(normalColor);
         }
 
         private void Flash()
         {
+            // Simple 1-shot flash
+            if (!IsStaggered)
+            {
+                if (_flashTween != null) _flashTween.Kill();
+
+                SetColor(flashColor);
+                _flashTween = DOVirtual.DelayedCall(0.1f, () =>
+                {
+                    if (!IsStaggered) SetColor(normalColor);
+                }).SetId(gameObject);
+            }
+        }
+
+        private void SetColor(Color c)
+        {
             if (meshRenderer)
             {
-                meshRenderer.material.DOColor(flashColor, 0.1f).OnComplete(() =>
-                {
-                    if (this != null) meshRenderer.material.color = IsStaggered ? staggerColor : normalColor;
-                });
+                meshRenderer.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor(_colorPropID, c);
+                meshRenderer.SetPropertyBlock(_propBlock);
             }
         }
 
         public void Kill(bool instant)
         {
-            GameEvents.OnEnemyKilled?.Invoke(transform.position);
-#if UNITY_EDITOR
-            if (UnityEditor.Selection.activeGameObject == gameObject) UnityEditor.Selection.activeGameObject = null;
-#endif
-            Destroy(gameObject);
+            // --- FIXED: Pass the stats so the Event System knows what died ---
+            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats);
+            // ---------------------------------------------------------------
+
+            // CRITICAL FIX: Use Pool instead of Destroy
+            if (PoolManager.Instance)
+            {
+                PoolManager.Instance.Despawn(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

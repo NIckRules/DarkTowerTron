@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65f63d17ef75d5f45b55d0652fde43f2, type: 3}
   m_Name: Stats_Orbiter
   m_EditorClassIdentifier: 
+  isEssential: 0
+  scoreValue: 100
+  focusReward: 30
+  healsGrit: 1
+  gritRewardAmount: 1
   moveSpeed: 7
   rotationSpeed: 15
   acceleration: 20

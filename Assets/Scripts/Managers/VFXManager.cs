@@ -21,7 +21,8 @@ namespace DarkTowerTron.Managers
             GameEvents.OnEnemySpawned -= PlaySpawnVFX;
         }
 
-        private void PlayDeathVFX(Vector3 pos)
+        // Update the signature to match the new Event
+        private void PlayDeathVFX(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats)
         {
             if (explosionPrefab && PoolManager.Instance)
             {
@@ -35,7 +36,10 @@ namespace DarkTowerTron.Managers
         {
             if (spawnPrefab && PoolManager.Instance)
             {
-                GameObject vfx = PoolManager.Instance.Spawn(spawnPrefab, pos, Quaternion.identity);
+                // FIX: Force the VFX to the ground level (Y=0.1 to avoid z-fighting)
+                Vector3 groundPos = new Vector3(pos.x, 0.1f, pos.z);
+
+                GameObject vfx = PoolManager.Instance.Spawn(spawnPrefab, groundPos, Quaternion.identity);
                 var ps = vfx.GetComponent<ParticleSystem>();
                 if (ps) ps.Play();
             }

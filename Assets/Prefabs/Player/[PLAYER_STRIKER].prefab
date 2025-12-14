@@ -800,7 +800,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 4
   m_CollisionDetection: 0
 --- !u!114 &6365553688910257222
 MonoBehaviour:
@@ -814,11 +814,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b9a2817a44039e4db8de7c843c7e7a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obstacleMask:
+  _obstacleMask:
     serializedVersion: 2
-    m_Bits: 2049
+    m_Bits: 0
   _skinWidth: 0.015
-  gravity: 0
+  _maxStepHeight: 0.3
+  _maxSlopeAngle: 45
+  _groundSnapDistance: 0.3
 --- !u!114 &8588073913637015239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -840,6 +842,7 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 2048
+  gravity: 20
 --- !u!114 &6949509784031142000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -865,6 +868,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxGrit: 2
+  startWithHull: 1
 --- !u!114 &3146043007839357323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -879,7 +883,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxFocus: 100
   decayRate: 3
-  focusOnKill: 33
+  defaultFocusOnKill: 30
 --- !u!114 &1722693863214666388
 MonoBehaviour:
   m_ObjectHideFlags: 0

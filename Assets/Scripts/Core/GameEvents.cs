@@ -1,47 +1,69 @@
 using System;
 using UnityEngine;
+using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
 
 namespace DarkTowerTron.Core
 {
     public static class GameEvents
     {
-        // Combat
-        public static Action<Vector3> OnEnemyKilled;
-        public static Action<Vector3> OnEnemySpawned; // Position
+        // --- COMBAT ---
+        // OLD: public static Action<Vector3> OnEnemyKilled;
+
+        // NEW: Passes Position AND Stats (to check if essential)
+        public static Action<Vector3, EnemyStatsSO> OnEnemyKilled;
+
         public static Action OnPlayerHit;
         public static Action OnPlayerDied;
-        public static Action OnGameVictory;
+
+        // Feedback
+        public static Action<Vector3, float, bool> OnDamageDealt;
+        public static Action<Vector3, string> OnPopupText;
 
         // Resources
         public static Action<float, float> OnFocusChanged;
         public static Action<int> OnGritChanged;
 
-        // System
-        public static Action OnWaveCleared;
-        
-        // NEW: Announces upcoming wave (e.g., "WAVE 2")
-        public static Action<int> OnWaveAnnounce; 
-        
-        // NEW: Fired when countdown finishes and enemies actually spawn
-        public static Action OnWaveCombatStarted;
-        
-        // NEW: Updates the countdown number (3, 2, 1...)
-        public static Action<string> OnCountdownChange;
+        // NEW: True = Hull Active, False = Hull Broken (Danger)
+        public static Action<bool> OnHullStateChanged;
 
-        // AI Targeting
-        // Fired when a high-priority target appears (Decoy)
+        // System
+        public static Action<Vector3> OnEnemySpawned;
+        public static Action OnWaveCleared;
+        public static Action OnGameVictory;
+        public static Action<int> OnWaveAnnounce;
+        public static Action<string> OnCountdownChange;
+        public static Action OnWaveCombatStarted;
+
+        // AI
         public static Action<Transform> OnDecoySpawned;
-        // Fired when the decoy is gone (Enemies should revert to Player)
         public static Action OnDecoyExpired;
 
         // UI
-        public static Action<int, int> OnScoreChanged; // Score, Multiplier
+        public static Action<int, int> OnScoreChanged;
 
-        // Feedback Events
-        // Position, Amount, IsCritical (Glory Kill)
-        public static Action<Vector3, float, bool> OnDamageDealt; 
-        
-        // Position, Text (e.g., "STAGGER", "BLOCKED")
-        public static Action<Vector3, string> OnPopupText;
+        /// <summary>
+        /// CRITICAL: Call this when loading a scene to prevent memory leaks
+        /// and calling functions on destroyed objects.
+        /// </summary>
+        public static void Cleanup()
+        {
+            OnEnemyKilled = null;
+            OnPlayerHit = null;
+            OnPlayerDied = null;
+            OnDamageDealt = null;
+            OnPopupText = null;
+            OnFocusChanged = null;
+            OnGritChanged = null;
+            OnHullStateChanged = null;
+            OnEnemySpawned = null;
+            OnWaveCleared = null;
+            OnGameVictory = null;
+            OnWaveAnnounce = null;
+            OnCountdownChange = null;
+            OnWaveCombatStarted = null;
+            OnDecoySpawned = null;
+            OnDecoyExpired = null;
+            OnScoreChanged = null;
+        }
     }
 }

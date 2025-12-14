@@ -18,6 +18,9 @@ namespace DarkTowerTron.Player
         public float repulsionForce = 5f; // How hard we push
         public LayerMask wallLayer;
 
+        [Header("Physics")]
+        public float gravity = 20f; // Gravity is controlled here
+
         // Expose input for Blitz
         public Vector3 MoveInput => _inputDir;
 
@@ -81,15 +84,12 @@ namespace DarkTowerTron.Player
         {
             float dt = Time.deltaTime;
 
-            // 1. Calculate Target
+            // 1. Calculate Target (Inputs)
             Vector3 targetVel = _inputDir * moveSpeed;
-
-            // 2. Wall Repulsion (The "Magnetic" Effect)
-            // We add a tiny push away from nearby walls to prevent sticking
             Vector3 wallPush = CalculateWallRepulsion();
             targetVel += wallPush;
 
-            // 3. Accelerate/Decelerate
+            // 2. Acceleration
             if (_inputDir.magnitude > 0.1f)
             {
                 _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, acceleration * dt);
@@ -100,7 +100,7 @@ namespace DarkTowerTron.Player
                 if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
             }
 
-            // 4. External Forces (Friction)
+            // 3. External Forces (Recoil/Knockback)
             if (_externalForce.magnitude > 0.1f)
             {
                 _externalForce = Vector3.Lerp(_externalForce, Vector3.zero, 5f * dt);
@@ -110,9 +110,23 @@ namespace DarkTowerTron.Player
                 _externalForce = Vector3.zero;
             }
 
-            // 5. Move
-            Vector3 finalMotion = (_currentVelocity + _externalForce) * dt;
-            _mover.Move(finalMotion);
+            // 4. COMBINE (No dt multiplication here!)
+            Vector3 finalVelocity = _currentVelocity + _externalForce;
+
+            // 5. APPLY GRAVITY MANUALLY
+            if (!_mover.IsGrounded)
+            {
+                // For a top-down game, a simple constant downward velocity works if we don't jump.
+                finalVelocity.y -= gravity;
+            }
+            else
+            {
+                // Stick to ground
+                finalVelocity.y = -2f;
+            }
+
+            // 6. EXECUTE
+            _mover.Move(finalVelocity);
         }
 
         private Vector3 CalculateWallRepulsion()

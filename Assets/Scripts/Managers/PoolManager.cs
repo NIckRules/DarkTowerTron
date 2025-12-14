@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Managers
 {
@@ -22,7 +23,6 @@ namespace DarkTowerTron.Managers
         {
             int poolKey = prefab.GetInstanceID();
 
-            // 1. Create pool if it doesn't exist
             if (!_poolDictionary.ContainsKey(poolKey))
             {
                 _poolDictionary.Add(poolKey, new Queue<GameObject>());
@@ -30,24 +30,30 @@ namespace DarkTowerTron.Managers
 
             GameObject objectToSpawn;
 
-            // 2. Try to dequeue an inactive object
+            // 1. POOLED OBJECT
             if (_poolDictionary[poolKey].Count > 0)
             {
                 objectToSpawn = _poolDictionary[poolKey].Dequeue();
+
+                // CRITICAL FIX: Move it BEFORE waking it up
+                objectToSpawn.transform.position = position;
+                objectToSpawn.transform.rotation = rotation;
+
+                objectToSpawn.SetActive(true); // Now OnEnable fires at the correct location
             }
+            // 2. NEW OBJECT
             else
             {
-                // 3. If empty, instantiate new
-                objectToSpawn = Instantiate(prefab);
+                // CRITICAL FIX: Instantiate AT position/rotation directly
+                objectToSpawn = Instantiate(prefab, position, rotation);
+                // OnEnable fires immediately here, but position is already correct
             }
 
-            // 4. Setup
-            objectToSpawn.transform.position = position;
-            objectToSpawn.transform.rotation = rotation;
-            objectToSpawn.SetActive(true);
+            // NEW: Interface Call
+            var poolable = objectToSpawn.GetComponent<IPoolable>();
+            if (poolable != null) poolable.OnSpawn();
 
-            // 5. Track it (Map the instance to the pool key)
-            // We use Add/Set logic to ensure we don't crash on re-adding
+            // 3. Track it
             int instanceKey = objectToSpawn.GetInstanceID();
             if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
             {
@@ -64,6 +70,10 @@ namespace DarkTowerTron.Managers
             // Only pool objects we know about; otherwise destroy them
             if (_spawnedObjectsParentId.ContainsKey(instanceKey))
             {
+                // NEW: Interface Call
+                var poolable = obj.GetComponent<IPoolable>();
+                if (poolable != null) poolable.OnDespawn();
+
                 int poolKey = _spawnedObjectsParentId[instanceKey];
 
                 obj.SetActive(false);

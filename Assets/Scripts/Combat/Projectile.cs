@@ -6,7 +6,7 @@ namespace DarkTowerTron.Combat
 {
     [RequireComponent(typeof(SphereCollider))]
     [RequireComponent(typeof(Rigidbody))]
-    public class Projectile : MonoBehaviour, IReflectable
+    public class Projectile : MonoBehaviour, IReflectable, IPoolable
     {
         [Header("Ballistics")]
         public float speed = 15f;
@@ -20,7 +20,10 @@ namespace DarkTowerTron.Combat
         [Header("Visuals")]
         public Renderer meshRenderer;
         public Material friendlyMaterial;
-        // Cache original material to reset on respawn
+
+        [Header("Safety")]
+        public LayerMask wallLayer; // Explicit LayerMask
+
         private Material _originalMaterial;
 
         private Vector3 _direction;
@@ -30,7 +33,22 @@ namespace DarkTowerTron.Combat
 
         private void Awake()
         {
-            if (meshRenderer) _originalMaterial = meshRenderer.material;
+            if (meshRenderer) _originalMaterial = meshRenderer.sharedMaterial; // sharedMaterial is safer for caching origin
+
+            // Default mask if not set
+            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
+        }
+
+        public void OnSpawn()
+        {
+            // Reset logic happens in Initialize, but we can safety reset here too
+            _lifeTimer = lifetime;
+        }
+
+        public void OnDespawn()
+        {
+            CancelInvoke();
+            _isInitialized = false;
         }
 
         public void Initialize(Vector3 dir)
@@ -39,30 +57,10 @@ namespace DarkTowerTron.Combat
             _isInitialized = true;
             _lifeTimer = lifetime;
 
-            // RESET STATE (Crucial for Pooling)
-            _isRedirected = false;
+            _isRedirected = false; // Reset status
 
-            // Restore original settings if we were redirected previously
-            // Note: If you have different prefabs for Player vs Enemy, this usually handles itself,
-            // but resetting material is safe.
+            // Restore visual
             if (meshRenderer && _originalMaterial) meshRenderer.material = _originalMaterial;
-
-            // Reset Hostile State? 
-            // Better to rely on the Spawner to set 'isHostile' correctly after spawning, 
-            // OR reset to default here if the prefab dictates it. 
-            // For now, we assume the Spawner doesn't change isHostile, but Redirect does.
-            // So we must reset it.
-            // Assumption: Prefab default is correct.
-            // But wait! If we pool it, 'isHostile' might be stuck at false from previous redirection.
-            // We need to reset it. But we don't know if the original was true or false (Player vs Enemy).
-            // SIMPLE FIX: Reset logic is handled, but 'isHostile' needs to be passed in Initialize if we want perfection.
-            // For this prototype, let's assume Redirect is the only thing changing it.
-
-            // Actually, let's be safe. Initialize should take parameters or reset to Inspector defaults?
-            // Inspector defaults are lost on runtime change.
-            // Let's rely on the Prefab's integrity: 
-            // A PlayerBullet Prefab always starts non-hostile. An EnemyBullet always starts hostile.
-            // We just need to revert the "Redirect" changes.
         }
 
         // RESET LOGIC WHEN PULLED FROM POOL
@@ -89,8 +87,14 @@ namespace DarkTowerTron.Combat
         {
             if (other.isTrigger) return;
 
-            IDamageable target = other.GetComponentInParent<IDamageable>();
+            // Wall Check using Bitmask Math (Faster & Safer than string compare)
+            if (((1 << other.gameObject.layer) & wallLayer.value) != 0)
+            {
+                Despawn();
+                return;
+            }
 
+            IDamageable target = other.GetComponentInParent<IDamageable>();
             if (target != null)
             {
                 if (isHostile && other.CompareTag(GameConstants.TAG_ENEMY)) return;
@@ -107,11 +111,6 @@ namespace DarkTowerTron.Combat
                 };
 
                 if (target.TakeDamage(info)) Despawn();
-            }
-            else if (other.gameObject.layer == LayerMask.NameToLayer(GameConstants.LAYER_WALL) ||
-                     other.gameObject.layer == LayerMask.NameToLayer("Default"))
-            {
-                Despawn();
             }
         }
 
@@ -130,15 +129,8 @@ namespace DarkTowerTron.Combat
 
         private void Despawn()
         {
-            // Use PoolManager if it exists, otherwise Destroy
-            if (PoolManager.Instance != null)
-            {
-                PoolManager.Instance.Despawn(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
+            else Destroy(gameObject);
         }
     }
 }

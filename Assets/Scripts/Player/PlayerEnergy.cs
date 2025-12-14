@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
 
 namespace DarkTowerTron.Player
 {
@@ -9,13 +10,11 @@ namespace DarkTowerTron.Player
         public float maxFocus = 100f;
         public float decayRate = 5f;
 
-        [Header("Rewards")]
-        public float focusOnKill = 30f;
+        [Header("Rewards (Defaults)")]
+        public float defaultFocusOnKill = 30f;
 
         private float _currentFocus;
         private bool _isDead;
-
-        // NEW: State Flag
         private bool _isCombatActive = false;
 
         private void Start()
@@ -25,7 +24,6 @@ namespace DarkTowerTron.Player
             GameEvents.OnEnemyKilled += OnEnemyKilled;
             GameEvents.OnPlayerDied += OnPlayerDied;
 
-            // NEW: Listen for Combat State
             GameEvents.OnWaveCombatStarted += EnableDecay;
             GameEvents.OnWaveCleared += DisableDecay;
             GameEvents.OnGameVictory += DisableDecay;
@@ -47,22 +45,23 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return;
 
-            // NEW: Logic Check
-            // Only decay if we are actually fighting
             if (_isCombatActive && _currentFocus > 0)
             {
                 _currentFocus -= decayRate * Time.deltaTime;
                 if (_currentFocus < 0) _currentFocus = 0;
-
                 UpdateUI();
             }
         }
 
-        // --- STATE HANDLERS ---
-        private void EnableDecay() { _isCombatActive = true; }
-        private void DisableDecay() { _isCombatActive = false; }
+        // --- FIXED SIGNATURE ---
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        {
+            // Use specific reward if available, otherwise default
+            float reward = (stats != null) ? stats.focusReward : defaultFocusOnKill;
+            AddFocus(reward);
+        }
+        // -----------------------
 
-        // --- API (Spending still works even if decay is paused) ---
         public bool HasFocus(float amount)
         {
             return _currentFocus >= amount;
@@ -86,15 +85,10 @@ namespace DarkTowerTron.Player
             UpdateUI();
         }
 
-        private void OnEnemyKilled(Vector3 pos)
-        {
-            AddFocus(focusOnKill);
-        }
+        private void EnableDecay() { _isCombatActive = true; }
+        private void DisableDecay() { _isCombatActive = false; }
 
-        private void OnPlayerDied()
-        {
-            _isDead = true;
-        }
+        private void OnPlayerDied() { _isDead = true; }
 
         private void UpdateUI()
         {
