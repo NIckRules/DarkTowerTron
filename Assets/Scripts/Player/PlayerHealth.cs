@@ -9,16 +9,18 @@ namespace DarkTowerTron.Player
     {
         [Header("Stats")]
         public int maxGrit = 2;
-        public bool startWithHull = true; // Default to having the shield
+        public bool startWithHull = true;
 
         private int _currentGrit;
         private bool _hasHull;
         private bool _isDead;
         private PlayerMovement _movement;
+        private PlayerDodge _dodge; // Reference to Dodge logic
 
         private void Awake()
         {
             _movement = GetComponent<PlayerMovement>();
+            _dodge = GetComponent<PlayerDodge>(); // Cache reference
         }
 
         private void Start()
@@ -38,37 +40,33 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return false;
 
-            // 1. Calculate actual damage (for Grit calculation)
+            // CRITICAL FIX-003: Invulnerability Check
+            if (_dodge != null && _dodge.IsInvulnerable)
+            {
+                // Optional: Play a "Miss" or "Dodge" sound here?
+                return false; 
+            }
+
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
-            // LOGIC GATE
             if (_currentGrit > 0)
             {
-                // PHASE 1: Take Grit Damage
                 _currentGrit -= dmg;
-                if (_currentGrit < 0) _currentGrit = 0; // Clamp, don't carry over damage to hull
-
-                GameEvents.OnPlayerHit?.Invoke(); // Standard Ouch
+                if (_currentGrit < 0) _currentGrit = 0; 
+                GameEvents.OnPlayerHit?.Invoke(); 
             }
             else if (_hasHull)
             {
-                // PHASE 2: Hull Break (Gate)
-                // We absorb ALL damage from this single hit, regardless of amount.
                 _hasHull = false;
-
-                // Special Feedback for breaking the shield
-                Debug.Log("<color=orange>HULL BREACHED!</color>");
-                // We can fire OnPlayerHit for shake, or a specific Hull Break event
-                GameEvents.OnPlayerHit?.Invoke();
+                GameEvents.OnPlayerHit?.Invoke(); 
+                GameEvents.OnHullStateChanged?.Invoke(false); // Notify Hull Break
             }
             else
             {
-                // PHASE 3: Death
                 Kill(false);
             }
 
-            // Apply Physics (Always happens if not dead)
-            if (!_isDead && _movement)
+            if (!_isDead && _movement) 
                 _movement.ApplyKnockback(info.pushDirection * info.pushForce);
 
             UpdateUI();
@@ -82,7 +80,6 @@ namespace DarkTowerTron.Player
             _currentGrit = 0;
             _hasHull = false;
             UpdateUI();
-
             Debug.Log("PLAYER DEAD");
             GameEvents.OnPlayerDied?.Invoke();
         }
@@ -90,8 +87,6 @@ namespace DarkTowerTron.Player
         public void HealGrit(int amount = 1)
         {
             if (_isDead) return;
-
-            // NOTE: We only heal Grit. Hull is not replenishable (per design).
             _currentGrit = Mathf.Min(_currentGrit + amount, maxGrit);
             UpdateUI();
         }
@@ -99,8 +94,7 @@ namespace DarkTowerTron.Player
         private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
-
-            // Only heal if allowed
+            
             if (stats != null)
             {
                 if (stats.healsGrit) HealGrit(stats.gritRewardAmount);

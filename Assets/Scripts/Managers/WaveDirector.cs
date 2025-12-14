@@ -108,21 +108,24 @@ namespace DarkTowerTron.Managers
             }
         }
 
-        // NEW: We remove the 'isEssential' bool because we will ask the prefab itself
+        // Updated Spawn Method
         private void SpawnEnemy(GameObject prefab, int forcedIndex)
         {
             if (_spawner == null) return;
-
-            // SAFETY CHECK
+            
             if (prefab == null)
             {
-                Debug.LogError($"WaveDirector: Attempted to spawn NULL prefab in Wave {_currentWaveIndex}. Checking Next.");
+                Debug.LogError($"WaveDirector: Attempted to spawn NULL prefab.");
                 return;
             }
 
-            _spawner.SpawnEnemy(prefab, forcedIndex);
+            // CRITICAL FIX-002: Get the actual spawned instance
+            GameObject instance = _spawner.SpawnEnemy(prefab, forcedIndex);
 
-            var motor = prefab.GetComponentInChildren<DarkTowerTron.Enemy.EnemyMotor>();
+            if (instance == null) return;
+
+            // Check the INSTANCE stats, not the PREFAB stats
+            var motor = instance.GetComponentInChildren<DarkTowerTron.Enemy.EnemyMotor>();
             bool countAsEssential = false;
 
             if (motor != null && motor.stats != null)
@@ -131,12 +134,7 @@ namespace DarkTowerTron.Managers
             }
             else
             {
-                // SAFETY FALLBACK:
-                // If an enemy has no stats, we MUST assume it is Essential.
-                // If we assume it is a Grunt, and it never dies properly or doesn't count,
-                // the wave might hang. But if we assume Essential, at least the wave count goes up
-                // and killing it will progress the wave.
-                Debug.LogWarning($"Enemy {prefab.name} missing Stats! Defaulting to Essential to prevent soft-lock.");
+                Debug.LogWarning($"Enemy {instance.name} missing Stats! Defaulting to Essential.");
                 countAsEssential = true;
             }
 

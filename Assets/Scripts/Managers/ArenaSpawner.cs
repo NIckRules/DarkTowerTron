@@ -1,5 +1,5 @@
 using UnityEngine;
-using DarkTowerTron.Managers; // For PoolManager
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Managers
 {
@@ -8,31 +8,23 @@ namespace DarkTowerTron.Managers
         [Header("Setup")]
         public Transform[] spawnPoints;
 
-        /// <summary>
-        /// Spawns an enemy at a specific index or random location.
-        /// </summary>
-        public void SpawnEnemy(GameObject prefab, int forcedIndex = -1)
+        // CHANGED: Returns GameObject instead of void
+        public GameObject SpawnEnemy(GameObject prefab, int forcedIndex = -1)
         {
-            if (spawnPoints.Length == 0 || prefab == null) return;
+            if (spawnPoints.Length == 0 || prefab == null) return null;
 
             Transform sp;
 
-            // 1. Determine Position
             if (forcedIndex >= 0 && forcedIndex < spawnPoints.Length)
-            {
                 sp = spawnPoints[forcedIndex];
-            }
             else
-            {
                 sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            }
 
-            // 2. Add Offset (prevent stacking)
             Vector3 offset = Random.insideUnitSphere * 2.0f;
             offset.y = 0;
 
-            // 3. Pool Spawn
-            PoolManager.Instance.Spawn(prefab, sp.position + offset, Quaternion.LookRotation(sp.forward));
+            // Return the actual instance
+            return PoolManager.Instance.Spawn(prefab, sp.position + offset, Quaternion.LookRotation(sp.forward));
         }
     }
 }

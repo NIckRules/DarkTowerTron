@@ -42,8 +42,8 @@ namespace DarkTowerTron.Core
         public static Action<int, int> OnScoreChanged;
 
         /// <summary>
-        /// CRITICAL: Call this when loading a scene to prevent memory leaks
-        /// and calling functions on destroyed objects.
+        /// CRITICAL FIX-004: Call this when loading scenes or quitting.
+        /// Prevents static events from holding references to destroyed objects.
         /// </summary>
         public static void Cleanup()
         {
@@ -64,6 +64,8 @@ namespace DarkTowerTron.Core
             OnDecoySpawned = null;
             OnDecoyExpired = null;
             OnScoreChanged = null;
+            
+            Debug.Log("[GameEvents] All static listeners cleared.");
         }
     }
 }

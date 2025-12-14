@@ -1,20 +1,22 @@
 # 📦 Codebase Export
 - **Profile:** `unity`
-- **Generated:** 2025-12-13 12:31
-- **Files:** 49
-- **Total LOC:** 4081
-- **Estimated tokens:** 32041
+- **Generated:** 2025-12-14 12:45
+- **Files:** 59
+- **Total LOC:** 4869
+- **Estimated tokens:** 38043
 
 ## 📁 Project Tree
 ```
 Assets
   Scripts
     Combat
+      HazardZone.cs
       Projectile.cs
     Core
       CameraRig.cs
       CircleRenderer.cs
       Data
+        AttackPatternSO.cs
         EnemyStatsSO.cs
         WaveDefinitionSO.cs
       GameConstants.cs
@@ -25,16 +27,28 @@ Assets
     Enemy
       Agents
         EnemyAgent_Chaser.cs
-        EnemyAgent_Orbiter.cs
+        EnemyAgent_Guardian.cs
         EnemyAgent_Sentinel.cs
+        EnemyAgent_Sniper.cs
+      EnemyBaseAI.cs
       EnemyController.cs
       EnemyMotors.cs
-      Legacy
-        EnemyAI_Chaser.cs
-        EnemyAI_Sniper.cs
-        EnemyAI_Strafer.cs
-        EnemyAI_Turret.cs
-        EnemyBaseAI.cs
+      PatrolPath.cs
+      States
+        Chaser
+          ChaserState_Chase.cs
+          ChaserState_Primer.cs
+        Guardian
+          GuardianState_Attack.cs
+          GuardianState_Move.cs
+        Sentinel
+          SentinelState_Combat.cs
+          SentinelState_Hunt.cs
+        Sniper
+          SniperState_Aiming.cs
+          SniperState_Firing.cs
+          SniperState_Positioning.cs
+          SniperState_Teleport.cs
     Managers
       ArenaSpawner.cs
       AudioManager.cs
@@ -49,7 +63,7 @@ Assets
       ScoreManager.cs
       VFXManager.cs
       WaveDirector.cs
-    Physic
+    Physics
       KinematicMover.cs
     Player
       AfterImage.cs
@@ -71,45 +85,129 @@ Assets
       CameraShaker.cs
 ```
 
-## 📄 `Assets\Scripts\Combat\Projectile.cs`
-- Lines: 144
-- Size: 5.2 KB
-- Modified: 2025-12-11 07:51
+## 📄 `Assets\Scripts\Combat\HazardZone.cs`
+- Lines: 60
+- Size: 1.9 KB
+- Modified: 2025-12-14 10:43
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Managers; // Needed for PoolManager
+using DG.Tweening;
+
+namespace DarkTowerTron.Combat
+{
+    public class HazardZone : MonoBehaviour
+    {
+        [Header("Settings")]
+        public float duration = 3.0f;
+        public float damage = 1f;
+        public float knockbackForce = 15f;
+        public LayerMask targetLayer; // Player
+
+        [Header("Visuals")]
+        public Transform visualRing; // Assign a cylinder/sprite
+
+        private void Start()
+        {
+            // 1. Expand Visuals (Juice)
+            transform.localScale = Vector3.zero;
+            transform.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack);
+
+            // 2. Schedule Destruction
+            // Fade out before destroying
+            DOVirtual.DelayedCall(duration - 0.5f, FadeOut);
+            Destroy(gameObject, duration);
+        }
+
+        private void FadeOut()
+        {
+            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            // Check Layer
+            if (((1 << other.gameObject.layer) & targetLayer) != 0)
+            {
+                IDamageable target = other.GetComponentInParent<IDamageable>();
+                if (target != null)
+                {
+                    // Calculate push direction (Away from center of zone)
+                    Vector3 dir = (other.transform.position - transform.position).normalized;
+                    dir.y = 0;
+
+                    DamageInfo info = new DamageInfo
+                    {
+                        damageAmount = damage,
+                        pushDirection = dir,
+                        pushForce = knockbackForce,
+                        source = gameObject
+                    };
+
+                    target.TakeDamage(info);
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\Projectile.cs`
+- Lines: 129
+- Size: 4.1 KB
+- Modified: 2025-12-14 12:42
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Combat
 {
     [RequireComponent(typeof(SphereCollider))]
     [RequireComponent(typeof(Rigidbody))]
-    public class Projectile : MonoBehaviour, IReflectable
+    public class Projectile : MonoBehaviour, IReflectable, IPoolable
     {
         [Header("Ballistics")]
         public float speed = 15f;
         public float lifetime = 5f;
         public bool isHostile = true;
+        
+        [Header("Safety")]
+        public float gracePeriod = 0.05f; // Ignore hits for first 0.05s
+        public LayerMask wallLayer;
 
         [Header("Damage Stats")]
         public float damage = 10f;
         public float stagger = 0f;
 
         [Header("Visuals")]
-        public Renderer meshRenderer;
+        public Renderer meshRenderer; 
         public Material friendlyMaterial;
-        // Cache original material to reset on respawn
-        private Material _originalMaterial;
 
+        private Material _originalMaterial;
         private Vector3 _direction;
         private bool _isInitialized = false;
-        private bool _isRedirected = false;
+        private bool _isRedirected = false; 
         private float _lifeTimer;
+        private float _graceTimer;
 
         private void Awake()
         {
-            if (meshRenderer) _originalMaterial = meshRenderer.material;
+            if (meshRenderer) _originalMaterial = meshRenderer.sharedMaterial;
+            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
+        }
+
+        public void OnSpawn()
+        {
+            _lifeTimer = lifetime;
+        }
+
+        public void OnDespawn()
+        {
+            CancelInvoke();
+            _isInitialized = false;
         }
 
         public void Initialize(Vector3 dir)
@@ -117,59 +215,42 @@ namespace DarkTowerTron.Combat
             _direction = dir.normalized;
             _isInitialized = true;
             _lifeTimer = lifetime;
-
-            // RESET STATE (Crucial for Pooling)
-            _isRedirected = false;
-
-            // Restore original settings if we were redirected previously
-            // Note: If you have different prefabs for Player vs Enemy, this usually handles itself,
-            // but resetting material is safe.
+            _graceTimer = gracePeriod; // RESET TIMER
+            _isRedirected = false; 
+            
             if (meshRenderer && _originalMaterial) meshRenderer.material = _originalMaterial;
-
-            // Reset Hostile State? 
-            // Better to rely on the Spawner to set 'isHostile' correctly after spawning, 
-            // OR reset to default here if the prefab dictates it. 
-            // For now, we assume the Spawner doesn't change isHostile, but Redirect does.
-            // So we must reset it.
-            // Assumption: Prefab default is correct.
-            // But wait! If we pool it, 'isHostile' might be stuck at false from previous redirection.
-            // We need to reset it. But we don't know if the original was true or false (Player vs Enemy).
-            // SIMPLE FIX: Reset logic is handled, but 'isHostile' needs to be passed in Initialize if we want perfection.
-            // For this prototype, let's assume Redirect is the only thing changing it.
-
-            // Actually, let's be safe. Initialize should take parameters or reset to Inspector defaults?
-            // Inspector defaults are lost on runtime change.
-            // Let's rely on the Prefab's integrity: 
-            // A PlayerBullet Prefab always starts non-hostile. An EnemyBullet always starts hostile.
-            // We just need to revert the "Redirect" changes.
         }
 
-        // RESET LOGIC WHEN PULLED FROM POOL
-        public void ResetHostility(bool startHostile)
-        {
-            isHostile = startHostile;
-        }
+        public void ResetHostility(bool startHostile) { isHostile = startHostile; }
 
         private void Update()
         {
             if (!_isInitialized) return;
+            
+            // Countdown Grace Period
+            if (_graceTimer > 0) _graceTimer -= Time.deltaTime;
 
             transform.Translate(_direction * speed * Time.deltaTime, Space.World);
 
-            // Manual Lifetime check
             _lifeTimer -= Time.deltaTime;
-            if (_lifeTimer <= 0)
-            {
-                Despawn();
-            }
+            if (_lifeTimer <= 0) Despawn();
         }
 
         private void OnTriggerEnter(Collider other)
         {
+            // SAFETY CHECK: If grace period active, ignore everything
+            if (_graceTimer > 0) return;
+
             if (other.isTrigger) return;
 
-            IDamageable target = other.GetComponentInParent<IDamageable>();
+            // Wall Check
+            if ((wallLayer.value & (1 << other.gameObject.layer)) > 0)
+            {
+                Despawn();
+                return;
+            }
 
+            IDamageable target = other.GetComponentInParent<IDamageable>();
             if (target != null)
             {
                 if (isHostile && other.CompareTag(GameConstants.TAG_ENEMY)) return;
@@ -182,42 +263,28 @@ namespace DarkTowerTron.Combat
                     pushDirection = _direction,
                     pushForce = 5f,
                     source = gameObject,
-                    isRedirected = this._isRedirected
+                    isRedirected = this._isRedirected 
                 };
 
                 if (target.TakeDamage(info)) Despawn();
-            }
-            else if (other.gameObject.layer == LayerMask.NameToLayer(GameConstants.LAYER_WALL) ||
-                     other.gameObject.layer == LayerMask.NameToLayer("Default"))
-            {
-                Despawn();
             }
         }
 
         public void Redirect(Vector3 newDirection, GameObject newOwner)
         {
-            isHostile = false;
+            isHostile = false; 
             _isRedirected = true;
             _direction = newDirection.normalized;
-            speed *= 1.5f;
-
+            speed *= 1.5f; 
             if (meshRenderer && friendlyMaterial) meshRenderer.material = friendlyMaterial;
             else if (meshRenderer) meshRenderer.material.color = Color.cyan;
-
-            _lifeTimer = 3.0f; // Renew lifetime
+            _lifeTimer = 3.0f; 
         }
 
         private void Despawn()
         {
-            // Use PoolManager if it exists, otherwise Destroy
-            if (PoolManager.Instance != null)
-            {
-                PoolManager.Instance.Despawn(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
+            else Destroy(gameObject);
         }
     }
 }
@@ -326,10 +393,41 @@ namespace DarkTowerTron.Core
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Data\AttackPatternSO.cs`
+- Lines: 23
+- Size: 0.8 KB
+- Modified: 2025-12-14 11:08
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Data
+{
+    [CreateAssetMenu(menuName = "DarkTowerTron/Combat/Attack Pattern")]
+    public class AttackPatternSO : ScriptableObject
+    {
+        [Header("Pattern Shape")]
+        public int projectileCount = 1;
+        [Range(0, 360)] public float spreadAngle = 0f; // 0 = Stream, 360 = Nova
+        public bool spinDuringFire = false;
+        public float spinSpeed = 0f;
+
+        [Header("Timing")]
+        public float delayBetweenShots = 0.1f; // Machine gun vs Shotgun
+        public float startDelay = 0.5f; // Windup time
+
+        [Header("Projectile Override")]
+        public float speed = 15f;
+        // Optional: Custom prefab for this specific attack? 
+        // For now, we use the Agent's default prefab to keep it simple.
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Data\EnemyStatsSO.cs`
-- Lines: 39
-- Size: 1.2 KB
-- Modified: 2025-12-11 14:21
+- Lines: 62
+- Size: 2.2 KB
+- Modified: 2025-12-14 12:15
 
 ```csharp
 using UnityEngine;
@@ -345,13 +443,13 @@ namespace DarkTowerTron.Core.Data
         [Header("Rewards")]
         public int scoreValue = 100;
         public float focusReward = 30f;
-
         public bool healsGrit = true;
-        [Min(1)] public int gritRewardAmount = 1; // NEW: Default to 1
+        [Min(1)] public int gritRewardAmount = 1;
 
         [Header("Movement")]
         public float moveSpeed = 8f;
-        public float rotationSpeed = 10f;
+        public float rotationSpeed = 10f; // Fast, for navigation
+        public float combatRotationSpeed = 3f; // Slow, for aiming at player
         public float acceleration = 20f;
 
         [Header("Flight (Set 0 for Ground)")]
@@ -369,6 +467,29 @@ namespace DarkTowerTron.Core.Data
         [Header("Defenses")]
         public bool hasFrontalShield = false;
         [Range(0f, 1f)] public float shieldAngle = 0.5f;
+
+        // --- NEW: VALIDATION LOGIC ---
+        // This runs automatically whenever you change a value in the Inspector
+        private void OnValidate()
+        {
+            // Prevent negative movement
+            moveSpeed = Mathf.Max(0f, moveSpeed);
+            rotationSpeed = Mathf.Max(0f, rotationSpeed);
+            combatRotationSpeed = Mathf.Max(0.1f, combatRotationSpeed);
+            acceleration = Mathf.Max(0.1f, acceleration); // 0 accel = infinite stuck
+
+            // Prevent negative rewards
+            scoreValue = Mathf.Max(0, scoreValue);
+            focusReward = Mathf.Max(0f, focusReward);
+            gritRewardAmount = Mathf.Max(1, gritRewardAmount);
+
+            // Prevent divide-by-zero or weird logic in Stagger
+            maxStagger = Mathf.Max(0.1f, maxStagger);
+            staggerDecay = Mathf.Max(0.1f, staggerDecay);
+
+            // Flocking safety
+            separationRadius = Mathf.Max(0.1f, separationRadius);
+        }
     }
 }
 ```
@@ -437,9 +558,9 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Core\GameEvents.cs`
-- Lines: 41
-- Size: 1.3 KB
-- Modified: 2025-12-11 14:03
+- Lines: 69
+- Size: 2.2 KB
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using System;
@@ -453,8 +574,8 @@ namespace DarkTowerTron.Core
         // --- COMBAT ---
         // OLD: public static Action<Vector3> OnEnemyKilled;
 
-        // NEW: Passes Position AND Stats (to check if essential)
-        public static Action<Vector3, EnemyStatsSO> OnEnemyKilled;
+        // Updated Signature: Vector3 pos, Stats, bool rewardPlayer
+        public static Action<Vector3, EnemyStatsSO, bool> OnEnemyKilled;
 
         public static Action OnPlayerHit;
         public static Action OnPlayerDied;
@@ -466,6 +587,9 @@ namespace DarkTowerTron.Core
         // Resources
         public static Action<float, float> OnFocusChanged;
         public static Action<int> OnGritChanged;
+
+        // NEW: True = Hull Active, False = Hull Broken (Danger)
+        public static Action<bool> OnHullStateChanged;
 
         // System
         public static Action<Vector3> OnEnemySpawned;
@@ -481,6 +605,31 @@ namespace DarkTowerTron.Core
 
         // UI
         public static Action<int, int> OnScoreChanged;
+
+        /// <summary>
+        /// CRITICAL: Call this when loading a scene to prevent memory leaks
+        /// and calling functions on destroyed objects.
+        /// </summary>
+        public static void Cleanup()
+        {
+            OnEnemyKilled = null;
+            OnPlayerHit = null;
+            OnPlayerDied = null;
+            OnDamageDealt = null;
+            OnPopupText = null;
+            OnFocusChanged = null;
+            OnGritChanged = null;
+            OnHullStateChanged = null;
+            OnEnemySpawned = null;
+            OnWaveCleared = null;
+            OnGameVictory = null;
+            OnWaveAnnounce = null;
+            OnCountdownChange = null;
+            OnWaveCombatStarted = null;
+            OnDecoySpawned = null;
+            OnDecoyExpired = null;
+            OnScoreChanged = null;
+        }
     }
 }
 ```
@@ -529,9 +678,9 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Core\Interfaces.cs`
-- Lines: 31
-- Size: 0.7 KB
-- Modified: 2025-12-11 07:51
+- Lines: 37
+- Size: 0.8 KB
+- Modified: 2025-12-13 14:44
 
 ```csharp
 using UnityEngine;
@@ -564,6 +713,12 @@ namespace DarkTowerTron.Core
     {
         void SetFiring(bool isFiring);
     }
+
+    public interface IPoolable
+    {
+        void OnSpawn();
+        void OnDespawn();
+    }
 }
 ```
 
@@ -591,286 +746,627 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Chaser.cs`
-- Lines: 70
-- Size: 2.2 KB
-- Modified: 2025-12-13 12:26
+- Lines: 133
+- Size: 4.1 KB
+- Modified: 2025-12-14 10:46
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.AI.Core;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.States.Chaser;
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.Agents
 {
+    public enum ChaserMode { Missile, MineLayer }
+
+    [RequireComponent(typeof(StateMachine))]
     [RequireComponent(typeof(ContextSolver))]
     [RequireComponent(typeof(AIData))]
     public class EnemyAgent_Chaser : EnemyBaseAI
     {
-        [Header("Kamikaze Settings")]
-        public float attackRange = 1.5f; // Distance to trigger explosion
+        [Header("Mode Selection")]
+        public ChaserMode mode = ChaserMode.Missile;
+
+        [Header("Settings")]
+        public float attackRange = 1.5f; 
+        
+        [Header("Mine Settings")]
+        public GameObject hazardPrefab;
+        public float fuseDuration = 0.5f;
+
+        [Header("Missile Settings")]
         public float damage = 1f;
         public float explosionForce = 20f;
 
-        private ContextSolver _brain;
+        [Header("Steering")]
+        public System.Collections.Generic.List<SteeringBehavior> chaseBehaviors;
+
+        // -- COMPONENTS --
+        public ContextSolver Brain { get; private set; }
+        public StateMachine FSM { get; private set; }
+
+        // -- STATES --
+        public ChaserState_Chase StateChase { get; private set; }
+        public ChaserState_Priming StatePriming { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
-            _brain = GetComponent<ContextSolver>();
+            Brain = GetComponent<ContextSolver>();
+            FSM = GetComponent<StateMachine>();
+
+            StateChase = new ChaserState_Chase(this);
+            StatePriming = new ChaserState_Priming(this);
         }
 
-        protected override void RunAI()
+        protected override void Start()
         {
-            // 1. Navigation (Smart)
-            Vector3 smartDir = _brain.GetDirectionToMove();
-            _motor.Move(smartDir);
+            base.Start();
+            FSM.Initialize(StateChase);
+        }
 
-            // Face movement direction
-            if (smartDir.sqrMagnitude > 0.1f)
+        protected override void RunAI() { }
+
+        // --- ATTACK LOGIC ---
+
+        public void TriggerAttack()
+        {
+            if (mode == ChaserMode.Missile)
             {
-                _motor.FaceTarget(transform.position + smartDir);
+                // INSTANT BOOM
+                DetonateMissile();
             }
-
-            // 2. Attack Check (Distance)
-            float dist = Vector3.Distance(transform.position, _currentTarget.position);
-
-            if (dist <= attackRange)
+            else
             {
-                Detonate();
+                // PRIME MINE (Shake then Boom)
+                FSM.ChangeState(StatePriming);
             }
         }
 
-        private void Detonate()
+        public void DetonateMissile()
         {
-            // 1. Try to Damage the Target
-            IDamageable target = _currentTarget.GetComponent<IDamageable>();
-
-            // If target is the player (or decoy with health), hurt them
-            if (target != null)
+            // Standard damage logic
+            if (_currentTarget != null)
             {
-                DamageInfo info = new DamageInfo
+                IDamageable targetHealth = _currentTarget.GetComponentInParent<IDamageable>();
+                if (targetHealth != null)
                 {
-                    damageAmount = damage,
-                    pushDirection = transform.forward,
-                    pushForce = explosionForce,
-                    source = gameObject
-                };
-                target.TakeDamage(info);
+                    DamageInfo info = new DamageInfo
+                    {
+                        damageAmount = damage,
+                        pushDirection = transform.forward,
+                        pushForce = explosionForce,
+                        source = gameObject
+                    };
+                    targetHealth.TakeDamage(info);
+                    _controller.SelfDestruct();
+                }
+                else
+                {
+                    // Hit Decoy? Reward.
+                    if (_currentTarget.name.Contains("AfterImage")) _controller.Kill(true);
+                    else _controller.SelfDestruct();
+                }
             }
+            else
+            {
+                _controller.SelfDestruct();
+            }
+        }
 
-            // 2. Die (This triggers the Orange Explosion VFX via Event System)
-            // We pass 'false' because we don't need a second kill sound, 
-            // the explosion IS the sound.
-            // Note: If you want a specific "Boom" sound different from death, add it here.
-            _controller.Kill(true);
+        public void DeployMine()
+        {
+            // Spawn Hazard
+            if (hazardPrefab)
+            {
+                // Spawn at ground level
+                Vector3 pos = transform.position;
+                pos.y = 0;
+                Instantiate(hazardPrefab, pos, Quaternion.identity);
+            }
+            
+            // Die (No Reward, because you didn't kill it, it deployed)
+            // Or Reward? Let's say SelfDestruct (No reward).
+            _controller.SelfDestruct();
+        }
+
+        // ... Gizmos and Getters ...
+        public Transform GetTarget() => _currentTarget;
+        public EnemyController GetController() => _controller;
+        public EnemyMotor GetMotor() => _motor;
+        
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
         }
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Orbiter.cs`
-- Lines: 91
-- Size: 2.9 KB
-- Modified: 2025-12-13 11:58
+## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Guardian.cs`
+- Lines: 152
+- Size: 5.0 KB
+- Modified: 2025-12-14 11:59
 
 ```csharp
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
 using DarkTowerTron.AI.Core;
+using DarkTowerTron.AI.FSM;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Enemy.States.Guardian;
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.Agents
 {
+    [RequireComponent(typeof(StateMachine))]
     [RequireComponent(typeof(ContextSolver))]
     [RequireComponent(typeof(AIData))]
-    public class EnemyAgent_Orbiter : EnemyBaseAI
+    public class EnemyAgent_Guardian : EnemyBaseAI
     {
-        [Header("AI Settings")]
-        public SteeringBehavior orbitClockwise;
-        public SteeringBehavior orbitCounterClockwise;
-        public SteeringBehavior avoidWalls; // Assign Beh_AvoidWalls here
+        [Header("Patrol Config")]
+        public float waypointTolerance = 1.5f;
+        public List<SteeringBehavior> moveBehaviors;
 
-        [Header("Combat")]
+        [Header("Combat Config")]
         public GameObject projectilePrefab;
         public Transform firePoint;
-        public float fireInterval = 2.5f;
-        public int burstCount = 2;
-        public float burstRate = 0.2f;
+        public List<AttackPatternSO> attackPatterns;
 
-        private ContextSolver _brain;
-        private float _fireTimer;
+        // -- COMPONENTS --
+        public ContextSolver Brain { get; private set; }
+        public StateMachine FSM { get; private set; }
+
+        // -- STATE DATA --
+        public PatrolPath ActivePath { get; private set; }
+        public int CurrentWaypointIndex { get; set; } = 0;
+
+        // -- STATES --
+        public GuardianState_Move StateMove { get; private set; }
+        public GuardianState_Attack StateAttack { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
-            _brain = GetComponent<ContextSolver>();
+            Brain = GetComponent<ContextSolver>();
+            FSM = GetComponent<StateMachine>();
+
+            StateMove = new GuardianState_Move(this);
+            StateAttack = new GuardianState_Attack(this);
         }
 
         protected override void Start()
         {
             base.Start();
 
-            // 1. Randomize Direction
-            // We build the brain's behavior list dynamically at start
-            bool isClockwise = Random.value > 0.5f;
-
-            _brain.behaviors = new List<SteeringBehavior>();
-
-            // Add the chosen orbit direction
-            if (isClockwise && orbitClockwise) _brain.behaviors.Add(orbitClockwise);
-            else if (orbitCounterClockwise) _brain.behaviors.Add(orbitCounterClockwise);
-
-            // Always add wall avoidance
-            if (avoidWalls) _brain.behaviors.Add(avoidWalls);
-
-            // 2. Randomize Fire Timer
-            _fireTimer = Random.Range(1f, fireInterval);
-        }
-
-        protected override void RunAI()
-        {
-            // --- 1. MOVEMENT (Context Steering) ---
-            Vector3 smartDir = _brain.GetDirectionToMove();
-            _motor.Move(smartDir);
-
-            // Face the Target (Player) to shoot, even if moving sideways
-            _motor.FaceTarget(_currentTarget.position);
-
-            // --- 2. COMBAT ---
-            _fireTimer -= Time.deltaTime;
-            if (_fireTimer <= 0)
+            // Auto-find path if not assigned
+            if (ActivePath == null)
             {
-                StartCoroutine(FireBurst());
-                _fireTimer = fireInterval;
+                ActivePath = FindNearestPath();
+            }
+
+            if (ActivePath != null && ActivePath.waypoints.Count > 0)
+            {
+                FSM.Initialize(StateMove);
+            }
+            else
+            {
+                Debug.LogWarning($"{name}: No PatrolPath found! Standing still.");
+                FSM.Initialize(StateAttack);
             }
         }
 
-        private IEnumerator FireBurst()
+        protected override void RunAI() { }
+
+        public IEnumerator ExecutePattern(AttackPatternSO pattern)
         {
-            for (int i = 0; i < burstCount; i++)
+            if (pattern == null || projectilePrefab == null) yield break;
+
+            yield return new WaitForSeconds(pattern.startDelay);
+
+            float angleStep = (pattern.spreadAngle > 0 && pattern.projectileCount > 1)
+                ? pattern.spreadAngle / (pattern.projectileCount - 1)
+                : 0;
+
+            float startAngle = -pattern.spreadAngle / 2f;
+
+            for (int i = 0; i < pattern.projectileCount; i++)
             {
                 if (_controller.IsStaggered) yield break;
 
-                if (projectilePrefab)
-                {
-                    Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
+                float currentAngle = startAngle + (angleStep * i);
 
-                    // Use Base Helper
-                    FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 12f);
-                }
-                yield return new WaitForSeconds(burstRate);
+                if (pattern.spinDuringFire)
+                    startAngle += pattern.spinSpeed * pattern.delayBetweenShots;
+
+                Quaternion rot = transform.rotation * Quaternion.Euler(0, currentAngle, 0);
+                Vector3 fireDir = rot * Vector3.forward;
+
+                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
+
+                FireProjectile(projectilePrefab, spawnPos, rot, fireDir, pattern.speed);
+
+                if (pattern.delayBetweenShots > 0)
+                    yield return new WaitForSeconds(pattern.delayBetweenShots);
             }
         }
+
+        // --- PATHFINDING HELPERS ---
+        private PatrolPath FindNearestPath()
+        {
+            PatrolPath[] allPaths = FindObjectsOfType<PatrolPath>();
+            if (allPaths.Length == 0) return null;
+
+            PatrolPath closest = null;
+            float closestDist = float.MaxValue;
+
+            foreach (var path in allPaths)
+            {
+                if (path.waypoints.Count > 0 && path.waypoints[0] != null)
+                {
+                    float dist = Vector3.Distance(transform.position, path.waypoints[0].position);
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closest = path;
+                    }
+                }
+            }
+            return closest;
+        }
+
+        public Transform GetCurrentWaypoint()
+        {
+            if (ActivePath == null || ActivePath.waypoints.Count == 0) return null;
+            return ActivePath.waypoints[CurrentWaypointIndex];
+        }
+
+        public void AdvanceWaypoint()
+        {
+            if (ActivePath == null) return;
+            CurrentWaypointIndex++;
+            if (CurrentWaypointIndex >= ActivePath.waypoints.Count)
+            {
+                CurrentWaypointIndex = (ActivePath.loop) ? 0 : ActivePath.waypoints.Count - 1;
+            }
+        }
+
+        // --- PUBLIC ACCESSORS (Fixes CS1061) ---
+        public EnemyController GetController() => _controller;
+        public EnemyMotor GetMotor() => _motor;
+
+        // This was the missing one:
+        public Transform GetTarget() => _currentTarget;
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Sentinel.cs`
-- Lines: 81
-- Size: 2.7 KB
-- Modified: 2025-12-11 08:12
+- Lines: 88
+- Size: 3.0 KB
+- Modified: 2025-12-14 10:25
 
 ```csharp
 using UnityEngine;
+using System.Collections.Generic;
 using DarkTowerTron.Core;
-using DarkTowerTron.AI.Core; // Access to Context Solver
-using DarkTowerTron.Combat;
-using DarkTowerTron.Managers;
-using System.Collections;
+using DarkTowerTron.AI.Core;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.States.Sentinel; // Sub-namespace for States
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.Agents
 {
-    // "Agent" implies it uses the Context Steering System
+    [RequireComponent(typeof(StateMachine))]
     [RequireComponent(typeof(ContextSolver))]
     [RequireComponent(typeof(AIData))]
     public class EnemyAgent_Sentinel : EnemyBaseAI
     {
-        [Header("Sentinel Combat")]
+        [Header("Tactics")]
+        public float combatRange = 10f; // Switch to Combat
+        public float huntRange = 15f;   // Switch back to Hunt
+
+        [Header("Combat")]
         public GameObject projectilePrefab;
         public Transform firePoint;
-        public float attackRange = 10f;
-        public float fireInterval = 2.0f;
+        public float fireRate = 2.0f;
 
-        private ContextSolver _brain;
-        private float _fireTimer;
+        [Header("Steering Profiles")]
+        // Assigned in Inspector (e.g. Seek, AvoidWalls)
+        public List<SteeringBehavior> huntBehaviors;
+        // Assigned in Inspector (e.g. Orbit, Flee, AvoidWalls)
+        public List<SteeringBehavior> combatBehaviors;
+
+        // -- COMPONENTS --
+        public ContextSolver Brain { get; private set; }
+        public StateMachine FSM { get; private set; }
+
+        // -- STATES --
+        public SentinelState_Hunt StateHunt { get; private set; }
+        public SentinelState_Combat StateCombat { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
-            _brain = GetComponent<ContextSolver>();
+            Brain = GetComponent<ContextSolver>();
+            FSM = GetComponent<StateMachine>();
+
+            // Initialize States
+            StateHunt = new SentinelState_Hunt(this);
+            StateCombat = new SentinelState_Combat(this);
         }
 
         protected override void Start()
         {
             base.Start();
-            // Randomize start firing to avoid synchronization with other units
-            _fireTimer = Random.Range(0.5f, fireInterval);
+            // Start Hunting immediately
+            FSM.Initialize(StateHunt);
         }
 
         protected override void RunAI()
         {
-            // --- 1. INTELLIGENT NAVIGATION ---
-            // We don't calculate direction manually anymore. The Brain does it.
-            // It considers the Target (Seek) AND the Walls (Avoidance).
-            Vector3 smartDirection = _brain.GetDirectionToMove();
-
-            // Feed the smart vector to the motor
-            _motor.Move(smartDirection);
-
-            // --- 2. COMBAT LOGIC ---
-            // Distance check is still useful for deciding when to shoot
-            float distToTarget = Vector3.Distance(transform.position, _currentTarget.position);
-
-            // Face movement direction if moving, otherwise face target
-            if (smartDirection.sqrMagnitude > 0.1f)
-            {
-                _motor.FaceTarget(transform.position + smartDirection);
-            }
-            else
-            {
-                _motor.FaceTarget(_currentTarget.position);
-            }
-
-            // Attack Cycle
-            _fireTimer -= Time.deltaTime;
-            if (_fireTimer <= 0 && distToTarget <= attackRange)
-            {
-                Fire();
-                _fireTimer = fireInterval;
-            }
+            // Logic is delegated to the FSM component via its own Update loop.
         }
 
-        private void Fire()
+        // --- HELPERS FOR STATES ---
+
+        public void HelperFireProjectile()
         {
             if (projectilePrefab && !_controller.IsStaggered)
             {
-                Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
+                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
 
-                // Use the BaseAI helper to spawn from pool
+                // Use BaseAI helper to spawn via Pool
                 FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 15f);
             }
+        }
+
+        // Expose protected members to States
+        public Transform GetTarget() => _currentTarget;
+        public EnemyController GetController() => _controller;
+        public EnemyMotor GetMotor() => _motor;
+
+        private void OnDrawGizmosSelected()
+        {
+            // Visualize the hysteresis ranges
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, combatRange);
+            Gizmos.color = new Color(1, 1, 0, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, huntRange);
         }
     }
 }
 ```
 
+## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Sniper.cs`
+- Lines: 86
+- Size: 2.9 KB
+- Modified: 2025-12-14 10:23
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+using DarkTowerTron.Core;
+using DarkTowerTron.AI.Core;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Combat;
+using DarkTowerTron.Enemy.States.Sniper;
+
+namespace DarkTowerTron.Enemy.Agents
+{
+    [RequireComponent(typeof(StateMachine))]
+    [RequireComponent(typeof(ContextSolver))]
+    [RequireComponent(typeof(AIData))]
+    public class EnemyAgent_Sniper : EnemyBaseAI
+    {
+        [Header("Tactics")]
+        public float panicDistance = 6f;
+        public float attackRange = 18f;
+
+        [Tooltip("How far to jump when panicking")]
+        public float teleportDistance = 12f; // NEW: Configurable
+        public float teleportCooldown = 5f;
+        public LayerMask wallLayer;
+
+        [Header("Combat")]
+        public GameObject projectilePrefab;
+        public Transform firePoint;
+        public LineRenderer laserSight;
+        public float fireRate = 3.0f;
+        public float aimDuration = 1.5f;
+
+        [Header("Steering Profiles (Optimization)")]
+        // NEW: Pre-allocated lists to prevent Garbage Collection spikes
+        public List<SteeringBehavior> positioningBehaviors;
+
+        // -- COMPONENTS --
+        public ContextSolver Brain { get; private set; }
+        public StateMachine FSM { get; private set; }
+
+        // -- STATES --
+        public SniperState_Positioning StatePositioning { get; private set; }
+        public SniperState_Aiming StateAiming { get; private set; }
+        public SniperState_Teleport StateTeleport { get; private set; }
+        public SniperState_Firing StateFiring { get; private set; }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            Brain = GetComponent<ContextSolver>();
+            FSM = GetComponent<StateMachine>();
+
+            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
+
+            // Initialize States
+            StatePositioning = new SniperState_Positioning(this);
+            StateAiming = new SniperState_Aiming(this);
+            StateTeleport = new SniperState_Teleport(this);
+            StateFiring = new SniperState_Firing(this);
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            if (laserSight) laserSight.enabled = false;
+
+            FSM.Initialize(StatePositioning);
+        }
+
+        protected override void RunAI()
+        {
+            // Logic delegated to FSM
+        }
+
+        // Helpers
+        public void HelperFireProjectile(float speed)
+        {
+            if (projectilePrefab)
+            {
+                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
+                FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, speed);
+            }
+        }
+
+        public Transform GetTarget() => _currentTarget;
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\EnemyBaseAI.cs`
+- Lines: 107
+- Size: 3.3 KB
+- Modified: 2025-12-14 08:33
+
+```csharp
+using UnityEngine;
+using DG.Tweening; // Logic relies on Tweening
+using DarkTowerTron.Core;
+using DarkTowerTron.Combat;
+using DarkTowerTron.Managers;
+
+namespace DarkTowerTron.Enemy
+{
+    [RequireComponent(typeof(EnemyMotor))]
+    [RequireComponent(typeof(EnemyController))]
+    public abstract class EnemyBaseAI : MonoBehaviour, IPoolable
+    {
+        protected EnemyMotor _motor;
+        protected EnemyController _controller;
+        protected Transform _player;
+        protected Transform _currentTarget;
+
+        // Spawn state gate (prevents AI ticking during spawn animation)
+        protected bool _isSpawning = false;
+
+        protected virtual void Awake()
+        {
+            _motor = GetComponent<EnemyMotor>();
+            _controller = GetComponent<EnemyController>();
+        }
+
+        // REPLACE old OnEnable with OnSpawn
+        public virtual void OnSpawn()
+        {
+            _isSpawning = true;
+            transform.localScale = Vector3.zero;
+
+            GameEvents.OnEnemySpawned?.Invoke(transform.position);
+
+            transform.DOScale(Vector3.one, 0.8f)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() => _isSpawning = false);
+
+            // Reset any child AI timers here if needed
+        }
+
+        public virtual void OnDespawn()
+        {
+            transform.DOKill(); // Stop scaling tween
+            _isSpawning = false;
+        }
+
+        protected virtual void Start()
+        {
+            GameObject p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
+            if (p)
+            {
+                _player = p.transform;
+                _currentTarget = _player;
+            }
+
+            GameEvents.OnDecoySpawned += OnDecoySpawned;
+            GameEvents.OnDecoyExpired += OnDecoyExpired;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            GameEvents.OnDecoySpawned -= OnDecoySpawned;
+            GameEvents.OnDecoyExpired -= OnDecoyExpired;
+        }
+
+        private void Update()
+        {
+            // BLOCK LOGIC IF SPAWNING
+            if (_isSpawning) return;
+
+            if (_player == null) return;
+            if (_currentTarget == null) _currentTarget = _player;
+            if (_controller.IsStaggered) return;
+
+            RunAI();
+        }
+
+        protected abstract void RunAI();
+
+        // --- HELPER METHODS ---
+
+        /// <summary>
+        /// Centralized logic to spawn, reset, and fire a hostile projectile.
+        /// </summary>
+        protected void FireProjectile(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 direction, float speed)
+        {
+            if (prefab == null) return;
+
+            // 1. Spawn via Pool
+            GameObject p = PoolManager.Instance.Spawn(prefab, position, rotation);
+
+            // 2. Setup Logic
+            Projectile proj = p.GetComponent<Projectile>();
+            if (proj != null)
+            {
+                proj.ResetHostility(true); // Enemies always shoot hostile
+                proj.speed = speed;
+                proj.Initialize(direction);
+            }
+        }
+
+        // --- EVENTS ---
+        private void OnDecoySpawned(Transform decoy) { _currentTarget = decoy; }
+        private void OnDecoyExpired() { if (_player != null) _currentTarget = _player; }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Enemy\EnemyController.cs`
-- Lines: 163
-- Size: 4.9 KB
-- Modified: 2025-12-11 14:25
+- Lines: 234
+- Size: 7.1 KB
+- Modified: 2025-12-14 08:44
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Managers;
 using DG.Tweening;
 
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(EnemyMotor))]
-    public class EnemyController : MonoBehaviour, IDamageable
+    public class EnemyController : MonoBehaviour, IDamageable, IPoolable
     {
         private EnemyStatsSO _stats;
 
@@ -888,19 +1384,54 @@ namespace DarkTowerTron.Enemy
         private float _lastHitTime;
         public bool IsStaggered { get; private set; }
 
+        // OPTIMIZATION: Property Block to avoid Material Instancing
+        private MaterialPropertyBlock _propBlock;
         private Tween _flashTween;
+        private int _colorPropID;
 
         private void Awake()
         {
             _motor = GetComponent<EnemyMotor>();
             if (meshRenderer == null) meshRenderer = GetComponent<Renderer>();
-            if (meshRenderer) normalColor = meshRenderer.material.color;
+
+            // Setup Property Block
+            _propBlock = new MaterialPropertyBlock();
+            // URP usually uses "_BaseColor", Built-in uses "_Color"
+            _colorPropID = Shader.PropertyToID("_BaseColor");
         }
+
+        // --- IPoolable Implementation ---
+        public void OnSpawn()
+        {
+            if (_motor != null) _stats = _motor.stats;
+            ResetState();
+        }
+
+        public void OnDespawn()
+        {
+            // Kill tweens safely
+            transform.DOKill();
+            if (_flashTween != null) _flashTween.Kill();
+
+            // Reset color immediately so it doesn't spawn flashing next time
+            SetColor(normalColor);
+        }
+        // --------------------------------
 
         private void Start()
         {
-            if (_motor != null) _stats = _motor.stats;
-            // Removed the error check to allow for legacy testing without stats if needed
+            // Initial color set
+            SetColor(normalColor);
+
+            // Fallback for non-pooled usage
+            if (_motor != null && _stats == null) _stats = _motor.stats;
+        }
+
+        private void ResetState()
+        {
+            IsStaggered = false;
+            _currentStagger = 0;
+            SetColor(normalColor);
         }
 
         private void Update()
@@ -976,16 +1507,22 @@ namespace DarkTowerTron.Enemy
             if (GameFeel.Instance && staggerClip)
                 GameFeel.Instance.PlaySound(staggerClip, 1f, true);
 
-            if (meshRenderer)
-            {
-                meshRenderer.material.DOKill();
-                _flashTween = meshRenderer.material.DOColor(Color.red, 0.2f)
-                    .From(staggerColor)
-                    .SetLoops(-1, LoopType.Yoyo)
-                    .SetEase(Ease.Linear);
-            }
+            // Start Flashing via Tween that updates PropertyBlock
+            if (_flashTween != null) _flashTween.Kill();
 
-            DOVirtual.DelayedCall(2.0f, ExitStaggerState);
+            // We tween a dummy value to drive the update loop
+            float flashLerp = 0f;
+            _flashTween = DOTween.To(() => flashLerp, x => flashLerp = x, 1f, 0.2f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.Linear)
+                .OnUpdate(() =>
+                {
+                    // Manually Lerp color and apply block
+                    Color c = Color.Lerp(staggerColor, Color.red, flashLerp);
+                    SetColor(c);
+                });
+
+            DOVirtual.DelayedCall(2.0f, ExitStaggerState).SetId(gameObject); // ID for DOKill
         }
 
         private void ExitStaggerState()
@@ -994,43 +1531,72 @@ namespace DarkTowerTron.Enemy
             IsStaggered = false;
 
             if (_flashTween != null) _flashTween.Kill();
-            meshRenderer.material.DOKill();
-
             _currentStagger = 0;
-            if (meshRenderer) meshRenderer.material.color = normalColor;
+            SetColor(normalColor);
         }
 
         private void Flash()
         {
-            if (meshRenderer)
+            // Simple 1-shot flash
+            if (!IsStaggered)
             {
-                meshRenderer.material.DOColor(flashColor, 0.1f).OnComplete(() =>
+                if (_flashTween != null) _flashTween.Kill();
+
+                SetColor(flashColor);
+                _flashTween = DOVirtual.DelayedCall(0.1f, () =>
                 {
-                    if (this != null) meshRenderer.material.color = IsStaggered ? staggerColor : normalColor;
-                });
+                    if (!IsStaggered) SetColor(normalColor);
+                }).SetId(gameObject);
             }
         }
 
+        private void SetColor(Color c)
+        {
+            if (meshRenderer)
+            {
+                meshRenderer.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor(_colorPropID, c);
+                meshRenderer.SetPropertyBlock(_propBlock);
+            }
+        }
+
+        // Standard Kill (Player wins)
         public void Kill(bool instant)
         {
-            // --- FIXED: Pass the stats so the Event System knows what died ---
-            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats);
-            // ---------------------------------------------------------------
+            // Pass 'true' for reward
+            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats, true);
+            SafeDestroy();
+        }
 
+        // Suicide / Hazard Death (Player gets nothing)
+        public void SelfDestruct()
+        {
+            // Pass 'false' for reward
+            GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats, false);
+            SafeDestroy();
+        }
+
+        private void SafeDestroy()
+        {
 #if UNITY_EDITOR
-            if (UnityEditor.Selection.activeGameObject == gameObject) 
+            if (UnityEditor.Selection.activeGameObject == gameObject)
                 UnityEditor.Selection.activeGameObject = null;
 #endif
-            Destroy(gameObject);
+
+            // Use Pool if IPoolable, otherwise Destroy
+            if (PoolManager.Instance)
+                PoolManager.Instance.Despawn(gameObject);
+            else
+                Destroy(gameObject);
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyMotors.cs`
-- Lines: 147
-- Size: 4.8 KB
-- Modified: 2025-12-13 11:15
+- Lines: 171
+- Size: 5.5 KB
+- Modified: 2025-12-14 12:17
 
 ```csharp
 using UnityEngine;
@@ -1041,7 +1607,7 @@ using DarkTowerTron.Core.Data;
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(KinematicMover))]
-    public class EnemyMotor : MonoBehaviour
+    public class EnemyMotor : MonoBehaviour, IPoolable
     {
         [Header("Data Profile")]
         public EnemyStatsSO stats;
@@ -1061,22 +1627,34 @@ namespace DarkTowerTron.Enemy
             if (allyLayer == 0) allyLayer = LayerMask.GetMask(GameConstants.LAYER_ENEMY);
         }
 
-        // --- THE FIXED METHOD ---
         private void OnEnable()
         {
+            // Keep existing behavior even when not spawned via pool
+            OnSpawn();
+        }
+
+        // --- IPoolable ---
+        public void OnSpawn()
+        {
+            // Reset Physics State
             _currentVelocity = Vector3.zero;
             _knockbackForce = Vector3.zero;
             _currentVerticalSpeed = 0f;
 
-            // Fix: Check stats.rideHeight instead of local variable
+            // Reset Position logic
             if (stats != null && stats.rideHeight > 0)
             {
                 Vector3 startPos = transform.position;
-                startPos.y = 0; // Snap to floor so we can rise up
+                startPos.y = 0;
                 transform.position = startPos;
             }
         }
-        // ------------------------
+
+        public void OnDespawn()
+        {
+            // Stop moving immediately so we don't drift while in the pool
+            _currentVelocity = Vector3.zero;
+        }
 
         public void Move(Vector3 desiredDirection)
         {
@@ -1158,18 +1736,30 @@ namespace DarkTowerTron.Enemy
             return pushVector * stats.separationForce;
         }
 
+        // Standard Face Target (Uses Navigation Speed)
         public void FaceTarget(Vector3 targetPosition)
         {
             if (stats == null) return;
+            RotateTowards(targetPosition, stats.rotationSpeed);
+        }
 
+        // Combat Face Target (Uses Slower Combat Speed)
+        public void FaceCombatTarget(Vector3 targetPosition)
+        {
+            if (stats == null) return;
+            RotateTowards(targetPosition, stats.combatRotationSpeed);
+        }
+
+        // Helper to avoid duplicate code
+        private void RotateTowards(Vector3 targetPosition, float speed)
+        {
             Vector3 dir = targetPosition - transform.position;
-            dir.y = 0;
-
+            dir.y = 0; 
+            
             if (dir != Vector3.zero)
             {
                 Quaternion targetRot = Quaternion.LookRotation(dir);
-                // Use stats.rotationSpeed
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, stats.rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, speed * Time.deltaTime);
             }
         }
 
@@ -1182,492 +1772,664 @@ namespace DarkTowerTron.Enemy
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Legacy\EnemyAI_Chaser.cs`
-- Lines: 55
-- Size: 1.6 KB
-- Modified: 2025-12-11 07:51
+## 📄 `Assets\Scripts\Enemy\PatrolPath.cs`
+- Lines: 28
+- Size: 0.8 KB
+- Modified: 2025-12-14 11:08
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Core;
+using System.Collections.Generic;
 
 namespace DarkTowerTron.Enemy
 {
-    public class EnemyAI_Chaser : EnemyBaseAI
+    public class PatrolPath : MonoBehaviour
     {
-        [Header("Chaser Settings")]
-        public float attackRange = 1.2f;
-        public float damage = 1f;
+        public List<Transform> waypoints;
+        public bool loop = true;
 
-        protected override void RunAI()
+        private void OnDrawGizmos()
         {
-            float dist = Vector3.Distance(transform.position, _currentTarget.position);
+            if (waypoints == null || waypoints.Count < 2) return;
 
-            if (dist <= attackRange)
+            Gizmos.color = Color.cyan;
+            for (int i = 0; i < waypoints.Count - 1; i++)
             {
-                // Only explode on the REAL player (optional choice, but logical)
-                if (_currentTarget == _player)
-                {
-                    Explode();
-                }
-                else
-                {
-                    // If targeting decoy, just wait or circle
-                    _motor.Move(Vector3.zero);
-                }
+                if (waypoints[i] && waypoints[i + 1])
+                    Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
             }
-            else
-            {
-                // Chase Target
-                Vector3 dir = (_currentTarget.position - transform.position).normalized;
-                _motor.Move(dir);
-                _motor.FaceTarget(_currentTarget.position);
-            }
-        }
 
-        private void Explode()
-        {
-            IDamageable target = _player.GetComponent<IDamageable>();
-            if (target != null)
+            if (loop && waypoints[0] && waypoints[waypoints.Count - 1])
             {
-                DamageInfo info = new DamageInfo
-                {
-                    damageAmount = damage,
-                    pushDirection = transform.forward,
-                    pushForce = 20f,
-                    source = gameObject
-                };
-                target.TakeDamage(info);
+                Gizmos.DrawLine(waypoints[waypoints.Count - 1].position, waypoints[0].position);
             }
-            Destroy(gameObject);
         }
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Legacy\EnemyAI_Sniper.cs`
-- Lines: 151
-- Size: 5.0 KB
-- Modified: 2025-12-11 07:51
+## 📄 `Assets\Scripts\Enemy\States\Chaser\ChaserState_Chase.cs`
+- Lines: 42
+- Size: 1.1 KB
+- Modified: 2025-12-14 10:44
 
 ```csharp
 using UnityEngine;
-using System.Collections;
-using DarkTowerTron.Combat;
-using DarkTowerTron.Core;
-using DarkTowerTron.Physics; // For LayerMasks
-using DarkTowerTron.Managers;
-using DG.Tweening;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.Agents;
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.States.Chaser
 {
-    public class EnemyAI_Sniper : EnemyBaseAI
+    public class ChaserState_Chase : State
     {
-        [Header("Sniper Stats")]
-        public float panicDistance = 5f;
-        public float teleportCooldown = 5.0f; // New: No spamming
-        public float fireRate = 4.0f;
-        public float telegraphTime = 1.5f;
+        private EnemyAgent_Chaser _agent;
 
-        [Header("Setup")]
-        public GameObject projectilePrefab;
-        public Transform firePoint;
-        public LineRenderer laserSight;
-        public LayerMask wallLayer; // New: For bounds checking
-
-        private bool _isBusy;
-        private float _fireTimer;
-        private float _teleportTimer; // Tracks cooldown
-
-        protected override void Start()
+        public ChaserState_Chase(EnemyAgent_Chaser agent)
         {
-            base.Start();
-            if (laserSight) laserSight.enabled = false;
-
-            // Default wall layer if not set
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
+            _agent = agent;
         }
 
-        protected override void RunAI()
+        public override void Enter()
         {
-            // Cooldown management
-            if (_teleportTimer > 0) _teleportTimer -= Time.deltaTime;
-            if (_fireTimer > 0) _fireTimer -= Time.deltaTime;
+            _agent.Brain.behaviors = _agent.chaseBehaviors;
+        }
 
-            if (_isBusy) return;
+        public override void LogicUpdate()
+        {
+            if (_agent.GetTarget() == null) return;
 
-            // 1. Panic Check (Teleport)
-            // Only if cooldown is ready AND player is too close
-            float dist = Vector3.Distance(transform.position, _currentTarget.position);
-            if (dist < panicDistance && _teleportTimer <= 0)
+            // 1. Move
+            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
+            _agent.GetMotor().Move(moveDir);
+
+            if (moveDir.sqrMagnitude > 0.1f)
+                _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
+
+            // 2. Transition
+            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
+
+            if (dist <= _agent.attackRange)
             {
-                StartCoroutine(TeleportAway());
+                // DELEGATE DECISION TO AGENT
+                _agent.TriggerAttack();
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\States\Chaser\ChaserState_Primer.cs`
+- Lines: 63
+- Size: 1.9 KB
+- Modified: 2025-12-14 10:45
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.FSM;
+using System.Collections.Generic;
+using DG.Tweening;
+using DarkTowerTron.Enemy.Agents;
+
+namespace DarkTowerTron.Enemy.States.Chaser
+{
+    public class ChaserState_Priming : State
+    {
+        private EnemyAgent_Chaser _agent;
+        private float _timer;
+        private Tween _shakeTween;
+
+        public ChaserState_Priming(EnemyAgent_Chaser agent)
+        {
+            _agent = agent;
+        }
+
+        public override void Enter()
+        {
+            // STOP MOVING
+            _agent.Brain.behaviors = new List<DarkTowerTron.AI.Core.SteeringBehavior>();
+
+            _timer = _agent.fuseDuration;
+
+            // VISUAL WARNING: Shake the mesh
+            // (Assumes Art is a child, so we shake the child or local rotation)
+            // A simple scale punch or color flash works too.
+            // Let's do a Color Flash + Scale Shake
+
+            if (_agent.GetController().meshRenderer)
+            {
+                _agent.GetController().meshRenderer.material.DOColor(Color.red, 0.1f).SetLoops(-1, LoopType.Yoyo);
+            }
+            _agent.transform.DOShakeScale(_agent.fuseDuration, 0.5f, 20, 90);
+        }
+
+        public override void LogicUpdate()
+        {
+            _timer -= Time.deltaTime;
+
+            // Lock rotation to target so it looks aggressive
+            if (_agent.GetTarget() != null)
+            {
+                _agent.GetMotor().FaceTarget(_agent.GetTarget().position);
+            }
+
+            if (_timer <= 0)
+            {
+                _agent.DeployMine(); // CHANGED: Was Detonate()
+            }
+        }
+
+        public override void Exit()
+        {
+            // Cleanup tweens if we get stunned/killed during priming
+            _agent.transform.DOKill();
+            if (_agent.GetController().meshRenderer)
+                _agent.GetController().meshRenderer.material.DOKill();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\States\Guardian\GuardianState_Attack.cs`
+- Lines: 62
+- Size: 1.9 KB
+- Modified: 2025-12-14 12:18
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Core.Data;
+using System.Collections.Generic;
+using DarkTowerTron.Enemy.Agents;
+
+namespace DarkTowerTron.Enemy.States.Guardian
+{
+    public class GuardianState_Attack : State
+    {
+        private EnemyAgent_Guardian _agent;
+
+        public GuardianState_Attack(EnemyAgent_Guardian agent)
+        {
+            _agent = agent;
+        }
+
+        public override void Enter()
+        {
+            // 1. Stop Moving
+            _agent.Brain.behaviors = new List<DarkTowerTron.AI.Core.SteeringBehavior>(); 
+            
+            // 2. Start Shooting Routine
+            _agent.StartCoroutine(AttackRoutine());
+        }
+
+        public override void LogicUpdate()
+        {
+            if (_agent.GetController().IsStaggered) return;
+
+            // Keep facing player while shooting (Slowly!)
+            Transform combatTarget = _agent.GetTarget();
+            if (combatTarget != null)
+            {
+                _agent.GetMotor().FaceCombatTarget(combatTarget.position);
+            }
+        }
+
+        private System.Collections.IEnumerator AttackRoutine()
+        {
+            // Debug check
+            if (_agent.attackPatterns == null || _agent.attackPatterns.Count == 0)
+            {
+                Debug.LogWarning("Guardian has no Attack Patterns assigned!");
+            }
+            else
+            {
+                // Pick random pattern
+                AttackPatternSO pattern = _agent.attackPatterns[Random.Range(0, _agent.attackPatterns.Count)];
+                
+                // Execute and Wait for it to finish
+                yield return _agent.ExecutePattern(pattern);
+            }
+            
+            // Cooldown after firing
+            yield return new WaitForSeconds(1.5f);
+
+            // Go back to moving
+            _stateMachine.ChangeState(_agent.StateMove);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\States\Guardian\GuardianState_Move.cs`
+- Lines: 75
+- Size: 2.5 KB
+- Modified: 2025-12-14 12:17
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.AI.Core; // For AIData
+using DarkTowerTron.Enemy.Agents;
+
+namespace DarkTowerTron.Enemy.States.Guardian
+{
+    public class GuardianState_Move : State
+    {
+        private EnemyAgent_Guardian _agent;
+
+        public GuardianState_Move(EnemyAgent_Guardian agent)
+        {
+            _agent = agent;
+        }
+
+        public override void Enter()
+        {
+            // 1. Set Steering to "Move Profile"
+            _agent.Brain.behaviors = _agent.moveBehaviors;
+
+            // 2. Tell the Brain to Seek the Waypoint
+            // We must update AIData so ContextSolver knows where to go
+            var aiData = _agent.GetComponent<AIData>();
+            if (aiData != null)
+            {
+                aiData.currentTarget = _agent.GetCurrentWaypoint();
+            }
+        }
+
+        public override void LogicUpdate()
+        {
+            if (_agent.GetController().IsStaggered) return;
+
+            Transform wp = _agent.GetCurrentWaypoint();
+
+            // Safety: If path is broken/missing, switch to attack in place
+            if (wp == null)
+            {
+                _stateMachine.ChangeState(_agent.StateAttack);
                 return;
             }
 
-            // 2. Face Target
-            _motor.FaceTarget(_currentTarget.position);
+            // --- MOVEMENT ---
+            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
+            _agent.GetMotor().Move(moveDir);
 
-            // 3. Attack Cycle
-            if (_fireTimer <= 0)
+            // --- ROTATION (Use SLOW Combat Speed when looking at player) ---
+            Transform combatTarget = _agent.GetTarget();
+
+            if (combatTarget != null)
             {
-                StartCoroutine(SniperShot());
-            }
-        }
-
-        private IEnumerator TeleportAway()
-        {
-            _isBusy = true;
-            AbortAttack();
-
-            // 1. Shrink (Vanish)
-            transform.DOScale(Vector3.zero, 0.2f);
-            yield return new WaitForSeconds(0.2f);
-
-            // 2. Calculate Safe Position
-            Vector3 dirFromTarget = (transform.position - _currentTarget.position).normalized;
-            float targetDist = 12f; // Try to go far away
-
-            // RAYCAST CHECK:
-            // Cast from Player towards the desired direction.
-            // If we hit a wall, stop 2 units before the wall.
-            Vector3 newPos;
-            if (UnityEngine.Physics.Raycast(_currentTarget.position, dirFromTarget, out RaycastHit hit, targetDist, wallLayer))
-            {
-                // Hit wall -> Place sniper 2m in front of wall
-                newPos = hit.point - (dirFromTarget * 2.0f);
+                // Use the slow rotation method for aiming at player
+                _agent.GetMotor().FaceCombatTarget(combatTarget.position);
             }
             else
             {
-                // No wall -> Full distance
-                newPos = _currentTarget.position + (dirFromTarget * targetDist);
+                // Fallback: Face movement direction using normal speed
+                if (moveDir.sqrMagnitude > 0.1f)
+                    _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
             }
 
-            newPos.y = 0; // Keep grounded
-            transform.position = newPos;
+            // --- TRANSITION ---
+            // Check distance to Waypoint (flat check to ignore height diff)
+            Vector3 toWaypoint = wp.position - _agent.transform.position;
+            toWaypoint.y = 0;
 
-            // 3. Grow (Appear)
-            transform.DOScale(Vector3.one, 0.2f);
-            yield return new WaitForSeconds(0.2f);
-
-            _teleportTimer = teleportCooldown; // Reset Cooldown
-            _fireTimer = 1.0f; // Delay before shooting
-            _isBusy = false;
-        }
-
-        private IEnumerator SniperShot()
-        {
-            _isBusy = true;
-            if (laserSight) laserSight.enabled = true;
-
-            float aimTimer = 0f;
-            while (aimTimer < telegraphTime)
+            if (toWaypoint.magnitude < _agent.waypointTolerance)
             {
-                if (_controller.IsStaggered) { AbortAttack(); _isBusy = false; yield break; }
-
-                // Stop tracking in last 0.3s (Lock Aim)
-                if (aimTimer < telegraphTime - 0.3f)
-                    _motor.FaceTarget(_currentTarget.position);
-
-                // Update Laser Visuals
-                if (laserSight)
-                {
-                    Vector3 start = firePoint ? firePoint.position : transform.position;
-                    laserSight.SetPosition(0, start);
-                    laserSight.SetPosition(1, _currentTarget.position);
-                }
-
-                aimTimer += Time.deltaTime;
-                yield return null;
+                _agent.AdvanceWaypoint(); // Select next point for NEXT time
+                _stateMachine.ChangeState(_agent.StateAttack);
             }
-
-            // FIRE
-            if (laserSight) laserSight.enabled = false;
-
-            if (projectilePrefab && !_controller.IsStaggered)
-            {
-                Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
-                
-                // ONE LINE TO RULE THEM ALL
-                FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 30f);
-            }
-
-            _fireTimer = fireRate;
-            _isBusy = false;
-        }
-
-        private void AbortAttack()
-        {
-            if (laserSight) laserSight.enabled = false;
         }
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Legacy\EnemyAI_Strafer.cs`
-- Lines: 82
-- Size: 2.8 KB
-- Modified: 2025-12-11 07:51
+## 📄 `Assets\Scripts\Enemy\States\Sentinel\SentinelState_Combat.cs`
+- Lines: 56
+- Size: 1.7 KB
+- Modified: 2025-12-14 10:26
 
 ```csharp
 using UnityEngine;
-using System.Collections;
-using DarkTowerTron.Combat;
-using DarkTowerTron.Core;
-using DarkTowerTron.Managers;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.Agents;
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.States.Sentinel
 {
-    public class EnemyAI_Strafer : EnemyBaseAI
+    public class SentinelState_Combat : State
     {
-        [Header("Strafe Settings")]
-        public bool clockwise = true;
-        public float idealDistance = 6f;
+        private EnemyAgent_Sentinel _agent;
+        private float _fireTimer;
 
-        [Header("Combat")]
-        public GameObject projectilePrefab;
-        public Transform firePoint; // <--- ADDED THIS
-        public float fireInterval = 2.5f;
-        public int burstCount = 2;
-        public float burstRate = 0.2f;
-
-        private float _timer;
-
-        protected override void Start()
+        public SentinelState_Combat(EnemyAgent_Sentinel agent)
         {
-            base.Start();
-            clockwise = Random.value > 0.5f;
-            _timer = Random.Range(1f, fireInterval);
+            _agent = agent;
         }
 
-        protected override void RunAI()
+        public override void Enter()
         {
-            // --- MOVEMENT (Orbit) ---
-            Vector3 offset = transform.position - _currentTarget.position;
-            
-            // FIX: Flatten the offset so we calculate distance/direction purely on the floor plane
-            offset.y = 0; 
+            // Load "Orbit + Flee" Profile
+            _agent.Brain.behaviors = _agent.combatBehaviors;
 
-            Vector3 dirToTarget = -offset.normalized;
-            float distance = offset.magnitude;
+            // Randomize first shot
+            _fireTimer = Random.Range(0.5f, _agent.fireRate);
+        }
 
-            Vector3 tangent = Vector3.Cross(Vector3.up, dirToTarget).normalized;
-            if (!clockwise) tangent = -tangent;
+        public override void LogicUpdate()
+        {
+            if (_agent.GetController().IsStaggered) return;
+            if (_agent.GetTarget() == null) return;
 
-            Vector3 correction = Vector3.zero;
-            if (distance > idealDistance + 1f) correction = dirToTarget * 0.5f;
-            else if (distance < idealDistance - 1f) correction = -dirToTarget * 0.5f;
+            // 1. Move (Orbit/Strafe)
+            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
+            _agent.GetMotor().Move(moveDir);
 
-            // The resulting vector is now guaranteed to be flat (y=0)
-            _motor.Move((tangent + correction).normalized);
-            
-            // Face target (EnemyMotor.FaceTarget already handles flattening, so this is safe)
-            _motor.FaceTarget(_currentTarget.position);
+            // 2. Aim (Always lock on target)
+            _agent.GetMotor().FaceTarget(_agent.GetTarget().position);
 
-            // --- COMBAT ---
-            _timer -= Time.deltaTime;
-            if (_timer <= 0)
+            // 3. Fire
+            _fireTimer -= Time.deltaTime;
+            if (_fireTimer <= 0)
             {
-                StartCoroutine(FireBurst());
-                _timer = fireInterval;
+                _agent.HelperFireProjectile();
+                _fireTimer = _agent.fireRate;
             }
-        }
 
-        private IEnumerator FireBurst()
-        {
-            for (int i = 0; i < burstCount; i++)
+            // 4. Transition Check
+            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
+
+            // Use "HuntRange" (hysteresis) to prevent flickering
+            if (dist > _agent.huntRange)
             {
-                if (_controller.IsStaggered) yield break;
-
-                if (projectilePrefab)
-                {
-                    Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward * 1.0f;
-                    Quaternion spawnRot = firePoint ? firePoint.rotation : transform.rotation;
-
-                    // Fire
-                    FireProjectile(projectilePrefab, spawnPos, spawnRot, transform.forward, 12f);
-                }
-                yield return new WaitForSeconds(burstRate);
+                _stateMachine.ChangeState(_agent.StateHunt);
             }
         }
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Legacy\EnemyAI_Turret.cs`
-- Lines: 62
+## 📄 `Assets\Scripts\Enemy\States\Sentinel\SentinelState_Hunt.cs`
+- Lines: 44
+- Size: 1.2 KB
+- Modified: 2025-12-14 10:35
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.Agents;
+
+namespace DarkTowerTron.Enemy.States.Sentinel
+{
+    public class SentinelState_Hunt : State
+    {
+        private EnemyAgent_Sentinel _agent;
+
+        public SentinelState_Hunt(EnemyAgent_Sentinel agent)
+        {
+            _agent = agent;
+        }
+
+        public override void Enter()
+        {
+            // Load "Seek" Profile
+            _agent.Brain.behaviors = _agent.huntBehaviors;
+        }
+
+        public override void LogicUpdate()
+        {
+            if (_agent.GetController().IsStaggered) return;
+            if (_agent.GetTarget() == null) return;
+
+            // 1. Move
+            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
+            _agent.GetMotor().Move(moveDir);
+
+            // Face movement
+            if (moveDir.sqrMagnitude > 0.1f)
+                _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
+
+            // 2. Transition Check
+            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
+
+            if (dist <= _agent.combatRange)
+            {
+                _stateMachine.ChangeState(_agent.StateCombat);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Aiming.cs`
+- Lines: 65
 - Size: 1.9 KB
-- Modified: 2025-12-11 07:51
+- Modified: 2025-12-14 10:23
 
 ```csharp
 using UnityEngine;
-using System.Collections;
-using DarkTowerTron.Combat;
+using DarkTowerTron.AI.FSM;
+using System.Collections.Generic;
+using DarkTowerTron.Enemy.Agents;
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.States.Sniper
 {
-    public class EnemyAI_Turret : EnemyBaseAI
+    public class SniperState_Aiming : State
     {
-        [Header("Turret Stats")]
-        // Removed rotationSpeed variable (Now handled by Stats_Guardian asset)
-        public float fireInterval = 3.0f;
-        public int burstCount = 5;
-        public float burstRate = 0.1f;
-
-        [Header("Setup")]
-        public GameObject projectilePrefab;
-        public Transform firePoint;
-
+        private EnemyAgent_Sniper _agent;
         private float _timer;
 
-        protected override void Start()
+        public SniperState_Aiming(EnemyAgent_Sniper agent)
         {
-            base.Start();
-
-            // REMOVED: Manual overrides for motor.rotationSpeed, moveSpeed, shield.
-            // WHY: These are now defined in the 'Stats_Guardian' ScriptableObject.
-            // Ensure your Stats_Guardian asset has MoveSpeed = 0, Rotation = 3, Shield = True.
+            _agent = agent;
         }
 
-        protected override void RunAI()
+        public override void Enter()
         {
-            // 1. Tracking
-            _motor.FaceTarget(_currentTarget.position);
+            // STOP MOVING (Clear behaviors or set empty list)
+            _agent.Brain.behaviors = new List<DarkTowerTron.AI.Core.SteeringBehavior>();
 
-            // 2. Shooting Logic
+            _timer = _agent.aimDuration;
+            if (_agent.laserSight) _agent.laserSight.enabled = true;
+        }
+
+        public override void LogicUpdate()
+        {
+            if (_agent.GetTarget() == null)
+            {
+                _stateMachine.ChangeState(_agent.StatePositioning);
+                return;
+            }
+
             _timer -= Time.deltaTime;
+
+            // 1. Visuals
+            if (_agent.laserSight)
+            {
+                Vector3 start = _agent.firePoint ? _agent.firePoint.position : _agent.transform.position;
+                // Aim at chest
+                Vector3 end = _agent.GetTarget().position + Vector3.up * 1.0f;
+                _agent.laserSight.SetPosition(0, start);
+                _agent.laserSight.SetPosition(1, end);
+            }
+
+            // 2. Tracking (Stop tracking in last 0.2s for fairness)
+            if (_timer > 0.2f)
+            {
+                _agent.GetComponent<EnemyMotor>().FaceTarget(_agent.GetTarget().position);
+            }
+
+            // 3. Transition
             if (_timer <= 0)
             {
-                StartCoroutine(FireBurst());
-                _timer = fireInterval;
+                _stateMachine.ChangeState(_agent.StateFiring);
             }
         }
 
-        private IEnumerator FireBurst()
+        public override void Exit()
         {
-            for (int i = 0; i < burstCount; i++)
-            {
-                if (_controller.IsStaggered) yield break;
-
-                if (projectilePrefab)
-                {
-                    Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
-
-                    // Fire using Base Helper
-                    FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 15f);
-                }
-
-                yield return new WaitForSeconds(burstRate);
-            }
+            if (_agent.laserSight) _agent.laserSight.enabled = false;
         }
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Legacy\EnemyBaseAI.cs`
-- Lines: 100
-- Size: 3.1 KB
-- Modified: 2025-12-11 07:51
+## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Firing.cs`
+- Lines: 24
+- Size: 0.6 KB
+- Modified: 2025-12-14 10:24
+
+```csharp
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.Agents;
+
+namespace DarkTowerTron.Enemy.States.Sniper
+{
+    public class SniperState_Firing : State
+    {
+        private EnemyAgent_Sniper _agent;
+
+        public SniperState_Firing(EnemyAgent_Sniper agent)
+        {
+            _agent = agent;
+        }
+
+        public override void Enter()
+        {
+            // Shoot
+            _agent.HelperFireProjectile(35f); // Fast bullet
+
+            // Immediately return to positioning
+            _stateMachine.ChangeState(_agent.StatePositioning);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Positioning.cs`
+- Lines: 54
+- Size: 1.6 KB
+- Modified: 2025-12-14 10:24
 
 ```csharp
 using UnityEngine;
-using DG.Tweening; // Logic relies on Tweening
-using DarkTowerTron.Core;
-using DarkTowerTron.Combat;
-using DarkTowerTron.Managers;
+using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Enemy.Agents;
 
-namespace DarkTowerTron.Enemy
+namespace DarkTowerTron.Enemy.States.Sniper
 {
-    [RequireComponent(typeof(EnemyMotor))]
-    [RequireComponent(typeof(EnemyController))]
-    public abstract class EnemyBaseAI : MonoBehaviour
+    public class SniperState_Positioning : State
     {
-        protected EnemyMotor _motor;
-        protected EnemyController _controller;
-        protected Transform _player;
-        protected Transform _currentTarget;
+        private EnemyAgent_Sniper _agent;
+        private float _cooldownTimer;
 
-        // NEW: State Flag
-        protected bool _isSpawning = true; 
-
-        protected virtual void Awake()
+        public SniperState_Positioning(EnemyAgent_Sniper agent)
         {
-            _motor = GetComponent<EnemyMotor>();
-            _controller = GetComponent<EnemyController>();
+            _agent = agent;
         }
 
-        // NEW: OnEnable handles the Spawn Logic (Runs every time it comes from Pool)
-        protected virtual void OnEnable()
+        public override void Enter()
         {
-            _isSpawning = true;
-            transform.localScale = Vector3.zero;
+            // OPTIMIZATION: Assign the pre-filled list reference. 
+            // Zero Garbage Allocation.
+            _agent.Brain.behaviors = _agent.positioningBehaviors;
 
-            // FIRE SPAWN EVENT
-            GameEvents.OnEnemySpawned?.Invoke(transform.position);
-
-            transform.DOScale(Vector3.one, 0.8f)
-                .SetEase(Ease.OutBack)
-                .OnComplete(() => _isSpawning = false);
+            _cooldownTimer = 1.0f;
         }
 
-        protected virtual void Start()
+        public override void LogicUpdate()
         {
-            GameObject p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
-            if (p)
+            if (_agent.GetTarget() == null) return;
+
+            if (_cooldownTimer > 0) _cooldownTimer -= Time.deltaTime;
+
+            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
+
+            // 1. Panic
+            if (dist < _agent.panicDistance)
             {
-                _player = p.transform;
-                _currentTarget = _player;
+                _stateMachine.ChangeState(_agent.StateTeleport);
+                return;
             }
 
-            GameEvents.OnDecoySpawned += OnDecoySpawned;
-            GameEvents.OnDecoyExpired += OnDecoyExpired;
-        }
-
-        protected virtual void OnDestroy()
-        {
-            GameEvents.OnDecoySpawned -= OnDecoySpawned;
-            GameEvents.OnDecoyExpired -= OnDecoyExpired;
-        }
-
-        private void Update()
-        {
-            // BLOCK LOGIC IF SPAWNING
-            if (_isSpawning) return;
-
-            if (_player == null) return;
-            if (_currentTarget == null) _currentTarget = _player;
-            if (_controller.IsStaggered) return;
-
-            RunAI();
-        }
-
-        protected abstract void RunAI();
-
-        // --- HELPER METHODS ---
-
-        /// <summary>
-        /// Centralized logic to spawn, reset, and fire a hostile projectile.
-        /// </summary>
-        protected void FireProjectile(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 direction, float speed)
-        {
-            if (prefab == null) return;
-
-            // 1. Spawn via Pool
-            GameObject p = PoolManager.Instance.Spawn(prefab, position, rotation);
-
-            // 2. Setup Logic
-            Projectile proj = p.GetComponent<Projectile>();
-            if (proj != null)
+            // 2. Attack
+            if (dist < _agent.attackRange && _cooldownTimer <= 0)
             {
-                proj.ResetHostility(true); // Enemies always shoot hostile
-                proj.speed = speed;
-                proj.Initialize(direction);
+                _stateMachine.ChangeState(_agent.StateAiming);
+                return;
+            }
+
+            // 3. Move
+            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
+            _agent.GetComponent<EnemyMotor>().Move(moveDir);
+            _agent.GetComponent<EnemyMotor>().FaceTarget(_agent.GetTarget().position);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Teleport.cs`
+- Lines: 61
+- Size: 1.7 KB
+- Modified: 2025-12-14 10:24
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.FSM;
+using DG.Tweening;
+using DarkTowerTron.Enemy.Agents;
+
+namespace DarkTowerTron.Enemy.States.Sniper
+
+{
+    public class SniperState_Teleport : State
+    {
+        private EnemyAgent_Sniper _agent;
+        private bool _isTeleporting;
+
+        public SniperState_Teleport(EnemyAgent_Sniper agent)
+        {
+            _agent = agent;
+        }
+
+        public override void Enter()
+        {
+            _isTeleporting = true;
+            _agent.transform.DOScale(Vector3.zero, 0.2f).OnComplete(PerformJump);
+        }
+
+        private void PerformJump()
+        {
+            if (_agent == null) return;
+
+            Vector3 dirAway = (_agent.transform.position - _agent.GetTarget().position).normalized;
+
+            // CONFIGURABLE DISTANCE
+            float dist = _agent.teleportDistance;
+            Vector3 dest = _agent.transform.position + (dirAway * dist);
+
+            // Wall Check
+            if (UnityEngine.Physics.Raycast(_agent.transform.position, dirAway, out RaycastHit hit, dist, _agent.wallLayer))
+            {
+                dest = hit.point - (dirAway * 2f);
+            }
+
+            dest.y = 0;
+            _agent.transform.position = dest;
+
+            // Reset Velocity
+            _agent.GetComponent<EnemyMotor>().OnSpawn();
+
+            _agent.transform.DOScale(Vector3.one, 0.2f).OnComplete(() =>
+            {
+                _isTeleporting = false;
+            });
+        }
+
+        public override void LogicUpdate()
+        {
+            if (!_isTeleporting)
+            {
+                _stateMachine.ChangeState(_agent.StatePositioning);
             }
         }
-
-        // --- EVENTS ---
-        private void OnDecoySpawned(Transform decoy) { _currentTarget = decoy; }
-        private void OnDecoyExpired() { if (_player != null) _currentTarget = _player; }
     }
 }
 ```
@@ -1923,9 +2685,9 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\FeedbackDirector.cs`
-- Lines: 48
-- Size: 1.4 KB
-- Modified: 2025-12-11 14:23
+- Lines: 71
+- Size: 2.3 KB
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
@@ -1942,16 +2704,39 @@ namespace DarkTowerTron.Managers
         public AudioClip killClip;
         public AudioClip playerHurtClip;
 
+        [Header("Hull")]
+        public AudioClip hullBreakClip; // Drag "Glass Shatter" or "Alarm" here
+
+        private bool _hasLastHullState;
+        private bool _lastHasHull;
+
         private void OnEnable()
         {
             GameEvents.OnPlayerHit += OnPlayerHit;
             GameEvents.OnEnemyKilled += OnEnemyKilled;
+            GameEvents.OnHullStateChanged += OnHullChanged;
         }
 
         private void OnDisable()
         {
             GameEvents.OnPlayerHit -= OnPlayerHit;
             GameEvents.OnEnemyKilled -= OnEnemyKilled;
+            GameEvents.OnHullStateChanged -= OnHullChanged;
+        }
+
+        private void OnHullChanged(bool hasHull)
+        {
+            bool lostHull = _hasLastHullState && _lastHasHull && !hasHull;
+
+            _hasLastHullState = true;
+            _lastHasHull = hasHull;
+
+            // Only play feedback if we LOST the hull (became false)
+            if (!lostHull) return;
+
+            if (AudioManager.Instance) AudioManager.Instance.PlaySound(hullBreakClip, 1.0f);
+            if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.5f, 0.7f); // Big shake
+            if (GameTime.Instance) GameTime.Instance.HitStop(0.2f); // Dramatic pause
         }
 
         private void OnPlayerHit()
@@ -1966,7 +2751,7 @@ namespace DarkTowerTron.Managers
             if (GameTime.Instance) GameTime.Instance.HitStop(0.1f);
         }
 
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             // 1. Audio
             if (AudioManager.Instance) AudioManager.Instance.PlaySound(killClip, 0.8f);
@@ -1980,8 +2765,8 @@ namespace DarkTowerTron.Managers
 
 ## 📄 `Assets\Scripts\Managers\GameFeel.cs`
 - Lines: 98
-- Size: 2.9 KB
-- Modified: 2025-12-11 14:05
+- Size: 3.0 KB
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
@@ -2066,7 +2851,7 @@ namespace DarkTowerTron.Core
         }
 
         // Update the signature
-        private void OnEnemyKilled(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats, bool rewardPlayer)
         {
             PlaySound(_killClip, 0.8f);
             CameraShake(0.15f, 0.2f); 
@@ -2085,9 +2870,9 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Managers\GameSession.cs`
-- Lines: 135
-- Size: 3.9 KB
-- Modified: 2025-12-11 14:11
+- Lines: 139
+- Size: 4.0 KB
+- Modified: 2025-12-13 14:45
 
 ```csharp
 using UnityEngine;
@@ -2139,8 +2924,12 @@ namespace DarkTowerTron.Managers
 
         private void OnDestroy()
         {
+            // Existing unsubscriptions
             GameEvents.OnPlayerDied -= TriggerGameOver;
             GameEvents.OnGameVictory -= TriggerVictory;
+
+            // CRITICAL: Wipe static listeners
+            GameEvents.Cleanup();
         }
 
         // --- PUBLIC UI FUNCTIONS ---
@@ -2228,9 +3017,9 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\HUDManager.cs`
-- Lines: 93
-- Size: 3.0 KB
-- Modified: 2025-12-11 07:51
+- Lines: 128
+- Size: 4.2 KB
+- Modified: 2025-12-14 08:19
 
 ```csharp
 using UnityEngine;
@@ -2251,6 +3040,11 @@ namespace DarkTowerTron.Managers
         public GameObject[] gritPips; // Drag your Pip Images here
         public Color activePipColor = Color.white;
         public Color inactivePipColor = new Color(1, 1, 1, 0.2f); // Faded
+
+        [Header("Hull / Wound")]
+        public Image hullIcon; // Assign the Wound Image
+        public Color hullActiveColor = Color.cyan; // Shield is UP
+        public Color hullBrokenColor = new Color(1, 0, 0, 0.3f); // Shield BROKEN (Red/Transparent)
 
         [Header("System")]
         public TMPro.TextMeshProUGUI waveText;
@@ -2278,6 +3072,7 @@ namespace DarkTowerTron.Managers
             GameEvents.OnFocusChanged += UpdateFocus;
             GameEvents.OnGritChanged += UpdateGrit;
             GameEvents.OnScoreChanged += UpdateScoreUI;
+            GameEvents.OnHullStateChanged += UpdateHull;
             // Optional: Listen for wave changes if we added that event
         }
 
@@ -2286,6 +3081,25 @@ namespace DarkTowerTron.Managers
             GameEvents.OnFocusChanged -= UpdateFocus;
             GameEvents.OnGritChanged -= UpdateGrit;
             GameEvents.OnScoreChanged -= UpdateScoreUI;
+            GameEvents.OnHullStateChanged -= UpdateHull;
+        }
+
+        private void UpdateHull(bool hasHull)
+        {
+            if (!hullIcon) return;
+
+            if (hasHull)
+            {
+                // Hull is intact
+                hullIcon.color = hullActiveColor;
+                // Optional: hullIcon.sprite = shieldSprite;
+            }
+            else
+            {
+                // Hull is gone (Danger State)
+                hullIcon.color = hullBrokenColor;
+                // Optional: hullIcon.sprite = brokenSkullSprite;
+            }
         }
 
         private void UpdateFocus(float current, float max)
@@ -2304,15 +3118,25 @@ namespace DarkTowerTron.Managers
 
         private void UpdateGrit(int currentGrit)
         {
+
+            Debug.Log($"[DEBUG HUD] Updating Grit UI: {currentGrit}");
+
             if (gritPips == null) return;
+
+            Debug.Log($"[DEBUG HUD] Grit Pips Length: {gritPips.Length}");
 
             for (int i = 0; i < gritPips.Length; i++)
             {
                 if (gritPips[i] == null) continue;
 
+                Debug.Log($"[DEBUG HUD] Updating Pip {i}");
+
                 Image pipImg = gritPips[i].GetComponent<Image>();
                 if (pipImg)
                 {
+
+                    Debug.Log($"[DEBUG HUD] Setting Pip {i} Color");
+
                     // If currentGrit is 2, pips 0 and 1 are active.
                     pipImg.color = (i < currentGrit) ? activePipColor : inactivePipColor;
                 }
@@ -2390,13 +3214,14 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\PoolManager.cs`
-- Lines: 81
-- Size: 2.8 KB
-- Modified: 2025-12-11 17:42
+- Lines: 89
+- Size: 3.1 KB
+- Modified: 2025-12-14 08:34
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Managers
 {
@@ -2434,8 +3259,6 @@ namespace DarkTowerTron.Managers
                 // CRITICAL FIX: Move it BEFORE waking it up
                 objectToSpawn.transform.position = position;
                 objectToSpawn.transform.rotation = rotation;
-
-                objectToSpawn.SetActive(true); // Now OnEnable fires at the correct location
             }
             // 2. NEW OBJECT
             else
@@ -2444,6 +3267,11 @@ namespace DarkTowerTron.Managers
                 objectToSpawn = Instantiate(prefab, position, rotation);
                 // OnEnable fires immediately here, but position is already correct
             }
+
+            // Interface Call (root + children)
+            objectToSpawn.SetActive(true);
+            var poolables = objectToSpawn.GetComponentsInChildren<IPoolable>(true);
+            foreach (var p in poolables) p.OnSpawn();
 
             // 3. Track it
             int instanceKey = objectToSpawn.GetInstanceID();
@@ -2462,6 +3290,10 @@ namespace DarkTowerTron.Managers
             // Only pool objects we know about; otherwise destroy them
             if (_spawnedObjectsParentId.ContainsKey(instanceKey))
             {
+                // Interface Call (root + children)
+                var poolables = obj.GetComponentsInChildren<IPoolable>(true);
+                foreach (var p in poolables) p.OnDespawn();
+
                 int poolKey = _spawnedObjectsParentId[instanceKey];
 
                 obj.SetActive(false);
@@ -2479,9 +3311,9 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\ScoreManager.cs`
-- Lines: 96
-- Size: 2.6 KB
-- Modified: 2025-12-11 14:25
+- Lines: 98
+- Size: 2.7 KB
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
@@ -2533,8 +3365,10 @@ namespace DarkTowerTron.Managers
         }
 
         // --- FIXED METHOD SIGNATURE ---
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
+            if (!rewardPlayer) return;
+
             // Determine score from Stats asset, or use default if missing
             int scoreValue = (stats != null) ? stats.scoreValue : baseScorePerKill;
 
@@ -2584,8 +3418,8 @@ namespace DarkTowerTron.Managers
 
 ## 📄 `Assets\Scripts\Managers\VFXManager.cs`
 - Lines: 48
-- Size: 1.5 KB
-- Modified: 2025-12-11 17:35
+- Size: 1.6 KB
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
@@ -2612,7 +3446,7 @@ namespace DarkTowerTron.Managers
         }
 
         // Update the signature to match the new Event
-        private void PlayDeathVFX(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats)
+        private void PlayDeathVFX(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats, bool rewardPlayer)
         {
             if (explosionPrefab && PoolManager.Instance)
             {
@@ -2639,9 +3473,9 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\WaveDirector.cs`
-- Lines: 194
+- Lines: 192
 - Size: 6.5 KB
-- Modified: 2025-12-11 17:36
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
@@ -2757,14 +3591,17 @@ namespace DarkTowerTron.Managers
         // NEW: We remove the 'isEssential' bool because we will ask the prefab itself
         private void SpawnEnemy(GameObject prefab, int forcedIndex)
         {
-            if (_spawner == null || prefab == null) return;
+            if (_spawner == null) return;
+
+            // SAFETY CHECK
+            if (prefab == null)
+            {
+                Debug.LogError($"WaveDirector: Attempted to spawn NULL prefab in Wave {_currentWaveIndex}. Checking Next.");
+                return;
+            }
 
             _spawner.SpawnEnemy(prefab, forcedIndex);
 
-            // --- DATA INTEGRITY FIX ---
-            // We check the prefab's stats to decide which counter to increment.
-            // This ensures Spawn and Death logic use the exact same source of truth.
-            
             var motor = prefab.GetComponentInChildren<DarkTowerTron.Enemy.EnemyMotor>();
             bool countAsEssential = false;
 
@@ -2774,25 +3611,20 @@ namespace DarkTowerTron.Managers
             }
             else
             {
-                // Fallback: If no stats found, assume essential to prevent soft-lock, 
-                // or assume grunt. Let's assume Essential if it was in the Main list?
-                // Actually, let's look at the calling context.
-                // But relying on the prefab is safer.
-                Debug.LogWarning($"Enemy {prefab.name} missing Stats! Defaulting to Essential.");
+                // SAFETY FALLBACK:
+                // If an enemy has no stats, we MUST assume it is Essential.
+                // If we assume it is a Grunt, and it never dies properly or doesn't count,
+                // the wave might hang. But if we assume Essential, at least the wave count goes up
+                // and killing it will progress the wave.
+                Debug.LogWarning($"Enemy {prefab.name} missing Stats! Defaulting to Essential to prevent soft-lock.");
                 countAsEssential = true;
             }
 
-            if (countAsEssential)
-            {
-                _essentialEnemiesAlive++;
-            }
-            else
-            {
-                _gruntsAlive++;
-            }
+            if (countAsEssential) _essentialEnemiesAlive++;
+            else _gruntsAlive++;
         }
 
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!_gameStarted) return;
 
@@ -2840,10 +3672,10 @@ namespace DarkTowerTron.Managers
 }
 ```
 
-## 📄 `Assets\Scripts\Physic\KinematicMover.cs`
-- Lines: 240
-- Size: 9.6 KB
-- Modified: 2025-12-13 11:00
+## 📄 `Assets\Scripts\Physics\KinematicMover.cs`
+- Lines: 261
+- Size: 10.5 KB
+- Modified: 2025-12-14 08:35
 
 ```csharp
 using UnityEngine;
@@ -2861,6 +3693,10 @@ namespace DarkTowerTron.Physics
         [Range(0f, 90f)][SerializeField] private float _maxSlopeAngle = 45f;
         [SerializeField] private float _groundSnapDistance = 0.3f;
 
+        [Header("Optimization")]
+        public bool useCulling = true;
+        public float cullingDistance = 40f; // Beyond this, physics stops
+
         // Events
         public event System.Action<Vector3> OnCollision;
         public event System.Action<float> OnStepClimbed;
@@ -2874,6 +3710,8 @@ namespace DarkTowerTron.Physics
         private Vector3 _platformLastPos;
         private Quaternion _platformLastRot;
 
+        private Transform _camTransform;
+
         // Cache
         private RaycastHit[] _hitBuffer = new RaycastHit[8];
         private HashSet<Collider> _ignoredColliders = new HashSet<Collider>();
@@ -2886,6 +3724,7 @@ namespace DarkTowerTron.Physics
         private void Awake()
         {
             _capsule = GetComponent<CapsuleCollider>();
+            if (Camera.main) _camTransform = Camera.main.transform;
             if (_obstacleMask == 0) _obstacleMask = 1;
         }
 
@@ -2893,6 +3732,20 @@ namespace DarkTowerTron.Physics
         {
             float dt = Time.deltaTime;
             if (dt < 1e-5f) return;
+
+            // --- CULLING CHECK ---
+            if (useCulling && _camTransform != null)
+            {
+                // SqrMagnitude is faster than Distance
+                float distSqr = (transform.position - _camTransform.position).sqrMagnitude;
+                if (distSqr > cullingDistance * cullingDistance)
+                {
+                    // CHEAP MOVEMENT: Just translate, ignore walls
+                    transform.Translate(desiredVelocity * dt, Space.World);
+                    return; // Skip the expensive stuff below
+                }
+            }
+            // ---------------------
 
             // 1. Safety & Platforming
             Depenetrate();
@@ -3235,7 +4088,7 @@ namespace DarkTowerTron.Player
 ## 📄 `Assets\Scripts\Player\PlayerController.cs`
 - Lines: 186
 - Size: 6.0 KB
-- Modified: 2025-12-11 07:51
+- Modified: 2025-12-14 08:28
 
 ```csharp
 using UnityEngine;
@@ -3284,36 +4137,35 @@ namespace DarkTowerTron.Player
 
             _controls = new GameControls();
 
-            // --- CACHE ACTIONS ---
-            // We look them up once. If they don't exist, these variables will be null.
+            // --- STRICT BINDING (No Strings) ---
+            // Direct access ensures compile-time errors if names change.
+
+            // Cache actions once (no FindAction lookups)
             _moveAction = _controls.Gameplay.Move;
             _lookPadAction = _controls.Gameplay.LookGamepad;
             _lookMouseAction = _controls.Gameplay.LookMouse;
-
-            // Safely find actions even if you renamed them slightly differently
-            _fireBeamAction = _controls.asset.FindAction("Melee");
-            _fireGunAction = _controls.asset.FindAction("Gun");
-
-            // --- BINDINGS ---
-            // 1. Dodge (Space / RB)
-            // Use FindAction to be safe, or direct access if you are sure
-            var dodgeAction = _controls.asset.FindAction("Blitz");
-            if (dodgeAction != null) dodgeAction.performed += ctx => OnDodge();
-
-            // 2. Glory Kill (E / LB)
-            var killAction = _controls.asset.FindAction("GloryKill");
-            if (killAction != null) killAction.performed += ctx => OnGloryKill();
+            _fireBeamAction = _controls.Gameplay.Melee;
+            _fireGunAction = _controls.Gameplay.Gun;
         }
 
         private void OnEnable()
         {
+            _controls.Gameplay.Blitz.performed += OnBlitzPerformed;
+            _controls.Gameplay.GloryKill.performed += OnGloryKillPerformed;
+
             if (_inputEnabled) _controls.Enable();
         }
 
         private void OnDisable()
         {
+            _controls.Gameplay.Blitz.performed -= OnBlitzPerformed;
+            _controls.Gameplay.GloryKill.performed -= OnGloryKillPerformed;
+
             _controls.Disable();
         }
+
+        private void OnBlitzPerformed(InputAction.CallbackContext ctx) => OnDodge();
+        private void OnGloryKillPerformed(InputAction.CallbackContext ctx) => OnGloryKill();
 
         private void Update()
         {
@@ -3383,16 +4235,17 @@ namespace DarkTowerTron.Player
         private void HandleFiring()
         {
             // 1. Handle BEAM
-            if (_beamWeapon != null && _fireBeamAction != null)
+            if (_beamWeapon != null)
             {
-                bool isBeam = _fireBeamAction.ReadValue<float>() > 0.5f;
+                // Direct access via generated class
+                bool isBeam = _controls.Gameplay.Melee.ReadValue<float>() > 0.5f;
                 _beamWeapon.SetFiring(isBeam);
             }
 
             // 2. Handle GUN
-            if (_gunWeapon != null && _fireGunAction != null)
+            if (_gunWeapon != null)
             {
-                bool isGun = _fireGunAction.ReadValue<float>() > 0.5f;
+                bool isGun = _controls.Gameplay.Gun.ReadValue<float>() > 0.5f;
                 _gunWeapon.SetFiring(isGun);
             }
         }
@@ -3593,9 +4446,9 @@ namespace DarkTowerTron.Player
 ```
 
 ## 📄 `Assets\Scripts\Player\PlayerEnergy.cs`
-- Lines: 98
+- Lines: 100
 - Size: 2.8 KB
-- Modified: 2025-12-11 14:21
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
@@ -3654,8 +4507,10 @@ namespace DarkTowerTron.Player
         }
 
         // --- FIXED SIGNATURE ---
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
+            if (!rewardPlayer) return;
+
             // Use specific reward if available, otherwise default
             float reward = (stats != null) ? stats.focusReward : defaultFocusOnKill;
             AddFocus(reward);
@@ -3836,14 +4691,14 @@ namespace DarkTowerTron.Player
 ```
 
 ## 📄 `Assets\Scripts\Player\PlayerHealth.cs`
-- Lines: 93
-- Size: 2.4 KB
-- Modified: 2025-12-11 14:22
+- Lines: 120
+- Size: 3.5 KB
+- Modified: 2025-12-14 08:43
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
+using DarkTowerTron.Core.Data;
 
 namespace DarkTowerTron.Player
 {
@@ -3852,8 +4707,10 @@ namespace DarkTowerTron.Player
     {
         [Header("Stats")]
         public int maxGrit = 2;
+        public bool startWithHull = true; // Default to having the shield
 
         private int _currentGrit;
+        private bool _hasHull;
         private bool _isDead;
         private PlayerMovement _movement;
 
@@ -3865,6 +4722,7 @@ namespace DarkTowerTron.Player
         private void Start()
         {
             _currentGrit = maxGrit;
+            _hasHull = startWithHull;
             GameEvents.OnEnemyKilled += OnEnemyKilled;
             UpdateUI();
         }
@@ -3878,16 +4736,38 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return false;
 
+            // 1. Calculate actual damage (for Grit calculation)
+            int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
+
+            // LOGIC GATE
             if (_currentGrit > 0)
             {
-                _currentGrit--;
+                // PHASE 1: Take Grit Damage
+                _currentGrit -= dmg;
+                if (_currentGrit < 0) _currentGrit = 0; // Clamp, don't carry over damage to hull
+
+                GameEvents.OnPlayerHit?.Invoke(); // Standard Ouch
+            }
+            else if (_hasHull)
+            {
+                // PHASE 2: Hull Break (Gate)
+                // We absorb ALL damage from this single hit, regardless of amount.
+                _hasHull = false;
+
+                // Special Feedback for breaking the shield
+                Debug.Log("<color=orange>HULL BREACHED!</color>");
+                // We can fire OnPlayerHit for shake, or a specific Hull Break event
                 GameEvents.OnPlayerHit?.Invoke();
-                if (_movement) _movement.ApplyKnockback(info.pushDirection * info.pushForce);
             }
             else
             {
+                // PHASE 3: Death
                 Kill(false);
             }
+
+            // Apply Physics (Always happens if not dead)
+            if (!_isDead && _movement)
+                _movement.ApplyKnockback(info.pushDirection * info.pushForce);
 
             UpdateUI();
             return true;
@@ -3897,6 +4777,10 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return;
             _isDead = true;
+            _currentGrit = 0;
+            _hasHull = false;
+            UpdateUI();
+
             Debug.Log("PLAYER DEAD");
             GameEvents.OnPlayerDied?.Invoke();
         }
@@ -3904,33 +4788,31 @@ namespace DarkTowerTron.Player
         public void HealGrit(int amount = 1)
         {
             if (_isDead) return;
+
+            // NOTE: We only heal Grit. Hull is not replenishable (per design).
             _currentGrit = Mathf.Min(_currentGrit + amount, maxGrit);
             UpdateUI();
         }
 
-        // Updated Event Handler
-        private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats)
+        private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
+            if (!rewardPlayer) return;
+
+            // Only heal if allowed
             if (stats != null)
             {
-                // Check boolean flag first
-                if (stats.healsGrit)
-                {
-                    // Use the specific amount defined in the asset
-                    HealGrit(stats.gritRewardAmount);
-                }
+                if (stats.healsGrit) HealGrit(stats.gritRewardAmount);
             }
             else
             {
-                // Fallback for legacy/missing stats
                 HealGrit(1);
             }
         }
-        // -----------------------
 
         private void UpdateUI()
         {
             GameEvents.OnGritChanged?.Invoke(_currentGrit);
+            GameEvents.OnHullStateChanged?.Invoke(_hasHull);
         }
     }
 }

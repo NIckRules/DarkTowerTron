@@ -47,11 +47,12 @@ namespace DarkTowerTron.Managers
 
         private void OnDestroy()
         {
-            // Existing unsubscriptions
+            // Unsubscribe LOCAL listeners first
             GameEvents.OnPlayerDied -= TriggerGameOver;
             GameEvents.OnGameVictory -= TriggerVictory;
 
-            // CRITICAL: Wipe static listeners
+            // THEN wipe the static board
+            // This ensures no one else triggers events on dead objects during unload
             GameEvents.Cleanup();
         }
 
