@@ -46,27 +46,32 @@ namespace DarkTowerTron.Player
             StartCoroutine(ExecutionRoutine(_scanner.CurrentTarget));
         }
 
-        private IEnumerator ExecutionRoutine(DarkTowerTron.Enemy.EnemyController target)
+        // Change parameter type to Interface
+        private IEnumerator ExecutionRoutine(ICombatTarget target)
         {
             _isBusy = true;
 
             // 1. Teleport
-            Vector3 enemyPos = target.transform.position;
-            Vector3 attackPos = enemyPos - (transform.forward * 1.0f);
+            Vector3 targetPos = target.transform.position;
+            Vector3 attackPos = targetPos - (transform.forward * 1.0f);
             transform.position = attackPos;
 
-            // 2. Kill
-            // This fires 'OnEnemyKilled', which PlayerHealth listens to for the heal.
-            target.Kill(false);
+            // 2. Trigger Target Reaction (Die or Reset)
+            target.OnExecutionHit();
 
             // PLAY SOUND
             if (GameFeel.Instance && executeClip) 
                 GameFeel.Instance.PlaySound(executeClip, 1f);
 
             // 3. Rewards
-            // Only handle Focus manually here (as a bonus for the move).
-            // Health is handled by the Global Event "OnEnemyKilled".
+            // We assume execution always gives Focus (movement fuel)
             _energy.AddFocus(killRewardFocus);
+            
+            // LOGIC CHECK: Only heal if it was a living enemy? 
+            // Or rely on OnEnemyKilled event?
+            // Since EnemyController.Kill fires OnEnemyKilled, the health will update automatically.
+            // DamageableProp DOES NOT fire OnEnemyKilled (usually), so Anchors won't heal you.
+            // This is correct behavior!
 
             if (ScoreManager.Instance)
                 ScoreManager.Instance.TriggerGloryKillBonus();
@@ -74,11 +79,11 @@ namespace DarkTowerTron.Player
             // 4. Juice
             if (GameFeel.Instance)
             {
-                GameFeel.Instance.HitStop(0.2f);
-                GameFeel.Instance.CameraShake(0.3f, 0.8f);
+                GameFeel.Instance.HitStop(0.1f);
+                GameFeel.Instance.CameraShake(0.2f, 0.5f);
             }
 
-            yield return new WaitForSeconds(0.15f); // Animation lock
+            yield return new WaitForSeconds(0.1f);
 
             _isBusy = false;
         }

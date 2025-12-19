@@ -1,6 +1,5 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Enemy;
 
 namespace DarkTowerTron.Player
 {
@@ -19,7 +18,7 @@ namespace DarkTowerTron.Player
         public Color lockedColor = Color.cyan;
         public Color executionColor = Color.yellow; // or Red
 
-        public EnemyController CurrentTarget { get; private set; }
+        public ICombatTarget CurrentTarget { get; private set; }
 
         private Transform _reticleInstance;
         private LineRenderer _reticleLine; // Assuming we use the LineRenderer reticle
@@ -41,10 +40,12 @@ namespace DarkTowerTron.Player
 
             if (UnityEngine.Physics.SphereCast(origin, scanRadius, aimDirection, out RaycastHit hit, scanRange, enemyLayer))
             {
-                EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-                if (enemy != null)
+                // FIX: Look for Interface instead of EnemyController
+                ICombatTarget target = hit.collider.GetComponentInParent<ICombatTarget>();
+                
+                if (target != null)
                 {
-                    CurrentTarget = enemy;
+                    CurrentTarget = target;
                 }
                 else
                 {

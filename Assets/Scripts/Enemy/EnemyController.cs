@@ -7,7 +7,7 @@ using DG.Tweening;
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(EnemyMotor))]
-    public class EnemyController : MonoBehaviour, IDamageable, IPoolable
+    public class EnemyController : MonoBehaviour, IDamageable, IPoolable, ICombatTarget
     {
         private EnemyStatsSO _stats;
 
@@ -199,6 +199,13 @@ namespace DarkTowerTron.Enemy
                 _propBlock.SetColor(_colorPropID, c);
                 meshRenderer.SetPropertyBlock(_propBlock);
             }
+        }
+
+        // --- ICombatTarget Implementation ---
+        public void OnExecutionHit()
+        {
+            // Standard Enemy Behavior: Die immediately
+            Kill(false);
         }
 
         // Standard Kill (Player wins)

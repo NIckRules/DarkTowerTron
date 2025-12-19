@@ -34,4 +34,16 @@ namespace DarkTowerTron.Core
         void OnSpawn();
         void OnDespawn();
     }
+
+    /// <summary>
+    /// Implemented by anything the Player can Lock-On to and Execute (Enemy or Prop).
+    /// </summary>
+    public interface ICombatTarget
+    {
+        Transform transform { get; } // Access to position
+        bool IsStaggered { get; }    // Can we teleport to it?
+        
+        // Called when Player presses 'E' on this target
+        void OnExecutionHit();
+    }
 }
