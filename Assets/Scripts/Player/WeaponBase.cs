@@ -1,28 +1,34 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Enemy;
 
 namespace DarkTowerTron.Player
 {
     // Abstract means you can't put this directly on an object, 
     // you must extend it (like PlayerGun : WeaponBase)
+    [RequireComponent(typeof(PlayerStats))]
     public abstract class WeaponBase : MonoBehaviour, IWeapon
     {
         [Header("Weapon Base Stats")]
         public Transform firePoint;
-        public float fireRate = 0.2f;
+        public float baseFireRate = 0.2f;
         
         [Header("Audio")]
-        public AudioClip fireClip; // NEW: Drag sound here
+        public AudioClip fireClip;
         [Range(0f, 1f)] public float volume = 0.8f;
 
+        [Header("Feel")]
+        public float inputBufferTime = 0.2f;
+
         protected float _timer;
+        protected float _bufferTimer;
         protected bool _isFiring;
         protected TargetScanner _scanner;
+        protected PlayerStats _stats;
 
         protected virtual void Awake()
         {
             _scanner = GetComponent<TargetScanner>();
+            _stats = GetComponent<PlayerStats>();
         }
 
         public void SetFiring(bool state)
@@ -33,24 +39,29 @@ namespace DarkTowerTron.Player
         protected virtual void Update()
         {
             if (_timer > 0) _timer -= Time.deltaTime;
+            if (_bufferTimer > 0) _bufferTimer -= Time.deltaTime;
 
-            if (_isFiring && _timer <= 0)
+            if (_isFiring)
+            {
+                _bufferTimer = inputBufferTime;
+            }
+
+            if (_bufferTimer > 0 && _timer <= 0)
             {
                 Fire();
-                PlayFireSound(); // NEW
-                _timer = fireRate;
+                PlayFireSound();
+                _timer = baseFireRate / _stats.FireRateMultiplier;
+                _bufferTimer = 0;
             }
         }
 
         protected abstract void Fire();
 
-        // NEW HELPER
         protected void PlayFireSound()
         {
-            if (fireClip && GameFeel.Instance)
+            if (fireClip && Managers.AudioManager.Instance)
             {
-                // Randomize pitch slightly for realism
-                GameFeel.Instance.PlaySound(fireClip, volume, true); 
+                Managers.AudioManager.Instance.PlaySound(fireClip, volume, true);
             }
         }
 
@@ -68,11 +79,11 @@ namespace DarkTowerTron.Player
 
             if (_scanner != null && _scanner.CurrentTarget != null)
             {
-                // Logic moved here from Gun/Attack scripts
                 Vector3 targetPos = _scanner.CurrentTarget.transform.position;
                 
-                // Try to find center of mass
-                var col = _scanner.CurrentTarget.GetComponent<Collider>();
+                // FIX: Access GetComponent via the .transform property
+                var col = _scanner.CurrentTarget.transform.GetComponent<Collider>();
+                
                 if (col != null) targetPos = col.bounds.center;
 
                 aimDir = (targetPos - firePoint.position).normalized;

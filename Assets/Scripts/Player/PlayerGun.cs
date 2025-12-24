@@ -5,28 +5,35 @@ using DarkTowerTron.Managers;
 namespace DarkTowerTron.Player
 {
     // Inherits from WeaponBase instead of MonoBehaviour
+    [RequireComponent(typeof(PlayerLoadout))]
     public class PlayerGun : WeaponBase 
     {
         [Header("Gun Specifics")]
-        public GameObject bulletPrefab;
         public float bulletSpeed = 25f;
+
+        private PlayerLoadout _loadout;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _loadout = GetComponent<PlayerLoadout>();
+        }
 
         protected override void Fire()
         {
-            if (bulletPrefab && firePoint)
-            {
-                // 1. Get Aim (Handled by Base)
-                Vector3 aimDir = GetAimDirection();
+            // Read from loadout
+            GameObject prefabToSpawn = _loadout.currentProjectile;
 
-                // 2. Spawn
-                GameObject p = PoolManager.Instance.Spawn(bulletPrefab, firePoint.position, Quaternion.LookRotation(aimDir));
+            if (prefabToSpawn && firePoint)
+            {
+                Vector3 aimDir = GetAimDirection();
+                GameObject p = PoolManager.Instance.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
                 
-                // 3. Setup
                 Projectile proj = p.GetComponent<Projectile>();
                 if (proj)
                 {
                     proj.speed = bulletSpeed;
-                    proj.isHostile = false; // Player bullet
+                    proj.isHostile = false;
                     proj.Initialize(aimDir);
                 }
             }

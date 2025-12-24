@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Physics
 {
@@ -54,7 +55,8 @@ namespace DarkTowerTron.Physics
             if (dt < 1e-5f) return;
 
             // --- CULLING CHECK ---
-            if (useCulling && _camTransform != null)
+            // Fix: Never cull the Player, even if camera is far away
+            if (useCulling && _camTransform != null && !gameObject.CompareTag(GameConstants.TAG_PLAYER))
             {
                 // SqrMagnitude is faster than Distance
                 float distSqr = (transform.position - _camTransform.position).sqrMagnitude;

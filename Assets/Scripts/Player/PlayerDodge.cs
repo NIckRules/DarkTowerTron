@@ -9,6 +9,7 @@ namespace DarkTowerTron.Player
     [RequireComponent(typeof(KinematicMover))]
     [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerLoadout))]
     public class PlayerDodge : MonoBehaviour
     {
         [Header("Dodge Settings")]
@@ -19,7 +20,6 @@ namespace DarkTowerTron.Player
         public AudioClip dashClip; // Assign in Inspector
 
         [Header("Visuals")]
-        public GameObject afterImagePrefab;
         public Transform indicatorRef;
         public Renderer indicatorRenderer;
         public Material readyMat;
@@ -32,12 +32,14 @@ namespace DarkTowerTron.Player
         private KinematicMover _mover;
         private PlayerEnergy _energy;
         private PlayerMovement _movement;
+        private PlayerLoadout _loadout;
 
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
             _energy = GetComponent<PlayerEnergy>();
             _movement = GetComponent<PlayerMovement>();
+            _loadout = GetComponent<PlayerLoadout>();
 
             if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
         }
@@ -68,8 +70,9 @@ namespace DarkTowerTron.Player
             IsInvulnerable = true;
             if (indicatorRef) indicatorRef.gameObject.SetActive(false);
 
-            // Visuals
-            if (afterImagePrefab) Instantiate(afterImagePrefab, transform.position, transform.rotation);
+            // Spawn decoy from loadout
+            GameObject decoyToSpawn = _loadout.currentDecoy;
+            if (decoyToSpawn) Instantiate(decoyToSpawn, transform.position, transform.rotation);
 
             // Direction Logic
             Vector3 dashDir;

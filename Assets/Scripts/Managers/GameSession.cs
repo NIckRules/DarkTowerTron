@@ -36,9 +36,12 @@ namespace DarkTowerTron.Managers
 
         private void Start()
         {
-            Time.timeScale = 1f; 
+            // CRITICAL CHANGE: Pause physics/time immediately
+            Time.timeScale = 0f; 
+            
             SetPanelActive(startPanel);
 
+            // Input is disabled, but Time=0 stops gravity too
             if (player) player.ToggleInput(false);
 
             GameEvents.OnPlayerDied += TriggerGameOver;
@@ -62,6 +65,10 @@ namespace DarkTowerTron.Managers
         {
             _isGameRunning = true;
             _isPaused = false;
+            
+            // UNPAUSE: Physics and Logic start now
+            Time.timeScale = 1f; 
+            
             SetPanelActive(hudPanel);
 
             if (player) player.ToggleInput(true);

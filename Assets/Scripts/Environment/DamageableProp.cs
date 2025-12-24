@@ -1,6 +1,5 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // For EnemyStatsSO if needed, or just raw stats
 using DarkTowerTron.Managers;
 using DG.Tweening;
 
@@ -9,17 +8,18 @@ namespace DarkTowerTron.Environment
     public class DamageableProp : MonoBehaviour, IDamageable, ICombatTarget
     {
         [Header("Stats")]
-        public float health = 10f; // -1 for Immortal
+        public float health = 10f;
         public bool isImmortal = false;
+        public bool volatileStructure = false; // NEW: Stagger hurts Health
 
         [Header("Stagger Logic")]
         public float maxStagger = 1.0f;
         public float staggerDecay = 1.0f;
         public float staggerDuration = 2.0f;
 
-        [Header("Execution Reward")]
-        public bool refillFocus = true;
-        public bool healGrit = false;
+        [Header("Death Rattle")]
+        public GameObject spawnOnDeath;
+        public bool destroyOnDeath = true;
 
         [Header("Visuals")]
         public Renderer meshRenderer;
@@ -27,7 +27,6 @@ namespace DarkTowerTron.Environment
         public Color staggerColor = Color.yellow;
         public Color flashColor = Color.white;
 
-        // State
         private float _currentStagger;
         public bool IsStaggered { get; private set; }
 
@@ -38,7 +37,6 @@ namespace DarkTowerTron.Environment
 
         private void Update()
         {
-            // Stagger Decay
             if (!IsStaggered && _currentStagger > 0)
             {
                 _currentStagger -= staggerDecay * Time.deltaTime;
@@ -49,10 +47,9 @@ namespace DarkTowerTron.Environment
         // --- IDamageable ---
         public bool TakeDamage(DamageInfo info)
         {
-            // 1. Visual Flash
             Flash();
 
-            // 2. Add Stagger
+            // 1. Add Stagger (Standard Logic)
             if (!IsStaggered)
             {
                 _currentStagger += info.staggerAmount;
@@ -62,16 +59,25 @@ namespace DarkTowerTron.Environment
                 }
             }
 
-            // 3. Take Health Damage
+            // 2. Take Health Damage
             if (!isImmortal)
             {
-                // Bonus damage if staggered (Critical Hit)
-                float dmg = info.damageAmount * (IsStaggered ? 2f : 1f);
+                float finalDamage = info.damageAmount;
 
-                health -= dmg;
+                // NEW: If Volatile, Stagger Damage counts as Health Damage
+                if (volatileStructure)
+                {
+                    finalDamage += info.staggerAmount;
+                }
 
-                // Show Numbers
-                GameEvents.OnDamageDealt?.Invoke(transform.position, dmg, IsStaggered);
+                // Crit multiplier if already staggered
+                if (IsStaggered) finalDamage *= 2f;
+
+                health -= finalDamage;
+
+                // Only show numbers if damage > 0
+                if (finalDamage > 0)
+                    GameEvents.OnDamageDealt?.Invoke(transform.position, finalDamage, IsStaggered);
 
                 if (health <= 0)
                 {
@@ -82,50 +88,44 @@ namespace DarkTowerTron.Environment
             return true;
         }
 
-        public void Kill(bool instant)
-        {
-            Die();
-        }
+        public void Kill(bool instant) => Die();
 
-        // --- ICombatTarget ---
+        // --- ICombatTarget (Glory Kill) ---
         public void OnExecutionHit()
         {
-            // What happens when player Teleports here?
-
-            // 1. Rewards
-            // We fire the kill event logic manually to trigger Player rewards?
-            // Or better: The PlayerExecution script handles the reward logic based on our flags.
-            // But we need to define specific behavior here.
-
-            // For now, let's keep it visual. The Logic stays in PlayerExecution for consistency,
-            // but we can trigger a reaction here.
-
             if (isImmortal)
             {
-                // Anchor Logic: Reset Stagger immediately so we can shoot it again?
-                // Or keep it staggered?
-                // Let's bounce the mesh
+                // Anchor Logic (Bounce)
                 transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
-                IsStaggered = false; // Reset so you have to shoot it again to chain
+                IsStaggered = false;
                 _currentStagger = 0;
                 if (meshRenderer) meshRenderer.material.color = normalColor;
             }
             else
             {
-                // Boss Hand Logic: Massive Damage
-                DamageInfo executionDmg = new DamageInfo { damageAmount = 50f };
-                TakeDamage(executionDmg);
+                // Boss Hand / Barrel Logic
+                if (volatileStructure)
+                {
+                    // Volatile things explode instantly on execution
+                    Die();
+                }
+                else
+                {
+                    // Standard props take massive damage
+                    DamageInfo executionDmg = new DamageInfo { damageAmount = 50f };
+                    TakeDamage(executionDmg);
+                }
             }
         }
 
-        // --- INTERNAL ---
+        // ... (EnterStaggerState, Flash, Die methods remain the same) ...
+
         private void EnterStaggerState()
         {
             IsStaggered = true;
             if (meshRenderer) meshRenderer.material.color = staggerColor;
-            GameEvents.OnPopupText?.Invoke(transform.position, "READY"); // "READY" for teleport
+            GameEvents.OnPopupText?.Invoke(transform.position, "READY");
 
-            // Auto-recover after duration
             DOVirtual.DelayedCall(staggerDuration, () =>
             {
                 IsStaggered = false;
@@ -148,12 +148,25 @@ namespace DarkTowerTron.Environment
 
         private void Die()
         {
-            // Explosion VFX
+            if (spawnOnDeath)
+            {
+                if (Managers.PoolManager.Instance)
+                    Managers.PoolManager.Instance.Spawn(spawnOnDeath, transform.position, Quaternion.identity);
+                else
+                    Instantiate(spawnOnDeath, transform.position, Quaternion.identity);
+            }
+
+            // Note: We pass 'false' to reward because blowing up a barrel isn't a "Kill" for stats
+            // Unless you want it to be?
             GameEvents.OnEnemyKilled?.Invoke(transform.position, null, false);
 
-            // Logic: Disable self (for Boss Hands) or Destroy (for Crates)
-            gameObject.SetActive(false);
-            // Optional: Notify Boss Controller via event
+            if (destroyOnDeath)
+            {
+                if (Managers.PoolManager.Instance)
+                    Managers.PoolManager.Instance.Despawn(gameObject);
+                else
+                    gameObject.SetActive(false);
+            }
         }
     }
 }

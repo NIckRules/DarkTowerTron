@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
+  m_Name: PAL_Neon
+  m_EditorClassIdentifier: 
+  playerPrimary:
+    mainColor: {r: 0, g: 8, b: 8, a: 0}
+    smoothness: 0
+    metallic: 0
+  playerSecondary:
+    mainColor: {r: 0, g: 0.19450173, b: 3.5471697, a: 0}
+    smoothness: 0
+    metallic: 0
+  enemyBody:
+    mainColor: {r: 8, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  projectileHostile:
+    mainColor: {r: 16, g: 10.792157, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  projectileFriendly:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  staggerColor: {r: 1, g: 1, b: 0, a: 0}
+  floor:
+    mainColor: {r: 0.09411765, g: 0, b: 0.19215687, a: 0}
+    smoothness: 0
+    metallic: 0
+  walls:
+    mainColor: {r: 1.3803922, g: 0, b: 4, a: 0}
+    smoothness: 0
+    metallic: 0
+  hazards:
+    mainColor: {r: 4, g: 0, b: 1.9921569, a: 0}
+    smoothness: 0
+    metallic: 0
+  skyColor: {r: 0, g: 0, b: 0, a: 1}

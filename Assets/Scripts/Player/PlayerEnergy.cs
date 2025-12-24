@@ -4,6 +4,7 @@ using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
 
 namespace DarkTowerTron.Player
 {
+    [RequireComponent(typeof(PlayerStats))]
     public class PlayerEnergy : MonoBehaviour
     {
         [Header("Stats")]
@@ -16,6 +17,12 @@ namespace DarkTowerTron.Player
         private float _currentFocus;
         private bool _isDead;
         private bool _isCombatActive = false;
+        private PlayerStats _stats;
+
+        private void Awake()
+        {
+            _stats = GetComponent<PlayerStats>();
+        }
 
         private void Start()
         {
@@ -45,6 +52,11 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return;
 
+            // Overdrive check
+            bool shouldBeOverdrive = _currentFocus >= _stats.baseStats.overdriveThreshold;
+            _stats.SetOverdrive(shouldBeOverdrive);
+
+            // Decay logic
             if (_isCombatActive && _currentFocus > 0)
             {
                 _currentFocus -= decayRate * Time.deltaTime;

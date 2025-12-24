@@ -14,8 +14,13 @@ namespace DarkTowerTron.Managers
         [Header("Spawn Keys (NumPad)")]
         public GameObject[] enemiesToSpawn; // Assign prefabs in Inspector
 
+        [Header("Perk Testing")]
+        public GameObject homingPrefab;
+        public GameObject explosiveDecoyPrefab;
+
         private PlayerEnergy _energy;
         private PlayerHealth _health;
+        private PlayerLoadout _loadout;
 
         private void Start()
         {
@@ -25,6 +30,7 @@ namespace DarkTowerTron.Managers
             {
                 _energy = p.GetComponent<PlayerEnergy>();
                 _health = p.GetComponent<PlayerHealth>();
+                _loadout = p.GetComponent<PlayerLoadout>();
             }
         }
 
@@ -59,6 +65,19 @@ namespace DarkTowerTron.Managers
             // 5. Cheats Application
             if (infiniteFocus && _energy) _energy.AddFocus(100f);
             if (godMode && _health) _health.HealGrit(2);
+
+            // 6. Toggle Perks
+            if (Input.GetKeyDown(KeyCode.H)) // Homing
+            {
+                Debug.Log("Cheat: Equipped Homing Missiles");
+                if (_loadout) _loadout.EquipProjectile(homingPrefab);
+            }
+
+            if (Input.GetKeyDown(KeyCode.J)) // Juke (Decoy)
+            {
+                Debug.Log("Cheat: Equipped Explosive Decoy");
+                if (_loadout) _loadout.EquipDecoy(explosiveDecoyPrefab);
+            }
         }
 
         private void Spawn(int index)

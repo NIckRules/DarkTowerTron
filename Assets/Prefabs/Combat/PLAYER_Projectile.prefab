@@ -203,6 +203,10 @@ MonoBehaviour:
   speed: 15
   lifetime: 5
   isHostile: 0
+  gracePeriod: 0.05
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 2048
   damage: 0
   stagger: 0.4
   meshRenderer: {fileID: 7853976462343550844}

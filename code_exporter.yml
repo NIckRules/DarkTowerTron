@@ -15,6 +15,7 @@ profiles:
     # Root folders scanned (relative to project root)
     roots:
       - Assets\Scripts
+      - Assets\Prefabs
 
     # Source files only
     include_extensions:
@@ -24,6 +25,7 @@ profiles:
       - .compute
       - .json
       - .md
+      - .prefab
 
     # Unity-generated / irrelevant folders
     exclude_dirs:

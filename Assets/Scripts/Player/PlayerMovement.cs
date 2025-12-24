@@ -5,11 +5,10 @@ using DarkTowerTron.Physics;
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(KinematicMover))]
+    [RequireComponent(typeof(PlayerStats))]
     public class PlayerMovement : MonoBehaviour
     {
         [Header("Motion Settings")]
-        public float moveSpeed = 12f;
-        public float acceleration = 60f;
         public float deceleration = 40f;
         public float rotationSpeed = 25f;
 
@@ -21,15 +20,23 @@ namespace DarkTowerTron.Player
         [Header("Physics")]
         public float gravity = 20f; // Gravity is controlled here
 
+        [Header("Safety Net")]
+        public float safeGroundTimer = 0.5f; // Time required to be grounded to count as "Safe"
+        
+        // Read-only property for the Health script to access
+        public Vector3 LastSafePosition { get; private set; }
+
         // Expose input for Blitz
         public Vector3 MoveInput => _inputDir;
 
         private KinematicMover _mover;
         private Camera _cam;
+        private PlayerStats _stats;
 
         private Vector3 _inputDir;
         private Vector3 _currentVelocity;
         private Vector3 _externalForce;
+        private float _groundedTimer;
 
         // Cache for optimization
         private Collider[] _wallBuffer = new Collider[5];
@@ -38,9 +45,15 @@ namespace DarkTowerTron.Player
         {
             _mover = GetComponent<KinematicMover>();
             _cam = Camera.main;
+            _stats = GetComponent<PlayerStats>();
 
             // Default mask if not set
             if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
+        }
+
+        private void Start()
+        {
+            LastSafePosition = transform.position;
         }
 
         public void SetMoveInput(Vector3 dir)
@@ -78,6 +91,7 @@ namespace DarkTowerTron.Player
         private void Update()
         {
             HandleVelocity();
+            HandleSafeGround();
         }
 
         private void HandleVelocity()
@@ -85,14 +99,14 @@ namespace DarkTowerTron.Player
             float dt = Time.deltaTime;
 
             // 1. Calculate Target (Inputs)
-            Vector3 targetVel = _inputDir * moveSpeed;
+            Vector3 targetVel = _inputDir * _stats.MoveSpeed;
             Vector3 wallPush = CalculateWallRepulsion();
             targetVel += wallPush;
 
             // 2. Acceleration
             if (_inputDir.magnitude > 0.1f)
             {
-                _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, acceleration * dt);
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, _stats.Acceleration * dt);
             }
             else
             {
@@ -127,6 +141,44 @@ namespace DarkTowerTron.Player
 
             // 6. EXECUTE
             _mover.Move(finalVelocity);
+        }
+
+        // NEW METHOD: Call this when teleporting/respawning
+        public void ResetVelocity()
+        {
+            _currentVelocity = Vector3.zero;
+            _externalForce = Vector3.zero;
+            _inputDir = Vector3.zero; // Optional: Stop input until player presses again
+        }
+
+        private void HandleSafeGround()
+        {
+            // STRICT CHECK:
+            // 1. Must be physically grounded (Motor check)
+            // 2. Must have ground directly beneath center (Raycast check)
+            // This prevents saving "The Edge" as a safe spot.
+            
+            bool isCenterSupported = false;
+            
+            // Cast from slightly up, downwards. Check GROUND layer only.
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, 2.0f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
+            {
+                isCenterSupported = true;
+            }
+
+            if (_mover.IsGrounded && isCenterSupported)
+            {
+                _groundedTimer += Time.deltaTime;
+                if (_groundedTimer > safeGroundTimer)
+                {
+                    // Save position slightly higher to prevent floor clipping
+                    LastSafePosition = transform.position + Vector3.up * 0.2f;
+                }
+            }
+            else
+            {
+                _groundedTimer = 0f;
+            }
         }
 
         private Vector3 CalculateWallRepulsion()

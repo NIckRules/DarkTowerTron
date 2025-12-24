@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Managers; // For AudioManager
 
 namespace DarkTowerTron.Player
 {
@@ -15,19 +16,21 @@ namespace DarkTowerTron.Player
         private bool _hasHull;
         private bool _isDead;
         private PlayerMovement _movement;
-        private PlayerDodge _dodge; // Reference to Dodge logic
+        private PlayerDodge _dodge;
 
         private void Awake()
         {
             _movement = GetComponent<PlayerMovement>();
-            _dodge = GetComponent<PlayerDodge>(); // Cache reference
+            _dodge = GetComponent<PlayerDodge>();
         }
 
         private void Start()
         {
             _currentGrit = maxGrit;
             _hasHull = startWithHull;
+            
             GameEvents.OnEnemyKilled += OnEnemyKilled;
+            
             UpdateUI();
         }
 
@@ -40,12 +43,8 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return false;
 
-            // CRITICAL FIX-003: Invulnerability Check
-            if (_dodge != null && _dodge.IsInvulnerable)
-            {
-                // Optional: Play a "Miss" or "Dodge" sound here?
-                return false; 
-            }
+            // Invulnerability Check
+            if (_dodge != null && _dodge.IsInvulnerable) return false;
 
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
@@ -59,7 +58,7 @@ namespace DarkTowerTron.Player
             {
                 _hasHull = false;
                 GameEvents.OnPlayerHit?.Invoke(); 
-                GameEvents.OnHullStateChanged?.Invoke(false); // Notify Hull Break
+                GameEvents.OnHullStateChanged?.Invoke(false); 
             }
             else
             {
@@ -94,7 +93,7 @@ namespace DarkTowerTron.Player
         private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
-            
+
             if (stats != null)
             {
                 if (stats.healsGrit) HealGrit(stats.gritRewardAmount);
@@ -109,6 +108,36 @@ namespace DarkTowerTron.Player
         {
             GameEvents.OnGritChanged?.Invoke(_currentGrit);
             GameEvents.OnHullStateChanged?.Invoke(_hasHull);
+        }
+
+        public void TakeVoidDamage()
+        {
+            if (_isDead) return;
+
+            Debug.Log("Fell into Void! Respawning...");
+
+            // 1. Teleport & Reset Physics
+            if (_movement)
+            {
+                // Reset Logic (Inertia)
+                _movement.ResetVelocity();
+                
+                // Teleport Logic (Position)
+                var motor = GetComponent<DarkTowerTron.Physics.KinematicMover>();
+                if (motor) motor.Teleport(_movement.LastSafePosition);
+                else transform.position = _movement.LastSafePosition;
+            }
+
+            // 2. Take Penalty (1 Grit/Hull) via standard damage path
+            DamageInfo info = new DamageInfo
+            {
+                damageAmount = 1f,
+                pushDirection = Vector3.zero,
+                pushForce = 0f,
+                source = null
+            };
+            
+            TakeDamage(info); 
         }
     }
 }

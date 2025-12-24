@@ -317,7 +317,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a05b6fae2bd964042b79a3bd0ffe0e9e, type: 2}
+  - {fileID: 2100000, guid: 3cf496f97baa02943befc49a0e9e5731, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -400,7 +400,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09f625e2981aecd40a1f0c6373a89715, type: 2}
+  - {fileID: 2100000, guid: 570a0b9c262ed7744a6cdcac4fe6e9a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -566,7 +566,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09f625e2981aecd40a1f0c6373a89715, type: 2}
+  - {fileID: 2100000, guid: 570a0b9c262ed7744a6cdcac4fe6e9a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -649,7 +649,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: dcf5a6f790bba88419459dcf2a8236eb, type: 2}
+  - {fileID: 2100000, guid: 11f428ecb4a389e48b3415c41eee0938, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -724,6 +724,9 @@ GameObject:
   - component: {fileID: 3406123499475282924}
   - component: {fileID: 5466856792935116601}
   - component: {fileID: 8853776279611051482}
+  - component: {fileID: -4286876796308643671}
+  - component: {fileID: 5645868823290248984}
+  - component: {fileID: 6849140618581266389}
   m_Layer: 6
   m_Name: '[PLAYER_STRIKER]'
   m_TagString: Player
@@ -816,7 +819,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 3201
   _skinWidth: 0.015
   _maxStepHeight: 0.3
   _maxSlopeAngle: 45
@@ -835,8 +838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2267156712e0248a224233bd101a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 12
-  acceleration: 60
   deceleration: 40
   rotationSpeed: 25
   wallBuffer: 0.7
@@ -845,6 +846,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   gravity: 20
+  safeGroundTimer: 0.5
 --- !u!114 &6949509784031142000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,11 +922,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
-  fireRate: 0.3
+  baseFireRate: 0.2
   fireClip: {fileID: 8300000, guid: f16c082ad078e8943990c633ba1ea8b4, type: 3}
   volume: 0.8
-  bulletPrefab: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
-    type: 3}
+  inputBufferTime: 0.2
   bulletSpeed: 45
 --- !u!114 &3406123499475282924
 MonoBehaviour:
@@ -939,9 +940,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
-  fireRate: 0.2
+  baseFireRate: 0.2
   fireClip: {fileID: 8300000, guid: 550cd03e285900e40b4fc9ce12aa32cb, type: 3}
   volume: 0.8
+  inputBufferTime: 0.2
   range: 7
   beamRadius: 0.5
   selfRecoil: 15
@@ -969,8 +971,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   dashClip: {fileID: 8300000, guid: 11a67d7cfc51a7a47aa5638e3bfd7826, type: 3}
-  afterImagePrefab: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
-    type: 3}
   indicatorRef: {fileID: 192944804307636621}
   indicatorRenderer: {fileID: 4811700125883332067}
   readyMat: {fileID: 2100000, guid: 24306aa8b0e3eee4a84f9603d5d3bf1a, type: 2}
@@ -992,6 +992,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   killRewardFocus: 50
   executeClip: {fileID: 8300000, guid: 3a8204bbfd76b4c44a30dbced9b6a021, type: 3}
+--- !u!114 &-4286876796308643671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3dabcba8c5ea184c98fdb8df9f5484c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actorType: 0
+  themeOverride: {fileID: 0}
+  primaryRenderers:
+  - {fileID: 2708127184922713459}
+  secondaryRenderers:
+  - {fileID: 8497757297922539902}
+  - {fileID: 1628793600088000154}
+  tertiaryRenderers:
+  - {fileID: 6070481044973411645}
+--- !u!114 &5645868823290248984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6343646a9f89d5e42b6ddc41b23a5f63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseStats: {fileID: 11400000, guid: 9baa1bba4b0c9814282f5c7ee9f8e67a, type: 2}
+--- !u!114 &6849140618581266389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9df14f1b6c62074f8c30a847e0e1eb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultProjectile: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
+    type: 3}
+  defaultDecoy: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
+    type: 3}
+  currentProjectile: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
+    type: 3}
+  currentDecoy: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
+    type: 3}
 --- !u!1 &8799886156076035042
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,9 +13,12 @@ namespace DarkTowerTron.Enemy
 
         [Header("Visuals")]
         public Renderer meshRenderer;
-        public Color normalColor = Color.red;
-        public Color staggerColor = Color.yellow;
-        public Color flashColor = Color.white;
+        public ColorPaletteSO palette;
+
+        // Cache colors
+        private Color _normalColor;
+        private Color _staggerColor;
+        private Color _flashColor = Color.white;
 
         [Header("Audio")]
         public AudioClip staggerClip;
@@ -25,7 +28,6 @@ namespace DarkTowerTron.Enemy
         private float _lastHitTime;
         public bool IsStaggered { get; private set; }
 
-        // OPTIMIZATION: Property Block to avoid Material Instancing
         private MaterialPropertyBlock _propBlock;
         private Tween _flashTween;
         private int _colorPropID;
@@ -35,13 +37,20 @@ namespace DarkTowerTron.Enemy
             _motor = GetComponent<EnemyMotor>();
             if (meshRenderer == null) meshRenderer = GetComponent<Renderer>();
 
-            // Setup Property Block
             _propBlock = new MaterialPropertyBlock();
-            // URP usually uses "_BaseColor", Built-in uses "_Color"
             _colorPropID = Shader.PropertyToID("_BaseColor");
+
+            // Load defaults
+            _normalColor = Color.red;
+            _staggerColor = Color.yellow;
+
+            if (palette != null)
+            {
+                _normalColor = palette.enemyPrimary.mainColor;
+                _staggerColor = palette.staggerColor;
+            }
         }
 
-        // --- IPoolable Implementation ---
         public void OnSpawn()
         {
             if (_motor != null) _stats = _motor.stats;
@@ -50,29 +59,22 @@ namespace DarkTowerTron.Enemy
 
         public void OnDespawn()
         {
-            // Kill tweens safely
             transform.DOKill();
             if (_flashTween != null) _flashTween.Kill();
-
-            // Reset color immediately so it doesn't spawn flashing next time
-            SetColor(normalColor);
+            SetColor(_normalColor);
         }
-        // --------------------------------
 
         private void Start()
         {
-            // Initial color set
-            SetColor(normalColor);
-
-            // Fallback for non-pooled usage
-            if (_motor != null && _stats == null) _stats = _motor.stats;
+            if (_motor != null) _stats = _motor.stats;
+            SetColor(_normalColor);
         }
 
         private void ResetState()
         {
             IsStaggered = false;
             _currentStagger = 0;
-            SetColor(normalColor);
+            SetColor(_normalColor);
         }
 
         private void Update()
@@ -92,7 +94,6 @@ namespace DarkTowerTron.Enemy
         public bool TakeDamage(DamageInfo info)
         {
             if (_stats == null) return false;
-
             _lastHitTime = Time.time;
 
             if (info.isRedirected)
@@ -127,17 +128,13 @@ namespace DarkTowerTron.Enemy
                 AddStagger(info.staggerAmount);
                 Flash();
             }
-
             return true;
         }
 
         private void AddStagger(float amount)
         {
             _currentStagger += amount;
-            if (_currentStagger >= _stats.maxStagger)
-            {
-                EnterStaggerState();
-            }
+            if (_currentStagger >= _stats.maxStagger) EnterStaggerState();
         }
 
         private void EnterStaggerState()
@@ -145,48 +142,43 @@ namespace DarkTowerTron.Enemy
             IsStaggered = true;
             GameEvents.OnPopupText?.Invoke(transform.position, "STAGGER");
 
-            if (GameFeel.Instance && staggerClip)
-                GameFeel.Instance.PlaySound(staggerClip, 1f, true);
+            if (Managers.AudioManager.Instance && staggerClip)
+                Managers.AudioManager.Instance.PlaySound(staggerClip, 1f, true);
 
-            // Start Flashing via Tween that updates PropertyBlock
             if (_flashTween != null) _flashTween.Kill();
 
-            // We tween a dummy value to drive the update loop
             float flashLerp = 0f;
             _flashTween = DOTween.To(() => flashLerp, x => flashLerp = x, 1f, 0.2f)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.Linear)
                 .OnUpdate(() =>
                 {
-                    // Manually Lerp color and apply block
-                    Color c = Color.Lerp(staggerColor, Color.red, flashLerp);
+                    Color c = Color.Lerp(_staggerColor, Color.red, flashLerp);
                     SetColor(c);
                 });
 
-            DOVirtual.DelayedCall(2.0f, ExitStaggerState).SetId(gameObject); // ID for DOKill
+            DOVirtual.DelayedCall(2.0f, ExitStaggerState).SetId(gameObject);
         }
 
         private void ExitStaggerState()
         {
             if (this == null) return;
             IsStaggered = false;
-
             if (_flashTween != null) _flashTween.Kill();
             _currentStagger = 0;
-            SetColor(normalColor);
+            SetColor(_normalColor);
         }
 
         private void Flash()
         {
-            // Simple 1-shot flash
             if (!IsStaggered)
             {
                 if (_flashTween != null) _flashTween.Kill();
 
-                SetColor(flashColor);
+                SetColor(_flashColor);
                 _flashTween = DOVirtual.DelayedCall(0.1f, () =>
                 {
-                    if (!IsStaggered) SetColor(normalColor);
+                    if (!IsStaggered) SetColor(_normalColor);
                 }).SetId(gameObject);
             }
         }
@@ -197,29 +189,20 @@ namespace DarkTowerTron.Enemy
             {
                 meshRenderer.GetPropertyBlock(_propBlock);
                 _propBlock.SetColor(_colorPropID, c);
+                // Also set Emission to match for the glow effect
+                _propBlock.SetColor("_EmissionColor", c);
                 meshRenderer.SetPropertyBlock(_propBlock);
             }
         }
 
-        // --- ICombatTarget Implementation ---
-        public void OnExecutionHit()
-        {
-            // Standard Enemy Behavior: Die immediately
-            Kill(false);
-        }
-
-        // Standard Kill (Player wins)
         public void Kill(bool instant)
         {
-            // Pass 'true' for reward
             GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats, true);
             SafeDestroy();
         }
 
-        // Suicide / Hazard Death (Player gets nothing)
         public void SelfDestruct()
         {
-            // Pass 'false' for reward
             GameEvents.OnEnemyKilled?.Invoke(transform.position, _stats, false);
             SafeDestroy();
         }
@@ -227,15 +210,16 @@ namespace DarkTowerTron.Enemy
         private void SafeDestroy()
         {
 #if UNITY_EDITOR
-            if (UnityEditor.Selection.activeGameObject == gameObject)
+            if (UnityEditor.Selection.activeGameObject == gameObject) 
                 UnityEditor.Selection.activeGameObject = null;
 #endif
+            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
+            else Destroy(gameObject);
+        }
 
-            // Use Pool if IPoolable, otherwise Destroy
-            if (PoolManager.Instance)
-                PoolManager.Instance.Despawn(gameObject);
-            else
-                Destroy(gameObject);
+        public void OnExecutionHit()
+        {
+            Kill(false);
         }
     }
 }

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
+  m_Name: PAL_Alt
+  m_EditorClassIdentifier: 
+  playerPrimary:
+    mainColor: {r: 0.4811321, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  playerSecondary:
+    mainColor: {r: 1, g: 0.16509432, b: 0.16509432, a: 0}
+    smoothness: 0
+    metallic: 0
+  playerTertiary:
+    mainColor: {r: 0.9528302, g: 0.4809096, b: 0.4809096, a: 0}
+    smoothness: 0
+    metallic: 0
+  enemyPrimary:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  enemySecondary:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  enemyTertiary:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  projectileHostile:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  projectileFriendly:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  staggerColor: {r: 0.4811321, g: 0.44333738, b: 0.0068084607, a: 1}
+  floor:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  walls:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  hazards:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+  skyColor: {r: 0.89444643, g: 0.93871146, b: 0.9433962, a: 1}
