@@ -12,7 +12,14 @@ namespace DarkTowerTron.AI.Core
         public List<Transform> targets = new List<Transform>();
         public List<Collider> obstacles = new List<Collider>();
 
-        // We cache the GetTargets() result to avoid allocations
+        // NEW: Cache the owner's collider here
+        public Collider ownerCollider;
+
+        private void Awake()
+        {
+            ownerCollider = GetComponent<Collider>();
+        }
+
         public int GetTargetsCount() => targets != null ? targets.Count : 0;
     }
 }

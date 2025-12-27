@@ -112,7 +112,12 @@ namespace DarkTowerTron.Physics
                 }
 
                 GetCapsulePoints(pos, out Vector3 p1, out Vector3 p2, out float r);
-                int count = UnityEngine.Physics.CapsuleCastNonAlloc(p1, p2, r, remaining.normalized, _hitBuffer, dist + _skinWidth, _obstacleMask);
+                
+                // QueryTriggerInteraction.Ignore: Do not hit Triggers with this sweep
+                int count = UnityEngine.Physics.CapsuleCastNonAlloc(
+                    p1, p2, r, remaining.normalized, _hitBuffer, dist + _skinWidth, _obstacleMask,
+                    QueryTriggerInteraction.Ignore
+                );
 
                 RaycastHit closest = default;
                 float closestDist = Mathf.Infinity;
@@ -120,6 +125,9 @@ namespace DarkTowerTron.Physics
 
                 for (int j = 0; j < count; j++)
                 {
+                    // Double safety check (redundant with QueryTriggerInteraction.Ignore, but good to keep)
+                    if (_hitBuffer[j].collider.isTrigger) continue;
+
                     if (_hitBuffer[j].distance <= 0 || _ignoredColliders.Contains(_hitBuffer[j].collider) || _hitBuffer[j].transform == transform) continue;
                     if (_hitBuffer[j].distance < closestDist)
                     {
@@ -244,7 +252,12 @@ namespace DarkTowerTron.Physics
             for (int i = 0; i < c; i++)
             {
                 var col = buffer[i];
+                // Ignore self AND ignored colliders
                 if (col == _capsule || _ignoredColliders.Contains(col)) continue;
+                
+                // CRITICAL FIX: Do not push out of Triggers!
+                if (col.isTrigger) continue;
+
                 if (UnityEngine.Physics.ComputePenetration(_capsule, transform.position, transform.rotation, col, col.transform.position, col.transform.rotation, out Vector3 dir, out float d))
                 {
                     transform.position += dir * (d + _skinWidth);

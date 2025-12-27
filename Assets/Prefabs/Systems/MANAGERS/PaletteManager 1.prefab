@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6517007470742711404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5777255461544183831}
+  - component: {fileID: 1345613954782036784}
+  m_Layer: 0
+  m_Name: PaletteManager 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5777255461544183831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6517007470742711404}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1345613954782036784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6517007470742711404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f4c1f22d2c2edf429a4df06c4e619d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activePalette: {fileID: 11400000, guid: 253c73382724c81448699d784b933b68, type: 2}
+  playerPrimaryCols: {fileID: 11400000, guid: 4a48fecfa6f40d546a691de1b3a319e8, type: 2}
+  playerSecondaryCols: {fileID: 11400000, guid: 42b58d063cd4d28498b6832812f62242,
+    type: 2}
+  playerTertiaryCols: {fileID: 11400000, guid: 316488ef898c4da408965571ac1534e7, type: 2}
+  enemyPrimaryCols: {fileID: 11400000, guid: a5ab19fb2b2b2d74497a9c5d67f872d5, type: 2}
+  enemySecondaryCols: {fileID: 11400000, guid: 6aeec2b6cfc6b5b45b4f4aea63ea700a, type: 2}
+  enemyTertiaryCols: {fileID: 11400000, guid: 395003987dc20114f91713ff6dd2225a, type: 2}
+  floorCols: {fileID: 11400000, guid: e64a29004f9ed6d4994b85261337aacb, type: 2}
+  wallCols: {fileID: 11400000, guid: 8342502258de9bb48b87f0298e3e2ff2, type: 2}
+  hazardCols: {fileID: 11400000, guid: d6e557455fd9a074cbc5863e7c3da0fd, type: 2}
+  projectileHostileCols: {fileID: 0}
+  projectileFriendlyCols: {fileID: 0}
+  refreshNow: 0

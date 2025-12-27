@@ -29,8 +29,18 @@ namespace DarkTowerTron.Enemy.States.Chaser
             if (moveDir.sqrMagnitude > 0.1f)
                 _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
 
-            // 2. Transition
-            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
+            // 2. Transition (Distance Check)
+            // FIX: Flatten positions to ignore height (Y-Axis)
+            Vector3 myPos = _agent.transform.position;
+            myPos.y = 0;
+
+            Vector3 targetPos = _agent.GetTarget().position;
+            targetPos.y = 0;
+
+            float dist = Vector3.Distance(myPos, targetPos);
+
+            // Debug to verify
+            // Debug.Log($"Chaser Distance: {dist} / Range: {_agent.attackRange}");
 
             if (dist <= _agent.attackRange)
             {

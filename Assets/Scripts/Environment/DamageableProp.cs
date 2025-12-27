@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using DarkTowerTron.Core;
 using DarkTowerTron.Managers;
 using DG.Tweening;
@@ -27,12 +28,26 @@ namespace DarkTowerTron.Environment
         public Color staggerColor = Color.yellow;
         public Color flashColor = Color.white;
 
+        [Header("Anchor Logic")]
+        public bool respawns = false; // Set True for Traversal Anchors
+        public float respawnTime = 3.0f;
+
+        // Components to hide
+        private Collider _col;
+        private Renderer _rend;
+
         private float _currentStagger;
         public bool IsStaggered { get; private set; }
 
         private void Start()
         {
             if (meshRenderer) meshRenderer.material.color = normalColor;
+        }
+
+        private void Awake()
+        {
+            _col = GetComponent<Collider>();
+            _rend = meshRenderer ? meshRenderer : GetComponent<Renderer>();
         }
 
         private void Update()
@@ -95,11 +110,16 @@ namespace DarkTowerTron.Environment
         {
             if (isImmortal)
             {
-                // Anchor Logic (Bounce)
-                transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
-                IsStaggered = false;
-                _currentStagger = 0;
-                if (meshRenderer) meshRenderer.material.color = normalColor;
+                if (respawns)
+                {
+                    StartCoroutine(RespawnRoutine());
+                }
+                else
+                {
+                    // Standard Bounce
+                    transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
+                    ResetStagger();
+                }
             }
             else
             {
@@ -116,6 +136,36 @@ namespace DarkTowerTron.Environment
                     TakeDamage(executionDmg);
                 }
             }
+        }
+
+        private IEnumerator RespawnRoutine()
+        {
+            // 1. Disable Interactions
+            if (_col) _col.enabled = false;
+            if (_rend) _rend.enabled = false;
+
+            // Reset Stagger state internally
+            ResetStagger();
+
+            // 2. Wait
+            yield return new WaitForSeconds(respawnTime);
+
+            // 3. Re-Enable
+            if (_rend)
+            {
+                _rend.enabled = true;
+                // Juice: Scale up from 0
+                transform.localScale = Vector3.zero;
+                transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
+            }
+            if (_col) _col.enabled = true;
+        }
+
+        private void ResetStagger()
+        {
+            IsStaggered = false;
+            _currentStagger = 0;
+            if (meshRenderer) meshRenderer.material.color = normalColor;
         }
 
         // ... (EnterStaggerState, Flash, Die methods remain the same) ...

@@ -37,7 +37,8 @@ namespace DarkTowerTron.Player
         private Vector3 _currentVelocity;
         private Vector3 _externalForce;
         private float _groundedTimer;
-
+        private float _gravitySuspendTimer = 0f;
+        
         // Cache for optimization
         private Collider[] _wallBuffer = new Collider[5];
 
@@ -90,6 +91,9 @@ namespace DarkTowerTron.Player
 
         private void Update()
         {
+
+            if (_gravitySuspendTimer > 0) _gravitySuspendTimer -= Time.deltaTime;
+
             HandleVelocity();
             HandleSafeGround();
         }
@@ -127,17 +131,22 @@ namespace DarkTowerTron.Player
             // 4. COMBINE (No dt multiplication here!)
             Vector3 finalVelocity = _currentVelocity + _externalForce;
 
-            // 5. APPLY GRAVITY MANUALLY
-            if (!_mover.IsGrounded)
+            // --- GRAVITY LOGIC UPDATE ---
+            // Only apply gravity if NOT grounded AND NOT suspended
+            if (!_mover.IsGrounded && _gravitySuspendTimer <= 0)
             {
-                // For a top-down game, a simple constant downward velocity works if we don't jump.
                 finalVelocity.y -= gravity;
+            }
+            else if (_mover.IsGrounded)
+            {
+                finalVelocity.y = -2f; // Stick to ground
             }
             else
             {
-                // Stick to ground
-                finalVelocity.y = -2f;
+                // We are in Air + Suspended = Zero Gravity (Hover)
+                finalVelocity.y = 0f;
             }
+            // ----------------------------
 
             // 6. EXECUTE
             _mover.Move(finalVelocity);
@@ -212,6 +221,16 @@ namespace DarkTowerTron.Player
             }
 
             return push;
+        }
+
+        public void SuspendGravity(float duration)
+        {
+            _gravitySuspendTimer = duration;
+
+            // CRITICAL: Kill existing downward momentum immediately
+            // so we don't carry "falling speed" into the hover.
+            if (_externalForce.y < 0) _externalForce.y = 0;
+            if (_currentVelocity.y < 0) _currentVelocity.y = 0;
         }
     }
 }

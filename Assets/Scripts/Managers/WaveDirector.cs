@@ -46,9 +46,12 @@ namespace DarkTowerTron.Managers
 
         private IEnumerator RunWave(int index)
         {
+            // Stop condition: all waves complete
             if (index >= waves.Count)
             {
-                GameEvents.OnGameVictory?.Invoke();
+                Debug.Log("ROOM CLEARED");
+                // Open the doors. Boss script will handle Victory separately.
+                GameEvents.OnRoomCleared?.Invoke();
                 yield break;
             }
 

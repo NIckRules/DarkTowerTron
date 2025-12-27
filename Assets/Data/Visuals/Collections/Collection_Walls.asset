@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Collection_Walls
   m_EditorClassIdentifier: 
   materials:
-  - {fileID: 2100000, guid: 3a93bbcea6f88004ca8a2383bec8d1cb, type: 2}
+  - {fileID: 2100000, guid: 02bb3983b3cf79d46a37acc3579e096d, type: 2}

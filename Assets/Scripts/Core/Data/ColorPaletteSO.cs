@@ -8,6 +8,10 @@ namespace DarkTowerTron.Core.Data
         [ColorUsage(true, true)] public Color mainColor;
         [Range(0f, 1f)] public float smoothness;
         [Range(0f, 1f)] public float metallic;
+        
+        [ColorUsage(true, true)] public Color emissionColor;
+        [Tooltip("How bright is the emission? (Use HDR)")]
+        public float emissionIntensity;
     }
 
     [CreateAssetMenu(fileName = "NewPalette", menuName = "DarkTowerTron/Visuals/Color Palette")]

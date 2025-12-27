@@ -1,128 +1,154 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro; // TextMeshPro
 using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Managers
 {
     public class HUDManager : MonoBehaviour
     {
-        [Header("Focus")]
+        [Header("Focus (Energy)")]
         public Slider focusSlider;
         public Image focusFillImage;
         public Color normalFocusColor = Color.cyan;
-        public Color overheatFocusColor = Color.red;
+        public Color fullFocusColor = new Color(1f, 0f, 1f); // Purple/Pink for Overdrive
 
         [Header("Grit (Health)")]
-        public GameObject[] gritPips; // Drag your Pip Images here
+        public Transform gritContainer; // Assign a HorizontalLayoutGroup object here
+        public GameObject pipPrefab;    // Prefab with just an Image component
         public Color activePipColor = Color.white;
         public Color inactivePipColor = new Color(1, 1, 1, 0.2f); // Faded
 
-        [Header("Hull / Wound")]
-        public Image hullIcon; // Assign the Wound Image
-        public Color hullActiveColor = Color.cyan; // Shield is UP
-        public Color hullBrokenColor = new Color(1, 0, 0, 0.3f); // Shield BROKEN (Red/Transparent)
+        [Header("Hull (Shield)")]
+        public Image hullIcon;
+        public Color hullActiveColor = Color.cyan;
+        public Color hullBrokenColor = new Color(1, 0, 0, 0.3f);
 
-        [Header("System")]
-        public TMPro.TextMeshProUGUI waveText;
+        [Header("Score & System")]
+        public TextMeshProUGUI scoreText;
+        public TextMeshProUGUI multiplierText;
+        public TextMeshProUGUI timerText;
 
-        [Header("Score UI")]
-        public TMPro.TextMeshProUGUI scoreText;
-        public TMPro.TextMeshProUGUI multiplierText;
-        public TMPro.TextMeshProUGUI timerText;
-
-        private void Update()
-        {
-            // Simple Timer Update
-            if (timerText && Managers.ScoreManager.Instance)
-            {
-                float t = Managers.ScoreManager.Instance.GameTime;
-                // Format 00:00
-                string minutes = Mathf.Floor(t / 60).ToString("00");
-                string seconds = (t % 60).ToString("00");
-                timerText.text = $"{minutes}:{seconds}";
-            }
-        }
+        // Internal State
+        private List<Image> _spawnedPips = new List<Image>();
 
         private void OnEnable()
         {
             GameEvents.OnFocusChanged += UpdateFocus;
             GameEvents.OnGritChanged += UpdateGrit;
-            GameEvents.OnScoreChanged += UpdateScoreUI;
             GameEvents.OnHullStateChanged += UpdateHull;
-            // Optional: Listen for wave changes if we added that event
+            GameEvents.OnScoreChanged += UpdateScoreUI;
         }
 
         private void OnDisable()
         {
             GameEvents.OnFocusChanged -= UpdateFocus;
             GameEvents.OnGritChanged -= UpdateGrit;
-            GameEvents.OnScoreChanged -= UpdateScoreUI;
             GameEvents.OnHullStateChanged -= UpdateHull;
+            GameEvents.OnScoreChanged -= UpdateScoreUI;
         }
 
-        private void UpdateHull(bool hasHull)
+        private void Update()
         {
-            if (!hullIcon) return;
-
-            if (hasHull)
+            // Update Timer every frame directly from Manager (no event needed)
+            if (timerText && ScoreManager.Instance)
             {
-                // Hull is intact
-                hullIcon.color = hullActiveColor;
-                // Optional: hullIcon.sprite = shieldSprite;
-            }
-            else
-            {
-                // Hull is gone (Danger State)
-                hullIcon.color = hullBrokenColor;
-                // Optional: hullIcon.sprite = brokenSkullSprite;
+                float t = ScoreManager.Instance.GameTime;
+                string minutes = Mathf.Floor(t / 60).ToString("00");
+                string seconds = (t % 60).ToString("00");
+                timerText.text = $"{minutes}:{seconds}";
             }
         }
+
+        // --- EVENT HANDLERS ---
 
         private void UpdateFocus(float current, float max)
         {
             if (focusSlider)
             {
+                // Ensure slider is 0-1
                 focusSlider.value = current / max;
             }
 
-            // Optional: Change color if full (Overheat warning)
             if (focusFillImage)
             {
-                focusFillImage.color = (current >= max) ? overheatFocusColor : normalFocusColor;
+                // Visual feedback for Overdrive (Full Bar)
+                bool isFull = current >= (max * 0.8f); // 80% threshold
+                focusFillImage.color = isFull ? fullFocusColor : normalFocusColor;
             }
         }
 
-        private void UpdateGrit(int currentGrit)
+        private void UpdateGrit(int currentGrit, int maxGrit)
         {
 
-            Debug.Log($"[DEBUG HUD] Updating Grit UI: {currentGrit}");
-
-            if (gritPips == null) return;
-
-            Debug.Log($"[DEBUG HUD] Grit Pips Length: {gritPips.Length}");
-
-            for (int i = 0; i < gritPips.Length; i++)
+            // 1. Check if we need to rebuild the layout
+            // (Happens on Start or if Max HP changes via Upgrade)
+            if (_spawnedPips.Count != maxGrit)
             {
-                if (gritPips[i] == null) continue;
+                RebuildGritLayout(maxGrit);
+            }
 
-                Debug.Log($"[DEBUG HUD] Updating Pip {i}");
+            // 2. Update Colors
+            for (int i = 0; i < _spawnedPips.Count; i++)
+            {
+                if (_spawnedPips[i] == null) continue;
 
-                Image pipImg = gritPips[i].GetComponent<Image>();
-                if (pipImg)
-                {
+                // Example: Grit 2. 
+                // i=0 (<2) -> Active. 
+                // i=1 (<2) -> Active. 
+                // i=2 (>=2) -> Inactive.
+                _spawnedPips[i].color = (i < currentGrit) ? activePipColor : inactivePipColor;
+            }
+        }
 
-                    Debug.Log($"[DEBUG HUD] Setting Pip {i} Color");
+        private void UpdateHull(bool hasHull)
+        {
+            if (hullIcon)
+            {
+                hullIcon.color = hasHull ? hullActiveColor : hullBrokenColor;
 
-                    // If currentGrit is 2, pips 0 and 1 are active.
-                    pipImg.color = (i < currentGrit) ? activePipColor : inactivePipColor;
-                }
+                // Optional: Pulse animation
+                // if (!hasHull) hullIcon.transform.DOPunchScale(...)
             }
         }
 
         private void UpdateScoreUI(int score, int multiplier)
         {
-            if (scoreText) scoreText.text = score.ToString("N0"); // "N0" adds commas (1,000)
+            if (scoreText) scoreText.text = score.ToString("N0");
             if (multiplierText) multiplierText.text = $"x{multiplier}";
+        }
+
+        // --- HELPERS ---
+
+        private void RebuildGritLayout(int max)
+        {
+
+            Debug.Log($"[HUDManager] Rebuilding Grit Layout for Max Grit: {max}");
+
+            if (gritContainer == null || pipPrefab == null) return;
+
+            // Clear existing
+            foreach (Transform child in gritContainer)
+            {
+                Destroy(child.gameObject);
+            }
+            _spawnedPips.Clear();
+
+            // Spawn new
+            for (int i = 0; i < max; i++)
+            {
+
+                Debug.Log($"[HUDManager] Spawning Grit Pip {i + 1}/{max}");
+
+                GameObject newPip = Instantiate(pipPrefab, gritContainer);
+                Image img = newPip.GetComponent<Image>();
+                if (img)
+                {
+                    Debug.Log($"[HUDManager] Successfully spawned pip and added to list.");
+                    _spawnedPips.Add(img);
+                }
+            }
         }
     }
 }

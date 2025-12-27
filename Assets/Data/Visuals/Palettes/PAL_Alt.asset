@@ -16,45 +16,67 @@ MonoBehaviour:
     mainColor: {r: 0.4811321, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   playerSecondary:
     mainColor: {r: 1, g: 0.16509432, b: 0.16509432, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   playerTertiary:
     mainColor: {r: 0.9528302, g: 0.4809096, b: 0.4809096, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   enemyPrimary:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   enemySecondary:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   enemyTertiary:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   projectileHostile:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   projectileFriendly:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   staggerColor: {r: 0.4811321, g: 0.44333738, b: 0.0068084607, a: 1}
   floor:
-    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    mainColor: {r: 0.8584906, g: 0.8584906, b: 0.8584906, a: 0}
     smoothness: 0
-    metallic: 0
+    metallic: 0.00029999999
+    emissionColor: {r: 0.42352942, g: 0, b: 0.30123967, a: 0}
+    emissionIntensity: 1
   walls:
-    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    mainColor: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0.33962262, g: 0, b: 0.33961517, a: 0}
+    emissionIntensity: 0
   hazards:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   skyColor: {r: 0.89444643, g: 0.93871146, b: 0.9433962, a: 1}

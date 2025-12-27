@@ -8,15 +8,18 @@ namespace DarkTowerTron.Player
     [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerHealth))]
     [RequireComponent(typeof(TargetScanner))]
+    [RequireComponent(typeof(PlayerMovement))]
     public class PlayerExecution : MonoBehaviour
     {
         [Header("Settings")]
         public float killRewardFocus = 50f;
+        public float postKillHangTime = 0.4f; // NEW: Time to float after teleport
         public AudioClip executeClip; // Assign in Inspector
 
         private PlayerEnergy _energy;
         private PlayerHealth _health;
         private TargetScanner _scanner;
+        private PlayerMovement _movement;
         private bool _isBusy;
 
         private void Awake()
@@ -24,6 +27,7 @@ namespace DarkTowerTron.Player
             _energy = GetComponent<PlayerEnergy>();
             _health = GetComponent<PlayerHealth>();
             _scanner = GetComponent<TargetScanner>();
+            _movement = GetComponent<PlayerMovement>();
         }
 
         public void PerformGloryKill()
@@ -56,7 +60,14 @@ namespace DarkTowerTron.Player
             Vector3 attackPos = targetPos - (transform.forward * 1.0f);
             transform.position = attackPos;
 
-            // 2. Trigger Target Reaction (Die or Reset)
+            // 2. Suspend Gravity (The "Matrix" Pause)
+            if (_movement)
+            {
+                _movement.ResetVelocity();
+                _movement.SuspendGravity(postKillHangTime);
+            }
+
+            // 3. Trigger Target Reaction (Die or Reset)
             target.OnExecutionHit();
 
             // PLAY SOUND

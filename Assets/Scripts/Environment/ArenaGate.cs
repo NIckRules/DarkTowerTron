@@ -6,15 +6,15 @@ namespace DarkTowerTron.Environment
 {
     public class ArenaGate : MonoBehaviour
     {
-        [Header("Settings")]
-        public float animDuration = 1.0f;
-        public float openHeight = -3f; // Move down to hide
-        public float closedHeight = 0f; // Move up to block
-
         [Header("Parts")]
-        public Transform gateVisuals;
-        public Collider gateCollider;
-        public Renderer gateRenderer; // To change color (Red=Locked, Green=Open)
+        public Transform laserWall;    // The Pivot (Scales up/down)
+        public Renderer baseRenderer;  // The Floor Strip
+        public Renderer wallRenderer;  // NEW: The Actual Wall Mesh (Child)
+        public Collider wallCollider;  // The Physics Block
+
+        [Header("Settings")]
+        public float animDuration = 0.5f;
+        public Vector3 closedScale = new Vector3(1, 1, 1);
 
         [Header("Colors")]
         public Color lockedColor = Color.red;
@@ -22,54 +22,55 @@ namespace DarkTowerTron.Environment
 
         private void Start()
         {
-            // Start Open
-            OpenGate(true);
+            // Initial State: Open
+            SetGate(false, true);
 
-            GameEvents.OnWaveCombatStarted += () => CloseGate();
-            GameEvents.OnWaveCleared += () => OpenGate();
+            GameEvents.OnRoomCleared += () => SetGate(false);
         }
 
         private void OnDestroy()
         {
-            // Unsubscribe (using lambda requires careful cleanup, 
-            // but for scene objects destroyed on load it's usually fine. 
-            // Ideally, define methods to unsubscribe cleanly.)
-            GameEvents.OnWaveCombatStarted -= CloseGate;
-            GameEvents.OnWaveCleared -= OpenGate;
+            GameEvents.OnRoomCleared -= () => SetGate(false);
         }
 
-        // Wrapper methods for event subscription cleanliness
-        private void CloseGate() => SetGate(true);
-        private void OpenGate() => SetGate(false);
-        // Overload for instant snap
-        private void OpenGate(bool instant) => SetGate(false, instant);
+        public void ForceClose()
+        {
+            SetGate(true, false);
+        }
 
         private void SetGate(bool isClosed, bool instant = false)
         {
-            float targetY = isClosed ? closedHeight : openHeight;
-            Color targetColor = isClosed ? lockedColor : openColor;
+            // 1. Collider
+            if (wallCollider) wallCollider.enabled = isClosed;
 
-            if (gateCollider) gateCollider.enabled = isClosed;
-
-            if (gateVisuals)
+            // 2. Visuals (Scaling the Pivot)
+            if (laserWall)
             {
-                if (instant)
-                {
-                    Vector3 pos = gateVisuals.localPosition;
-                    pos.y = targetY;
-                    gateVisuals.localPosition = pos;
-                }
-                else
-                {
-                    gateVisuals.DOLocalMoveY(targetY, animDuration).SetEase(Ease.OutBack);
-                }
+                Vector3 targetScale = isClosed ? closedScale : new Vector3(closedScale.x, 0f, closedScale.z);
+
+                if (instant) laserWall.localScale = targetScale;
+                else laserWall.DOScale(targetScale, animDuration).SetEase(Ease.OutBack);
             }
 
-            if (gateRenderer)
+            // 3. Colors
+            Color targetColor = isClosed ? lockedColor : openColor;
+
+            // A. Base Strip (Opaque)
+            if (baseRenderer)
             {
-                // Tween Color/Emission
-                gateRenderer.material.DOColor(targetColor, "_BaseColor", animDuration);
-                gateRenderer.material.DOColor(targetColor, "_EmissionColor", animDuration);
+                baseRenderer.material.DOColor(targetColor, "_BaseColor", animDuration);
+                baseRenderer.material.DOColor(targetColor * 2f, "_EmissionColor", animDuration);
+            }
+
+            // B. Laser Wall (Transparent) - NEW LOGIC
+            if (wallRenderer)
+            {
+                // We want the wall to be semi-transparent (Alpha ~ 0.3 or 80/255)
+                Color transparentColor = new Color(targetColor.r, targetColor.g, targetColor.b, 0.3f);
+
+                // Use DOTween for smooth color transition
+                wallRenderer.material.DOColor(transparentColor, "_BaseColor", animDuration);
+                wallRenderer.material.DOColor(targetColor, "_EmissionColor", animDuration);
             }
         }
     }

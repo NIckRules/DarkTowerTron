@@ -28,7 +28,13 @@ namespace DarkTowerTron.Enemy
 
         private void OnEnable()
         {
-            // Keep existing behavior even when not spawned via pool
+            _currentVelocity = Vector3.zero;
+            _knockbackForce = Vector3.zero;
+            _currentVerticalSpeed = 0f;
+
+            // REMOVED: The code that snapped transform.position.y = 0
+            // logic: We trust the Spawner to put us where we need to be.
+            // If rideHeight > 0, the Update loop will naturally float us up/down to that height.
             OnSpawn();
         }
 
@@ -41,12 +47,7 @@ namespace DarkTowerTron.Enemy
             _currentVerticalSpeed = 0f;
 
             // Reset Position logic
-            if (stats != null && stats.rideHeight > 0)
-            {
-                Vector3 startPos = transform.position;
-                startPos.y = 0;
-                transform.position = startPos;
-            }
+            // (Removed y=0 snap. Spawner is responsible for initial Y. If rideHeight > 0, Update loop will float us.)
         }
 
         public void OnDespawn()

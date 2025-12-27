@@ -1,6 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.AI.Utils;
-using DarkTowerTron.AI.Core; // Access Base Class
+using DarkTowerTron.AI.Core;
 
 namespace DarkTowerTron.AI.Core.Behaviors
 {
@@ -12,25 +12,16 @@ namespace DarkTowerTron.AI.Core.Behaviors
 
         public override void GetSteering(float[] interest, float[] danger, AIData aiData)
         {
-            // --- SAFETY CHECKS ---
-            // 1. Owner Collider must exist
-            if (ownerCollider == null)
-            {
-                // Try to get it if it was missed (e.g., Awake ran too early)
-                ownerCollider = aiData.GetComponent<Collider>();
-                if (ownerCollider == null) return; // Cannot proceed without it
-            }
-            // 2. Avoid Targets that are targets (Don't avoid player if seeking player)
-            if (aiData.currentTarget != null && aiData.currentTarget.gameObject == ownerCollider.gameObject) return;
-            // --- END SAFETY ---
+            // 1. Safety Check: Use data from the agent
+            if (aiData.ownerCollider == null) return;
 
-            // --- Original Logic ---
+            // 2. Logic
             if (aiData.obstacles == null || aiData.obstacles.Count == 0) return;
 
             foreach (Collider obstacle in aiData.obstacles)
             {
-                // Use the ownerCollider to get the correct center and radius for casting
-                Vector3 closestPoint = ownerCollider.ClosestPoint(aiData.transform.position);
+                // FIX: Access the collider via aiData
+                Vector3 closestPoint = aiData.ownerCollider.ClosestPoint(aiData.transform.position);
 
                 Vector3 dirToObstacle = closestPoint - aiData.transform.position;
                 dirToObstacle.y = 0;

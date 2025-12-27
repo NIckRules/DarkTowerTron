@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 1527507773856463301}
   - component: {fileID: 1839963594574695099}
   m_Layer: 7
-  m_Name: ENE_Chaser_Millise
+  m_Name: ENE_Chaser_Missile
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

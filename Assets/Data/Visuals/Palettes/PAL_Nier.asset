@@ -13,48 +13,70 @@ MonoBehaviour:
   m_Name: PAL_Nier
   m_EditorClassIdentifier: 
   playerPrimary:
-    mainColor: {r: 0, g: 0.02924453, b: 0.6415094, a: 0}
+    mainColor: {r: 0.5952296, g: 0.5955943, b: 0.6037736, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   playerSecondary:
-    mainColor: {r: 0.9339623, g: 0.7973923, b: 0.7973923, a: 0}
+    mainColor: {r: 0.21226418, g: 0.2626792, b: 1, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   playerTertiary:
     mainColor: {r: 0.8679245, g: 0.09416164, b: 0.09416164, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   enemyPrimary:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   enemySecondary:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   enemyTertiary:
     mainColor: {r: 0, g: 0, b: 0, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   projectileHostile:
     mainColor: {r: 1, g: 0.33965325, b: 0.0990566, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   projectileFriendly:
     mainColor: {r: 0, g: 0.12644672, b: 1, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   staggerColor: {r: 1, g: 0.8, b: 0, a: 1}
   floor:
-    mainColor: {r: 0.8679245, g: 0.79013884, b: 0.79013884, a: 0}
+    mainColor: {r: 0.8666667, g: 0.7882353, b: 0.7882353, a: 0}
     smoothness: 0.00029999999
     metallic: 0
+    emissionColor: {r: 0.26352793, g: 0.7660412, b: 0.8867924, a: 0}
+    emissionIntensity: 1
   walls:
     mainColor: {r: 0.6886792, g: 0.63995194, b: 0.63995194, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0.2627451, g: 0.7647059, b: 0.8862745, a: 0}
+    emissionIntensity: 1
   hazards:
     mainColor: {r: 1, g: 0.1462264, b: 0.1462264, a: 0}
     smoothness: 0
     metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
   skyColor: {r: 0.4009434, g: 1, b: 0.95789695, a: 1}

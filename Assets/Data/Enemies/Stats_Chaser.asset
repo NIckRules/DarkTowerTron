@@ -19,8 +19,9 @@ MonoBehaviour:
   gritRewardAmount: 1
   moveSpeed: 9
   rotationSpeed: 15
+  combatRotationSpeed: 3
   acceleration: 20
-  rideHeight: 0.5
+  rideHeight: 1.1
   verticalSmoothTime: 0.5
   separationRadius: 1.5
   separationForce: 8

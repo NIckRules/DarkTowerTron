@@ -6,40 +6,46 @@ namespace DarkTowerTron.AI.Core.Behaviors
     [CreateAssetMenu(fileName = "Beh_Flee", menuName = "DarkTowerTron/AI/Behaviors/Flee")]
     public class FleeBehavior : SteeringBehavior
     {
-        public float fleeDistance = 10f; // Only flee if target is closer than this
+        [Tooltip("Enemy will only flee if target is closer than this distance.")]
+        public float fleeDistance = 10f;
 
-        private Collider ownerCollider;
-
-        public void Initialize(Collider owner)
-        {
-            ownerCollider = owner;
-        }
+        [Tooltip("Strength of the flee desire (0 to 1).")]
+        public float weight = 1.0f;
 
         public override void GetSteering(float[] interest, float[] danger, AIData aiData)
         {
-            // Call Initialize if it hasn't been called yet
-            if (ownerCollider == null) Initialize(aiData.GetComponent<Collider>());
-
+            // Safety Check
             if (aiData.currentTarget == null) return;
 
+            // 1. Calculate vector TO the target
             Vector3 vectorToTarget = aiData.currentTarget.position - aiData.transform.position;
-            vectorToTarget.y = 0;
-            float dist = vectorToTarget.magnitude;
+            vectorToTarget.y = 0; // Keep it flat
 
-            // If we are safe, don't force movement
-            if (dist > fleeDistance) return;
+            float distanceSqr = vectorToTarget.sqrMagnitude;
 
-            // Flee direction is opposite to target
+            // 2. Distance Check (Optimization)
+            // If we are far enough away, we don't need to flee.
+            if (distanceSqr > fleeDistance * fleeDistance) return;
+
+            // 3. Calculate "Away" Direction
             Vector3 dirAway = -vectorToTarget.normalized;
 
+            // 4. Map to 8 Directions
             for (int i = 0; i < interest.Length; i++)
             {
-                // We want to go in directions similar to 'dirAway'
+                // Dot Product: How well does this compass direction align with "Away"?
                 float dot = Vector3.Dot(dirAway, AIDirections.EightDirections[i]);
 
-                if (dot > 0 && dot > interest[i])
+                // We only care about directions that actually take us away (> 0)
+                if (dot > 0)
                 {
-                    interest[i] = dot;
+                    float value = dot * weight;
+
+                    // If this behavior suggests a stronger interest than existing ones, override it
+                    if (value > interest[i])
+                    {
+                        interest[i] = value;
+                    }
                 }
             }
         }

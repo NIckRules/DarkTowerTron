@@ -161,7 +161,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.1, y: 1.1, z: 1.1}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &154471003305820079
 MonoBehaviour:
@@ -213,9 +213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshRenderer: {fileID: 3834379093864157853}
-  normalColor: {r: 1, g: 0, b: 0, a: 1}
-  staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  palette: {fileID: 0}
   staggerClip: {fileID: 8300000, guid: 8825eac8c60f4bf439a3043099071044, type: 3}
 --- !u!136 &4375997593325643076
 CapsuleCollider:

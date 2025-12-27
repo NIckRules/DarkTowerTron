@@ -107,8 +107,36 @@ namespace DarkTowerTron.Managers
             foreach (var mat in collection.materials)
             {
                 if (mat == null) continue;
+
+                // --- 1. BASE COLOR ---
                 if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", surf.mainColor);
-                if (mat.HasProperty("_EmissionColor")) mat.SetColor("_EmissionColor", surf.mainColor);
+                else if (mat.HasProperty("_Color")) mat.SetColor("_Color", surf.mainColor);
+
+                // --- 2. GLOW / EMISSION (The Fix) ---
+                // Option A: Standard URP Lit
+                if (mat.HasProperty("_EmissionColor"))
+                {
+                    // Use the specific emission color defined in the palette
+                    mat.SetColor("_EmissionColor", surf.emissionColor);
+                    // Handle Intensity (HDR math)
+                    // If the shader supports a separate intensity float, set it.
+                    // Otherwise, we assume surf.emissionColor already has HDR intensity baked in.
+                    if (mat.HasProperty("_EmissionIntensity"))
+                    {
+                        mat.SetFloat("_EmissionIntensity", surf.emissionIntensity);
+                    }
+                    mat.EnableKeyword("_EMISSION");
+                }
+                // Option B: Your Custom Shader (GlowColor)
+                // We check for the specific reference name used in Shader Graph
+                else if (mat.HasProperty("_GlowColor"))
+                {
+                    // Combine Color * Intensity for the final HDR result
+                    Color finalGlow = surf.emissionColor * Mathf.LinearToGammaSpace(surf.emissionIntensity);
+                    mat.SetColor("_GlowColor", finalGlow);
+                }
+
+                // --- 3. PHYSICS ---
                 if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", surf.smoothness);
                 if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", surf.metallic);
             }

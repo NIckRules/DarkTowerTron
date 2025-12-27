@@ -21,7 +21,7 @@ namespace DarkTowerTron.Core
 
         // Resources
         public static Action<float, float> OnFocusChanged;
-        public static Action<int> OnGritChanged;
+        public static Action<int, int> OnGritChanged; // Current, Max
 
         // NEW: True = Hull Active, False = Hull Broken (Danger)
         public static Action<bool> OnHullStateChanged;
@@ -29,7 +29,8 @@ namespace DarkTowerTron.Core
         // System
         public static Action<Vector3> OnEnemySpawned;
         public static Action OnWaveCleared;
-        public static Action OnGameVictory;
+        public static Action OnRoomCleared; // Doors open, but game continues
+        public static Action OnGameVictory; // Roll credits
         public static Action<int> OnWaveAnnounce;
         public static Action<string> OnCountdownChange;
         public static Action OnWaveCombatStarted;
@@ -57,6 +58,7 @@ namespace DarkTowerTron.Core
             OnHullStateChanged = null;
             OnEnemySpawned = null;
             OnWaveCleared = null;
+            OnRoomCleared = null;
             OnGameVictory = null;
             OnWaveAnnounce = null;
             OnCountdownChange = null;
