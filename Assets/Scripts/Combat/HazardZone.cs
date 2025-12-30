@@ -15,27 +15,55 @@ namespace DarkTowerTron.Combat
         [Header("Visuals")]
         public Transform visualRing; // Assign a cylinder/sprite
 
+        // Tween references so we can safely kill them if the zone is stopped early
+        private Tween _scaleTween;
+        private Tween _fadeTween;
+        private Tween _delayedCallTween;
+        private Coroutine _destroyCoroutine;
+
         private void Start()
         {
+            Transform target = visualRing != null ? visualRing : transform;
+
             // 1. Expand Visuals (Juice)
-            transform.localScale = Vector3.zero;
-            transform.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack);
+            target.localScale = Vector3.zero;
+            _scaleTween = target.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack);
 
             // 2. Schedule Destruction
-            // Fade out before destroying
-            DOVirtual.DelayedCall(duration - 0.5f, FadeOut);
-            Destroy(gameObject, duration);
+            // Fade out shortly before destroying
+            _delayedCallTween = DOVirtual.DelayedCall(Mathf.Max(0f, duration - 0.5f), FadeOut);
+            _destroyCoroutine = StartCoroutine(AutoDestroyCoroutine());
+        }
+
+        private void OnDisable()
+        {
+            _scaleTween?.Kill();
+            _fadeTween?.Kill();
+            _delayedCallTween?.Kill();
+
+            if (_destroyCoroutine != null)
+            {
+                try { StopCoroutine(_destroyCoroutine); } catch { }
+                _destroyCoroutine = null;
+            }
+        }
+
+        private System.Collections.IEnumerator AutoDestroyCoroutine()
+        {
+            yield return new WaitForSeconds(duration);
+            Destroy(gameObject);
         }
 
         private void FadeOut()
         {
-            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+            Transform target = visualRing != null ? visualRing : transform;
+            _fadeTween = target.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
         }
 
         private void OnTriggerEnter(Collider other)
         {
             // Check Layer
-            if (((1 << other.gameObject.layer) & targetLayer) != 0)
+            if ((targetLayer.value & (1 << other.gameObject.layer)) != 0)
             {
                 IDamageable target = other.GetComponentInParent<IDamageable>();
                 if (target != null)

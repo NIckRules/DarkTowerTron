@@ -32,6 +32,12 @@ namespace DarkTowerTron.Environment
         public bool respawns = false; // Set True for Traversal Anchors
         public float respawnTime = 3.0f;
 
+        [Header("Traversal")]
+        public bool snapPlayerToGround = false; // Default false for floating anchors
+
+        // Interface implementation
+        public bool KeepPlayerGrounded => snapPlayerToGround;
+
         // Components to hide
         private Collider _col;
         private Renderer _rend;

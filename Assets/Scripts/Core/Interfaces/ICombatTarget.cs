@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace DarkTowerTron.Core
 {
-    /// <summary>
-    /// Implemented by anything the Player can Lock-On to and Execute (Enemy or Prop).
-    /// </summary>
     public interface ICombatTarget
     {
-        Transform transform { get; } // Required to get position
-        bool IsStaggered { get; }    // Execution condition
+        Transform transform { get; }
+        bool IsStaggered { get; }
+
+        // NEW: Tells the Execution script if it should snap Y to ground
+        bool KeepPlayerGrounded { get; }
 
         void OnExecutionHit();
     }

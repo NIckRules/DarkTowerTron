@@ -1,47 +1,76 @@
 using UnityEngine;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Managers; // For PoolManager
 
 namespace DarkTowerTron.Managers
 {
     public class ArenaSpawner : MonoBehaviour
     {
         [Header("Setup")]
-        public Transform[] spawnPoints; // This gets updated by WaveTrigger
+        public Transform[] spawnPoints;
+
+        [Header("Debug")]
+        public bool showDebugRays = true;
+        public float debugLineDuration = 20f; // Long time to analyze in Scene view
 
         public GameObject SpawnEnemy(GameObject prefab, int forcedIndex = -1)
         {
-            // SAFETY CHECK 1: Prefab missing
-            if (prefab == null) return null;
+            if (spawnPoints == null || spawnPoints.Length == 0 || prefab == null) return null;
 
-            // SAFETY CHECK 2: No points assigned (The Fix for your error)
-            if (spawnPoints == null || spawnPoints.Length == 0)
-            {
-                Debug.LogError("ArenaSpawner ERROR: Attempted to spawn enemy, but 'Spawn Points' list is Empty! Did the WaveTrigger assign them?");
-                return null;
-            }
-
+            // 1. Pick Point
             Transform sp;
+            if (forcedIndex >= 0 && forcedIndex < spawnPoints.Length) sp = spawnPoints[forcedIndex];
+            else sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
 
-            if (forcedIndex >= 0 && forcedIndex < spawnPoints.Length)
+            // 2. Randomize Offset
+            Vector2 randomCircle = Random.insideUnitCircle * 2.0f;
+            Vector3 attemptPos = sp.position + new Vector3(randomCircle.x, 0, randomCircle.y);
+
+            // 3. Find Floor
+            Vector3 spawnPos;
+            int mask = LayerMask.GetMask("Ground", "Default", "Wall");
+            Vector3 rayOrigin = attemptPos + Vector3.up * 50f;
+
+            if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 100f, mask))
             {
-                sp = spawnPoints[forcedIndex];
+                spawnPos = hit.point;
+
+                // Call dedicated Debugger
+                if (showDebugRays) VisualizeSpawn(rayOrigin, hit, true);
             }
             else
             {
-                sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
+                // Fallback (Air Drop)
+                spawnPos = attemptPos + Vector3.up * 2.0f;
+
+                // Call dedicated Debugger
+                if (showDebugRays) VisualizeSpawn(rayOrigin, new RaycastHit(), false);
             }
 
-            // Check if the specific point is null (deleted object)
-            if (sp == null)
+            return PoolManager.Instance.Spawn(prefab, spawnPos, Quaternion.LookRotation(sp.forward));
+        }
+
+        // --- NEW DEBUG METHOD ---
+        private void VisualizeSpawn(Vector3 origin, RaycastHit hit, bool success)
+        {
+            if (success)
             {
-                Debug.LogError("ArenaSpawner ERROR: A spawn point in the list is NULL.");
-                return null;
+                // Draw Green Line to exact hit point
+                Debug.DrawLine(origin, hit.point, Color.green, debugLineDuration);
+
+                // Draw a small Cross at the hit point so you can see exactly where it landed
+                Debug.DrawRay(hit.point, Vector3.up * 0.5f, Color.green, debugLineDuration);
+                Debug.DrawRay(hit.point, Vector3.right * 0.5f, Color.green, debugLineDuration);
+
+                // Log details
+                string layerName = LayerMask.LayerToName(hit.collider.gameObject.layer);
+                Debug.Log($"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>");
             }
-
-            Vector3 offset = Random.insideUnitSphere * 2.0f;
-            offset.y = 1.0f; // Air drop
-
-            return PoolManager.Instance.Spawn(prefab, sp.position + offset, Quaternion.LookRotation(sp.forward));
+            else
+            {
+                // Draw Red Line all the way down
+                Debug.DrawRay(origin, Vector3.down * 100f, Color.red, debugLineDuration);
+                Debug.LogError($"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.");
+            }
         }
     }
 }

@@ -63,6 +63,9 @@ namespace DarkTowerTron.Player
 
             var killAction = _controls.asset.FindAction("GloryKill");
             if (killAction != null) killAction.performed += ctx => OnGloryKill();
+
+            // NEW: Register self
+            GameServices.RegisterPlayer(this);
         }
 
         private void OnEnable()

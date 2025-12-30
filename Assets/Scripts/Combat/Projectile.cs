@@ -27,6 +27,7 @@ namespace DarkTowerTron.Combat
 
         private Material _originalMaterial;
         private Vector3 _direction;
+        private GameObject _source;
         private bool _isInitialized = false;
         private bool _isRedirected = false; 
         private float _lifeTimer;
@@ -62,6 +63,11 @@ namespace DarkTowerTron.Combat
 
         public void ResetHostility(bool startHostile) { isHostile = startHostile; }
 
+        public void SetSource(GameObject source)
+        {
+            _source = source;
+        }
+
         private void Update()
         {
             if (!_isInitialized) return;
@@ -81,6 +87,12 @@ namespace DarkTowerTron.Combat
             if (_graceTimer > 0) return;
 
             if (other.isTrigger) return;
+
+            // FIX: Ignore the shooter (and its children/parents usually)
+            if (_source != null && (other.gameObject == _source || other.transform.IsChildOf(_source.transform)))
+            {
+                return;
+            }
 
             // Wall Check
             if ((wallLayer.value & (1 << other.gameObject.layer)) > 0)

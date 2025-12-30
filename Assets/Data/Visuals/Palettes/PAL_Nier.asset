@@ -31,13 +31,13 @@ MonoBehaviour:
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
     emissionIntensity: 0
   enemyPrimary:
-    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    mainColor: {r: 0, g: 0.23518094, b: 0.6792453, a: 0}
     smoothness: 0
     metallic: 0
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
     emissionIntensity: 0
   enemySecondary:
-    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    mainColor: {r: 0.9528302, g: 0.4179868, b: 0.4179868, a: 0}
     smoothness: 0
     metallic: 0
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
@@ -77,6 +77,6 @@ MonoBehaviour:
     mainColor: {r: 1, g: 0.1462264, b: 0.1462264, a: 0}
     smoothness: 0
     metallic: 0
-    emissionColor: {r: 0, g: 0, b: 0, a: 0}
-    emissionIntensity: 0
+    emissionColor: {r: 1, g: 0.9481132, b: 0.9481132, a: 0}
+    emissionIntensity: 0.5
   skyColor: {r: 0.4009434, g: 1, b: 0.95789695, a: 1}

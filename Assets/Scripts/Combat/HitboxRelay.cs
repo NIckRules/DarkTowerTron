@@ -1,33 +1,58 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Enemy; // Access EnemyController
 
 namespace DarkTowerTron.Combat
 {
-    /// <summary>
-    /// Place this on Child Colliders (e.g. Head, Weakpoint).
-    /// It forwards damage to the Main Controller on the Root.
-    /// </summary>
     public class HitboxRelay : MonoBehaviour, IDamageable
     {
         [Header("Link")]
-        [SerializeField] private EnemyController _mainController;
+        // CHANGED: Serialized Object reference, cast to Interface at runtime
+        // Why GameObject? Unity can't serialize Interfaces directly in Inspector easily.
+        [SerializeField] private GameObject _mainControllerObject;
+
+        private IDamageable _mainController;
 
         [Header("Settings")]
-        [SerializeField] private float _damageMultiplier = 1.0f; // 2.0 = Critical Spot
+        [SerializeField] private float _damageMultiplier = 1.0f;
 
         private void Awake()
         {
-            // Auto-link if empty
+            // Manual Assignment Logic
+            if (_mainControllerObject != null)
+            {
+                _mainController = _mainControllerObject.GetComponent<IDamageable>();
+            }
+
+            // Auto-Link Fallback (If empty)
             if (_mainController == null)
-                _mainController = GetComponentInParent<EnemyController>();
+            {
+                // Try parent first
+                _mainController = GetComponentInParent<IDamageable>();
+
+                // If this object IS the parent (recursion risk), look specifically for other components?
+                // No, Relay is usually on a child. 
+                // But wait! If Relay is on Child, and Parent has Controller, GetComponentInParent works.
+                // Note: GetComponentsInParent includes THIS object. We must ensure we don't find ourselves!
+
+                if (_mainController == this as IDamageable)
+                {
+                    // If we found ourselves, look at parent specifically
+                    if (transform.parent != null)
+                        _mainController = transform.parent.GetComponentInParent<IDamageable>();
+                }
+            }
+
+            if (_mainController == null)
+            {
+                Debug.LogWarning($"HitboxRelay on {name} could not find an IDamageable parent!");
+            }
         }
 
         public bool TakeDamage(DamageInfo info)
         {
             if (_mainController == null) return false;
 
-            // Apply Multiplier (e.g. Headshot)
+            // Apply multiplier
             info.damageAmount *= _damageMultiplier;
 
             // Forward the hit
@@ -36,7 +61,7 @@ namespace DarkTowerTron.Combat
 
         public void Kill(bool instant)
         {
-            if (_mainController) _mainController.Kill(instant);
+            if (_mainController != null) _mainController.Kill(instant);
         }
     }
 }

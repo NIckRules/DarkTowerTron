@@ -55,9 +55,29 @@ namespace DarkTowerTron.Player
         {
             _isBusy = true;
 
-            // 1. Teleport
+            // 1. Calculate Position
             Vector3 targetPos = target.transform.position;
-            Vector3 attackPos = targetPos - (transform.forward * 1.0f);
+            Vector3 attackPos = targetPos - (transform.forward * 1.0f); 
+
+            // 2. Y-Axis Logic (The Fix)
+            if (target.KeepPlayerGrounded)
+            {
+                // Find the ground below the target
+                if (UnityEngine.Physics.Raycast(targetPos + Vector3.up, Vector3.down, out RaycastHit hit, 10f, LayerMask.GetMask("Ground")))
+                {
+                    attackPos.y = hit.point.y;
+                }
+                else
+                {
+                    attackPos.y = targetPos.y; // Fallback
+                }
+            }
+            else
+            {
+                // Go to exact height (e.g. Floating Anchor)
+                attackPos.y = targetPos.y;
+            }
+
             transform.position = attackPos;
 
             // 2. Suspend Gravity (The "Matrix" Pause)

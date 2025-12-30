@@ -24,6 +24,8 @@ namespace DarkTowerTron.Enemy
         [Header("Audio")]
         public AudioClip staggerClip;
 
+        public bool KeepPlayerGrounded => true;
+
         // Components
         private EnemyMotor _motor;
 

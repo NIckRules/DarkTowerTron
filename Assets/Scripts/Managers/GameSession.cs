@@ -7,17 +7,11 @@ namespace DarkTowerTron.Managers
 {
     public class GameSession : MonoBehaviour
     {
-        [Header("UI Panels")]
-        public GameObject startPanel;
-        public GameObject tutorialPanel;
-        public GameObject hudPanel;
-        public GameObject pausePanel;
-        public GameObject gameOverPanel;
-        public GameObject victoryPanel;
+        [Header("Manager References")]
+        public UIManager uiManager;
 
-        [Header("Scene References")]
-        public PlayerController player;
-        public WaveDirector waveDirector; // Renamed from WaveManager
+        [Header("Debug")]
+        public string activeSpawnID = "Start";
 
         private bool _isGameRunning = false;
         private bool _isPaused = false;
@@ -26,172 +20,153 @@ namespace DarkTowerTron.Managers
         private void Awake()
         {
             _controls = new GameControls();
-
-            // Bind Pause Action (ESC / Start)
             _controls.Gameplay.Pause.performed += ctx => TogglePause();
         }
 
-        private void OnEnable()
-        {
-            _controls.Enable();
-        }
-
-        private void OnDisable()
-        {
-            _controls.Disable();
-        }
+        private void OnEnable() => _controls.Enable();
+        private void OnDisable() => _controls.Disable();
 
         private void Start()
         {
-            // Pause everything immediately on load
             Time.timeScale = 0f;
 
-            // Show Main Menu
-            SetPanelActive(startPanel);
+            // Use UIManager
+            if (uiManager) uiManager.ShowStartMenu();
 
-            // Lock Player
-            if (player) player.ToggleInput(false);
+            // Locate Player via Service
+            MovePlayerToStart();
+            if (GameServices.Player) GameServices.Player.ToggleInput(false);
 
-            // Subscribe to Global Events
             GameEvents.OnPlayerDied += TriggerGameOver;
             GameEvents.OnGameVictory += TriggerVictory;
         }
 
         private void OnDestroy()
         {
-            // Unsubscribe Local
             GameEvents.OnPlayerDied -= TriggerGameOver;
             GameEvents.OnGameVictory -= TriggerVictory;
-
-            // CRITICAL: Clean up static events so they don't linger between scene loads
             GameEvents.Cleanup();
         }
 
-        // --- PUBLIC UI FUNCTIONS (Linked to Buttons) ---
+        // --- PUBLIC UI FUNCTIONS ---
 
         public void BeginGame()
         {
             _isGameRunning = true;
             _isPaused = false;
-
-            // Unpause Physics/Logic
             Time.timeScale = 1f;
 
-            // Switch UI
-            SetPanelActive(hudPanel);
+            if (uiManager) uiManager.ShowHUD();
 
-            // Wake up Player
-            if (player)
+            if (GameServices.Player)
             {
-                player.ToggleInput(true);
+                GameServices.Player.ToggleInput(true);
 
-                // CRITICAL FIX: Now that HUD is active, force PlayerHealth 
-                // to resend the initial HP values so the UI updates.
-                var health = player.GetComponent<PlayerHealth>();
+                // Refresh UI
+                var health = GameServices.Player.GetComponent<PlayerHealth>();
                 if (health) health.ForceUpdateUI();
-
-                // Also sync energy if needed
-                var energy = player.GetComponent<PlayerEnergy>();
-                // (Assuming you might add ForceUpdate to Energy later, but Health is the priority)
             }
 
-            // Start the Level Logic
-            if (waveDirector) waveDirector.StartGame();
-        }
-
-        public void OpenTutorial()
-        {
-            SetPanelActive(tutorialPanel);
-        }
-
-        public void BackToMenu()
-        {
-            SetPanelActive(startPanel);
-        }
-
-        public void RestartGame()
-        {
-            Time.timeScale = 1f; // Reset time so the next scene loads cleanly
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-
-        public void QuitGame()
-        {
-            Debug.Log("EXITING SYSTEM...");
-            Application.Quit();
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#endif
+            if (GameServices.WaveDirector) GameServices.WaveDirector.StartGame();
         }
 
         public void TogglePause()
         {
-            // Can't pause if in menu or dead
             if (!_isGameRunning) return;
 
             _isPaused = !_isPaused;
 
             if (_isPaused)
             {
-                // PAUSE STATE
                 Time.timeScale = 0f;
-                pausePanel.SetActive(true);
-                // Optional: Hide HUD while paused
-                // hudPanel.SetActive(false); 
-
-                // Disable input so clicking menus doesn't shoot guns
-                if (player) player.ToggleInput(false);
+                if (uiManager) uiManager.ShowPause();
+                if (GameServices.Player) GameServices.Player.ToggleInput(false);
             }
             else
             {
-                // RESUME STATE
                 Time.timeScale = 1f;
-                pausePanel.SetActive(false);
-                // hudPanel.SetActive(true);
-
-                if (player) player.ToggleInput(true);
+                if (uiManager) uiManager.ShowHUD();
+                if (GameServices.Player) GameServices.Player.ToggleInput(true);
             }
         }
 
-        // --- INTERNAL LOGIC ---
+        public void OpenTutorial()
+        {
+            if (uiManager) uiManager.ShowTutorial();
+        }
+
+        public void BackToMenu()
+        {
+            if (uiManager) uiManager.ShowStartMenu();
+        }
+
+        public void RestartGame()
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        public void QuitGame()
+        {
+            Debug.Log("EXITING...");
+            Application.Quit();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        }
+
+        // --- INTERNAL ---
 
         private void TriggerGameOver()
         {
             if (!_isGameRunning) return;
             _isGameRunning = false;
-
-            // Slow Motion Death
             Time.timeScale = 0.2f;
-
-            SetPanelActive(gameOverPanel);
-
-            if (player) player.ToggleInput(false);
+            if (uiManager) uiManager.ShowGameOver();
+            if (GameServices.Player) GameServices.Player.ToggleInput(false);
         }
 
         private void TriggerVictory()
         {
             if (!_isGameRunning) return;
             _isGameRunning = false;
-
-            // Slow Motion Victory
             Time.timeScale = 0.5f;
-
-            SetPanelActive(victoryPanel);
-
-            if (player) player.ToggleInput(false);
+            if (uiManager) uiManager.ShowVictory();
+            if (GameServices.Player) GameServices.Player.ToggleInput(false);
         }
 
-        // Helper to ensure only one panel is visible at a time
-        private void SetPanelActive(GameObject activePanel)
+        private void MovePlayerToStart()
         {
-            if (startPanel) startPanel.SetActive(false);
-            if (tutorialPanel) tutorialPanel.SetActive(false);
-            if (hudPanel) hudPanel.SetActive(false);
-            if (gameOverPanel) gameOverPanel.SetActive(false);
-            if (victoryPanel) victoryPanel.SetActive(false);
-            if (pausePanel) pausePanel.SetActive(false);
+            if (GameServices.Player == null) return;
+            var playerTransform = GameServices.Player.transform;
 
-            if (activePanel) activePanel.SetActive(true);
+            var points = FindObjectsOfType<DarkTowerTron.Environment.PlayerStart>();
+            Transform targetPoint = null;
+
+            foreach (var p in points)
+            {
+                if (p.spawnID == activeSpawnID) { targetPoint = p.transform; break; }
+            }
+
+            if (targetPoint == null && activeSpawnID != "Start")
+            {
+                foreach (var p in points) if (p.spawnID == "Start") { targetPoint = p.transform; break; }
+            }
+
+            if (targetPoint != null)
+            {
+                var motor = GameServices.Player.GetComponent<DarkTowerTron.Physics.KinematicMover>();
+                if (motor)
+                {
+                    motor.Teleport(targetPoint.position);
+                    playerTransform.rotation = targetPoint.rotation;
+                }
+                else
+                {
+                    playerTransform.position = targetPoint.position;
+                    playerTransform.rotation = targetPoint.rotation;
+                }
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections; // Required for IEnumerator
 using DarkTowerTron.Core;
 using DarkTowerTron.Player;
 using DarkTowerTron.Managers;
@@ -7,12 +8,15 @@ namespace DarkTowerTron.Managers
 {
     public class DebugController : MonoBehaviour
     {
+        [Header("Workflow")]
+        public bool autoStartGame = false; // Check this to skip Main Menu
+
         [Header("Cheats")]
         public bool godMode = false;
         public bool infiniteFocus = false;
 
         [Header("Spawn Keys (NumPad)")]
-        public GameObject[] enemiesToSpawn; // Assign prefabs in Inspector
+        public GameObject[] enemiesToSpawn;
 
         [Header("Perk Testing")]
         public GameObject homingPrefab;
@@ -22,15 +26,30 @@ namespace DarkTowerTron.Managers
         private PlayerHealth _health;
         private PlayerLoadout _loadout;
 
-        private void Start()
+        // Changed void to IEnumerator to allow waiting
+        private IEnumerator Start()
         {
-            // Find player components safely
+            // 1. Find Player Components
             var p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
             if (p)
             {
                 _energy = p.GetComponent<PlayerEnergy>();
                 _health = p.GetComponent<PlayerHealth>();
                 _loadout = p.GetComponent<PlayerLoadout>();
+            }
+
+            // 2. Auto-Start Logic
+            if (autoStartGame)
+            {
+                // Wait one frame to ensure GameSession.Start() has finished setting up UI
+                yield return null;
+
+                var session = FindObjectOfType<GameSession>();
+                if (session)
+                {
+                    Debug.Log("<color=yellow>[DEBUG] Auto-Starting Game...</color>");
+                    session.BeginGame();
+                }
             }
         }
 
@@ -39,7 +58,7 @@ namespace DarkTowerTron.Managers
             // 1. Time Control
             if (Input.GetKeyDown(KeyCode.T))
             {
-                Time.timeScale = (Time.timeScale == 1f) ? 0.1f : 1f; // Slow motion toggle
+                Time.timeScale = (Time.timeScale == 1f) ? 0.1f : 1f;
             }
 
             // 2. Kill All
@@ -57,37 +76,25 @@ namespace DarkTowerTron.Managers
             }
 
             // 4. Manual Spawning (NumPad 1-4)
-            if (Input.GetKeyDown(KeyCode.Keypad1)) Spawn(0); // Grunt
-            if (Input.GetKeyDown(KeyCode.Keypad2)) Spawn(1); // Sniper
-            if (Input.GetKeyDown(KeyCode.Keypad3)) Spawn(2); // Orbiter
-            if (Input.GetKeyDown(KeyCode.Keypad4)) Spawn(3); // Guardian
+            if (Input.GetKeyDown(KeyCode.Keypad1)) Spawn(0);
+            if (Input.GetKeyDown(KeyCode.Keypad2)) Spawn(1);
+            if (Input.GetKeyDown(KeyCode.Keypad3)) Spawn(2);
+            if (Input.GetKeyDown(KeyCode.Keypad4)) Spawn(3);
 
             // 5. Cheats Application
             if (infiniteFocus && _energy) _energy.AddFocus(100f);
             if (godMode && _health) _health.HealGrit(2);
 
-            // 6. Toggle Perks
-            if (Input.GetKeyDown(KeyCode.H)) // Homing
-            {
-                Debug.Log("Cheat: Equipped Homing Missiles");
-                if (_loadout) _loadout.EquipProjectile(homingPrefab);
-            }
-
-            if (Input.GetKeyDown(KeyCode.J)) // Juke (Decoy)
-            {
-                Debug.Log("Cheat: Equipped Explosive Decoy");
-                if (_loadout) _loadout.EquipDecoy(explosiveDecoyPrefab);
-            }
+            // 6. Perk Toggles
+            if (Input.GetKeyDown(KeyCode.H) && _loadout) _loadout.EquipProjectile(homingPrefab);
+            if (Input.GetKeyDown(KeyCode.J) && _loadout) _loadout.EquipDecoy(explosiveDecoyPrefab);
         }
 
         private void Spawn(int index)
         {
             if (index < 0 || index >= enemiesToSpawn.Length) return;
-
-            // Spawn at cursor logic or random offset
             Vector3 spawnPos = Vector3.zero + Random.insideUnitSphere * 5f;
             spawnPos.y = 0;
-
             PoolManager.Instance.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
         }
     }

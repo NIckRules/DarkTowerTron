@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c00ec1be340b92143a5060df8ebbf3e9, type: 3}
+  m_Name: WA_1_3Sen_3Chm
+  m_EditorClassIdentifier: 
+  waveName: Wave 1
+  entries:
+  - enemyPrefab: {fileID: 3219024694404494821, guid: 4b198c7d670993e44b7353b1eeff09fd,
+      type: 3}
+    count: 3
+    rate: 0.5
+    spawnPointIndex: -1
+  - enemyPrefab: {fileID: 3473038045254472648, guid: 1513d0ac6f440b04981069a6ebcff7b7,
+      type: 3}
+    count: 3
+    rate: 0.5
+    spawnPointIndex: -1
+  gruntPrefabs: []
+  maxGrunts: 0
+  gruntSpawnRate: 5
