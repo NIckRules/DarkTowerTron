@@ -402,7 +402,7 @@ MonoBehaviour:
   godMode: 0
   infiniteFocus: 0
   enemiesToSpawn: []
-  cheatPerk1: {fileID: 0}
+  cheatPerk1: {fileID: 11400000, guid: c9ee3bfe168b6984a904d20292a89bb8, type: 2}
   cheatPerk2: {fileID: 0}
   cheatPerk3: {fileID: 0}
 --- !u!1 &3580903583240986971
