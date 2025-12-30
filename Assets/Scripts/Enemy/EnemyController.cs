@@ -31,6 +31,7 @@ namespace DarkTowerTron.Enemy
 
         // State
         private float _currentStagger;
+        private float _currentHealth; // NEW
         private float _lastHitTime;
         public bool IsStaggered { get; private set; }
 
@@ -65,6 +66,10 @@ namespace DarkTowerTron.Enemy
         public void OnSpawn()
         {
             if (_motor != null) _stats = _motor.stats;
+            // NEW: Reset Health
+            if (_stats != null) _currentHealth = _stats.maxHealth;
+            else _currentHealth = 10f;
+
             ResetState();
             // Refresh colors in case Palette changed while in pool
             LoadColors();
@@ -134,14 +139,33 @@ namespace DarkTowerTron.Enemy
             // 3. Apply Physics Knockback
             _motor.ApplyKnockback(info.pushDirection * info.pushForce);
 
-            // 4. Calculate if this is a "Big Hit" for UI feedback
-            bool isBigHit = IsStaggered; // Crits on staggered enemies
+            // 4. HEALTH LOGIC (NEW)
+            // Apply damage. Note: Player Gun usually deals 0 damage, so this won't kill.
+            // Player Beam deals 10 damage.
+            _currentHealth -= info.damageAmount;
+
+            // Show Numbers
+            bool isBigHit = info.isRedirected || IsStaggered || _currentHealth <= 0;
             GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, isBigHit);
 
-            // 5. Stagger or Kill Logic
+            // Check Death
+            if (_currentHealth <= 0)
+            {
+                Kill(false);
+                return true; // Stop processing
+            }
+
+            // 5. Stagger Logic (Existing)
             if (IsStaggered)
             {
-                // Execution Hit (Damage while staggered = Death)
+                // Execution Hit (Double Damage was applied above, kill check happened above)
+                // If we are here, it means we took damage but are NOT dead yet (HP > 0).
+                // Do we force kill on Stagger hit?
+                // DESIGN CHOICE:
+                // Option A: Staggered + Hit = INSTANT DEATH (Current Design)
+                // Option B: Staggered + Hit = Double Damage (RPG Design)
+                
+                // Let's stick to Option A for "Glass Cannon" feel, but only if damage > 0
                 if (info.damageAmount > 0) Kill(false);
             }
             else

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4720043074774516620}
   - component: {fileID: 8876131734462160885}
   - component: {fileID: 2506214670472289537}
-  - component: {fileID: 6137953672136972031}
+  - component: {fileID: -6759021638277592065}
   m_Layer: 7
   m_Name: Prop_Anchor_Crystal
   m_TagString: Untagged
@@ -106,7 +106,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6137953672136972031
+--- !u!114 &-6759021638277592065
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,17 +115,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 6042327649744245293}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ceae2df6c08c934bbced6c18fe38dc9, type: 3}
+  m_Script: {fileID: 11500000, guid: d20b58dfd70c9bd45937efe72bece5f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
-  isImmortal: 1
-  maxStagger: 0.1
+  maxStagger: 1
   staggerDecay: 1
-  staggerDuration: 3
-  refillFocus: 1
-  healGrit: 0
   meshRenderer: {fileID: 0}
   normalColor: {r: 0, g: 1, b: 1, a: 1}
   staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flashColor: {r: 1, g: 1, b: 1, a: 1}
+  respawnTime: 3
+  keepPlayerInAir: 1

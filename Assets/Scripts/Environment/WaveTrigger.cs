@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Managers;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core; // <--- THIS WAS MISSING
 
 namespace DarkTowerTron.Environment
 {
@@ -12,18 +13,15 @@ namespace DarkTowerTron.Environment
         public Transform[] spawnPointsForThisRoom;
 
         [Header("Arena Gates")]
-        public ArenaGate[] gatesToClose; // Assign gates here
+        public ArenaGate[] gatesToClose;
 
         private bool _triggered = false;
 
         private void OnTriggerEnter(Collider other)
         {
-
-            Debug.Log("WaveTrigger: OnTriggerEnter called.");
-
             if (_triggered) return;
 
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(GameConstants.TAG_PLAYER))
             {
                 _triggered = true;
                 StartRoomEncounter();
@@ -32,26 +30,41 @@ namespace DarkTowerTron.Environment
 
         private void StartRoomEncounter()
         {
-            var director = FindObjectOfType<WaveDirector>();
-            var spawner = FindObjectOfType<ArenaSpawner>();
+            // USE SERVICE LOCATOR
+            var director = GameServices.WaveDirector;
+
+            // Logic: ArenaSpawner is attached to the same object as WaveDirector
+            var spawner = director != null ? director.GetComponent<ArenaSpawner>() : null;
 
             if (director && spawner)
             {
-                // 1. Setup Data
-                spawner.spawnPoints = spawnPointsForThisRoom;
-                director.waves = wavesForThisRoom;
-                
-                // 2. Lock the doors instantly
-                foreach (var gate in gatesToClose)
+                // 1. Hand off Spawn Points
+                if (spawnPointsForThisRoom != null && spawnPointsForThisRoom.Length > 0)
                 {
-                    if (gate) gate.ForceClose();
+                    spawner.spawnPoints = spawnPointsForThisRoom;
                 }
 
-                // 3. Start the Show
+                // 2. Load Waves & Start
+                director.waves = wavesForThisRoom;
                 director.StartGame();
+
+                // 3. Lock Gates
+                ForceCloseGates();
             }
-            
+            else
+            {
+                Debug.LogError("WaveTrigger: Could not find WaveDirector via GameServices!");
+            }
+
             gameObject.SetActive(false);
+        }
+
+        public void ForceCloseGates()
+        {
+            foreach (var gate in gatesToClose)
+            {
+                if (gate != null) gate.ForceClose();
+            }
         }
     }
 }

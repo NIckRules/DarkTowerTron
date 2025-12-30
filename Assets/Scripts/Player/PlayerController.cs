@@ -16,7 +16,7 @@ namespace DarkTowerTron.Player
         private TargetScanner _scanner;
 
         // Weapon References
-        private PlayerAttack _beamWeapon; // Left Trigger / LMB
+        private PlayerBeam _beamWeapon; // Left Trigger / LMB
         private PlayerGun _gunWeapon;     // Right Trigger / RMB
 
         // Input State
@@ -40,7 +40,7 @@ namespace DarkTowerTron.Player
             _execution = GetComponent<PlayerExecution>();
             _scanner = GetComponent<TargetScanner>();
 
-            _beamWeapon = GetComponent<PlayerAttack>();
+            _beamWeapon = GetComponent<PlayerBeam>();
             _gunWeapon = GetComponent<PlayerGun>();
 
             _cam = Camera.main;

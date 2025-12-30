@@ -442,8 +442,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 99627371919686331}
-  - component: {fileID: 6682544090839290607}
   - component: {fileID: 7252766067025741314}
+  - component: {fileID: 5684596600139573616}
   m_Layer: 7
   m_Name: Visual_Slider
   m_TagString: Enemy
@@ -468,32 +468,6 @@ Transform:
   - {fileID: 5603124598900854037}
   m_Father: {fileID: 2456214488409256994}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6682544090839290607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6279505616729054333}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ceae2df6c08c934bbced6c18fe38dc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 20
-  isImmortal: 0
-  volatileStructure: 1
-  maxStagger: 1
-  staggerDecay: 1
-  staggerDuration: 2
-  spawnOnDeath: {fileID: 0}
-  destroyOnDeath: 1
-  meshRenderer: {fileID: 0}
-  normalColor: {r: 0, g: 1, b: 1, a: 1}
-  staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  flashColor: {r: 1, g: 1, b: 1, a: 1}
-  respawns: 0
-  respawnTime: 3
 --- !u!114 &7252766067025741314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,13 +481,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 99627371919686331}
+  meshPivot: {fileID: 4451013507396349675}
   wallObject: {fileID: 7679308459106352141}
   firePoint: {fileID: 6550980544771571632}
   projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
     type: 3}
   slideDuration: 1
-  meshPivot: {fileID: 4451013507396349675}
   rotateDuration: 0.4
+--- !u!114 &5684596600139573616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6279505616729054333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f975c77f2adc9984eabcce601bb4700d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 10
+  maxStagger: 1
+  staggerDecay: 1
+  meshRenderer: {fileID: 0}
+  normalColor: {r: 0, g: 1, b: 1, a: 1}
+  staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  spawnOnDeath: {fileID: 0}
+  volatileOnStagger: 1
 --- !u!1 &7679308459106352141
 GameObject:
   m_ObjectHideFlags: 0

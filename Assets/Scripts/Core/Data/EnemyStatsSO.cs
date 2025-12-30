@@ -29,6 +29,7 @@ namespace DarkTowerTron.Core.Data
         public float separationForce = 8f;
 
         [Header("Combat & Stagger")]
+        public float maxHealth = 10f; // NEW: Actual HP
         public float maxStagger = 1.0f;
         public float staggerDecay = 0.5f;
 
@@ -50,6 +51,9 @@ namespace DarkTowerTron.Core.Data
             scoreValue = Mathf.Max(0, scoreValue);
             focusReward = Mathf.Max(0f, focusReward);
             gritRewardAmount = Mathf.Max(1, gritRewardAmount);
+
+            // Prevent 0 HP zombies
+            maxHealth = Mathf.Max(1f, maxHealth);
 
             // Prevent divide-by-zero or weird logic in Stagger
             maxStagger = Mathf.Max(0.1f, maxStagger);

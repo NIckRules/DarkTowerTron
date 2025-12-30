@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1771352897995823416}
   - component: {fileID: 2461008291067431992}
   - component: {fileID: 4762684029309144326}
-  - component: {fileID: 597494721512262453}
+  - component: {fileID: 5293253979163305418}
   m_Layer: 7
   m_Name: Prop_Explosive_Barrel
   m_TagString: Untagged
@@ -108,7 +108,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &597494721512262453
+--- !u!114 &5293253979163305418
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -117,20 +117,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 4944833170603572708}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ceae2df6c08c934bbced6c18fe38dc9, type: 3}
+  m_Script: {fileID: 11500000, guid: f975c77f2adc9984eabcce601bb4700d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 10
-  isImmortal: 0
+  health: 5
   maxStagger: 1
   staggerDecay: 1
-  staggerDuration: 2
-  refillFocus: 0
-  healGrit: 0
-  spawnOnDeath: {fileID: 2235014378595880763, guid: e7933c66a251e694c92cba8c27bf5ca3,
-    type: 3}
-  destroyOnDeath: 1
   meshRenderer: {fileID: 0}
   normalColor: {r: 0, g: 1, b: 1, a: 1}
   staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flashColor: {r: 1, g: 1, b: 1, a: 1}
+  spawnOnDeath: {fileID: 2235014378595880763, guid: e7933c66a251e694c92cba8c27bf5ca3,
+    type: 3}
+  volatileOnStagger: 1

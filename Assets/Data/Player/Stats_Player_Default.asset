@@ -14,13 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 12
   acceleration: 60
-  maxGrit: 2
+  maxGrit: 3
   maxFocus: 100
   dashCost: 25
   dashDistance: 8
   dashCooldown: 0.15
-  damageMultiplier: 1
-  fireRateMultiplier: 1
+  gunFireRate: 0.5
+  gunDamage: 0
+  gunStagger: 1
+  beamFireRate: 0.4
+  beamDamage: 10
+  beamStagger: 0
   overdriveThreshold: 80
   overdriveSpeedMult: 1.2
   overdriveDamageMult: 2
+  overdriveFireRateMult: 1.5

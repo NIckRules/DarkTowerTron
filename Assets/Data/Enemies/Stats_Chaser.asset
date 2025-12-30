@@ -25,7 +25,7 @@ MonoBehaviour:
   verticalSmoothTime: 0.5
   separationRadius: 1.5
   separationForce: 8
-  maxStagger: 0.5
+  maxStagger: 5
   staggerDecay: 0.5
   hasFrontalShield: 0
   shieldAngle: 0.5

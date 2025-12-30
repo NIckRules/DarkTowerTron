@@ -1,4 +1,5 @@
 using UnityEngine;
+using DarkTowerTron.Core.Data; // Access SoundDef
 
 namespace DarkTowerTron.Managers
 {
@@ -6,8 +7,6 @@ namespace DarkTowerTron.Managers
     public class AudioManager : MonoBehaviour
     {
         public static AudioManager Instance;
-
-        [Header("Sources")]
         [SerializeField] private AudioSource _sfxSource;
 
         private void Awake()
@@ -18,22 +17,23 @@ namespace DarkTowerTron.Managers
             if (_sfxSource == null) _sfxSource = GetComponent<AudioSource>();
         }
 
-        /// <summary>
-        /// Plays a sound with optional pitch randomization.
-        /// </summary>
+        // --- NEW METHOD ---
+        public void PlaySound(SoundDef soundDef)
+        {
+            if (soundDef == null || _sfxSource == null) return;
+
+            AudioClip clip = soundDef.GetClip();
+            if (clip == null) return;
+
+            _sfxSource.pitch = soundDef.GetPitch();
+            _sfxSource.PlayOneShot(clip, soundDef.volume);
+        }
+
+        // Keep legacy method for compatibility until migration is complete
         public void PlaySound(AudioClip clip, float volume = 1f, bool randomizePitch = false)
         {
             if (clip == null || _sfxSource == null) return;
-
-            if (randomizePitch)
-            {
-                _sfxSource.pitch = Random.Range(0.9f, 1.1f);
-            }
-            else
-            {
-                _sfxSource.pitch = 1.0f;
-            }
-
+            _sfxSource.pitch = randomizePitch ? Random.Range(0.9f, 1.1f) : 1f;
             _sfxSource.PlayOneShot(clip, volume);
         }
     }

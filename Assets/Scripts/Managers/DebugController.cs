@@ -29,13 +29,15 @@ namespace DarkTowerTron.Managers
         // Changed void to IEnumerator to allow waiting
         private IEnumerator Start()
         {
-            // 1. Find Player Components
-            var p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
-            if (p)
+            // Wait for GameServices to initialize first
+            yield return null; 
+
+            // NEW: Use Service Locator for player components
+            if (GameServices.Player != null)
             {
-                _energy = p.GetComponent<PlayerEnergy>();
-                _health = p.GetComponent<PlayerHealth>();
-                _loadout = p.GetComponent<PlayerLoadout>();
+                _energy = GameServices.Player.GetComponent<PlayerEnergy>();
+                _health = GameServices.Player.GetComponent<PlayerHealth>();
+                _loadout = GameServices.Player.GetComponent<PlayerLoadout>();
             }
 
             // 2. Auto-Start Logic

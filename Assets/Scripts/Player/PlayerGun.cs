@@ -27,16 +27,29 @@ namespace DarkTowerTron.Player
             if (prefabToSpawn && firePoint)
             {
                 Vector3 aimDir = GetAimDirection();
-                GameObject p = PoolManager.Instance.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
+                GameObject p = Managers.PoolManager.Instance.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
                 
-                Projectile proj = p.GetComponent<Projectile>();
+                var proj = p.GetComponent<Combat.Projectile>();
                 if (proj)
                 {
                     proj.speed = bulletSpeed;
-                    proj.isHostile = false;
+                    proj.isHostile = false; 
+                    
+                    // --- DATA INJECTION ---
+                    // Overwrite the Prefab's damage with our RPG stats
+                    proj.damage = _stats.GunDamage;
+                    proj.stagger = _stats.GunStagger;
+                    // ---------------------
+
                     proj.Initialize(aimDir);
                 }
             }
+        }
+
+        // 1. Return the rate from Stats
+        protected override float GetCurrentFireRate()
+        {
+            return _stats.GunRate;
         }
     }
 }

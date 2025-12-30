@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
 
 namespace DarkTowerTron.Player
 {
@@ -10,11 +11,9 @@ namespace DarkTowerTron.Player
     {
         [Header("Weapon Base Stats")]
         public Transform firePoint;
-        public float baseFireRate = 0.2f;
         
         [Header("Audio")]
-        public AudioClip fireClip;
-        [Range(0f, 1f)] public float volume = 0.8f;
+        public SoundDef fireSound;
 
         [Header("Feel")]
         public float inputBufferTime = 0.2f;
@@ -50,18 +49,24 @@ namespace DarkTowerTron.Player
             {
                 Fire();
                 PlayFireSound();
-                _timer = baseFireRate / _stats.FireRateMultiplier;
+
+                // RESET TIMER: Child class must return the correct rate
+                _timer = GetCurrentFireRate();
+
                 _bufferTimer = 0;
             }
         }
 
+        // Abstract: Children must define where they get their speed from
+        protected abstract float GetCurrentFireRate();
         protected abstract void Fire();
 
         protected void PlayFireSound()
         {
-            if (fireClip && Managers.AudioManager.Instance)
+            // Use new system
+            if (fireSound && Managers.AudioManager.Instance)
             {
-                Managers.AudioManager.Instance.PlaySound(fireClip, volume, true);
+                Managers.AudioManager.Instance.PlaySound(fireSound);
             }
         }
 

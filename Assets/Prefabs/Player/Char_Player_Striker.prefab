@@ -922,9 +922,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
-  baseFireRate: 0.2
-  fireClip: {fileID: 8300000, guid: f16c082ad078e8943990c633ba1ea8b4, type: 3}
-  volume: 0.8
+  fireSound: {fileID: 11400000, guid: cc5967e00073e2247b05b155131c5da6, type: 2}
   inputBufferTime: 0.2
   bulletSpeed: 45
 --- !u!114 &3406123499475282924
@@ -940,9 +938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
-  baseFireRate: 0.2
-  fireClip: {fileID: 8300000, guid: 550cd03e285900e40b4fc9ce12aa32cb, type: 3}
-  volume: 0.8
+  fireSound: {fileID: 11400000, guid: 94fe90421e070e3479feb19132ca21bc, type: 2}
   inputBufferTime: 0.2
   range: 7
   beamRadius: 0.5

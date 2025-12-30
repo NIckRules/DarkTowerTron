@@ -8,61 +8,31 @@ namespace DarkTowerTron.Player
         [Header("Base Configuration")]
         public PlayerStatsSO baseStats;
 
-        // --- RUNTIME STATE ---
         public bool IsOverdrive { get; private set; }
 
-        // --- DYNAMIC PROPERTIES ---
-        // These calculate the final value every time they are asked
-
-        public float MoveSpeed
-        {
-            get
-            {
-                float val = baseStats.moveSpeed;
-                if (IsOverdrive) val *= baseStats.overdriveSpeedMult;
-                return val;
-            }
-        }
-
+        // --- MOVEMENT ---
+        public float MoveSpeed => IsOverdrive ? baseStats.moveSpeed * baseStats.overdriveSpeedMult : baseStats.moveSpeed;
         public float Acceleration => baseStats.acceleration;
 
+        // --- ABILITIES ---
         public float DashCost => baseStats.dashCost;
         public float DashDistance => baseStats.dashDistance;
         public float DashDuration => baseStats.dashCooldown;
 
-        public float DamageMultiplier
-        {
-            get
-            {
-                float val = baseStats.damageMultiplier;
-                if (IsOverdrive) val *= baseStats.overdriveDamageMult;
-                return val;
-            }
-        }
+        // --- WEAPON: GUN ---
+        public float GunDamage => IsOverdrive ? baseStats.gunDamage * baseStats.overdriveDamageMult : baseStats.gunDamage;
+        public float GunStagger => IsOverdrive ? baseStats.gunStagger * baseStats.overdriveDamageMult : baseStats.gunStagger;
+        // Rate: Lower is faster. If OverdriveMult is 1.5 (Faster), we divide the delay.
+        public float GunRate => IsOverdrive ? baseStats.gunFireRate / baseStats.overdriveFireRateMult : baseStats.gunFireRate;
 
-        // Lower is faster for fire rate delay
-        public float FireRateMultiplier
-        {
-            get
-            {
-                float val = baseStats.fireRateMultiplier;
-                // Example: Overdrive makes you shoot 50% faster (multiplier 1.5x)
-                // We handle the math in WeaponBase
-                if (IsOverdrive) val *= 1.5f;
-                return val;
-            }
-        }
-
-        // --- LOGIC ---
+        // --- WEAPON: BEAM ---
+        public float BeamDamage => IsOverdrive ? baseStats.beamDamage * baseStats.overdriveDamageMult : baseStats.beamDamage;
+        public float BeamStagger => IsOverdrive ? baseStats.beamStagger * baseStats.overdriveDamageMult : baseStats.beamStagger;
+        public float BeamRate => IsOverdrive ? baseStats.beamFireRate / baseStats.overdriveFireRateMult : baseStats.beamFireRate;
 
         public void SetOverdrive(bool state)
         {
-            if (IsOverdrive != state)
-            {
-                IsOverdrive = state;
-                // Optional: Trigger Visuals/Sound here later
-                Debug.Log($"Overdrive State: {state}");
-            }
+            IsOverdrive = state;
         }
     }
 }

@@ -56,9 +56,11 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
         private void Start()
         {
-            // Find Player
-            GameObject p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
-            if (p) _player = p.transform;
+            // Use Service Locator for player reference
+            if (GameServices.Player != null)
+            {
+                _player = GameServices.Player.transform;
+            }
 
             // Setup
             SetShield(true);
@@ -210,9 +212,8 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         {
             if (_player == null)
             {
-                // Re-acquire if lost
-                var p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
-                if (p) _player = p.transform;
+                // Re-acquire if lost via Service Locator
+                if (GameServices.Player != null) _player = GameServices.Player.transform;
             }
             return _player;
         }

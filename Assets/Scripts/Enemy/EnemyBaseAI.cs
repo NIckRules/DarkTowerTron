@@ -47,13 +47,17 @@ namespace DarkTowerTron.Enemy
 
         protected virtual void Start()
         {
-            GameObject p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
-            if (p)
+            // OLD:
+            // GameObject p = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
+            // if (p) { _player = p.transform; ... }
+
+            // NEW: Use the Service Locator
+            if (GameServices.Player != null)
             {
-                _player = p.transform;
+                _player = GameServices.Player.transform;
                 _currentTarget = _player;
             }
-
+            
             GameEvents.OnDecoySpawned += OnDecoySpawned;
             GameEvents.OnDecoyExpired += OnDecoyExpired;
         }

@@ -1,0 +1,81 @@
+using UnityEngine;
+using DarkTowerTron.Core;
+using DG.Tweening;
+
+namespace DarkTowerTron.Player
+{
+    // RENAMED: Was PlayerAttack
+    public class PlayerBeam : WeaponBase
+    {
+        [Header("Beam Specifics")]
+        public float range = 7f;
+        public float beamRadius = 0.5f;
+        public float selfRecoil = 15f;
+        public LayerMask hitLayers;
+        public GameObject beamVisualPrefab;
+
+        private PlayerMovement _movement;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _movement = GetComponent<PlayerMovement>();
+        }
+
+        // Implement Abstract Method from WeaponBase
+        protected override float GetCurrentFireRate()
+        {
+            // Read specific Beam stat
+            return _stats.BeamRate;
+        }
+
+        protected override void Fire()
+        {
+            Vector3 fireDir = GetAimDirection();
+
+            // 1. Visuals
+            if (beamVisualPrefab)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(fireDir);
+                GameObject beam = Instantiate(beamVisualPrefab, firePoint.position, targetRot, firePoint);
+
+                Vector3 parentScale = firePoint.lossyScale;
+                float compX = beamRadius / parentScale.x;
+                float compY = beamRadius / parentScale.y;
+                float compZ = range / parentScale.z;
+
+                beam.transform.localScale = new Vector3(compX, compY, 0f);
+                beam.transform.DOScaleZ(compZ, 0.1f).OnComplete(() => Destroy(beam, 0.1f));
+            }
+
+            // 2. Recoil
+            if (_movement)
+            {
+                _movement.ApplyKnockback(-fireDir * selfRecoil);
+            }
+
+            // 3. Hit Detection
+            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, hitLayers))
+            {
+                IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
+
+                if (target != null)
+                {
+                    DamageInfo info = new DamageInfo
+                    {
+                        // Read Stats
+                        damageAmount = _stats.BeamDamage,
+                        staggerAmount = _stats.BeamStagger,
+
+                        pushDirection = fireDir,
+                        pushForce = 10f,
+                        source = gameObject
+                    };
+
+                    target.TakeDamage(info);
+                    GameEvents.OnPlayerHit?.Invoke();
+                }
+            }
+        }
+    }
+}

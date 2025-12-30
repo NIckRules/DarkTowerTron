@@ -7,10 +7,10 @@ namespace DarkTowerTron.Managers
 {
     public class FeedbackDirector : MonoBehaviour
     {
-        [Header("Global Audio")]
-        public AudioClip hitClip;
-        public AudioClip killClip;
-        public AudioClip playerHurtClip;
+        [Header("Profiles")]
+        public FeedbackProfileSO hitProfile;
+        public FeedbackProfileSO killProfile;
+        public FeedbackProfileSO playerHurtProfile;
 
         [Header("Hull")]
         public AudioClip hullBreakClip; // Drag "Glass Shatter" or "Alarm" here
@@ -49,23 +49,30 @@ namespace DarkTowerTron.Managers
 
         private void OnPlayerHit()
         {
-            // 1. Audio
-            if (AudioManager.Instance) AudioManager.Instance.PlaySound(playerHurtClip);
-
-            // 2. Camera
-            if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.3f, 0.5f);
-
-            // 3. Time
-            if (GameTime.Instance) GameTime.Instance.HitStop(0.1f);
+            ApplyProfile(playerHurtProfile);
         }
 
         private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
-            // 1. Audio
-            if (AudioManager.Instance) AudioManager.Instance.PlaySound(killClip, 0.8f);
+            ApplyProfile(killProfile);
+        }
 
-            // 2. Camera (Lighter shake)
-            if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.15f, 0.2f);
+        // --- HELPER ---
+        private void ApplyProfile(FeedbackProfileSO profile)
+        {
+            if (profile == null) return;
+
+            // 1. Audio
+            if (profile.sound && Managers.AudioManager.Instance)
+                Managers.AudioManager.Instance.PlaySound(profile.sound);
+
+            // 2. Camera
+            if (Visuals.CameraShaker.Instance)
+                Visuals.CameraShaker.Instance.Shake(profile.shakeDuration, profile.shakeStrength);
+
+            // 3. Time
+            if (Core.GameTime.Instance && profile.hitStopDuration > 0)
+                Core.GameTime.Instance.HitStop(profile.hitStopDuration);
         }
     }
 }
