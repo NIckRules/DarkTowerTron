@@ -1,28 +1,28 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Data; // For SoundDef
+using DarkTowerTron.Managers; // For AudioManager
 
 namespace DarkTowerTron.Player
 {
-    // Abstract means you can't put this directly on an object, 
-    // you must extend it (like PlayerGun : WeaponBase)
     [RequireComponent(typeof(PlayerStats))]
     public abstract class WeaponBase : MonoBehaviour, IWeapon
     {
         [Header("Weapon Base Stats")]
         public Transform firePoint;
-        
+
         [Header("Audio")]
         public SoundDef fireSound;
 
         [Header("Feel")]
         public float inputBufferTime = 0.2f;
 
+        protected PlayerStats _stats;
+        protected TargetScanner _scanner;
+
         protected float _timer;
         protected float _bufferTimer;
         protected bool _isFiring;
-        protected TargetScanner _scanner;
-        protected PlayerStats _stats;
 
         protected virtual void Awake()
         {
@@ -50,32 +50,26 @@ namespace DarkTowerTron.Player
                 Fire();
                 PlayFireSound();
 
-                // RESET TIMER: Child class must return the correct rate
+                // Get rate dynamically from the specific weapon implementation
                 _timer = GetCurrentFireRate();
 
                 _bufferTimer = 0;
             }
         }
 
-        // Abstract: Children must define where they get their speed from
+        // Abstract Methods
         protected abstract float GetCurrentFireRate();
         protected abstract void Fire();
 
+        // Helpers
         protected void PlayFireSound()
         {
-            // Use new system
-            if (fireSound && Managers.AudioManager.Instance)
+            if (fireSound && AudioManager.Instance)
             {
-                Managers.AudioManager.Instance.PlaySound(fireSound);
+                AudioManager.Instance.PlaySound(fireSound);
             }
         }
 
-        // --- SHARED HELPER METHODS ---
-
-        /// <summary>
-        /// Calculates the best firing direction. 
-        /// Defaults to forward. If Locked On, aims at Enemy Center Mass.
-        /// </summary>
         protected Vector3 GetAimDirection()
         {
             if (firePoint == null) return transform.forward;
@@ -84,11 +78,11 @@ namespace DarkTowerTron.Player
 
             if (_scanner != null && _scanner.CurrentTarget != null)
             {
+                // Aim at the specific target transform
                 Vector3 targetPos = _scanner.CurrentTarget.transform.position;
-                
-                // FIX: Access GetComponent via the .transform property
+
+                // Try to find center of mass via Collider
                 var col = _scanner.CurrentTarget.transform.GetComponent<Collider>();
-                
                 if (col != null) targetPos = col.bounds.center;
 
                 aimDir = (targetPos - firePoint.position).normalized;

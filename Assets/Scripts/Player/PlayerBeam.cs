@@ -4,7 +4,6 @@ using DG.Tweening;
 
 namespace DarkTowerTron.Player
 {
-    // RENAMED: Was PlayerAttack
     public class PlayerBeam : WeaponBase
     {
         [Header("Beam Specifics")]
@@ -22,10 +21,8 @@ namespace DarkTowerTron.Player
             _movement = GetComponent<PlayerMovement>();
         }
 
-        // Implement Abstract Method from WeaponBase
         protected override float GetCurrentFireRate()
         {
-            // Read specific Beam stat
             return _stats.BeamRate;
         }
 
@@ -36,9 +33,16 @@ namespace DarkTowerTron.Player
             // 1. Visuals
             if (beamVisualPrefab)
             {
-                Quaternion targetRot = Quaternion.LookRotation(fireDir);
-                GameObject beam = Instantiate(beamVisualPrefab, firePoint.position, targetRot, firePoint);
+                // Rotate firePoint temporarily to align the instantiated child
+                Quaternion originalRot = firePoint.rotation;
+                firePoint.rotation = Quaternion.LookRotation(fireDir);
 
+                GameObject beam = Instantiate(beamVisualPrefab, firePoint.position, firePoint.rotation, firePoint);
+
+                // Restore rotation (optional, usually safer)
+                firePoint.rotation = originalRot;
+
+                // Scale Correction
                 Vector3 parentScale = firePoint.lossyScale;
                 float compX = beamRadius / parentScale.x;
                 float compY = beamRadius / parentScale.y;
@@ -63,10 +67,8 @@ namespace DarkTowerTron.Player
                 {
                     DamageInfo info = new DamageInfo
                     {
-                        // Read Stats
                         damageAmount = _stats.BeamDamage,
                         staggerAmount = _stats.BeamStagger,
-
                         pushDirection = fireDir,
                         pushForce = 10f,
                         source = gameObject

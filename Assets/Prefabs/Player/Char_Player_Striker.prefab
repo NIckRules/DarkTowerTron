@@ -838,8 +838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2267156712e0248a224233bd101a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deceleration: 40
-  rotationSpeed: 25
   wallBuffer: 0.7
   repulsionForce: 120
   wallLayer:

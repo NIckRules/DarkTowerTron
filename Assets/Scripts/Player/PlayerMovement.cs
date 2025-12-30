@@ -8,54 +8,57 @@ namespace DarkTowerTron.Player
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerMovement : MonoBehaviour
     {
-        [Header("Motion Settings")]
-        public float deceleration = 40f;
-        public float rotationSpeed = 25f;
-
-        [Header("Wall Repulsion (Anti-Stick)")]
-        public float wallBuffer = 0.6f; // How close before we push back (0.5 is player radius)
-        public float repulsionForce = 5f; // How hard we push
+        [Header("Wall Repulsion")]
+        public float wallBuffer = 0.7f;
+        public float repulsionForce = 10f;
         public LayerMask wallLayer;
 
         [Header("Physics")]
-        public float gravity = 20f; // Gravity is controlled here
+        public float gravity = 20f;
 
         [Header("Safety Net")]
-        public float safeGroundTimer = 0.5f; // Time required to be grounded to count as "Safe"
-        
-        // Read-only property for the Health script to access
+        public float safeGroundTimer = 0.5f;
+
+        // Public Properties
+        public Vector3 MoveInput => _inputDir;
         public Vector3 LastSafePosition { get; private set; }
 
-        // Expose input for Blitz
-        public Vector3 MoveInput => _inputDir;
-
+        // Dependencies
         private KinematicMover _mover;
-        private Camera _cam;
         private PlayerStats _stats;
+        private Camera _cam;
 
+        // State
         private Vector3 _inputDir;
         private Vector3 _currentVelocity;
         private Vector3 _externalForce;
-        private float _groundedTimer;
         private float _gravitySuspendTimer = 0f;
-        
-        // Cache for optimization
-        private Collider[] _wallBuffer = new Collider[5];
+        private float _groundedTimer;
 
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
-            _cam = Camera.main;
             _stats = GetComponent<PlayerStats>();
+            _cam = Camera.main;
 
-            // Default mask if not set
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
+            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", "Wall");
         }
 
         private void Start()
         {
             LastSafePosition = transform.position;
         }
+
+        private void Update()
+        {
+            // Update Timers
+            if (_gravitySuspendTimer > 0) _gravitySuspendTimer -= Time.deltaTime;
+
+            HandleVelocity();
+            HandleSafeGround();
+        }
+
+        // --- PUBLIC API ---
 
         public void SetMoveInput(Vector3 dir)
         {
@@ -68,14 +71,14 @@ namespace DarkTowerTron.Player
             if (direction.sqrMagnitude > 0.001f)
             {
                 Quaternion targetRot = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+                // Hardcoded rotation speed is fine, or add to stats if needed
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 25f * Time.deltaTime);
             }
         }
 
         public void LookAtMouse(Vector2 mouseScreenPos)
         {
             Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
-            // Use UnityEngine.Physics to disambiguate
             if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
             {
                 Vector3 lookDir = hit.point - transform.position;
@@ -85,40 +88,47 @@ namespace DarkTowerTron.Player
 
         public void ApplyKnockback(Vector3 force)
         {
-            force.y = 0;
+            force.y = 0; // Flatten
             _externalForce += force;
         }
 
-        private void Update()
+        public void SuspendGravity(float duration)
         {
-
-            if (_gravitySuspendTimer > 0) _gravitySuspendTimer -= Time.deltaTime;
-
-            HandleVelocity();
-            HandleSafeGround();
+            _gravitySuspendTimer = duration;
+            if (_externalForce.y < 0) _externalForce.y = 0;
+            if (_currentVelocity.y < 0) _currentVelocity.y = 0;
         }
+
+        public void ResetVelocity()
+        {
+            _currentVelocity = Vector3.zero;
+            _externalForce = Vector3.zero;
+            _inputDir = Vector3.zero;
+        }
+
+        // --- INTERNAL LOGIC ---
 
         private void HandleVelocity()
         {
             float dt = Time.deltaTime;
 
-            // 1. Calculate Target (Inputs)
+            // 1. Calculate Target Velocity (Input + Wall Repulsion)
             Vector3 targetVel = _inputDir * _stats.MoveSpeed;
             Vector3 wallPush = CalculateWallRepulsion();
             targetVel += wallPush;
 
-            // 2. Acceleration
+            // 2. Accelerate / Decelerate
             if (_inputDir.magnitude > 0.1f)
             {
                 _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, _stats.Acceleration * dt);
             }
             else
             {
-                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, deceleration * dt);
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, 40f * dt); // Default friction
                 if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
             }
 
-            // 3. External Forces (Recoil/Knockback)
+            // 3. Handle External Forces (Knockback decay)
             if (_externalForce.magnitude > 0.1f)
             {
                 _externalForce = Vector3.Lerp(_externalForce, Vector3.zero, 5f * dt);
@@ -128,11 +138,9 @@ namespace DarkTowerTron.Player
                 _externalForce = Vector3.zero;
             }
 
-            // 4. COMBINE (No dt multiplication here!)
             Vector3 finalVelocity = _currentVelocity + _externalForce;
 
-            // --- GRAVITY LOGIC UPDATE ---
-            // Only apply gravity if NOT grounded AND NOT suspended
+            // 4. Apply Gravity
             if (!_mover.IsGrounded && _gravitySuspendTimer <= 0)
             {
                 finalVelocity.y -= gravity;
@@ -143,44 +151,49 @@ namespace DarkTowerTron.Player
             }
             else
             {
-                // We are in Air + Suspended = Zero Gravity (Hover)
-                finalVelocity.y = 0f;
+                finalVelocity.y = 0f; // Hovering
             }
-            // ----------------------------
 
-            // 6. EXECUTE
+            // 5. Execute
             _mover.Move(finalVelocity);
         }
 
-        // NEW METHOD: Call this when teleporting/respawning
-        public void ResetVelocity()
+        private Vector3 CalculateWallRepulsion()
         {
-            _currentVelocity = Vector3.zero;
-            _externalForce = Vector3.zero;
-            _inputDir = Vector3.zero; // Optional: Stop input until player presses again
+            Vector3 push = Vector3.zero;
+            Collider[] buffer = new Collider[5];
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, buffer, wallLayer);
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 closestPoint = buffer[i].ClosestPoint(transform.position + Vector3.up);
+                Vector3 dir = (transform.position - closestPoint);
+                dir.y = 0;
+
+                float dist = dir.magnitude;
+                if (dist < wallBuffer)
+                {
+                    push += dir.normalized * repulsionForce;
+                }
+            }
+            return push;
         }
 
         private void HandleSafeGround()
         {
-            // STRICT CHECK:
-            // 1. Must be physically grounded (Motor check)
-            // 2. Must have ground directly beneath center (Raycast check)
-            // This prevents saving "The Edge" as a safe spot.
-            
-            bool isCenterSupported = false;
-            
-            // Cast from slightly up, downwards. Check GROUND layer only.
-            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, 2.0f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
-            {
-                isCenterSupported = true;
-            }
+            // Raycast check for center-mass stability
+            bool isCenterSupported = UnityEngine.Physics.Raycast(
+                transform.position + Vector3.up * 0.5f,
+                Vector3.down,
+                2.0f,
+                LayerMask.GetMask(GameConstants.LAYER_GROUND)
+            );
 
             if (_mover.IsGrounded && isCenterSupported)
             {
                 _groundedTimer += Time.deltaTime;
                 if (_groundedTimer > safeGroundTimer)
                 {
-                    // Save position slightly higher to prevent floor clipping
                     LastSafePosition = transform.position + Vector3.up * 0.2f;
                 }
             }
@@ -188,49 +201,6 @@ namespace DarkTowerTron.Player
             {
                 _groundedTimer = 0f;
             }
-        }
-
-        private Vector3 CalculateWallRepulsion()
-        {
-            Vector3 push = Vector3.zero;
-
-            // Find walls within buffer range
-            // We use the player's position + slight up offset (center of mass)
-            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, _wallBuffer, wallLayer);
-
-            for (int i = 0; i < count; i++)
-            {
-                Collider wall = _wallBuffer[i];
-
-                // Find the closest point on the wall's surface to the player
-                Vector3 closestPoint = wall.ClosestPoint(transform.position + Vector3.up);
-
-                // Calculate direction AWAY from wall
-                Vector3 dir = (transform.position - closestPoint);
-                dir.y = 0; // Keep it flat
-
-                float dist = dir.magnitude;
-
-                // If we are actually inside/touching/near the wall
-                if (dist < wallBuffer)
-                {
-                    // The closer we are, the stronger the push
-                    // Normalized push * strength
-                    push += dir.normalized * repulsionForce;
-                }
-            }
-
-            return push;
-        }
-
-        public void SuspendGravity(float duration)
-        {
-            _gravitySuspendTimer = duration;
-
-            // CRITICAL: Kill existing downward momentum immediately
-            // so we don't carry "falling speed" into the hover.
-            if (_externalForce.y < 0) _externalForce.y = 0;
-            if (_currentVelocity.y < 0) _currentVelocity.y = 0;
         }
     }
 }
