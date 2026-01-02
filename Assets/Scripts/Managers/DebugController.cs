@@ -15,6 +15,9 @@ namespace DarkTowerTron.Managers
         public bool godMode = false;
         public bool infiniteFocus = false;
 
+		[Header("Visualization")]
+		public bool showEnemyStats = true; // Toggle this in Inspector
+
         [Header("Spawn Keys (NumPad)")]
         public GameObject[] enemiesToSpawn;
 
@@ -29,34 +32,43 @@ namespace DarkTowerTron.Managers
         // Changed void to IEnumerator to allow waiting
         private IEnumerator Start()
         {
-            // Wait for GameServices to initialize first
+            // Wait one frame so core systems (GameSession, GameServices) can boot
             yield return null; 
 
-            // NEW: Use Service Locator for player components
+            // 1. Auto-Start Logic
+            if (autoStartGame)
+            {
+                var session = FindObjectOfType<GameSession>();
+                if (session)
+                {
+                    Debug.Log("<color=yellow>[DEBUG] Auto-Starting Game...</color>");
+                    session.BeginGame();
+
+                    // Force combat state so focus decay and combat systems are active while testing
+                    GameEvents.OnWaveCombatStarted?.Invoke();
+                }
+            }
+
+            // 2. Locate player via GameServices
             if (GameServices.Player != null)
             {
                 _energy = GameServices.Player.GetComponent<PlayerEnergy>();
                 _health = GameServices.Player.GetComponent<PlayerHealth>();
                 _loadout = GameServices.Player.GetComponent<PlayerLoadout>();
             }
-
-            // 2. Auto-Start Logic
-            if (autoStartGame)
-            {
-                // Wait one frame to ensure GameSession.Start() has finished setting up UI
-                yield return null;
-
-                var session = FindObjectOfType<GameSession>();
-                if (session)
-                {
-                    Debug.Log("<color=yellow>[DEBUG] Auto-Starting Game...</color>");
-                    session.BeginGame();
-                }
-            }
         }
 
         private void Update()
         {
+            // Sync the static flag for enemy debug gizmos
+            DarkTowerTron.Combat.DamageReceiver.EnableDebugGizmos = showEnemyStats;
+
+            // Keyboard Shortcut (e.g. Tab) to toggle
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                showEnemyStats = !showEnemyStats;
+            }
+
             // 1. Time Control
             if (Input.GetKeyDown(KeyCode.T))
             {

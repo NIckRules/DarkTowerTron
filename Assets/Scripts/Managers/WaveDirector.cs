@@ -49,14 +49,14 @@ namespace DarkTowerTron.Managers
             // Stop condition: all waves complete
             if (index >= waves.Count)
             {
-                Debug.Log("ROOM CLEARED");
+                GameLogger.Log(LogChannel.System, "ROOM CLEARED", gameObject);
                 // Open the doors. Boss script will handle Victory separately.
                 GameEvents.OnRoomCleared?.Invoke();
                 yield break;
             }
 
             WaveDefinitionSO wave = waves[index];
-            Debug.Log($"WAVE {index + 1}: {wave.waveName}");
+            GameLogger.Log(LogChannel.System, $"WAVE {index + 1}: {wave.waveName}", gameObject);
 
             // --- COUNTDOWN ---
             GameEvents.OnWaveAnnounce?.Invoke(index);
@@ -118,7 +118,7 @@ namespace DarkTowerTron.Managers
             
             if (prefab == null)
             {
-                Debug.LogError($"WaveDirector: Attempted to spawn NULL prefab.");
+                GameLogger.LogError(LogChannel.System, $"WaveDirector: Attempted to spawn NULL prefab.", gameObject);
                 return;
             }
 
@@ -137,7 +137,7 @@ namespace DarkTowerTron.Managers
             }
             else
             {
-                Debug.LogWarning($"Enemy {instance.name} missing Stats! Defaulting to Essential.");
+                GameLogger.LogWarning(LogChannel.System, $"Enemy {instance.name} missing Stats! Defaulting to Essential.", instance);
                 countAsEssential = true;
             }
 
@@ -157,7 +157,7 @@ namespace DarkTowerTron.Managers
                 if (_essentialEnemiesAlive <= 0)
                 {
                     if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
-                    Debug.Log("VIPs Down. Reinforcements Stopped.");
+                    GameLogger.Log(LogChannel.System, "VIPs Down. Reinforcements Stopped.", gameObject);
                 }
             }
             else
@@ -174,7 +174,7 @@ namespace DarkTowerTron.Managers
             // VICTORY CONDITION: Room must be totally silent.
             if (_essentialEnemiesAlive <= 0 && _gruntsAlive <= 0 && !_isSpawningMain)
             {
-                Debug.Log("WAVE CLEARED - SECTOR SECURE");
+                GameLogger.Log(LogChannel.System, "WAVE CLEARED - SECTOR SECURE", gameObject);
 
                 if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
 

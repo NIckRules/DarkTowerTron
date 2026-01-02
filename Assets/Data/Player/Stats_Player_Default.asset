@@ -16,16 +16,18 @@ MonoBehaviour:
   acceleration: 60
   maxGrit: 3
   maxFocus: 100
+  focusDecayRate: 5
+  baseFocusOnKill: 30
   dashCost: 25
   dashDistance: 8
   dashCooldown: 0.15
-  gunFireRate: 0.5
+  gunFireRate: 0.8
   gunDamage: 0
   gunStagger: 1
   beamFireRate: 0.4
-  beamDamage: 10
+  beamDamage: 1
   beamStagger: 0
-  overdriveThreshold: 80
+  overdriveThreshold: 95
   overdriveSpeedMult: 1.2
   overdriveDamageMult: 2
   overdriveFireRateMult: 1.5

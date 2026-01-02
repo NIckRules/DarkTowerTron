@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 211356257347300322}
   - component: {fileID: 1527507773856463301}
   - component: {fileID: 1839963594574695099}
+  - component: {fileID: 7024901233131177813}
   m_Layer: 7
   m_Name: Enemy_Chaser_Basic
   m_TagString: Enemy
@@ -217,6 +218,21 @@ MonoBehaviour:
   chaseBehaviors:
   - {fileID: 11400000, guid: a9aa5036245d66e408d847a7f9f7750e, type: 2}
   - {fileID: 11400000, guid: b1e853f3913cd434ca7f324824d176f1, type: 2}
+--- !u!114 &7024901233131177813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3473038045254472648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bb24f46c1199614c8937a8d271167dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 10
+  _maxStagger: 1
+  _staggerDecay: 1
 --- !u!1 &3806107326065917591
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,6 +244,7 @@ GameObject:
   - component: {fileID: 7885210537638490098}
   - component: {fileID: 8646531339429306655}
   - component: {fileID: 2571947157768207275}
+  - component: {fileID: 9008431965790984371}
   m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
@@ -300,3 +317,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9008431965790984371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3806107326065917591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e4551bf74c0bd1458057a1697802711, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _health: {fileID: 7024901233131177813}

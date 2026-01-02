@@ -78,6 +78,9 @@ namespace DarkTowerTron.Combat
                         pushDirection = dir,
                         pushForce = knockbackForce,
                         source = gameObject
+                        ,
+                        // NEW: Environment
+                        damageType = DamageType.Environment
                     };
 
                     target.TakeDamage(info);

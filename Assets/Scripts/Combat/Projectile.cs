@@ -19,11 +19,13 @@ namespace DarkTowerTron.Combat
 
         [Header("Damage Stats")]
         public float damage = 10f;
-        public float stagger = 0f;
+        [Min(0)] public int stagger = 1; // Changed to Int
+        public DamageType damageType = DamageType.Projectile; // NEW
 
         [Header("Visuals")]
         public Renderer meshRenderer; 
-        public Material friendlyMaterial;
+        public Material friendlyMaterial; // Used when Player Blitzes
+        public Material hostileMaterial;  // NEW: Used when Enemy Shield Reflects
 
         private Material _originalMaterial;
         private Vector3 _direction;
@@ -31,6 +33,8 @@ namespace DarkTowerTron.Combat
         private bool _isInitialized = false;
         private bool _isRedirected = false; 
         private float _lifeTimer;
+        // NEW: State to prevent self-destruction on bounce
+        private bool _wasDeflectedThisFrame = false;
         private float _graceTimer;
 
         private void Awake()
@@ -71,28 +75,54 @@ namespace DarkTowerTron.Combat
         private void Update()
         {
             if (!_isInitialized) return;
-            
+            _wasDeflectedThisFrame = false; // Reset flag every frame
+
             // Countdown Grace Period
             if (_graceTimer > 0) _graceTimer -= Time.deltaTime;
 
-            transform.Translate(_direction * speed * Time.deltaTime, Space.World);
+            float moveDistance = speed * Time.deltaTime;
+
+            // --- ANTI-TUNNELING RAYCAST ---
+            // Cast a ray forward equal to the distance we are about to move
+            // We combine all relevant layers into one mask
+            int layerMask = LayerMask.GetMask("Default", "Wall", "Player", "Enemy");
+
+            if (UnityEngine.Physics.Raycast(transform.position, _direction, out RaycastHit hit, moveDistance, layerMask))
+            {
+                // IGNORE SELF / SOURCE
+                if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform))) 
+                {
+                    // Move normally if we hit the shooter (avoid stuck bullets)
+                    transform.Translate(_direction * moveDistance, Space.World);
+                }
+                else
+                {
+                    // WE HIT SOMETHING!
+                    // Move to the hit point
+                    transform.position = hit.point;
+                    // Trigger collision logic manually
+                    HandleCollision(hit.collider);
+                    return; // Stop moving this frame
+                }
+            }
+            else
+            {
+                // Clear path, move forward
+                transform.Translate(_direction * moveDistance, Space.World);
+            }
+            // -----------------------------
 
             _lifeTimer -= Time.deltaTime;
             if (_lifeTimer <= 0) Despawn();
         }
 
-        private void OnTriggerEnter(Collider other)
+        // Refactored logic from OnTriggerEnter to a shared method
+        private void HandleCollision(Collider other)
         {
-            // SAFETY CHECK: If grace period active, ignore everything
+            // Respect grace period
             if (_graceTimer > 0) return;
 
-            if (other.isTrigger) return;
-
-            // FIX: Ignore the shooter (and its children/parents usually)
-            if (_source != null && (other.gameObject == _source || other.transform.IsChildOf(_source.transform)))
-            {
-                return;
-            }
+            if (other.isTrigger && other.GetComponent<ShieldHitbox>() == null) return; // Ignore random triggers, but hit Shields
 
             // Wall Check
             if ((wallLayer.value & (1 << other.gameObject.layer)) > 0)
@@ -114,11 +144,50 @@ namespace DarkTowerTron.Combat
                     pushDirection = _direction,
                     pushForce = 5f,
                     source = gameObject,
-                    isRedirected = this._isRedirected 
+                    isRedirected = this._isRedirected,
+                    damageType = this.damageType
                 };
 
-                if (target.TakeDamage(info)) Despawn();
+                if (target.TakeDamage(info))
+                {
+                    if (!_wasDeflectedThisFrame) Despawn();
+                }
             }
+        }
+
+        // Keep OnTriggerEnter as a backup for overlaps
+        private void OnTriggerEnter(Collider other)
+        {
+             HandleCollision(other);
+        }
+
+        // --- NEW METHOD FOR SHIELDS ---
+        public void DeflectByEnemy(Vector3 surfaceNormal)
+        {
+            _wasDeflectedThisFrame = true;
+            isHostile = true; // Now it hurts the player!
+
+            // 1. Physics Math
+            _direction = Vector3.Reflect(_direction, surfaceNormal).normalized;
+            transform.rotation = Quaternion.LookRotation(_direction);
+            speed *= 1.2f;
+
+            // 2. Visual Change
+            if (meshRenderer)
+            {
+                if (hostileMaterial)
+                {
+                    meshRenderer.material = hostileMaterial;
+                }
+                else
+                {
+                    // Fallback
+                    meshRenderer.material.color = Color.red;
+                }
+            }
+            
+            // 3. Reset Timer
+            _lifeTimer = lifetime;
         }
 
         public void Redirect(Vector3 newDirection, GameObject newOwner)

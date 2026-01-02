@@ -30,8 +30,8 @@ namespace DarkTowerTron.Core.Data
 
         [Header("Combat & Stagger")]
         public float maxHealth = 10f; // NEW: Actual HP
-        public float maxStagger = 1.0f;
-        public float staggerDecay = 0.5f;
+        [Min(1)] public int maxStagger = 3; // INT (e.g. 3 hits)
+        public float staggerDecay = 1.0f; // Decay speed (1 per second)
 
         [Header("Defenses")]
         public bool hasFrontalShield = false;
@@ -55,9 +55,9 @@ namespace DarkTowerTron.Core.Data
             // Prevent 0 HP zombies
             maxHealth = Mathf.Max(1f, maxHealth);
 
-            // Prevent divide-by-zero or weird logic in Stagger
-            maxStagger = Mathf.Max(0.1f, maxStagger);
-            staggerDecay = Mathf.Max(0.1f, staggerDecay);
+            // Stagger must be a positive integer and decay shouldn't be zero
+            maxStagger = Mathf.Max(1, maxStagger);
+            staggerDecay = Mathf.Max(0.01f, staggerDecay);
 
             // Flocking safety
             separationRadius = Mathf.Max(0.1f, separationRadius);

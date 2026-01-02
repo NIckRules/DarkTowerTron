@@ -67,7 +67,7 @@ namespace DarkTowerTron.Core
             OnDecoyExpired = null;
             OnScoreChanged = null;
             
-            Debug.Log("[GameEvents] All static listeners cleared.");
+            GameLogger.Log(LogChannel.System, "[GameEvents] All static listeners cleared.", null);
         }
     }
 }

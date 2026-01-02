@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 419b632810dcd054091da8b034b8e1d5, type: 2}
+  - {fileID: 2100000, guid: 77736e828f9e8074798c85575b33cf35, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -203,10 +203,13 @@ MonoBehaviour:
   speed: 15
   lifetime: 5
   isHostile: 1
-  damage: 1
-  stagger: 0
-  meshRenderer: {fileID: 7853976462343550844}
-  friendlyMaterial: {fileID: 2100000, guid: cf01d22f2a790404ab04b7f9db4fdc89, type: 2}
+  gracePeriod: 0.05
   wallLayer:
     serializedVersion: 2
     m_Bits: 0
+  damage: 1
+  stagger: 0
+  damageType: 1
+  meshRenderer: {fileID: 7853976462343550844}
+  friendlyMaterial: {fileID: 2100000, guid: 3a04aa1b05131a14e9ff984a6458bdc6, type: 2}
+  hostileMaterial: {fileID: 2100000, guid: 77736e828f9e8074798c85575b33cf35, type: 2}

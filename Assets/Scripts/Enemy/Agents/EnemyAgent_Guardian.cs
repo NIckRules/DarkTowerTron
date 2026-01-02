@@ -62,7 +62,7 @@ namespace DarkTowerTron.Enemy.Agents
             }
             else
             {
-                Debug.LogWarning($"{name}: No PatrolPath found! Standing still.");
+                GameLogger.LogWarning(LogChannel.AI, $"{name}: No PatrolPath found! Standing still.", gameObject);
                 FSM.Initialize(StateAttack);
             }
         }

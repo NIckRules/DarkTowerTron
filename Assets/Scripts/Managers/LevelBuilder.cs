@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Environment;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Managers
 {
@@ -36,7 +37,7 @@ namespace DarkTowerTron.Managers
                     current.SnapTo(previous.exitPoint);
                 }
             }
-            Debug.Log("Level Snapped!");
+            GameLogger.Log(LogChannel.System, "Level Snapped!", gameObject);
         }
     }
 }

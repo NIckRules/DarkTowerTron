@@ -1,22 +1,18 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
+using DarkTowerTron.Core.Data;
 
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerEnergy : MonoBehaviour
     {
-        [Header("Stats")]
-        public float maxFocus = 100f;
-        public float decayRate = 5f;
-
-        [Header("Rewards (Defaults)")]
-        public float defaultFocusOnKill = 30f;
+        // NO INSPECTOR VARIABLES! All data comes from PlayerStats.
 
         private float _currentFocus;
         private bool _isDead;
-        private bool _isCombatActive = false;
+        private bool _isCombatActive = false; 
+
         private PlayerStats _stats;
 
         private void Awake()
@@ -26,15 +22,24 @@ namespace DarkTowerTron.Player
 
         private void Start()
         {
-            _currentFocus = maxFocus;
+            if (_stats == null)
+            {
+                GameLogger.LogError(LogChannel.Player, "PlayerEnergy missing PlayerStats component!", gameObject);
+                return;
+            }
 
+            // Init
+            _currentFocus = _stats.MaxFocus;
+            GameLogger.Log(LogChannel.Player, $"Energy Initialized. Max: {_stats.MaxFocus}", gameObject);
+
+            // Subscriptions
             GameEvents.OnEnemyKilled += OnEnemyKilled;
             GameEvents.OnPlayerDied += OnPlayerDied;
-
+            
             GameEvents.OnWaveCombatStarted += EnableDecay;
             GameEvents.OnWaveCleared += DisableDecay;
             GameEvents.OnGameVictory += DisableDecay;
-
+            
             UpdateUI();
         }
 
@@ -42,7 +47,7 @@ namespace DarkTowerTron.Player
         {
             GameEvents.OnEnemyKilled -= OnEnemyKilled;
             GameEvents.OnPlayerDied -= OnPlayerDied;
-
+            
             GameEvents.OnWaveCombatStarted -= EnableDecay;
             GameEvents.OnWaveCleared -= DisableDecay;
             GameEvents.OnGameVictory -= DisableDecay;
@@ -52,29 +57,22 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return;
 
-            // Overdrive check
+            // Check Overdrive Threshold via Stats
+            // (We assume the threshold is static in SO for now)
             bool shouldBeOverdrive = _currentFocus >= _stats.baseStats.overdriveThreshold;
             _stats.SetOverdrive(shouldBeOverdrive);
 
-            // Decay logic
+            // Decay Logic
             if (_isCombatActive && _currentFocus > 0)
             {
-                _currentFocus -= decayRate * Time.deltaTime;
+                _currentFocus -= _stats.FocusDecayRate * Time.deltaTime;
                 if (_currentFocus < 0) _currentFocus = 0;
+                
                 UpdateUI();
             }
         }
 
-        // --- FIXED SIGNATURE ---
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
-        {
-            if (!rewardPlayer) return;
-
-            // Use specific reward if available, otherwise default
-            float reward = (stats != null) ? stats.focusReward : defaultFocusOnKill;
-            AddFocus(reward);
-        }
-        // -----------------------
+        // --- PUBLIC API ---
 
         public bool HasFocus(float amount)
         {
@@ -94,19 +92,42 @@ namespace DarkTowerTron.Player
 
         public void AddFocus(float amount)
         {
+            float max = _stats.MaxFocus;
             _currentFocus += amount;
-            if (_currentFocus > maxFocus) _currentFocus = maxFocus;
+            if (_currentFocus > max) _currentFocus = max;
             UpdateUI();
         }
 
-        private void EnableDecay() { _isCombatActive = true; }
-        private void DisableDecay() { _isCombatActive = false; }
+        // --- EVENT HANDLERS ---
+
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
+        {
+            if (!rewardPlayer) return;
+
+            // Use enemy specific reward, or fallback to player base stat
+            float gain = (stats != null) ? stats.focusReward : _stats.BaseFocusOnKill;
+            
+            GameLogger.Log(LogChannel.Player, $"Enemy Killed. +{gain} Focus.", gameObject);
+            AddFocus(gain);
+        }
+
+        private void EnableDecay() 
+        { 
+            _isCombatActive = true;
+            GameLogger.Log(LogChannel.System, "Combat Started. Focus Decay ON.");
+        }
+
+        private void DisableDecay() 
+        { 
+            _isCombatActive = false; 
+            GameLogger.Log(LogChannel.System, "Combat Ended. Focus Decay OFF.");
+        }
 
         private void OnPlayerDied() { _isDead = true; }
 
         private void UpdateUI()
         {
-            GameEvents.OnFocusChanged?.Invoke(_currentFocus, maxFocus);
+            GameEvents.OnFocusChanged?.Invoke(_currentFocus, _stats.MaxFocus);
         }
     }
 }

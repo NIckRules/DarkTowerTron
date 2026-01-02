@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Managers; // For PoolManager
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Managers
 {
@@ -63,13 +64,13 @@ namespace DarkTowerTron.Managers
 
                 // Log details
                 string layerName = LayerMask.LayerToName(hit.collider.gameObject.layer);
-                Debug.Log($"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>");
+                GameLogger.Log(LogChannel.System, $"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>", hit.collider.gameObject);
             }
             else
             {
                 // Draw Red Line all the way down
                 Debug.DrawRay(origin, Vector3.down * 100f, Color.red, debugLineDuration);
-                Debug.LogError($"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.");
+                GameLogger.LogError(LogChannel.System, $"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.", gameObject);
             }
         }
     }

@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core;
 using DarkTowerTron.Visuals; // For Receiver
 
 namespace DarkTowerTron.Managers
@@ -97,7 +98,7 @@ namespace DarkTowerTron.Managers
             }
 #endif
 
-            Debug.Log($"Palette Applied: {activePalette.name}");
+            GameLogger.Log(LogChannel.VFX, $"Palette Applied: {activePalette.name}", this.gameObject);
         }
 
         // ApplySurface helper remains the same...

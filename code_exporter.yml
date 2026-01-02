@@ -15,7 +15,7 @@ profiles:
     # Root folders scanned (relative to project root)
     roots:
       - Assets\Scripts
-      - Assets\Prefabs
+      #- Assets\Prefabs
       - Assets\Data
 
     # Source files only

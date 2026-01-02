@@ -41,6 +41,9 @@ namespace DarkTowerTron.Player
                     proj.stagger = _stats.GunStagger;
                     // ---------------------
 
+
+                    Debug.Log($"[GUN DEBUG] Firing Bullet. Damage: {proj.damage} | Stagger: {proj.stagger}");
+                    
                     proj.Initialize(aimDir);
                 }
             }

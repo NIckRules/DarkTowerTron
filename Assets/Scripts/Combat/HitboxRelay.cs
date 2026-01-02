@@ -44,7 +44,7 @@ namespace DarkTowerTron.Combat
 
             if (_mainController == null)
             {
-                Debug.LogWarning($"HitboxRelay on {name} could not find an IDamageable parent!");
+                GameLogger.LogWarning(LogChannel.Combat, $"HitboxRelay on {name} could not find an IDamageable parent!", gameObject);
             }
         }
 

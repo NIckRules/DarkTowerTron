@@ -70,6 +70,9 @@ namespace DarkTowerTron.Player
                         pushDirection = fireDir,
                         pushForce = 10f,
                         source = gameObject
+                        ,
+                        // NEW: Explicitly Melee
+                        damageType = DamageType.Melee
                     };
 
                     target.TakeDamage(info);

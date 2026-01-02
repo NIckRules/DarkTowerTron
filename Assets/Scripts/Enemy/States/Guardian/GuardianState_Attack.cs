@@ -3,6 +3,7 @@ using DarkTowerTron.AI.FSM;
 using DarkTowerTron.Core.Data;
 using System.Collections.Generic;
 using DarkTowerTron.Enemy.Agents;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Enemy.States.Guardian
 {
@@ -41,7 +42,7 @@ namespace DarkTowerTron.Enemy.States.Guardian
             // Debug check
             if (_agent.attackPatterns == null || _agent.attackPatterns.Count == 0)
             {
-                Debug.LogWarning("Guardian has no Attack Patterns assigned!");
+                GameLogger.LogWarning(LogChannel.AI, "Guardian has no Attack Patterns assigned!", _agent.gameObject);
             }
             else
             {

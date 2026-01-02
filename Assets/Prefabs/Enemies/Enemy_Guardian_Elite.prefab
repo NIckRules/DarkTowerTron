@@ -18,6 +18,9 @@ GameObject:
   - component: {fileID: 3962461874279498121}
   - component: {fileID: 4368561175701528667}
   - component: {fileID: 413201274170582421}
+  - component: {fileID: 1546532495113037196}
+  - component: {fileID: 6030418908121928527}
+  - component: {fileID: 123217976715369142}
   m_Layer: 7
   m_Name: Enemy_Guardian_Elite
   m_TagString: Enemy
@@ -131,6 +134,7 @@ MonoBehaviour:
   currentTarget: {fileID: 0}
   targets: []
   obstacles: []
+  ownerCollider: {fileID: 0}
 --- !u!114 &852908296871562534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,10 +182,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
     type: 3}
   firePoint: {fileID: 2727545481032966752}
-  attackPatterns:
-  - {fileID: 11400000, guid: ead5bf89e297b6449843b262826d546f, type: 2}
-  - {fileID: 11400000, guid: 5fbf3fd672e4ba246ad5e10215cb41e3, type: 2}
-  - {fileID: 11400000, guid: bc9335a264b15b7498ea8e8e23bc444c, type: 2}
+  attackPatterns: []
 --- !u!114 &413201274170582421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,6 +200,45 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3136
   showGizmos: 1
+--- !u!114 &1546532495113037196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89939daf16190e4a8534162a9116e93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6030418908121928527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358fbf73a02f56a4dbf53de385f17f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &123217976715369142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 188435c26dc3ba349a8180861ff88419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useOverrides: 0
+  _overrideHealth: 50
+  _overrideStagger: 3
 --- !u!1 &4627178880318046138
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,10 +283,10 @@ GameObject:
   - component: {fileID: 7105195301462925413}
   - component: {fileID: 7750972262857401665}
   - component: {fileID: 3049953027818980408}
-  - component: {fileID: 549829072868250149}
+  - component: {fileID: 7476665315558890938}
   m_Layer: 7
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -294,7 +334,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a05b6fae2bd964042b79a3bd0ffe0e9e, type: 2}
+  - {fileID: 2100000, guid: 0165aae9d439d484298ed4132223d775, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -351,7 +391,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &549829072868250149
+--- !u!114 &7476665315558890938
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -360,11 +400,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4876148051091776293}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9016109235ae934418d90e23d17144f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e4551bf74c0bd1458057a1697802711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainController: {fileID: 940291227875785411}
-  _damageMultiplier: 1
+  _receiver: {fileID: 123217976715369142}
+  damageMultiplier: 1
 --- !u!1 &5792554547814395914
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,9 +416,11 @@ GameObject:
   - component: {fileID: 2887306487421600477}
   - component: {fileID: 3320879060073683073}
   - component: {fileID: 3108040752348881355}
-  m_Layer: 0
+  - component: {fileID: 7241364067446088334}
+  - component: {fileID: 5476268891801099821}
+  m_Layer: 7
   m_Name: Shield_Visual
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -392,7 +434,7 @@ Transform:
   m_GameObject: {fileID: 5792554547814395914}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.2}
+  m_LocalPosition: {x: 0, y: 0, z: 1.81}
   m_LocalScale: {x: 2, y: 2, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -426,7 +468,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 24306aa8b0e3eee4a84f9603d5d3bf1a, type: 2}
+  - {fileID: 2100000, guid: f4caefe9eb48df74b8c2bc0628f9ded0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -448,6 +490,49 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7241364067446088334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5792554547814395914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: decad77a4ac8a0941aa9a63ae8248a0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _receiver: {fileID: 123217976715369142}
+  maxHeat: 100
+  coolDownRate: 2
+  staggerToHeatMultiplier: 10
+  isBroken: 0
+  reflectProjectiles: 1
+  shieldRenderer: {fileID: 3108040752348881355}
+  coldColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  hotColor: {r: 1, g: 0.2, b: 0, a: 1}
+  breakClip: {fileID: 0}
+--- !u!65 &5476268891801099821
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5792554547814395914}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7507684932702318028
 GameObject:
   m_ObjectHideFlags: 0

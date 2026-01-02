@@ -871,7 +871,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8274311e1aea4644e8a6cd7bdb8828e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxGrit: 1
   startWithHull: 1
 --- !u!114 &3146043007839357323
 MonoBehaviour:
@@ -885,9 +884,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d87efa653f246b45be35b53052d787b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxFocus: 100
-  decayRate: 3
-  defaultFocusOnKill: 30
 --- !u!114 &1722693863214666388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -922,6 +918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
+  isAutomatic: 1
   fireSound: {fileID: 11400000, guid: cc5967e00073e2247b05b155131c5da6, type: 2}
   inputBufferTime: 0.2
   bulletSpeed: 45
@@ -938,6 +935,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
+  isAutomatic: 0
   fireSound: {fileID: 11400000, guid: 94fe90421e070e3479feb19132ca21bc, type: 2}
   inputBufferTime: 0.2
   range: 7
@@ -973,8 +971,8 @@ MonoBehaviour:
   dashClip: {fileID: 8300000, guid: 11a67d7cfc51a7a47aa5638e3bfd7826, type: 3}
   indicatorRef: {fileID: 192944804307636621}
   indicatorRenderer: {fileID: 4811700125883332067}
-  readyMat: {fileID: 2100000, guid: 24306aa8b0e3eee4a84f9603d5d3bf1a, type: 2}
-  notReadyMat: {fileID: 2100000, guid: cc19ea74c476bab4daeeff447d45cbc9, type: 2}
+  readyMat: {fileID: 2100000, guid: 4522c7822a3c7244392e80dbb5810b07, type: 2}
+  notReadyMat: {fileID: 2100000, guid: 4ebcdcf99683c0148aaa8d1b275a47b7, type: 2}
   showIndicator: 1
 --- !u!114 &8853776279611051482
 MonoBehaviour:

@@ -106,10 +106,12 @@ namespace DarkTowerTron.Managers
         {
             if (hullIcon)
             {
-                hullIcon.color = hasHull ? hullActiveColor : hullBrokenColor;
+                GameLogger.Log(LogChannel.UI, $"[HUDManager] Updating Hull Icon. Has Hull: {hasHull}", gameObject);
 
-                // Optional: Pulse animation
-                // if (!hasHull) hullIcon.transform.DOPunchScale(...)
+                Color targetColor = hasHull ? hullActiveColor : hullBrokenColor;
+                hullIcon.color = targetColor;
+            }else{
+                GameLogger.Log(LogChannel.UI, $"[HUDManager] Hull Icon reference is missing!", gameObject);
             }
         }
 
@@ -124,7 +126,7 @@ namespace DarkTowerTron.Managers
         private void RebuildGritLayout(int max)
         {
 
-            Debug.Log($"[HUDManager] Rebuilding Grit Layout for Max Grit: {max}");
+            GameLogger.Log(LogChannel.UI, $"[HUDManager] Rebuilding Grit Layout for Max Grit: {max}", gameObject);
 
             if (gritContainer == null || pipPrefab == null) return;
 
@@ -139,13 +141,13 @@ namespace DarkTowerTron.Managers
             for (int i = 0; i < max; i++)
             {
 
-                Debug.Log($"[HUDManager] Spawning Grit Pip {i + 1}/{max}");
+                GameLogger.Log(LogChannel.UI, $"[HUDManager] Spawning Grit Pip {i + 1}/{max}", gameObject);
 
                 GameObject newPip = Instantiate(pipPrefab, gritContainer);
                 Image img = newPip.GetComponent<Image>();
                 if (img)
                 {
-                    Debug.Log($"[HUDManager] Successfully spawned pip and added to list.");
+                    GameLogger.Log(LogChannel.UI, $"[HUDManager] Successfully spawned pip and added to list.", newPip);
                     _spawnedPips.Add(img);
                 }
             }

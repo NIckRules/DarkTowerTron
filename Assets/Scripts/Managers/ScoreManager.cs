@@ -86,7 +86,7 @@ namespace DarkTowerTron.Managers
         public void TriggerGloryKillBonus()
         {
             int bonus = gloryKillBonus * currentMultiplier;
-            Debug.Log($"<color=yellow>GLORY KILL! +{bonus}</color>");
+            GameLogger.Log(LogChannel.Combat, $"<color=yellow>GLORY KILL! +{bonus}</color>", this.gameObject);
             AddScore(bonus);
         }
 

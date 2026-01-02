@@ -6,31 +6,47 @@ using DarkTowerTron.Managers;
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerStats))] // NEW DEPENDENCY
     public class PlayerHealth : MonoBehaviour, IDamageable
     {
-        [Header("Stats")]
-        public int maxGrit = 2;
+        [Header("Configuration")]
         public bool startWithHull = true;
 
+        // State
         private int _currentGrit;
         private bool _hasHull;
         private bool _isDead;
+        
+        // Dependencies
         private PlayerMovement _movement;
         private PlayerDodge _dodge;
+        private PlayerStats _stats; // NEW
 
         private void Awake()
         {
             _movement = GetComponent<PlayerMovement>();
             _dodge = GetComponent<PlayerDodge>();
+            _stats = GetComponent<PlayerStats>();
         }
 
         private void Start()
         {
-            _currentGrit = maxGrit;
+            // FIX: Read Max Grit from Data, not Inspector
+            if (_stats != null && _stats.baseStats != null)
+            {
+                _currentGrit = _stats.baseStats.maxGrit;
+                GameLogger.Log(LogChannel.Player, $"Health Initialized. Max Grit: {_currentGrit}", gameObject);
+            }
+            else
+            {
+                _currentGrit = 2; // Fallback
+                GameLogger.LogError(LogChannel.Player, "Missing PlayerStatsSO! Defaulting to 2 Grit.", gameObject);
+            }
+
             _hasHull = startWithHull;
-
+            
             GameEvents.OnEnemyKilled += OnEnemyKilled;
-
+            
             UpdateUI();
         }
 
@@ -39,36 +55,40 @@ namespace DarkTowerTron.Player
             GameEvents.OnEnemyKilled -= OnEnemyKilled;
         }
 
-        // --- IDamageable ---
         public bool TakeDamage(DamageInfo info)
         {
             if (_isDead) return false;
 
-            // Invulnerability Check (Dodge)
-            if (_dodge != null && _dodge.IsInvulnerable) return false;
+            if (_dodge != null && _dodge.IsInvulnerable) 
+            {
+                GameLogger.Log(LogChannel.Combat, "Damage Dodged (Invulnerable)", gameObject);
+                return false;
+            }
 
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
-            // Logic Gate: Grit -> Hull -> Death
             if (_currentGrit > 0)
             {
                 _currentGrit -= dmg;
-                if (_currentGrit < 0) _currentGrit = 0;
-                GameEvents.OnPlayerHit?.Invoke();
+                if (_currentGrit < 0) _currentGrit = 0; 
+                
+                GameLogger.Log(LogChannel.Combat, $"Player Hit! Grit: {_currentGrit}", gameObject);
+                GameEvents.OnPlayerHit?.Invoke(); 
             }
             else if (_hasHull)
             {
-                _hasHull = false; // Hull breaks (One-shot protection)
-                GameEvents.OnPlayerHit?.Invoke();
-                GameEvents.OnHullStateChanged?.Invoke(false);
+                _hasHull = false;
+                
+                GameLogger.Log(LogChannel.Combat, "HULL BREACHED!", gameObject);
+                GameEvents.OnPlayerHit?.Invoke(); 
+                GameEvents.OnHullStateChanged?.Invoke(false); 
             }
             else
             {
                 Kill(false);
             }
 
-            // Physics Knockback
-            if (!_isDead && _movement)
+            if (!_isDead && _movement) 
                 _movement.ApplyKnockback(info.pushDirection * info.pushForce);
 
             UpdateUI();
@@ -79,9 +99,8 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return;
 
-            Debug.Log("Fell into Void! Respawning...");
+            GameLogger.Log(LogChannel.Physics, "Fell into Void. Respawning.", gameObject);
 
-            // 1. Teleport to Safety
             if (_movement)
             {
                 _movement.ResetVelocity();
@@ -90,16 +109,16 @@ namespace DarkTowerTron.Player
                 else transform.position = _movement.LastSafePosition;
             }
 
-            // 2. Take Penalty (1 Grit/Hull)
             DamageInfo info = new DamageInfo
             {
                 damageAmount = 1f,
                 pushDirection = Vector3.zero,
                 pushForce = 0f,
-                source = null
+                source = null,
+                damageType = DamageType.Environment
             };
-
-            TakeDamage(info);
+            
+            TakeDamage(info); 
         }
 
         public void Kill(bool instant)
@@ -109,20 +128,21 @@ namespace DarkTowerTron.Player
             _currentGrit = 0;
             _hasHull = false;
             UpdateUI();
-
-            Debug.Log("PLAYER DEAD");
+            
+            GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
             GameEvents.OnPlayerDied?.Invoke();
         }
 
-        // --- HEALING ---
         public void HealGrit(int amount = 1)
         {
             if (_isDead) return;
-            _currentGrit = Mathf.Min(_currentGrit + amount, maxGrit);
+            
+            int max = _stats ? _stats.baseStats.maxGrit : 2;
+            _currentGrit = Mathf.Min(_currentGrit + amount, max);
+            
             UpdateUI();
         }
 
-        // --- EVENTS ---
         private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
@@ -133,21 +153,20 @@ namespace DarkTowerTron.Player
             }
             else
             {
-                HealGrit(1); // Legacy fallback
+                HealGrit(1);
             }
+        }
+
+        public void ForceUpdateUI()
+        {
+            UpdateUI();
         }
 
         private void UpdateUI()
         {
-            GameEvents.OnGritChanged?.Invoke(_currentGrit, maxGrit);
+            int max = _stats ? _stats.baseStats.maxGrit : 2;
+            GameEvents.OnGritChanged?.Invoke(_currentGrit, max);
             GameEvents.OnHullStateChanged?.Invoke(_hasHull);
-        }
-
-        // --- NEW: CALLED BY GAMESESSION ---
-        public void ForceUpdateUI()
-        {
-            // Manually re-fire events to sync the HUD when it enables
-            UpdateUI();
         }
     }
 }

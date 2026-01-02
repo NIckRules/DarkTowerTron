@@ -53,7 +53,7 @@ namespace DarkTowerTron.Environment
             }
             else
             {
-                Debug.LogError("WaveTrigger: Could not find WaveDirector via GameServices!");
+                GameLogger.LogError(LogChannel.System, "WaveTrigger: Could not find WaveDirector via GameServices!", gameObject);
             }
 
             gameObject.SetActive(false);

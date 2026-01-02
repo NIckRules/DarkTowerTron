@@ -41,7 +41,7 @@ namespace DarkTowerTron.Core
         public static void RegisterPlayer(PlayerController player)
         {
             Player = player;
-            Debug.Log("[GameServices] Player Registered.");
+            GameLogger.Log(LogChannel.System, "[GameServices] Player Registered.", player != null ? player.gameObject : null);
         }
 
         private void OnDestroy()

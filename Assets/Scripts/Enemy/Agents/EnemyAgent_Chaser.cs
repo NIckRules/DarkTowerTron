@@ -86,6 +86,9 @@ namespace DarkTowerTron.Enemy.Agents
                         pushDirection = transform.forward,
                         pushForce = explosionForce,
                         source = gameObject
+                        ,
+                        // NEW: Explicitly Explosion
+                        damageType = DamageType.Explosion
                     };
                     targetHealth.TakeDamage(info);
                     _controller.SelfDestruct();

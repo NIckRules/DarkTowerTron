@@ -21,14 +21,22 @@ namespace DarkTowerTron.Player
 
         // --- WEAPON: GUN ---
         public float GunDamage => IsOverdrive ? baseStats.gunDamage * baseStats.overdriveDamageMult : baseStats.gunDamage;
-        public float GunStagger => IsOverdrive ? baseStats.gunStagger * baseStats.overdriveDamageMult : baseStats.gunStagger;
+        public int GunStagger => baseStats.gunStagger;
         // Rate: Lower is faster. If OverdriveMult is 1.5 (Faster), we divide the delay.
         public float GunRate => IsOverdrive ? baseStats.gunFireRate / baseStats.overdriveFireRateMult : baseStats.gunFireRate;
 
         // --- WEAPON: BEAM ---
         public float BeamDamage => IsOverdrive ? baseStats.beamDamage * baseStats.overdriveDamageMult : baseStats.beamDamage;
-        public float BeamStagger => IsOverdrive ? baseStats.beamStagger * baseStats.overdriveDamageMult : baseStats.beamStagger;
+        public int BeamStagger => baseStats.beamStagger;
         public float BeamRate => IsOverdrive ? baseStats.beamFireRate / baseStats.overdriveFireRateMult : baseStats.beamFireRate;
+
+        // --- RESOURCES ---
+        public int MaxGrit => baseStats.maxGrit;
+        public float MaxFocus => baseStats.maxFocus;
+        
+        // Future proofing: Modifiers could change these later
+        public float FocusDecayRate => baseStats.focusDecayRate; 
+        public float BaseFocusOnKill => baseStats.baseFocusOnKill;
 
         public void SetOverdrive(bool state)
         {

@@ -14,7 +14,7 @@ namespace DarkTowerTron.Environment
             if (other.CompareTag(GameConstants.TAG_PLAYER))
             {
                 _triggered = true;
-                Debug.Log("LEVEL COMPLETE");
+                GameLogger.Log(LogChannel.System, "LEVEL COMPLETE", gameObject);
 
                 // Trigger Victory Logic
                 GameEvents.OnGameVictory?.Invoke();

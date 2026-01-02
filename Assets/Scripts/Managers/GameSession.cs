@@ -108,7 +108,7 @@ namespace DarkTowerTron.Managers
 
         public void QuitGame()
         {
-            Debug.Log("EXITING...");
+            GameLogger.Log(LogChannel.System, "EXITING...", gameObject);
             Application.Quit();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
