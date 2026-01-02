@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Environment; // Access to Prop_Explosive
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 using DG.Tweening;
 
@@ -91,7 +92,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
 
             // Spawn from Pool
-            GameObject p = PoolManager.Instance.Spawn(projectilePrefab, firePoint.position, Quaternion.LookRotation(dir));
+            GameObject p = Services.Pool.Spawn(projectilePrefab, firePoint.position, Quaternion.LookRotation(dir));
             p.transform.localScale = Vector3.one * scale;
 
             var proj = p.GetComponent<Projectile>();

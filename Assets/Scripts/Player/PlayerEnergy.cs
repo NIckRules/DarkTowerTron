@@ -1,13 +1,18 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
 
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerEnergy : MonoBehaviour
     {
-        // NO INSPECTOR VARIABLES! All data comes from PlayerStats.
+        [Header("Broadcasting")]
+        [SerializeField] private FloatFloatEventChannelSO _focusEvent; // Replaces OnFocusChanged
+
+        [Header("Listening")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
 
         private float _currentFocus;
         private bool _isDead;
@@ -22,32 +27,28 @@ namespace DarkTowerTron.Player
 
         private void Start()
         {
-            if (_stats == null)
-            {
-                GameLogger.LogError(LogChannel.Player, "PlayerEnergy missing PlayerStats component!", gameObject);
-                return;
-            }
-
-            // Init
+            if (_stats == null) return;
             _currentFocus = _stats.MaxFocus;
-            GameLogger.Log(LogChannel.Player, $"Energy Initialized. Max: {_stats.MaxFocus}", gameObject);
-
-            // Subscriptions
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            GameEvents.OnPlayerDied += OnPlayerDied;
-            
-            GameEvents.OnWaveCombatStarted += EnableDecay;
-            GameEvents.OnWaveCleared += DisableDecay;
-            GameEvents.OnGameVictory += DisableDecay;
-            
             UpdateUI();
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
+            // Subscribe to SO Event
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+
+            // Subscribe to remaining Static Events (Phase 2 migration)
+            GameEvents.OnPlayerDied += OnPlayerDied;
+            GameEvents.OnWaveCombatStarted += EnableDecay;
+            GameEvents.OnWaveCleared += DisableDecay;
+            GameEvents.OnGameVictory += DisableDecay;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+
             GameEvents.OnPlayerDied -= OnPlayerDied;
-            
             GameEvents.OnWaveCombatStarted -= EnableDecay;
             GameEvents.OnWaveCleared -= DisableDecay;
             GameEvents.OnGameVictory -= DisableDecay;
@@ -57,27 +58,19 @@ namespace DarkTowerTron.Player
         {
             if (_isDead) return;
 
-            // Check Overdrive Threshold via Stats
-            // (We assume the threshold is static in SO for now)
             bool shouldBeOverdrive = _currentFocus >= _stats.baseStats.overdriveThreshold;
             _stats.SetOverdrive(shouldBeOverdrive);
 
-            // Decay Logic
             if (_isCombatActive && _currentFocus > 0)
             {
                 _currentFocus -= _stats.FocusDecayRate * Time.deltaTime;
                 if (_currentFocus < 0) _currentFocus = 0;
-                
                 UpdateUI();
             }
         }
 
         // --- PUBLIC API ---
-
-        public bool HasFocus(float amount)
-        {
-            return _currentFocus >= amount;
-        }
+        public bool HasFocus(float amount) => _currentFocus >= amount;
 
         public bool SpendFocus(float amount)
         {
@@ -92,42 +85,28 @@ namespace DarkTowerTron.Player
 
         public void AddFocus(float amount)
         {
-            float max = _stats.MaxFocus;
             _currentFocus += amount;
-            if (_currentFocus > max) _currentFocus = max;
+            if (_currentFocus > _stats.MaxFocus) _currentFocus = _stats.MaxFocus;
             UpdateUI();
         }
 
-        // --- EVENT HANDLERS ---
-
+        // --- HANDLERS ---
         private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
-
-            // Use enemy specific reward, or fallback to player base stat
             float gain = (stats != null) ? stats.focusReward : _stats.BaseFocusOnKill;
-            
-            GameLogger.Log(LogChannel.Player, $"Enemy Killed. +{gain} Focus.", gameObject);
             AddFocus(gain);
         }
 
-        private void EnableDecay() 
-        { 
-            _isCombatActive = true;
-            GameLogger.Log(LogChannel.System, "Combat Started. Focus Decay ON.");
-        }
-
-        private void DisableDecay() 
-        { 
-            _isCombatActive = false; 
-            GameLogger.Log(LogChannel.System, "Combat Ended. Focus Decay OFF.");
-        }
-
+        private void EnableDecay() { _isCombatActive = true; }
+        private void DisableDecay() { _isCombatActive = false; }
         private void OnPlayerDied() { _isDead = true; }
 
         private void UpdateUI()
         {
-            GameEvents.OnFocusChanged?.Invoke(_currentFocus, _stats.MaxFocus);
+            // NEW: Raise via Channel
+            if (_focusEvent != null) 
+                _focusEvent.Raise(_currentFocus, _stats.MaxFocus);
         }
     }
 }

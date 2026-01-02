@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Managers
 {
@@ -28,10 +29,10 @@ namespace DarkTowerTron.Managers
 
         private void ShowDamage(Vector3 pos, float amount, bool isCrit)
         {
-            if (textPrefab == null || PoolManager.Instance == null) return;
+            if (textPrefab == null || Services.Pool == null) return;
 
             // Spawn
-            GameObject obj = PoolManager.Instance.Spawn(textPrefab, pos + offset, Quaternion.identity);
+            GameObject obj = Services.Pool.Spawn(textPrefab, pos + offset, Quaternion.identity);
 
             // Configure
             var floatingText = obj.GetComponent<DarkTowerTron.UI.FloatingText>();
@@ -50,9 +51,9 @@ namespace DarkTowerTron.Managers
 
         private void ShowPopup(Vector3 pos, string message)
         {
-            if (textPrefab == null || PoolManager.Instance == null) return;
+            if (textPrefab == null || Services.Pool == null) return;
 
-            GameObject obj = PoolManager.Instance.Spawn(textPrefab, pos + offset, Quaternion.identity);
+            GameObject obj = Services.Pool.Spawn(textPrefab, pos + offset, Quaternion.identity);
             var floatingText = obj.GetComponent<DarkTowerTron.UI.FloatingText>();
 
             if (floatingText)

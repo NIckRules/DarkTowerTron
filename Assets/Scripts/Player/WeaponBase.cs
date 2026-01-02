@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data; 
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Player
@@ -88,8 +89,8 @@ namespace DarkTowerTron.Player
 
         protected void PlayFireSound()
         {
-            if (fireSound && AudioManager.Instance)
-                AudioManager.Instance.PlaySound(fireSound); 
+            if (fireSound && Services.Audio != null)
+                Services.Audio.PlaySound(fireSound); 
         }
 
         protected Vector3 GetAimDirection()

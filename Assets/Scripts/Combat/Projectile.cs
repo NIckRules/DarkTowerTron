@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Combat
@@ -203,7 +204,7 @@ namespace DarkTowerTron.Combat
 
         private void Despawn()
         {
-            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
+            if (Services.Pool != null) Services.Pool.Despawn(gameObject);
             else Destroy(gameObject);
         }
     }

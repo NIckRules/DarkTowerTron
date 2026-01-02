@@ -1,6 +1,8 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 using DarkTowerTron.Combat;
 using DG.Tweening;
@@ -14,6 +16,9 @@ namespace DarkTowerTron.Enemy
         private DamageReceiver _receiver;
         private EnemyMotor _motor;
         private EnemyStatsSO _stats;
+
+        [Header("Broadcasting")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
 
         [Header("Visuals")]
         public Renderer meshRenderer;
@@ -150,9 +155,10 @@ namespace DarkTowerTron.Enemy
 
         private void HandleDeath(EnemyStatsSO stats, bool reward)
         {
-            GameEvents.OnEnemyKilled?.Invoke(transform.position, stats, reward);
+            if (_enemyKilledEvent != null)
+                _enemyKilledEvent.Raise(transform.position, stats, reward);
             
-            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
+            if (Services.Pool != null) Services.Pool.Despawn(gameObject);
             else Destroy(gameObject);
         }
 
@@ -160,8 +166,8 @@ namespace DarkTowerTron.Enemy
         {
             GameEvents.OnPopupText?.Invoke(transform.position, "STAGGER");
 
-            if (AudioManager.Instance && staggerClip)
-                AudioManager.Instance.PlaySound(staggerClip, 1f, true);
+            if (Services.Audio != null && staggerClip)
+                Services.Audio.PlaySound(staggerClip, 1f, true);
 
             if (_flashTween != null) _flashTween.Kill();
             

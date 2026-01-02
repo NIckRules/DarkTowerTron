@@ -3,6 +3,7 @@ using System.Collections; // Required for IEnumerator
 using DarkTowerTron.Core;
 using DarkTowerTron.Player;
 using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Managers
 {
@@ -109,7 +110,7 @@ namespace DarkTowerTron.Managers
             if (index < 0 || index >= enemiesToSpawn.Length) return;
             Vector3 spawnPos = Vector3.zero + Random.insideUnitSphere * 5f;
             spawnPos.y = 0;
-            PoolManager.Instance.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
+            Services.Pool?.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
         }
     }
 }

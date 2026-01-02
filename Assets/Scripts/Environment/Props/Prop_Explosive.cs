@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Environment
@@ -32,17 +33,17 @@ namespace DarkTowerTron.Environment
             // 1. Spawn Hazard
             if (spawnOnDeath)
             {
-                PoolManager.Instance.Spawn(spawnOnDeath, transform.position, Quaternion.identity);
+                Services.Pool?.Spawn(spawnOnDeath, transform.position, Quaternion.identity);
             }
 
             // 2. VFX
-            if (VFXManager.Instance)
+            if (Services.VFX != null)
             {
-                PoolManager.Instance.Spawn(VFXManager.Instance.explosionPrefab, transform.position, Quaternion.identity);
+                Services.Pool?.Spawn(Services.VFX.explosionPrefab, transform.position, Quaternion.identity);
             }
 
             // 3. Despawn Self
-            PoolManager.Instance.Despawn(gameObject);
+            Services.Pool?.Despawn(gameObject);
         }
     }
 }

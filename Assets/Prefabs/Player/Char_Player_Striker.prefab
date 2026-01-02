@@ -872,6 +872,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startWithHull: 1
+  _gritEvent: {fileID: 11400000, guid: 13e14b718845bef499bf0df448e608af, type: 2}
+  _hullEvent: {fileID: 11400000, guid: 4823a310732ff2e47926091df574fe19, type: 2}
+  _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
 --- !u!114 &3146043007839357323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,6 +888,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d87efa653f246b45be35b53052d787b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _focusEvent: {fileID: 11400000, guid: ad87ff28194dffe44af147a10a273aba, type: 2}
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
 --- !u!114 &1722693863214666388
 MonoBehaviour:
   m_ObjectHideFlags: 0

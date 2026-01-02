@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening; // Logic relies on Tweening
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Enemy
@@ -92,7 +93,7 @@ namespace DarkTowerTron.Enemy
             if (prefab == null) return;
 
             // 1. Spawn via Pool
-            GameObject p = PoolManager.Instance.Spawn(prefab, position, rotation);
+            GameObject p = Services.Pool.Spawn(prefab, position, rotation);
 
             // 2. Setup Logic
             Projectile proj = p.GetComponent<Projectile>();

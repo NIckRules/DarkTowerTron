@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 using DG.Tweening;
 
@@ -109,8 +110,8 @@ namespace DarkTowerTron.Combat
             
             GameEvents.OnPopupText?.Invoke(transform.position, "SHATTERED");
             
-            if (AudioManager.Instance && breakClip)
-                 AudioManager.Instance.PlaySound(breakClip, 1.0f);
+              if (Services.Audio != null && breakClip)
+                  Services.Audio.PlaySound(breakClip, 1.0f);
                  
             // TODO: Spawn AOE Explosion Hazard here if you want the "Exploding Shield" perk
         }

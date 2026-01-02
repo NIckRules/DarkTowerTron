@@ -1,23 +1,22 @@
 using UnityEngine;
-using DarkTowerTron.Core.Data; // Access SoundDef
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core; // For GameLogger
 
-namespace DarkTowerTron.Managers
+namespace DarkTowerTron.Core.Services
 {
     [RequireComponent(typeof(AudioSource))]
     public class AudioManager : MonoBehaviour
     {
-        public static AudioManager Instance;
+        // REMOVED: public static AudioManager Instance;
+
         [SerializeField] private AudioSource _sfxSource;
 
         private void Awake()
         {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-
+            // REMOVED: Singleton check
             if (_sfxSource == null) _sfxSource = GetComponent<AudioSource>();
         }
 
-        // --- NEW METHOD ---
         public void PlaySound(SoundDef soundDef)
         {
             if (soundDef == null || _sfxSource == null) return;
@@ -29,7 +28,6 @@ namespace DarkTowerTron.Managers
             _sfxSource.PlayOneShot(clip, soundDef.volume);
         }
 
-        // Keep legacy method for compatibility until migration is complete
         public void PlaySound(AudioClip clip, float volume = 1f, bool randomizePitch = false)
         {
             if (clip == null || _sfxSource == null) return;

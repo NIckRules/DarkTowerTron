@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers; // Needed to talk to PoolManager
 
 namespace DarkTowerTron.UI
@@ -43,9 +44,9 @@ namespace DarkTowerTron.UI
         private void Despawn()
         {
             // Return to pool
-            if (PoolManager.Instance != null)
+            if (Services.Pool != null)
             {
-                PoolManager.Instance.Despawn(gameObject);
+                Services.Pool.Despawn(gameObject);
             }
             else
             {

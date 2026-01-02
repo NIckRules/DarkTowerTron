@@ -3,11 +3,19 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro; // TextMeshPro
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Managers
 {
     public class HUDManager : MonoBehaviour
     {
+        [Header("Event Channels")]
+        [SerializeField] private FloatFloatEventChannelSO _focusEvent; // Was GameEvents.OnFocusChanged
+        [SerializeField] private IntIntEventChannelSO _gritEvent;      // Was GameEvents.OnGritChanged
+        [SerializeField] private BoolEventChannelSO _hullEvent;        // Was GameEvents.OnHullStateChanged
+        [SerializeField] private IntIntEventChannelSO _scoreEvent;     // Was GameEvents.OnScoreChanged
+
         [Header("Focus (Energy)")]
         public Slider focusSlider;
         public Image focusFillImage;
@@ -35,26 +43,40 @@ namespace DarkTowerTron.Managers
 
         private void OnEnable()
         {
-            GameEvents.OnFocusChanged += UpdateFocus;
-            GameEvents.OnGritChanged += UpdateGrit;
-            GameEvents.OnHullStateChanged += UpdateHull;
-            GameEvents.OnScoreChanged += UpdateScoreUI;
+            if (_focusEvent != null) _focusEvent.OnEventRaised += UpdateFocus;
+            else GameEvents.OnFocusChanged += UpdateFocus;
+
+            if (_gritEvent != null) _gritEvent.OnEventRaised += UpdateGrit;
+            else GameEvents.OnGritChanged += UpdateGrit;
+
+            if (_hullEvent != null) _hullEvent.OnEventRaised += UpdateHull;
+            else GameEvents.OnHullStateChanged += UpdateHull;
+
+            if (_scoreEvent != null) _scoreEvent.OnEventRaised += UpdateScoreUI;
+            else GameEvents.OnScoreChanged += UpdateScoreUI;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnFocusChanged -= UpdateFocus;
-            GameEvents.OnGritChanged -= UpdateGrit;
-            GameEvents.OnHullStateChanged -= UpdateHull;
-            GameEvents.OnScoreChanged -= UpdateScoreUI;
+            if (_focusEvent != null) _focusEvent.OnEventRaised -= UpdateFocus;
+            else GameEvents.OnFocusChanged -= UpdateFocus;
+
+            if (_gritEvent != null) _gritEvent.OnEventRaised -= UpdateGrit;
+            else GameEvents.OnGritChanged -= UpdateGrit;
+
+            if (_hullEvent != null) _hullEvent.OnEventRaised -= UpdateHull;
+            else GameEvents.OnHullStateChanged -= UpdateHull;
+
+            if (_scoreEvent != null) _scoreEvent.OnEventRaised -= UpdateScoreUI;
+            else GameEvents.OnScoreChanged -= UpdateScoreUI;
         }
 
         private void Update()
         {
             // Update Timer every frame directly from Manager (no event needed)
-            if (timerText && ScoreManager.Instance)
+            if (timerText && Services.Score != null)
             {
-                float t = ScoreManager.Instance.GameTime;
+                float t = Services.Score.GameTime;
                 string minutes = Mathf.Floor(t / 60).ToString("00");
                 string seconds = (t % 60).ToString("00");
                 timerText.text = $"{minutes}:{seconds}";
@@ -104,6 +126,9 @@ namespace DarkTowerTron.Managers
 
         private void UpdateHull(bool hasHull)
         {
+
+            GameLogger.Log(DarkTowerTron.Core.LogChannel.UI, $"[HUD] Hull Event Received! State: {hasHull}", gameObject);
+
             if (hullIcon)
             {
                 GameLogger.Log(LogChannel.UI, $"[HUDManager] Updating Hull Icon. Has Hull: {hasHull}", gameObject);

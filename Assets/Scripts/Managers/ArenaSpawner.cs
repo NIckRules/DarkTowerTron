@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Managers; // For PoolManager
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Managers
 {
@@ -47,7 +48,7 @@ namespace DarkTowerTron.Managers
                 if (showDebugRays) VisualizeSpawn(rayOrigin, new RaycastHit(), false);
             }
 
-            return PoolManager.Instance.Spawn(prefab, spawnPos, Quaternion.LookRotation(sp.forward));
+            return Services.Pool.Spawn(prefab, spawnPos, Quaternion.LookRotation(sp.forward));
         }
 
         // --- NEW DEBUG METHOD ---

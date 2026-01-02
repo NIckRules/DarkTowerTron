@@ -1,26 +1,34 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+using DarkTowerTron.Core.Services;    // For GameLogger
 
 namespace DarkTowerTron.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
-    [RequireComponent(typeof(PlayerStats))] // NEW DEPENDENCY
+    [RequireComponent(typeof(PlayerDodge))]
+    [RequireComponent(typeof(PlayerStats))]
     public class PlayerHealth : MonoBehaviour, IDamageable
     {
         [Header("Configuration")]
         public bool startWithHull = true;
 
-        // State
+        [Header("Broadcasting")]
+        [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
+        [SerializeField] private BoolEventChannelSO _hullEvent;        // Replaces OnHullStateChanged
+        [SerializeField] private VoidEventChannelSO _playerHitEvent;   // Replaces OnPlayerHit
+
+        [Header("Listening")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+
         private int _currentGrit;
         private bool _hasHull;
         private bool _isDead;
         
-        // Dependencies
         private PlayerMovement _movement;
         private PlayerDodge _dodge;
-        private PlayerStats _stats; // NEW
+        private PlayerStats _stats;
 
         private void Awake()
         {
@@ -31,57 +39,40 @@ namespace DarkTowerTron.Player
 
         private void Start()
         {
-            // FIX: Read Max Grit from Data, not Inspector
-            if (_stats != null && _stats.baseStats != null)
-            {
-                _currentGrit = _stats.baseStats.maxGrit;
-                GameLogger.Log(LogChannel.Player, $"Health Initialized. Max Grit: {_currentGrit}", gameObject);
-            }
-            else
-            {
-                _currentGrit = 2; // Fallback
-                GameLogger.LogError(LogChannel.Player, "Missing PlayerStatsSO! Defaulting to 2 Grit.", gameObject);
-            }
-
+            _currentGrit = _stats ? _stats.MaxGrit : 2;
             _hasHull = startWithHull;
-            
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            
             UpdateUI();
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
         }
 
         public bool TakeDamage(DamageInfo info)
         {
             if (_isDead) return false;
-
-            if (_dodge != null && _dodge.IsInvulnerable) 
-            {
-                GameLogger.Log(LogChannel.Combat, "Damage Dodged (Invulnerable)", gameObject);
-                return false;
-            }
+            if (_dodge != null && _dodge.IsInvulnerable) return false;
 
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
             if (_currentGrit > 0)
             {
                 _currentGrit -= dmg;
-                if (_currentGrit < 0) _currentGrit = 0; 
-                
-                GameLogger.Log(LogChannel.Combat, $"Player Hit! Grit: {_currentGrit}", gameObject);
-                GameEvents.OnPlayerHit?.Invoke(); 
+                if (_currentGrit < 0) _currentGrit = 0;
+
+                // NEW: Raise Void Event for FX/Camera Shake
+                _playerHitEvent?.Raise();
             }
             else if (_hasHull)
             {
                 _hasHull = false;
-                
-                GameLogger.Log(LogChannel.Combat, "HULL BREACHED!", gameObject);
-                GameEvents.OnPlayerHit?.Invoke(); 
-                GameEvents.OnHullStateChanged?.Invoke(false); 
+                _playerHitEvent?.Raise();
             }
             else
             {
@@ -98,9 +89,7 @@ namespace DarkTowerTron.Player
         public void TakeVoidDamage()
         {
             if (_isDead) return;
-
-            GameLogger.Log(LogChannel.Physics, "Fell into Void. Respawning.", gameObject);
-
+            
             if (_movement)
             {
                 _movement.ResetVelocity();
@@ -109,16 +98,8 @@ namespace DarkTowerTron.Player
                 else transform.position = _movement.LastSafePosition;
             }
 
-            DamageInfo info = new DamageInfo
-            {
-                damageAmount = 1f,
-                pushDirection = Vector3.zero,
-                pushForce = 0f,
-                source = null,
-                damageType = DamageType.Environment
-            };
-            
-            TakeDamage(info); 
+            // Simulate Environment Damage
+            TakeDamage(new DamageInfo { damageAmount = 1f, damageType = DamageType.Environment });
         }
 
         public void Kill(bool instant)
@@ -130,43 +111,33 @@ namespace DarkTowerTron.Player
             UpdateUI();
             
             GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
-            GameEvents.OnPlayerDied?.Invoke();
+            GameEvents.OnPlayerDied?.Invoke(); // Still static for now
         }
 
         public void HealGrit(int amount = 1)
         {
             if (_isDead) return;
-            
-            int max = _stats ? _stats.baseStats.maxGrit : 2;
+            int max = _stats ? _stats.MaxGrit : 2;
             _currentGrit = Mathf.Min(_currentGrit + amount, max);
-            
             UpdateUI();
         }
 
         private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
-
-            if (stats != null)
-            {
-                if (stats.healsGrit) HealGrit(stats.gritRewardAmount);
-            }
-            else
-            {
-                HealGrit(1);
-            }
+            if (stats != null && stats.healsGrit) HealGrit(stats.gritRewardAmount);
+            else HealGrit(1);
         }
 
-        public void ForceUpdateUI()
-        {
-            UpdateUI();
-        }
+        public void ForceUpdateUI() => UpdateUI();
 
         private void UpdateUI()
         {
-            int max = _stats ? _stats.baseStats.maxGrit : 2;
-            GameEvents.OnGritChanged?.Invoke(_currentGrit, max);
-            GameEvents.OnHullStateChanged?.Invoke(_hasHull);
+            int max = _stats ? _stats.MaxGrit : 2;
+            
+            // NEW: Raise Typed Events
+            _gritEvent?.Raise(_currentGrit, max);
+            _hullEvent?.Raise(_hasHull);
         }
     }
 }

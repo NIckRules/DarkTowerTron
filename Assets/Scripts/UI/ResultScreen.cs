@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.UI
 {
@@ -19,14 +20,14 @@ namespace DarkTowerTron.UI
         // Called automatically when the GameObject is enabled (SetActive true)
         private void OnEnable()
         {
-            if (ScoreManager.Instance == null) return;
+            if (Services.Score == null) return;
 
             // 1. Stop the Timer
-            ScoreManager.Instance.StopTracking();
+            Services.Score.StopTracking();
 
             // 2. Get Stats
-            int finalScore = ScoreManager.Instance.TotalScore;
-            float finalTime = ScoreManager.Instance.GameTime;
+            int finalScore = Services.Score.TotalScore;
+            float finalTime = Services.Score.GameTime;
 
             // 3. Format Text
             if (scoreText) scoreText.text = finalScore.ToString("N0");

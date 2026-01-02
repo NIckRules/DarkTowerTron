@@ -1,44 +1,50 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+using DarkTowerTron.Core.Services;    // For logging
 
 namespace DarkTowerTron.Managers
 {
     public class ScoreManager : MonoBehaviour
     {
-        public static ScoreManager Instance;
+        // Note: ScoreManager is likely registered in Bootloader or Scene Context via ServiceLocator
+        // But internal logic remains MonoBehaviour-based for now.
+
+        [Header("Broadcasting")]
+        [SerializeField] private IntIntEventChannelSO _scoreEvent; // Replaces OnScoreChanged
+
+        [Header("Listening")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+        [SerializeField] private VoidEventChannelSO _playerHitEvent; // Replaces OnPlayerHit
 
         [Header("Score Settings")]
         public int baseScorePerKill = 100;
         public int gloryKillBonus = 500;
-
-        [Header("Multiplier Settings")]
-        public int currentMultiplier = 1;
         public int maxMultiplier = 5;
 
+        public int currentMultiplier = 1;
         public int TotalScore { get; private set; }
         public float GameTime { get; private set; }
 
         private bool _isTracking = false;
 
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
-
         private void Start()
         {
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            GameEvents.OnPlayerHit += OnPlayerHit;
             _isTracking = true;
             UpdateUI();
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
-            GameEvents.OnPlayerHit -= OnPlayerHit;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+            if (_playerHitEvent) _playerHitEvent.OnEventRaised += OnPlayerHit;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+            if (_playerHitEvent) _playerHitEvent.OnEventRaised -= OnPlayerHit;
         }
 
         private void Update()
@@ -46,25 +52,19 @@ namespace DarkTowerTron.Managers
             if (_isTracking) GameTime += Time.deltaTime;
         }
 
-        // --- FIXED METHOD SIGNATURE ---
         private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
 
-            // Determine score from Stats asset, or use default if missing
             int scoreValue = (stats != null) ? stats.scoreValue : baseScorePerKill;
-
-            // Apply Multiplier
             AddScore(scoreValue * currentMultiplier);
 
-            // Increase Multiplier
             if (currentMultiplier < maxMultiplier)
             {
                 currentMultiplier++;
                 UpdateUI();
             }
         }
-        // -----------------------------
 
         private void OnPlayerHit()
         {
@@ -86,13 +86,14 @@ namespace DarkTowerTron.Managers
         public void TriggerGloryKillBonus()
         {
             int bonus = gloryKillBonus * currentMultiplier;
-            GameLogger.Log(LogChannel.Combat, $"<color=yellow>GLORY KILL! +{bonus}</color>", this.gameObject);
+            GameLogger.Log(LogChannel.Combat, $"GLORY KILL! +{bonus}", gameObject);
             AddScore(bonus);
         }
 
         private void UpdateUI()
         {
-            GameEvents.OnScoreChanged?.Invoke(TotalScore, currentMultiplier);
+            // NEW: Raise event via Channel
+            _scoreEvent?.Raise(TotalScore, currentMultiplier);
         }
     }
 }

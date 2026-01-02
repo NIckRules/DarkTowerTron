@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
 using DarkTowerTron.Managers; // For ScoreManager
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Player
 {
@@ -104,8 +105,8 @@ namespace DarkTowerTron.Player
             // DamageableProp DOES NOT fire OnEnemyKilled (usually), so Anchors won't heal you.
             // This is correct behavior!
 
-            if (ScoreManager.Instance)
-                ScoreManager.Instance.TriggerGloryKillBonus();
+            if (Services.Score != null)
+                Services.Score.TriggerGloryKillBonus();
 
             // 4. Juice
             if (GameFeel.Instance)

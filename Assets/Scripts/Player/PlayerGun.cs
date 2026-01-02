@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
 namespace DarkTowerTron.Player
@@ -27,7 +28,7 @@ namespace DarkTowerTron.Player
             if (prefabToSpawn && firePoint)
             {
                 Vector3 aimDir = GetAimDirection();
-                GameObject p = Managers.PoolManager.Instance.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
+                GameObject p = Services.Pool.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
                 
                 var proj = p.GetComponent<Combat.Projectile>();
                 if (proj)

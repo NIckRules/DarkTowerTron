@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Combat;
 
@@ -87,8 +88,8 @@ namespace DarkTowerTron.Player
             _movement.SuspendGravity(dashDuration + hangTime);
 
             // --- 2. AUDIO & VISUALS ---
-            if (Managers.AudioManager.Instance && dashClip)
-                Managers.AudioManager.Instance.PlaySound(dashClip, 1f, true);
+            if (Services.Audio != null && dashClip)
+                Services.Audio.PlaySound(dashClip, 1f, true);
 
             // Spawn Decoy from Loadout (Standard or Explosive)
             if (_loadout && _loadout.currentDecoy)

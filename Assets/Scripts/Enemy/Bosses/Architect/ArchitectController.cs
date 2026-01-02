@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.AI.FSM; // State Machine System
 using DarkTowerTron.Managers; // VFX & Pool
 using DG.Tweening;
@@ -265,10 +266,10 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _currentRotationSpeed = 0;
 
             // Spawn BIG explosion
-            if (VFXManager.Instance && VFXManager.Instance.explosionPrefab)
+            if (Services.VFX != null && Services.VFX.explosionPrefab)
             {
                 // Spawn a few explosions for effect
-                PoolManager.Instance.Spawn(VFXManager.Instance.explosionPrefab, transform.position, Quaternion.identity);
+                Services.Pool?.Spawn(Services.VFX.explosionPrefab, transform.position, Quaternion.identity);
             }
 
             // Win Game

@@ -21,7 +21,7 @@ MonoBehaviour:
   dashCost: 25
   dashDistance: 8
   dashCooldown: 0.15
-  gunFireRate: 0.8
+  gunFireRate: 0.3
   gunDamage: 0
   gunStagger: 1
   beamFireRate: 0.4

@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Visuals; // <--- THIS WAS MISSING
 
 namespace DarkTowerTron.Managers
@@ -42,7 +43,7 @@ namespace DarkTowerTron.Managers
             // Only play feedback if we LOST the hull (became false)
             if (!lostHull) return;
 
-            if (AudioManager.Instance) AudioManager.Instance.PlaySound(hullBreakClip, 1.0f);
+            if (Services.Audio != null) Services.Audio.PlaySound(hullBreakClip, 1.0f);
             if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.5f, 0.7f); // Big shake
             if (GameTime.Instance) GameTime.Instance.HitStop(0.2f); // Dramatic pause
         }
@@ -63,8 +64,8 @@ namespace DarkTowerTron.Managers
             if (profile == null) return;
 
             // 1. Audio
-            if (profile.sound && Managers.AudioManager.Instance)
-                Managers.AudioManager.Instance.PlaySound(profile.sound);
+            if (profile.sound && Services.Audio != null)
+                Services.Audio.PlaySound(profile.sound);
 
             // 2. Camera
             if (Visuals.CameraShaker.Instance)
