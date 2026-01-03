@@ -135,7 +135,7 @@ MonoBehaviour:
   currentTarget: {fileID: 0}
   targets: []
   obstacles: []
-  ownerCollider: {fileID: 0}
+  ownerCollider: {fileID: 5871940570560534539}
 --- !u!114 &852908296871562534
 MonoBehaviour:
   m_ObjectHideFlags: 0

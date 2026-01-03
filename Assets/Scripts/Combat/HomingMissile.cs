@@ -1,6 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player; // To access TargetScanner
+using DarkTowerTron.Player.Combat;
 
 namespace DarkTowerTron.Combat
 {

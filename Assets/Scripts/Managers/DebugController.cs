@@ -3,6 +3,7 @@ using System.Collections; // Required for IEnumerator
 using DarkTowerTron.Core;
 using DarkTowerTron.Player;
 using DarkTowerTron.Managers;
+using DarkTowerTron.Player.Stats;
 using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Managers

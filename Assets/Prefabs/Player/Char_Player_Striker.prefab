@@ -715,18 +715,20 @@ GameObject:
   - component: {fileID: 9183884152685474308}
   - component: {fileID: 5230015545283728264}
   - component: {fileID: 6365553688910257222}
-  - component: {fileID: 8588073913637015239}
-  - component: {fileID: 6949509784031142000}
-  - component: {fileID: 7548255836402914066}
-  - component: {fileID: 3146043007839357323}
-  - component: {fileID: 1722693863214666388}
-  - component: {fileID: 441507639296113179}
-  - component: {fileID: 3406123499475282924}
-  - component: {fileID: 5466856792935116601}
-  - component: {fileID: 8853776279611051482}
   - component: {fileID: -4286876796308643671}
-  - component: {fileID: 5645868823290248984}
-  - component: {fileID: 6849140618581266389}
+  - component: {fileID: 7496228784035397067}
+  - component: {fileID: 6396008832873625397}
+  - component: {fileID: 595545573381503981}
+  - component: {fileID: 7923701252425940506}
+  - component: {fileID: 3392287083777916861}
+  - component: {fileID: 8410044251005915282}
+  - component: {fileID: 3403950254901794677}
+  - component: {fileID: 1702664329331836105}
+  - component: {fileID: 8962226766011840260}
+  - component: {fileID: 2251038212002885553}
+  - component: {fileID: 4003894760239246067}
+  - component: {fileID: 2038459139198636050}
+  - component: {fileID: 4400474212300462037}
   m_Layer: 6
   m_Name: Char_Player_Striker
   m_TagString: Player
@@ -826,175 +828,6 @@ MonoBehaviour:
   _groundSnapDistance: 0.3
   useCulling: 1
   cullingDistance: 40
---- !u!114 &8588073913637015239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf2267156712e0248a224233bd101a1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  deceleration: 40
-  rotationSpeed: 25
-  wallBuffer: 0.7
-  repulsionForce: 120
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  gravity: 20
-  safeGroundTimer: 0.5
---- !u!114 &6949509784031142000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e5f440b2737114418b3ca265853fa24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &7548255836402914066
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8274311e1aea4644e8a6cd7bdb8828e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startWithHull: 1
-  _gritEvent: {fileID: 11400000, guid: 13e14b718845bef499bf0df448e608af, type: 2}
-  _hullEvent: {fileID: 11400000, guid: 4823a310732ff2e47926091df574fe19, type: 2}
-  _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
-  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
---- !u!114 &3146043007839357323
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d87efa653f246b45be35b53052d787b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _focusEvent: {fileID: 11400000, guid: ad87ff28194dffe44af147a10a273aba, type: 2}
-  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
---- !u!114 &1722693863214666388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20549bf1521c4194fb2c644db7c18579, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scanRange: 35
-  scanRadius: 3
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  reticlePrefab: {fileID: 5938182085543417046}
-  reticleOffset: {x: 0, y: 0.1, z: 0}
-  lockedColor: {r: 0, g: 1, b: 1, a: 1}
-  executionColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
---- !u!114 &441507639296113179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07184ec7d777ba2459feab10aeb6bf89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firePoint: {fileID: 8608103599068932834}
-  isAutomatic: 1
-  fireSound: {fileID: 11400000, guid: cc5967e00073e2247b05b155131c5da6, type: 2}
-  inputBufferTime: 0.2
-  bulletSpeed: 45
---- !u!114 &3406123499475282924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b7430c062d1d144b9292b4648b893b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firePoint: {fileID: 8608103599068932834}
-  isAutomatic: 0
-  fireSound: {fileID: 11400000, guid: 94fe90421e070e3479feb19132ca21bc, type: 2}
-  inputBufferTime: 0.2
-  range: 7
-  beamRadius: 0.5
-  selfRecoil: 15
-  hitLayers:
-    serializedVersion: 2
-    m_Bits: 2177
-  beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
-    type: 3}
---- !u!114 &5466856792935116601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a613d45a4de2b84e9b8c6e96f0e8b7c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  focusCost: 22
-  dashDistance: 8
-  dashDuration: 0.15
-  hangTime: 0.2
-  projectileLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  dashClip: {fileID: 8300000, guid: 11a67d7cfc51a7a47aa5638e3bfd7826, type: 3}
-  indicatorRef: {fileID: 192944804307636621}
-  indicatorRenderer: {fileID: 4811700125883332067}
-  readyMat: {fileID: 2100000, guid: 4522c7822a3c7244392e80dbb5810b07, type: 2}
-  notReadyMat: {fileID: 2100000, guid: 4ebcdcf99683c0148aaa8d1b275a47b7, type: 2}
-  showIndicator: 1
---- !u!114 &8853776279611051482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be01441c03af92543876bc1721da12c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  killRewardFocus: 50
-  postKillHangTime: 0.4
-  executeClip: {fileID: 8300000, guid: 3a8204bbfd76b4c44a30dbced9b6a021, type: 3}
 --- !u!114 &-4286876796308643671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1016,7 +849,7 @@ MonoBehaviour:
   - {fileID: 1628793600088000154}
   tertiaryRenderers:
   - {fileID: 6070481044973411645}
---- !u!114 &5645868823290248984
+--- !u!114 &7496228784035397067
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1025,11 +858,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 8164355637247924031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6343646a9f89d5e42b6ddc41b23a5f63, type: 3}
+  m_Script: {fileID: 11500000, guid: e426abc94fdbcc9488930e6a561f357a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputSafetyBuffer: 0.2
+--- !u!114 &6396008832873625397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ea3d6f0b1abfa8459849111cc94f9d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   baseStats: {fileID: 11400000, guid: 9baa1bba4b0c9814282f5c7ee9f8e67a, type: 2}
---- !u!114 &6849140618581266389
+--- !u!114 &595545573381503981
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1038,16 +884,197 @@ MonoBehaviour:
   m_GameObject: {fileID: 8164355637247924031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9df14f1b6c62074f8c30a847e0e1eb8, type: 3}
+  m_Script: {fileID: 11500000, guid: 275e5da889897f54ea3b0fb0f78e5f4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deceleration: 40
+  rotationSpeed: 25
+  wallBuffer: 0.6
+  repulsionForce: 5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  gravity: 20
+  safeGroundTimer: 0.5
+--- !u!114 &7923701252425940506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 812a92c8cb3fc26489d9c58b3dbfc9fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _focusEvent: {fileID: 11400000, guid: ad87ff28194dffe44af147a10a273aba, type: 2}
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+--- !u!114 &3392287083777916861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b503fa40969cadc42be36c1584a4d8b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   defaultProjectile: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
     type: 3}
   defaultDecoy: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
     type: 3}
-  currentProjectile: {fileID: 4044515353307923508, guid: c7dcc8ab25afa6847a78b815b8462362,
-    type: 3}
-  currentDecoy: {fileID: 2788212711757725431, guid: 44f32e0a429fb8148884f01ad36c7703,
+  currentProjectile: {fileID: 0}
+  currentDecoy: {fileID: 0}
+--- !u!114 &8410044251005915282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e814617e436ff4ab728df419a20819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  focusCost: 25
+  dashDistance: 8
+  dashDuration: 0.15
+  hangTime: 0.2
+  projectileLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  dashClip: {fileID: 0}
+  indicatorRef: {fileID: 192944804307636621}
+  indicatorRenderer: {fileID: 4811700125883332067}
+  readyMat: {fileID: 2100000, guid: 4522c7822a3c7244392e80dbb5810b07, type: 2}
+  notReadyMat: {fileID: 2100000, guid: 4ebcdcf99683c0148aaa8d1b275a47b7, type: 2}
+  showIndicator: 1
+--- !u!114 &3403950254901794677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed7a18f8086f0ef42bb2f9d14962776c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startWithHull: 0
+  _gritEvent: {fileID: 11400000, guid: 13e14b718845bef499bf0df448e608af, type: 2}
+  _hullEvent: {fileID: 11400000, guid: 4823a310732ff2e47926091df574fe19, type: 2}
+  _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+--- !u!114 &1702664329331836105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36251c9bab67b3244a42735246777c33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scanRange: 25
+  scanRadius: 2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  reticlePrefab: {fileID: 5938182085543417046}
+  reticleOffset: {x: 0, y: 0.1, z: 0}
+  lockedColor: {r: 0, g: 0.4339623, b: 0.4339623, a: 1}
+  executionColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+--- !u!114 &8962226766011840260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6be25b1143e48f42850eb5ba1f0b961, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  killRewardFocus: 50
+  postKillHangTime: 0.4
+  executeClip: {fileID: 0}
+--- !u!114 &2251038212002885553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89bdc5f1377256442b50f35ca73c5a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _primaryWeapon: {fileID: 4400474212300462037}
+  _secondaryWeapon: {fileID: 2038459139198636050}
+--- !u!114 &4003894760239246067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ff14033414609c4bae767cd72479642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2038459139198636050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 164b9d971755e694d92113beb5061463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firePoint: {fileID: 8608103599068932834}
+  isAutomatic: 1
+  fireSound: {fileID: 0}
+  inputBufferTime: 0.2
+  bulletSpeed: 25
+--- !u!114 &4400474212300462037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3527fb8994930234184ffc7f77a0d2b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firePoint: {fileID: 8608103599068932834}
+  isAutomatic: 1
+  fireSound: {fileID: 0}
+  inputBufferTime: 0.2
+  range: 7
+  beamRadius: 0.5
+  selfRecoil: 15
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
     type: 3}
 --- !u!1 &8799886156076035042
 GameObject:

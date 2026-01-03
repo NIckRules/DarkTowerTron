@@ -2,6 +2,7 @@ using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
+using DarkTowerTron.Combat.Strategies;
 
 namespace DarkTowerTron.Combat
 {
@@ -31,8 +32,12 @@ namespace DarkTowerTron.Combat
         private Material _originalMaterial;
         private Vector3 _direction;
         private GameObject _source;
+
+        // Default strategy if none provided
+        private IMovementStrategy _movementStrategy;
         private bool _isInitialized = false;
         private bool _isRedirected = false; 
+        private bool _isEnemyDeflected = false;
         private float _lifeTimer;
         // NEW: State to prevent self-destruction on bounce
         private bool _wasDeflectedThisFrame = false;
@@ -53,17 +58,33 @@ namespace DarkTowerTron.Combat
         {
             CancelInvoke();
             _isInitialized = false;
+            _movementStrategy = null;
+            _isRedirected = false;
+            _isEnemyDeflected = false;
         }
 
         public void Initialize(Vector3 dir)
         {
+            // Default to Linear if strategy wasn't injected externally
+            if (_movementStrategy == null)
+                _movementStrategy = new LinearMovement();
+
+            _movementStrategy.Initialize(transform, dir, speed);
+
             _direction = dir.normalized;
             _isInitialized = true;
             _lifeTimer = lifetime;
             _graceTimer = gracePeriod; // RESET TIMER
-            _isRedirected = false; 
-            
-            if (meshRenderer && _originalMaterial) meshRenderer.material = _originalMaterial;
+            _isRedirected = false;
+            _isEnemyDeflected = false;
+
+            UpdateVisuals();
+        }
+
+        // NEW: Allow injecting a specific strategy (e.g. from a Boss pattern)
+        public void SetStrategy(IMovementStrategy strategy)
+        {
+            _movementStrategy = strategy;
         }
 
         public void ResetHostility(bool startHostile) { isHostile = startHostile; }
@@ -81,20 +102,32 @@ namespace DarkTowerTron.Combat
             // Countdown Grace Period
             if (_graceTimer > 0) _graceTimer -= Time.deltaTime;
 
-            float moveDistance = speed * Time.deltaTime;
+            float dt = Time.deltaTime;
+
+            // 1. STRATEGY MOVEMENT (Updates Transform)
+            // Capture position BEFORE move so we can Raycast the travelled segment
+            Vector3 oldPos = transform.position;
+            _movementStrategy?.Move(transform, dt);
+            Vector3 newPos = transform.position;
+
+            Vector3 travelVec = newPos - oldPos;
+            float moveDistance = travelVec.magnitude;
+            Vector3 travelDir = moveDistance > 0f ? (travelVec / moveDistance) : _direction;
+
+            // Keep direction updated for pushDirection / deflection math
+            if (moveDistance > 0f) _direction = travelDir;
 
             // --- ANTI-TUNNELING RAYCAST ---
             // Cast a ray forward equal to the distance we are about to move
             // We combine all relevant layers into one mask
             int layerMask = LayerMask.GetMask("Default", "Wall", "Player", "Enemy");
 
-            if (UnityEngine.Physics.Raycast(transform.position, _direction, out RaycastHit hit, moveDistance, layerMask))
+            if (moveDistance > 0f && UnityEngine.Physics.Raycast(oldPos, travelDir, out RaycastHit hit, moveDistance, layerMask))
             {
                 // IGNORE SELF / SOURCE
                 if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform))) 
                 {
-                    // Move normally if we hit the shooter (avoid stuck bullets)
-                    transform.Translate(_direction * moveDistance, Space.World);
+                    // Ignore hits on our current owner; keep the strategy-applied movement.
                 }
                 else
                 {
@@ -105,11 +138,6 @@ namespace DarkTowerTron.Combat
                     HandleCollision(hit.collider);
                     return; // Stop moving this frame
                 }
-            }
-            else
-            {
-                // Clear path, move forward
-                transform.Translate(_direction * moveDistance, Space.World);
             }
             // -----------------------------
 
@@ -163,43 +191,101 @@ namespace DarkTowerTron.Combat
         }
 
         // --- NEW METHOD FOR SHIELDS ---
+        // Backward-compatible overload
         public void DeflectByEnemy(Vector3 surfaceNormal)
         {
-            _wasDeflectedThisFrame = true;
-            isHostile = true; // Now it hurts the player!
-
-            // 1. Physics Math
-            _direction = Vector3.Reflect(_direction, surfaceNormal).normalized;
-            transform.rotation = Quaternion.LookRotation(_direction);
-            speed *= 1.2f;
-
-            // 2. Visual Change
-            if (meshRenderer)
-            {
-                if (hostileMaterial)
-                {
-                    meshRenderer.material = hostileMaterial;
-                }
-                else
-                {
-                    // Fallback
-                    meshRenderer.material.color = Color.red;
-                }
-            }
-            
-            // 3. Reset Timer
-            _lifeTimer = lifetime;
+            DeflectByEnemy(surfaceNormal, null);
         }
 
+        // Strategy-capable overload (e.g. perks / boss patterns)
+        public void DeflectByEnemy(Vector3 surfaceNormal, IMovementStrategy overrideStrategy = null)
+        {
+            _wasDeflectedThisFrame = true;
+            isHostile = true;
+
+            _isRedirected = false;
+            _isEnemyDeflected = true;
+
+            _direction = Vector3.Reflect(_direction, surfaceNormal).normalized;
+            _source = null;
+
+            // Preserve previous shield reflect tuning
+            speed *= 1.2f;
+            _lifeTimer = lifetime;
+
+            // STRATEGY LOGIC
+            if (overrideStrategy != null)
+            {
+                SetStrategy(overrideStrategy);
+            }
+            else
+            {
+                // Default: Shields usually bounce linearly
+                SetStrategy(new LinearMovement());
+            }
+
+            if (_movementStrategy == null) _movementStrategy = new LinearMovement();
+            _movementStrategy.Initialize(transform, _direction, speed);
+
+            UpdateVisuals();
+        }
+
+        // Backward-compatible overload
         public void Redirect(Vector3 newDirection, GameObject newOwner)
         {
-            isHostile = false; 
+            Redirect(newDirection, newOwner, null);
+        }
+
+        // "overrideStrategy" allows the Perk System to inject Homing/Spiral logic
+        public void Redirect(Vector3 newDirection, GameObject newOwner, IMovementStrategy overrideStrategy = null)
+        {
+            _wasDeflectedThisFrame = true;
+            isHostile = false;
             _isRedirected = true;
+            _isEnemyDeflected = false;
+
             _direction = newDirection.normalized;
-            speed *= 1.5f; 
-            if (meshRenderer && friendlyMaterial) meshRenderer.material = friendlyMaterial;
-            else if (meshRenderer) meshRenderer.material.color = Color.cyan;
-            _lifeTimer = 3.0f; 
+            _source = newOwner;
+
+            speed *= 1.5f;
+            _lifeTimer = 3.0f;
+
+            // STRATEGY LOGIC
+            if (overrideStrategy != null)
+            {
+                SetStrategy(overrideStrategy);
+            }
+            else
+            {
+                // Default: Reset to Linear (Clean slate)
+                SetStrategy(new LinearMovement());
+            }
+
+            if (_movementStrategy == null) _movementStrategy = new LinearMovement();
+            _movementStrategy.Initialize(transform, _direction, speed);
+
+            UpdateVisuals();
+        }
+
+        private void UpdateVisuals()
+        {
+            if (!meshRenderer) return;
+
+            if (_isRedirected)
+            {
+                if (friendlyMaterial) meshRenderer.material = friendlyMaterial;
+                else meshRenderer.material.color = Color.cyan;
+                return;
+            }
+
+            if (_isEnemyDeflected)
+            {
+                if (hostileMaterial) meshRenderer.material = hostileMaterial;
+                else meshRenderer.material.color = Color.red;
+                return;
+            }
+
+            if (_originalMaterial) meshRenderer.material = _originalMaterial;
         }
 
         private void Despawn()

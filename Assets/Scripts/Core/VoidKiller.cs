@@ -1,5 +1,5 @@
 using UnityEngine;
-using DarkTowerTron.Player; // Access PlayerHealth directly for special void logic
+using DarkTowerTron.Player.Stats; // Access PlayerHealth directly for special void logic
 
 namespace DarkTowerTron.Core
 {

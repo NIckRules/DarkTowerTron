@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player;
+using DarkTowerTron.Player.Stats;
 
 namespace DarkTowerTron.Managers
 {

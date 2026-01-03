@@ -1,6 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Managers;
-using DarkTowerTron.Player;
+using DarkTowerTron.Player.Controller;
 
 namespace DarkTowerTron.Core
 {
