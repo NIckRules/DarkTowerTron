@@ -12,16 +12,13 @@ namespace DarkTowerTron.Player.Movement
     [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerMovement))]
     [RequireComponent(typeof(PlayerLoadout))]
+    [RequireComponent(typeof(PlayerStats))]
     public class PlayerDodge : MonoBehaviour
     {
         [Header("Dodge Settings")]
         public float focusCost = 25f;
         public float dashDistance = 8f;
         public float dashDuration = 0.15f;
-
-        [Header("Traversal (Gravity Control)")]
-        [Tooltip("How long to suspend gravity AFTER the dash ends (Coyote Time).")]
-        public float hangTime = 0.2f;
 
         [Header("Interaction Settings")]
         public LayerMask projectileLayer;
@@ -46,6 +43,7 @@ namespace DarkTowerTron.Player.Movement
         private PlayerEnergy _energy;
         private PlayerMovement _movement;
         private PlayerLoadout _loadout;
+        private PlayerStats _stats;
 
         private void Awake()
         {
@@ -53,8 +51,9 @@ namespace DarkTowerTron.Player.Movement
             _energy = GetComponent<PlayerEnergy>();
             _movement = GetComponent<PlayerMovement>();
             _loadout = GetComponent<PlayerLoadout>();
+            _stats = GetComponent<PlayerStats>();
 
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", "Wall");
+            if (wallLayer == 0) wallLayer = GameConstants.MASK_WALLS;
         }
 
         private void Update()
@@ -86,7 +85,7 @@ namespace DarkTowerTron.Player.Movement
             // --- 1. GRAVITY SUSPENSION ---
             // We tell movement to ignore gravity for the dash duration + hang time.
             // This allows "Air Dashing" without falling immediately.
-            _movement.SuspendGravity(dashDuration + hangTime);
+            _movement.SuspendGravity(dashDuration + _stats.ActionHangTime);
 
             // --- 2. AUDIO & VISUALS ---
             if (Services.Audio != null && dashClip)
@@ -128,14 +127,15 @@ namespace DarkTowerTron.Player.Movement
             IsInvulnerable = false;
             IsDashing = false;
 
-            // Note: Gravity remains suspended for the duration of 'hangTime' 
+            // Note: Gravity remains suspended for the duration of ActionHangTime
             // handled by PlayerMovement timer.
         }
 
         private void CatchProjectiles()
         {
             // Detect hostile bullets in close range
-            Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, projectileLayer);
+            int layerMask = 1 << GameConstants.LAYER_PROJECTILE;
+            Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, layerMask);
 
             foreach (var hit in hits)
             {
@@ -173,7 +173,7 @@ namespace DarkTowerTron.Player.Movement
             Vector3 targetPos;
 
             // Raycast to stop indicator at walls
-            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, dashDistance, wallLayer))
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, dashDistance, GameConstants.MASK_WALLS))
             {
                 targetPos = hit.point - (dir * 0.5f);
             }

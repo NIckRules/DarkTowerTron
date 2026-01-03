@@ -23,11 +23,20 @@ namespace DarkTowerTron.Player.Stats
             }
         }
 
-        // --- MOVEMENT ---
+        // --- MOVEMENT & PHYSICS ---
         public float MoveSpeed => IsOverdrive
-            ? (Base?.moveSpeed ?? 10f) * (Base?.overdriveSpeedMult ?? 1f)
-            : (Base?.moveSpeed ?? 10f);
-        public float Acceleration => Base?.acceleration ?? 50f;
+            ? (Base?.moveSpeed ?? 12f) * (Base?.overdriveSpeedMult ?? 1f)
+            : (Base?.moveSpeed ?? 12f);
+        public float Acceleration => Base?.acceleration ?? 60f;
+        public float Deceleration => Base?.deceleration ?? 40f;
+        public float RotationSpeed => Base?.rotationSpeed ?? 25f;
+        public float Gravity => Base?.gravity ?? 20f;
+        public float WallRepulsion => Base?.wallRepulsionForce ?? 5f;
+        public float ActionHangTime => Base?.actionHangTime ?? 0.2f;
+
+        // --- SCANNER ---
+        public float ScanRange => Base?.scanRange ?? 25f;
+        public float ScanRadius => Base?.scanRadius ?? 2f;
 
         // --- ABILITIES ---
         public float DashCost => Base?.dashCost ?? 0f;

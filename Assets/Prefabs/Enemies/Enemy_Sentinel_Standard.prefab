@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3834379093864157853}
   - component: {fileID: 3591973053576949401}
   - component: {fileID: 2336007944503135607}
-  - component: {fileID: 713414480700382442}
+  - component: {fileID: 4608933254380305341}
   m_Layer: 0
   m_Name: Art_Drone
   m_TagString: Untagged
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a05b6fae2bd964042b79a3bd0ffe0e9e, type: 2}
+  - {fileID: 2100000, guid: 0165aae9d439d484298ed4132223d775, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -121,7 +121,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &713414480700382442
+--- !u!114 &4608933254380305341
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,11 +130,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1695730014863775712}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9016109235ae934418d90e23d17144f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e4551bf74c0bd1458057a1697802711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainControllerObject: {fileID: 3219024694404494821}
-  _damageMultiplier: 1
+  _receiver: {fileID: 7904817740265838072}
+  damageMultiplier: 1
 --- !u!1 &3219024694404494821
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,6 +154,9 @@ GameObject:
   - component: {fileID: 8878435702132643533}
   - component: {fileID: 2210773658854962218}
   - component: {fileID: 8762978511751056149}
+  - component: {fileID: 2804613237527396094}
+  - component: {fileID: 2041324009947468778}
+  - component: {fileID: 7904817740265838072}
   m_Layer: 7
   m_Name: Enemy_Sentinel_Standard
   m_TagString: Enemy
@@ -214,7 +217,7 @@ MonoBehaviour:
   stats: {fileID: 11400000, guid: cc0a6717566fad04484abcefff70db74, type: 2}
   allyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
 --- !u!114 &1212059287548495218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -227,6 +230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a7603a9ffd76d345ba02c3982101b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
   meshRenderer: {fileID: 3834379093864157853}
   palette: {fileID: 0}
   staggerClip: {fileID: 8300000, guid: 8825eac8c60f4bf439a3043099071044, type: 3}
@@ -357,6 +361,45 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8f5bf4ca0e1bfe849aa8ef34c8cb0487, type: 2}
   - {fileID: 11400000, guid: a9aa5036245d66e408d847a7f9f7750e, type: 2}
   - {fileID: 11400000, guid: b1e853f3913cd434ca7f324824d176f1, type: 2}
+--- !u!114 &2804613237527396094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3219024694404494821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89939daf16190e4a8534162a9116e93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2041324009947468778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3219024694404494821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358fbf73a02f56a4dbf53de385f17f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7904817740265838072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3219024694404494821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 188435c26dc3ba349a8180861ff88419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useOverrides: 0
+  _overrideHealth: 50
+  _overrideStagger: 3
 --- !u!1 &4710311676832444623
 GameObject:
   m_ObjectHideFlags: 0

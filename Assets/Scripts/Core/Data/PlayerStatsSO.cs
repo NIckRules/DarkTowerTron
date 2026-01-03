@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Core.Data
 {
@@ -8,6 +9,19 @@ namespace DarkTowerTron.Core.Data
         [Header("Movement")]
         public float moveSpeed = 12f;
         public float acceleration = 60f;
+        public float deceleration = 40f;
+        public float rotationSpeed = 25f;
+
+        [Header("Physics & Feel")]
+        public float gravity = 20f;
+        public float wallRepulsionForce = 5f;
+        [Tooltip("Time gravity is suspended after a dash/kill")]
+        [FormerlySerializedAs("postActionHangTime")]
+        public float actionHangTime = 0.2f;
+
+        [Header("Scanner")]
+        public float scanRange = 25f;
+        public float scanRadius = 2f;
 
         [Header("Resources")]
         public int maxGrit = 2;
@@ -35,6 +49,15 @@ namespace DarkTowerTron.Core.Data
         {
             moveSpeed = Mathf.Max(0f, moveSpeed);
             acceleration = Mathf.Max(0.01f, acceleration);
+            deceleration = Mathf.Max(0f, deceleration);
+            rotationSpeed = Mathf.Max(0f, rotationSpeed);
+
+            gravity = Mathf.Max(0f, gravity);
+            wallRepulsionForce = Mathf.Max(0f, wallRepulsionForce);
+            actionHangTime = Mathf.Max(0f, actionHangTime);
+
+            scanRange = Mathf.Max(0f, scanRange);
+            scanRadius = Mathf.Max(0f, scanRadius);
 
             maxGrit = Mathf.Max(1, maxGrit);
             maxFocus = Mathf.Max(0f, maxFocus);

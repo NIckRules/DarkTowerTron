@@ -49,7 +49,7 @@ namespace DarkTowerTron.Enemy.Agents
             Brain = GetComponent<ContextSolver>();
             FSM = GetComponent<StateMachine>();
 
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
+            if (wallLayer == 0) wallLayer = GameConstants.MASK_WALLS;
 
             // Initialize States
             StatePositioning = new SniperState_Positioning(this);

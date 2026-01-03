@@ -23,7 +23,7 @@ namespace DarkTowerTron.Enemy
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
-            if (allyLayer == 0) allyLayer = LayerMask.GetMask(GameConstants.LAYER_ENEMY);
+            if (allyLayer == 0) allyLayer = 1 << GameConstants.LAYER_ENEMY;
         }
 
         private void OnEnable()

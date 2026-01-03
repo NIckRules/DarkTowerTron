@@ -46,7 +46,7 @@ namespace DarkTowerTron.Physics
         {
             _capsule = GetComponent<CapsuleCollider>();
             if (Camera.main) _camTransform = Camera.main.transform;
-            if (_obstacleMask == 0) _obstacleMask = 1;
+            if (_obstacleMask == 0) _obstacleMask = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
 
         public void Move(Vector3 desiredVelocity)

@@ -1,4 +1,5 @@
 using UnityEngine;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Combat.Strategies
 {
@@ -7,8 +8,6 @@ namespace DarkTowerTron.Combat.Strategies
         private Transform _target;
         private float _turnSpeed;
         private float _speed;
-        
-        // State
         private Vector3 _currentDirection;
 
         public HomingMovement(Transform target, float turnSpeed)
@@ -26,12 +25,11 @@ namespace DarkTowerTron.Combat.Strategies
 
         public void Move(Transform transform, float deltaTime)
         {
-            // 1. Target Tracking
             if (_target != null)
             {
                 Vector3 dirToTarget = (_target.position - transform.position).normalized;
                 
-                // Smoothly rotate current direction towards target
+                // Rotate towards target
                 _currentDirection = Vector3.RotateTowards(
                     _currentDirection, 
                     dirToTarget, 
@@ -39,9 +37,7 @@ namespace DarkTowerTron.Combat.Strategies
                     0.0f
                 );
             }
-            // If target is null (died), we just keep flying in the last known _currentDirection (Linear)
 
-            // 2. Apply Rotation & Movement
             transform.rotation = Quaternion.LookRotation(_currentDirection);
             transform.Translate(_currentDirection * _speed * deltaTime, Space.World);
         }

@@ -17,7 +17,7 @@ namespace DarkTowerTron.Core.Services
         private void Awake()
         {
             // REMOVED: Singleton check
-            if (groundLayer == 0) groundLayer = LayerMask.GetMask("Ground", "Default", "Wall");
+            if (groundLayer == 0) groundLayer = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
 
         private void OnEnable()

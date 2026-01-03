@@ -14,6 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 12
   acceleration: 60
+  deceleration: 40
+  rotationSpeed: 25
+  gravity: 20
+  wallRepulsionForce: 100
+  actionHangTime: 0.2
+  scanRange: 25
+  scanRadius: 2
   maxGrit: 3
   maxFocus: 100
   focusDecayRate: 5

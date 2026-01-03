@@ -19,12 +19,14 @@ MonoBehaviour:
   gritRewardAmount: 1
   moveSpeed: 7
   rotationSpeed: 15
+  combatRotationSpeed: 3
   acceleration: 20
-  rideHeight: 1.5
+  rideHeight: 0.2
   verticalSmoothTime: 0.5
   separationRadius: 2
   separationForce: 5
-  maxStagger: 0.8
+  maxHealth: 10
+  maxStagger: 1
   staggerDecay: 0.5
   hasFrontalShield: 0
   shieldAngle: 0.5

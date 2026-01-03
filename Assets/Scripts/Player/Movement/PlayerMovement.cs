@@ -9,17 +9,8 @@ namespace DarkTowerTron.Player.Movement
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerMovement : MonoBehaviour
     {
-        [Header("Motion Settings")]
-        public float deceleration = 40f;
-        public float rotationSpeed = 25f;
-
-        [Header("Wall Repulsion (Anti-Stick)")]
-        public float wallBuffer = 0.6f; // How close before we push back (0.5 is player radius)
-        public float repulsionForce = 5f; // How hard we push
-        public LayerMask wallLayer;
-
-        [Header("Physics")]
-        public float gravity = 20f; // Gravity is controlled here
+        [Header("Wall Repulsion")]
+        public float wallBuffer = 0.6f; // Keep this (Collider size dependency)
 
         [Header("Safety Net")]
         public float safeGroundTimer = 0.5f; // Time required to be grounded to count as "Safe"
@@ -48,9 +39,6 @@ namespace DarkTowerTron.Player.Movement
             _mover = GetComponent<KinematicMover>();
             _cam = Camera.main;
             _stats = GetComponent<PlayerStats>();
-
-            // Default mask if not set
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
         }
 
         private void Start()
@@ -69,7 +57,7 @@ namespace DarkTowerTron.Player.Movement
             if (direction.sqrMagnitude > 0.001f)
             {
                 Quaternion targetRot = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, _stats.RotationSpeed * Time.deltaTime);
             }
         }
 
@@ -77,7 +65,7 @@ namespace DarkTowerTron.Player.Movement
         {
             Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
             // Use UnityEngine.Physics to disambiguate
-            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
+            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, GameConstants.MASK_GROUND_ONLY))
             {
                 Vector3 lookDir = hit.point - transform.position;
                 LookAtDirection(lookDir);
@@ -115,7 +103,7 @@ namespace DarkTowerTron.Player.Movement
             }
             else
             {
-                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, deceleration * dt);
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, _stats.Deceleration * dt);
                 if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
             }
 
@@ -136,7 +124,7 @@ namespace DarkTowerTron.Player.Movement
             // Only apply gravity if NOT grounded AND NOT suspended
             if (!_mover.IsGrounded && _gravitySuspendTimer <= 0)
             {
-                finalVelocity.y -= gravity;
+                finalVelocity.y -= _stats.Gravity;
             }
             else if (_mover.IsGrounded)
             {
@@ -171,7 +159,7 @@ namespace DarkTowerTron.Player.Movement
             bool isCenterSupported = false;
             
             // Cast from slightly up, downwards. Check GROUND layer only.
-            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, 2.0f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, 2.0f, GameConstants.MASK_GROUND_ONLY))
             {
                 isCenterSupported = true;
             }
@@ -195,9 +183,12 @@ namespace DarkTowerTron.Player.Movement
         {
             Vector3 push = Vector3.zero;
 
+            // CHANGE: Use Constant instead of variable
+            int layerMask = GameConstants.MASK_WALLS;
+
             // Find walls within buffer range
             // We use the player's position + slight up offset (center of mass)
-            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, _wallBuffer, wallLayer);
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, _wallBuffer, layerMask);
 
             for (int i = 0; i < count; i++)
             {
@@ -217,7 +208,7 @@ namespace DarkTowerTron.Player.Movement
                 {
                     // The closer we are, the stronger the push
                     // Normalized push * strength
-                    push += dir.normalized * repulsionForce;
+                    push += dir.normalized * _stats.WallRepulsion;
                 }
             }
 

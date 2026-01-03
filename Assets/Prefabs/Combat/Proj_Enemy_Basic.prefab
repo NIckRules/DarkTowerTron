@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 4853897871245773816}
   - component: {fileID: 7853976462343550844}
   - component: {fileID: 6894111335874687869}
+  - component: {fileID: 5034152483015390555}
+  - component: {fileID: 6824674176633771949}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -105,6 +107,54 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &5034152483015390555
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 337644372426971230}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &6824674176633771949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 337644372426971230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dd7805b9e1c7a741a660a6d1d5c316b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 25
+  lifetime: 5
+  isHostile: 0
+  damage: 10
+  stagger: 1
+  damageType: 1
+  meshRenderer: {fileID: 7853976462343550844}
+  friendlyMaterial: {fileID: 2100000, guid: 3a04aa1b05131a14e9ff984a6458bdc6, type: 2}
+  hostileMaterial: {fileID: 2100000, guid: 77736e828f9e8074798c85575b33cf35, type: 2}
 --- !u!1 &4044515353307923508
 GameObject:
   m_ObjectHideFlags: 0
@@ -203,10 +253,6 @@ MonoBehaviour:
   speed: 15
   lifetime: 5
   isHostile: 1
-  gracePeriod: 0.05
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 0
   damage: 1
   stagger: 0
   damageType: 1

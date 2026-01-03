@@ -796,6 +796,16 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5425164222855730169, guid: 63a246fb93fd860468c637a68c49938c,
+        type: 3}
+      propertyPath: showDebugRays
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5425164222855730169, guid: 63a246fb93fd860468c637a68c49938c,
+        type: 3}
+      propertyPath: debugLineDuration
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 6161392083986349302, guid: 63a246fb93fd860468c637a68c49938c,
         type: 3}
       propertyPath: target

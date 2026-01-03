@@ -1,13 +1,13 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Player.Stats;
 
 namespace DarkTowerTron.Player.Combat
 {
+    [RequireComponent(typeof(PlayerStats))]
     public class TargetScanner : MonoBehaviour
     {
         [Header("Settings")]
-        public float scanRange = 25f; // Increased Default
-        public float scanRadius = 2.0f; // Thicker Default
         public LayerMask enemyLayer;
 
         [Header("Visuals")]
@@ -22,6 +22,12 @@ namespace DarkTowerTron.Player.Combat
 
         private Transform _reticleInstance;
         private LineRenderer _reticleLine; // Assuming we use the LineRenderer reticle
+        private PlayerStats _stats;
+
+        private void Awake()
+        {
+            _stats = GetComponent<PlayerStats>();
+        }
 
         private void Start()
         {
@@ -38,7 +44,12 @@ namespace DarkTowerTron.Player.Combat
             // Lift origin slightly to avoid floor clipping
             Vector3 origin = transform.position + Vector3.up * 1.0f;
 
-            if (UnityEngine.Physics.SphereCast(origin, scanRadius, aimDirection, out RaycastHit hit, scanRange, enemyLayer))
+            int layerMask = 1 << GameConstants.LAYER_ENEMY;
+
+            float range = _stats ? _stats.ScanRange : 25f;
+            float radius = _stats ? _stats.ScanRadius : 2f;
+
+            if (UnityEngine.Physics.SphereCast(origin, radius, aimDirection, out RaycastHit hit, range, layerMask))
             {
                 // FIX: Look for Interface instead of EnemyController
                 ICombatTarget target = hit.collider.GetComponentInParent<ICombatTarget>();

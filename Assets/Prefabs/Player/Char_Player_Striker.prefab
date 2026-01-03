@@ -483,7 +483,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cc19ea74c476bab4daeeff447d45cbc9, type: 2}
+  - {fileID: 2100000, guid: 570a0b9c262ed7744a6cdcac4fe6e9a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -716,7 +716,6 @@ GameObject:
   - component: {fileID: 5230015545283728264}
   - component: {fileID: 6365553688910257222}
   - component: {fileID: -4286876796308643671}
-  - component: {fileID: 7496228784035397067}
   - component: {fileID: 6396008832873625397}
   - component: {fileID: 595545573381503981}
   - component: {fileID: 7923701252425940506}
@@ -729,6 +728,7 @@ GameObject:
   - component: {fileID: 4003894760239246067}
   - component: {fileID: 2038459139198636050}
   - component: {fileID: 4400474212300462037}
+  - component: {fileID: 9117973085963638233}
   m_Layer: 6
   m_Name: Char_Player_Striker
   m_TagString: Player
@@ -849,19 +849,6 @@ MonoBehaviour:
   - {fileID: 1628793600088000154}
   tertiaryRenderers:
   - {fileID: 6070481044973411645}
---- !u!114 &7496228784035397067
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8164355637247924031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e426abc94fdbcc9488930e6a561f357a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputSafetyBuffer: 0.2
 --- !u!114 &6396008832873625397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -887,14 +874,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 275e5da889897f54ea3b0fb0f78e5f4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deceleration: 40
-  rotationSpeed: 25
   wallBuffer: 0.6
-  repulsionForce: 5
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  gravity: 20
   safeGroundTimer: 0.5
 --- !u!114 &7923701252425940506
 MonoBehaviour:
@@ -943,7 +923,6 @@ MonoBehaviour:
   focusCost: 25
   dashDistance: 8
   dashDuration: 0.15
-  hangTime: 0.2
   projectileLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -985,8 +964,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36251c9bab67b3244a42735246777c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanRange: 25
-  scanRadius: 2
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -1007,7 +984,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killRewardFocus: 50
-  postKillHangTime: 0.4
   executeClip: {fileID: 0}
 --- !u!114 &2251038212002885553
 MonoBehaviour:
@@ -1076,6 +1052,33 @@ MonoBehaviour:
     m_Bits: 128
   beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
     type: 3}
+--- !u!114 &9117973085963638233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164355637247924031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e426abc94fdbcc9488930e6a561f357a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _moveAction: {fileID: -4671632893512155202, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  _aimGamepadAction: {fileID: -2744965540147172606, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  _aimMouseAction: {fileID: -3268333308273835459, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  _firePrimaryAction: {fileID: -5063990365196546900, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  _fireSecondaryAction: {fileID: 5185968880820387301, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  _dashAction: {fileID: 5213545983024138412, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  _gloryKillAction: {fileID: 5243871840208897243, guid: 14745409b882ae041994aad506d6aebb,
+    type: 3}
+  bufferTime: 0.15
 --- !u!1 &8799886156076035042
 GameObject:
   m_ObjectHideFlags: 0

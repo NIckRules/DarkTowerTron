@@ -1,4 +1,5 @@
 using UnityEngine;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Combat.Strategies
 {
@@ -11,14 +12,11 @@ namespace DarkTowerTron.Combat.Strategies
         {
             _speed = speed;
             _direction = direction.normalized;
-            
-            // Align visual rotation immediately
             transform.rotation = Quaternion.LookRotation(_direction);
         }
 
         public void Move(Transform transform, float deltaTime)
         {
-            // Simple translation
             transform.Translate(_direction * _speed * deltaTime, Space.World);
         }
     }

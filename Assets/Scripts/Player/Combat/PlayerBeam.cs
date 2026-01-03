@@ -56,7 +56,11 @@ namespace DarkTowerTron.Player.Combat
             }
 
             // 3. Hit Detection
-            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, hitLayers))
+            // CHANGE: Beam is instant, so we want to hit Enemies and Walls.
+            // Use a specific mask for Player attacks: Walls (+ Default) + Enemy.
+            int mask = GameConstants.MASK_WALLS | (1 << GameConstants.LAYER_ENEMY);
+
+            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, mask))
             {
                 IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
 

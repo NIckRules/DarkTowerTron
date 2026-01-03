@@ -356,5 +356,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4551bf74c0bd1458057a1697802711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _receiver: {fileID: 0}
+  _receiver: {fileID: 4750967128096105279}
   damageMultiplier: 1

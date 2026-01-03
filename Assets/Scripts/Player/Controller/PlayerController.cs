@@ -1,8 +1,8 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player.Combat;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron.Player.Combat;   // Ensure these match your folders
 using DarkTowerTron.Player.Movement;
+using DarkTowerTron.Player.Stats;
 
 namespace DarkTowerTron.Player.Controller
 {
@@ -32,8 +32,6 @@ namespace DarkTowerTron.Player.Controller
             _scanner = GetComponent<TargetScanner>();
 
             // 2. Bind Input Events
-            // Note: Continuous inputs (Move/Look) are polled in Update
-            // One-shots (Dash/Kill) are events
             _input.OnDash += PerformDodge;
             _input.OnGloryKill += PerformGloryKill;
 
@@ -53,13 +51,13 @@ namespace DarkTowerTron.Player.Controller
         private void Update()
         {
             // 1. Movement
-            // Convert Input(Vector2) to 3D Plane (X, 0, Y)
+            // We read from the Handler. If Handler is crashing (null refs), this returns (0,0)
             Vector3 moveDir = new Vector3(_input.MoveInput.x, 0, _input.MoveInput.y).normalized;
             _movement.SetMoveInput(moveDir);
 
             // 2. Looking / Aiming
             Vector3 aimDir = _input.LookDirection;
-            if (aimDir == Vector3.zero) aimDir = transform.forward; // Safety
+            if (aimDir == Vector3.zero) aimDir = transform.forward; 
             
             _movement.LookAtDirection(aimDir);
             if (_scanner) _scanner.UpdateScanner(aimDir);
@@ -81,7 +79,7 @@ namespace DarkTowerTron.Player.Controller
             if (_execution) _execution.PerformGloryKill();
         }
 
-        // --- PUBLIC API (Used by GameSession) ---
+        // --- PUBLIC API ---
 
         public void ToggleInput(bool state)
         {
