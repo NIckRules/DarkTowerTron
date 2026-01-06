@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Core.Events
 {
@@ -13,7 +14,7 @@ namespace DarkTowerTron.Core.Events
             if (OnEventRaised != null)
                 OnEventRaised.Invoke();
             else
-                Debug.LogWarning($"Void Event [{name}] was raised but nothing picked it up.");
+                GameLogger.LogWarning(LogChannel.System, $"Void Event [{name}] was raised but nothing picked it up.");
         }
     }
 }

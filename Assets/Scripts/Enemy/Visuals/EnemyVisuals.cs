@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Services;
 using DarkTowerTron.Services; // PaletteManager
@@ -42,7 +43,7 @@ namespace DarkTowerTron.Enemy.Visuals
             if (_renderers.Length == 0)
             {
                 // Warn but don't crash, logic will just loop 0 times
-                Debug.LogWarning($"[EnemyVisuals] No Renderers found on {name}", gameObject);
+                GameLogger.LogWarning(LogChannel.AI, $"[EnemyVisuals] No Renderers found on {name}", gameObject);
             }
 
             _baseColors = new Color[_renderers.Length];
@@ -56,7 +57,7 @@ namespace DarkTowerTron.Enemy.Visuals
         {
             if (profile == null)
             {
-                Debug.LogError($"[EnemyVisuals] Profile missing on {gameObject.name}. Animations will fail.", gameObject);
+                GameLogger.LogError(LogChannel.AI, $"[EnemyVisuals] Profile missing on {gameObject.name}. Animations will fail.", gameObject);
                 enabled = false;
                 return;
             }

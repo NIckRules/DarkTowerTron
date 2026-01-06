@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem; // NEW: For Keyboard
 using System.Collections;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Controller;
 using DarkTowerTron.Player.Stats;
 using DarkTowerTron.Combat; // For DamageReceiver
@@ -15,6 +16,9 @@ namespace DarkTowerTron.Managers
     {
         [Header("Workflow")]
         public bool autoStartGame = false;
+
+        [Header("Events")]
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;
 
         [Header("Cheats")]
         public bool godMode = false;
@@ -49,7 +53,7 @@ namespace DarkTowerTron.Managers
                     session.BeginGame();
 
                     // Force combat state active
-                    GameEvents.OnWaveCombatStarted?.Invoke();
+                    _combatStartedEvent?.Raise();
                 }
             }
 

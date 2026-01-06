@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Core.Events
 {
@@ -10,7 +11,10 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(bool value)
         {
-            OnEventRaised?.Invoke(value);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(value);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"Bool Event [{name}] was raised but nothing picked it up.");
         }
     }
 }

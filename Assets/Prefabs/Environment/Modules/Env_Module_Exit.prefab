@@ -264,6 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb90c6ad005a4947bfb3d30478005dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameVictoryEvent: {fileID: 11400000, guid: 4fbc2c313ec045e47ac68a922f56257e, type: 2}
 --- !u!1001 &5275893407393339795
 PrefabInstance:
   m_ObjectHideFlags: 0

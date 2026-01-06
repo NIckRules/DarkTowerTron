@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b065f9919f65e749895866ea7158886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _roomClearedEvent: {fileID: 11400000, guid: 5dbf1ba87b8243e4880befa80c30a2d3, type: 2}
   laserWall: {fileID: 9135160647385294742}
   baseRenderer: {fileID: 5452745938957646345}
   wallRenderer: {fileID: 6800928015375942299}

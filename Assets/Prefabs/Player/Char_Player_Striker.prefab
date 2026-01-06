@@ -906,6 +906,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 275e5da889897f54ea3b0fb0f78e5f4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useUnityController: 0
   wallBuffer: 0.6
   safeGroundTimer: 0.5
 --- !u!114 &7923701252425940506
@@ -922,6 +923,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _focusEvent: {fileID: 11400000, guid: ad87ff28194dffe44af147a10a273aba, type: 2}
   _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+  _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
+  _combatStartedEvent: {fileID: 11400000, guid: 82d8dc1f496caeb438899a555ff9688d,
+    type: 2}
+  _waveClearedEvent: {fileID: 11400000, guid: e7e1e513b7e74e840a25a99c41b46730, type: 2}
+  _gameVictoryEvent: {fileID: 11400000, guid: 4fbc2c313ec045e47ac68a922f56257e, type: 2}
 --- !u!114 &3392287083777916861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -970,11 +976,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed7a18f8086f0ef42bb2f9d14962776c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startWithHull: 0
+  startWithHull: 1
   _aimTarget: {fileID: 6510081702476418290}
   _gritEvent: {fileID: 11400000, guid: 13e14b718845bef499bf0df448e608af, type: 2}
   _hullEvent: {fileID: 11400000, guid: 4823a310732ff2e47926091df574fe19, type: 2}
   _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
+  _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
   _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
 --- !u!114 &1702664329331836105
 MonoBehaviour:

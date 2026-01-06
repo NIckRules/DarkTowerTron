@@ -40,8 +40,10 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
         [SerializeField] private IntIntEventChannelSO _waveAnnounceEvent; // For "Wave 666"
         [SerializeField] private VoidEventChannelSO _combatStartedEvent;
-        // Note: Popup/Damage text might still be static or you can inject a channel if you have one.
-        // Assuming GameEvents.OnPopupText is still static for now as per previous sessions.
+
+        // Replacements for legacy static UI calls
+        [SerializeField] private PopupTextEventChannelSO _popupEvent;
+        [SerializeField] private DamageTextEventChannelSO _damageTextEvent;
 
         [Header("Aiming")]
         [SerializeField] private float _aimOffset = 0f;
@@ -222,7 +224,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _fsm.ChangeState(null); // Stop AI
             _currentRotationSpeed = 60f; // Panic
 
-            GameEvents.OnPopupText?.Invoke(transform.position, "SHIELD DOWN"); // Legacy Event
+            _popupEvent?.Raise(transform.position, "SHIELD DOWN");
             yield return null;
         }
 
@@ -237,14 +239,13 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         {
             if (!_isVulnerable)
             {
-                GameEvents.OnPopupText?.Invoke(transform.position, "SHIELDED");
+                _popupEvent?.Raise(transform.position, "SHIELDED");
                 return false;
             }
 
             coreHealth -= info.damageAmount;
 
-            // Legacy Events for text
-            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, true);
+            _damageTextEvent?.Raise(transform.position, info.damageAmount, true, false);
 
             if (coreHealth <= 0) Kill(true);
             return true;
@@ -278,7 +279,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
             else
             {
-                GameEvents.OnPopupText?.Invoke(transform.position, "SHIELDED");
+                _popupEvent?.Raise(transform.position, "SHIELDED");
             }
         }
     }

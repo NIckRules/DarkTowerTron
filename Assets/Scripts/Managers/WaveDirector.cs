@@ -15,6 +15,13 @@ namespace DarkTowerTron.Managers
         [Tooltip("Listens for enemy deaths to track wave progress.")]
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
 
+        [Header("Broadcasting")]
+        [SerializeField] private IntEventChannelSO _announceEvent;
+        [SerializeField] private StringEventChannelSO _countdownEvent;
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;
+        [SerializeField] private VoidEventChannelSO _waveClearedEvent;
+        [SerializeField] private VoidEventChannelSO _roomClearedEvent;
+
         [Header("Configuration")]
         public List<WaveDefinitionSO> waves;
         public float timeBetweenWaves = 3.0f;
@@ -70,7 +77,7 @@ namespace DarkTowerTron.Managers
                 GameLogger.Log(LogChannel.System, "ROOM CLEARED", gameObject);
                 
                 // Triggers doors opening, etc.
-                GameEvents.OnRoomCleared?.Invoke(); 
+                _roomClearedEvent?.Raise();
                 yield break;
             }
 
@@ -78,20 +85,20 @@ namespace DarkTowerTron.Managers
             GameLogger.Log(LogChannel.System, $"STARTING WAVE {index + 1}: {wave.waveName}", gameObject);
 
             // --- UI ANNOUNCEMENT (Legacy Static Events) ---
-            GameEvents.OnWaveAnnounce?.Invoke(index);
+            _announceEvent?.Raise(index + 1);
             yield return new WaitForSeconds(1.0f);
             
-            GameEvents.OnCountdownChange?.Invoke("3");
+            _countdownEvent?.Raise("3");
             yield return new WaitForSeconds(1.0f);
-            GameEvents.OnCountdownChange?.Invoke("2");
+            _countdownEvent?.Raise("2");
             yield return new WaitForSeconds(1.0f);
-            GameEvents.OnCountdownChange?.Invoke("1");
+            _countdownEvent?.Raise("1");
             yield return new WaitForSeconds(1.0f);
             
-            GameEvents.OnCountdownChange?.Invoke("ENGAGE");
-            GameEvents.OnWaveCombatStarted?.Invoke();
+            _countdownEvent?.Raise("ENGAGE");
+            _combatStartedEvent?.Raise();
             yield return new WaitForSeconds(0.5f);
-            GameEvents.OnCountdownChange?.Invoke("");
+            _countdownEvent?.Raise("");
             // -----------------
 
             // Reset Counters
@@ -202,7 +209,7 @@ namespace DarkTowerTron.Managers
 
                 if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
 
-                GameEvents.OnWaveCleared?.Invoke(); // UI/FX Feedback
+                _waveClearedEvent?.Raise(); // UI/FX Feedback
                 
                 _currentWaveIndex++;
                 StartCoroutine(NextWaveRoutine());

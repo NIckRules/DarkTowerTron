@@ -1,10 +1,14 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 
 namespace DarkTowerTron.Environment
 {
     public class LevelEndTrigger : MonoBehaviour
     {
+        [Header("Broadcasting")]
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
+
         private bool _triggered = false;
 
         private void OnTriggerEnter(Collider other)
@@ -17,7 +21,7 @@ namespace DarkTowerTron.Environment
                 GameLogger.Log(LogChannel.System, "LEVEL COMPLETE", gameObject);
 
                 // Trigger Victory Logic
-                GameEvents.OnGameVictory?.Invoke();
+                _gameVictoryEvent?.Raise();
             }
         }
 

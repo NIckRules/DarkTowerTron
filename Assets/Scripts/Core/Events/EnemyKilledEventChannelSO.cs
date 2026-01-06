@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data; // For EnemyStatsSO
 
 namespace DarkTowerTron.Core.Events
@@ -12,7 +13,10 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
-            OnEventRaised?.Invoke(position, stats, rewardPlayer);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(position, stats, rewardPlayer);
+            else
+                GameLogger.LogWarning(LogChannel.Combat, $"EnemyKilled Event [{name}] was raised but nothing picked it up.");
         }
     }
 }

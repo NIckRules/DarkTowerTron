@@ -80,7 +80,7 @@ namespace DarkTowerTron.Player.Movement
             }
 
             _mover?.SetEnabled(true);
-            if (_mover != null) Debug.Log($"[PlayerMovement] Using Mover: {_mover.GetType().Name}");
+            if (_mover != null) GameLogger.Log(LogChannel.Player, $"[PlayerMovement] Using Mover: {_mover.GetType().Name}");
         }
 
         [ContextMenu("Swap Mover")]

@@ -3,6 +3,7 @@ using DG.Tweening; // Logic relies on Tweening
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events;
 using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
@@ -14,6 +15,11 @@ namespace DarkTowerTron.Enemy
     [RequireComponent(typeof(EnemyController))]
     public abstract class EnemyBaseAI : MonoBehaviour, IPoolable
     {
+        [Header("AI Event Wiring")]
+        [SerializeField] private Vector3EventChannelSO _enemySpawnedEvent;
+        [SerializeField] private TransformEventChannelSO _decoySpawnedEvent;
+        [SerializeField] private VoidEventChannelSO _decoyExpiredEvent;
+
         protected EnemyMotor _motor;
         protected EnemyController _controller;
         protected Transform _player;
@@ -34,7 +40,7 @@ namespace DarkTowerTron.Enemy
             _isSpawning = true;
             transform.localScale = Vector3.zero;
 
-            GameEvents.OnEnemySpawned?.Invoke(transform.position);
+            _enemySpawnedEvent?.Raise(transform.position);
 
             transform.DOScale(Vector3.one, 0.8f)
                 .SetEase(Ease.OutBack)
@@ -61,15 +67,15 @@ namespace DarkTowerTron.Enemy
                 _player = GameServices.Player.transform;
                 _currentTarget = _player;
             }
-            
-            GameEvents.OnDecoySpawned += OnDecoySpawned;
-            GameEvents.OnDecoyExpired += OnDecoyExpired;
+
+            if (_decoySpawnedEvent != null) _decoySpawnedEvent.OnEventRaised += OnDecoySpawned;
+            if (_decoyExpiredEvent != null) _decoyExpiredEvent.OnEventRaised += OnDecoyExpired;
         }
 
         protected virtual void OnDestroy()
         {
-            GameEvents.OnDecoySpawned -= OnDecoySpawned;
-            GameEvents.OnDecoyExpired -= OnDecoyExpired;
+            if (_decoySpawnedEvent != null) _decoySpawnedEvent.OnEventRaised -= OnDecoySpawned;
+            if (_decoyExpiredEvent != null) _decoyExpiredEvent.OnEventRaised -= OnDecoyExpired;
         }
 
         private void Update()

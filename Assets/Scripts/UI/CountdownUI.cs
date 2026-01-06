@@ -1,12 +1,16 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 
 namespace DarkTowerTron.UI
 {
     public class CountdownUI : MonoBehaviour
     {
+        [Header("Listening")]
+        [SerializeField] private IntEventChannelSO _announceEvent;
+        [SerializeField] private StringEventChannelSO _countdownEvent;
+
         [Header("UI References")]
         public TextMeshProUGUI waveTitleText; // "WAVE 1"
         public TextMeshProUGUI countdownText; // "3"
@@ -20,21 +24,21 @@ namespace DarkTowerTron.UI
 
         private void OnEnable()
         {
-            GameEvents.OnWaveAnnounce += ShowWaveTitle;
-            GameEvents.OnCountdownChange += UpdateCountdown;
+            if (_announceEvent != null) _announceEvent.OnEventRaised += ShowWaveTitle;
+            if (_countdownEvent != null) _countdownEvent.OnEventRaised += UpdateCountdown;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnWaveAnnounce -= ShowWaveTitle;
-            GameEvents.OnCountdownChange -= UpdateCountdown;
+            if (_announceEvent != null) _announceEvent.OnEventRaised -= ShowWaveTitle;
+            if (_countdownEvent != null) _countdownEvent.OnEventRaised -= UpdateCountdown;
         }
 
         private void ShowWaveTitle(int waveIndex)
         {
             if (waveTitleText)
             {
-                waveTitleText.text = $"WAVE {waveIndex + 1}"; // +1 because index starts at 0
+                waveTitleText.text = $"WAVE {waveIndex}";
                 waveTitleText.gameObject.SetActive(true);
 
                 // Animation: Scale Up and Fade In

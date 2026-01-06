@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Core.Events
 {
@@ -10,14 +11,25 @@ namespace DarkTowerTron.Core.Events
         public UnityAction<Vector3, float, bool, bool> OnEventRaised;
 
         public void Raise(Vector3 pos, float amount, bool isCrit, bool isStagger)
-            => OnEventRaised?.Invoke(pos, amount, isCrit, isStagger);
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(pos, amount, isCrit, isStagger);
+            else
+                GameLogger.LogWarning(LogChannel.UI, $"DamageText Event [{name}] was raised but nothing picked it up.");
+        }
     }
 
     [CreateAssetMenu(menuName = "Events/Popup Text Channel")]
     public class PopupTextEventChannelSO : ScriptableObject
     {
         public UnityAction<Vector3, string> OnEventRaised;
+
         public void Raise(Vector3 pos, string message)
-            => OnEventRaised?.Invoke(pos, message);
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(pos, message);
+            else
+                GameLogger.LogWarning(LogChannel.UI, $"PopupText Event [{name}] was raised but nothing picked it up.");
+        }
     }
 }

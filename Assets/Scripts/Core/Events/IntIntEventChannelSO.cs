@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Core.Events
 {
@@ -10,7 +11,10 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(int current, int max)
         {
-            OnEventRaised?.Invoke(current, max);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(current, max);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"IntInt Event [{name}] was raised but nothing picked it up.");
         }
     }
 }

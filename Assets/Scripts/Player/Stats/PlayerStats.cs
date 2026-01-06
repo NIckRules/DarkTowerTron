@@ -1,4 +1,5 @@
 using UnityEngine;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 
 namespace DarkTowerTron.Player.Stats
@@ -17,7 +18,7 @@ namespace DarkTowerTron.Player.Stats
         {
             if (baseStats == null)
             {
-                Debug.LogError(
+                GameLogger.LogError(LogChannel.Player,
                     $"[PlayerStats] CRITICAL: Missing PlayerStatsSO on {name}! Drag 'Stats_Player_Default' into the inspector.",
                     gameObject);
             }

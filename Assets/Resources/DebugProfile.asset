@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: DebugProfile
   m_EditorClassIdentifier: 
   enableLogging: 1
-  logPlayer: 0
-  logAI: 0
-  logCombat: 0
-  logUI: 0
-  logPhysics: 0
-  logSystem: 0
+  logPlayer: 1
+  logAI: 1
+  logCombat: 1
+  logUI: 1
+  logPhysics: 1
+  logSystem: 1
   logVFX: 1

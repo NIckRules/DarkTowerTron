@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Stats;
 using DarkTowerTron.UI;
 
@@ -8,6 +9,10 @@ namespace DarkTowerTron.Managers
 {
     public class GameSession : MonoBehaviour
     {
+        [Header("Wiring")]
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
+
         [Header("Manager References")]
         public UIManager uiManager;
 
@@ -24,8 +29,19 @@ namespace DarkTowerTron.Managers
             _controls.Gameplay.Pause.performed += ctx => TogglePause();
         }
 
-        private void OnEnable() => _controls.Enable();
-        private void OnDisable() => _controls.Disable();
+        private void OnEnable()
+        {
+            _controls.Enable();
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += TriggerGameOver;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised += TriggerVictory;
+        }
+
+        private void OnDisable()
+        {
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= TriggerGameOver;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised -= TriggerVictory;
+            _controls.Disable();
+        }
 
         private void Start()
         {
@@ -37,16 +53,6 @@ namespace DarkTowerTron.Managers
             // Locate Player via Service
             MovePlayerToStart();
             if (GameServices.Player) GameServices.Player.ToggleInput(false);
-
-            GameEvents.OnPlayerDied += TriggerGameOver;
-            GameEvents.OnGameVictory += TriggerVictory;
-        }
-
-        private void OnDestroy()
-        {
-            GameEvents.OnPlayerDied -= TriggerGameOver;
-            GameEvents.OnGameVictory -= TriggerVictory;
-            GameEvents.Cleanup();
         }
 
         // --- PUBLIC UI FUNCTIONS ---

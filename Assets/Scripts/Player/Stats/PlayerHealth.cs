@@ -23,6 +23,7 @@ namespace DarkTowerTron.Player.Stats
         [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
         [SerializeField] private BoolEventChannelSO _hullEvent;        // Replaces OnHullStateChanged
         [SerializeField] private VoidEventChannelSO _playerHitEvent;   // Replaces OnPlayerHit
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;  // Replaces OnPlayerDied
 
         [Header("Listening")]
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
@@ -116,7 +117,7 @@ namespace DarkTowerTron.Player.Stats
             UpdateUI();
             
             GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
-            GameEvents.OnPlayerDied?.Invoke(); // Still static for now
+            _playerDiedEvent?.Raise();
         }
 
         public void HealGrit(int amount = 1)

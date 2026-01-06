@@ -17,7 +17,7 @@ namespace DarkTowerTron.Core.Services
             var prefab = Resources.Load<GameObject>("SystemBootloader");
             if (prefab == null)
             {
-                Debug.LogError("CRITICAL: Missing 'SystemBootloader' in Resources folder!");
+                GameLogger.LogError(LogChannel.System, "CRITICAL: Missing 'SystemBootloader' in Resources folder!");
                 return;
             }
 

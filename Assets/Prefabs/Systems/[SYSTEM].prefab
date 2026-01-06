@@ -1,63 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &661497565534267334
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3126638106609169323}
-  - component: {fileID: 3251989244851036649}
-  m_Layer: 0
-  m_Name: DamageTextManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3126638106609169323
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661497565534267334}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 849.568, y: 244.97972, z: 1781.6443}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3620524476891969986}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3251989244851036649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 661497565534267334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 032c3d8b1873835498fcc07b16c6fbfc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _damageEvent: {fileID: 0}
-  _popupEvent: {fileID: 0}
-  textPrefab: {fileID: 3066595854704698543, guid: cd900abcfe87a174fab2d4512b65af2e,
-    type: 3}
-  offset: {x: 0, y: 2, z: 0}
-  healthColor: {r: 1, g: 1, b: 1, a: 1}
-  critColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  staggerColor: {r: 0, g: 1, b: 1, a: 1}
-  narrativeColor: {r: 1, g: 0.5, b: 0, a: 1}
-  barks:
-  - WHAM!
-  - CRUNCH!
-  - ERROR
-  - VOID
 --- !u!1 &1379869224141541905
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _waveDirector: {fileID: 6375891242009583288}
-  _damageTextManager: {fileID: 3251989244851036649}
+  _damageTextManager: {fileID: 0}
 --- !u!114 &2123055543117970472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,6 +188,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea17dbf14b3da0f40b82371170ad3a9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
+  _gameVictoryEvent: {fileID: 11400000, guid: 4fbc2c313ec045e47ac68a922f56257e, type: 2}
   uiManager: {fileID: 2783664782137103427}
   activeSpawnID: ST_Start
 --- !u!114 &1360794710383633628
@@ -261,6 +205,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoStartGame: 0
+  _combatStartedEvent: {fileID: 11400000, guid: 82d8dc1f496caeb438899a555ff9688d,
+    type: 2}
   godMode: 0
   infiniteFocus: 0
   showEnemyStats: 1
@@ -296,7 +242,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3126638106609169323}
   - {fileID: 5342293307715891191}
   m_Father: {fileID: 4583971373037434231}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -429,7 +374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoints: []
-  showDebugRays: 1
+  showDebugRays: 0
   debugLineDuration: 20
 --- !u!114 &6375891242009583288
 MonoBehaviour:
@@ -444,8 +389,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+  _announceEvent: {fileID: 11400000, guid: 2606d4ee0e6e0f94b9214ac6edcc746d, type: 2}
+  _countdownEvent: {fileID: 11400000, guid: 2c2b186e035406b42841963934e1fb8d, type: 2}
+  _combatStartedEvent: {fileID: 11400000, guid: 82d8dc1f496caeb438899a555ff9688d,
+    type: 2}
+  _waveClearedEvent: {fileID: 11400000, guid: e7e1e513b7e74e840a25a99c41b46730, type: 2}
+  _roomClearedEvent: {fileID: 11400000, guid: 5dbf1ba87b8243e4880befa80c30a2d3, type: 2}
   waves: []
-  timeBetweenWaves: 3
+  timeBetweenWaves: 1
 --- !u!1001 &1406556555021720400
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -647,6 +598,18 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: TogglePause
       objectReference: {fileID: 0}
+    - target: {fileID: 3519676716403322816, guid: dcff4a96bbce5774082018915d117428,
+        type: 3}
+      propertyPath: _announceEvent
+      value: 
+      objectReference: {fileID: 11400000, guid: 2606d4ee0e6e0f94b9214ac6edcc746d,
+        type: 2}
+    - target: {fileID: 3519676716403322816, guid: dcff4a96bbce5774082018915d117428,
+        type: 3}
+      propertyPath: _countdownEvent
+      value: 
+      objectReference: {fileID: 11400000, guid: 2c2b186e035406b42841963934e1fb8d,
+        type: 2}
     - target: {fileID: 3526816204144016603, guid: dcff4a96bbce5774082018915d117428,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

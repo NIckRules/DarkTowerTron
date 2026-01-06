@@ -1,12 +1,17 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
 
 namespace DarkTowerTron.Player.Movement
 {
     public class AfterImage : MonoBehaviour, IDamageable, ICombatTarget
     {
+        [Header("Broadcasting")]
+        [SerializeField] private TransformEventChannelSO _decoySpawnedEvent;
+        [SerializeField] private VoidEventChannelSO _decoyExpiredEvent;
+
         [Header("Stats")]
         public float lifetime = 1.0f;
         public float health = 10f; // Default hp
@@ -23,7 +28,7 @@ namespace DarkTowerTron.Player.Movement
         private void Start()
         {
             // 1. Notify AI
-            GameEvents.OnDecoySpawned?.Invoke(transform);
+            _decoySpawnedEvent?.Raise(transform);
 
             // 2. Visual Fade
             Renderer rend = GetComponentInChildren<Renderer>();
@@ -41,8 +46,8 @@ namespace DarkTowerTron.Player.Movement
         {
             // Cleanup
             if (_fadeTween != null) _fadeTween.Kill();
-            
-            GameEvents.OnDecoyExpired?.Invoke();
+
+            _decoyExpiredEvent?.Raise();
         }
 
         public void OnExecutionHit()

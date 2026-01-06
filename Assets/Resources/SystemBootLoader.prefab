@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 6538587460628853691}
   - component: {fileID: 78568643233073422}
   - component: {fileID: 8744451723609990132}
+  - component: {fileID: 3163029198683243387}
   m_Layer: 0
   m_Name: SystemBootLoader
   m_TagString: Untagged
@@ -77,6 +78,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3de3d7dd814a41f4a81234b4ce9471f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+  _enemySpawnedEvent: {fileID: 11400000, guid: b89a69cd6d15d384aa07c6ae13b764c9, type: 2}
   explosionPrefab: {fileID: 648059833510886341, guid: 68f25ab6f4dbf344187bc8a7231afda4,
     type: 3}
   spawnPrefab: {fileID: 823617336625923824, guid: e803ad9022950d94a8887bcbf94af167,
@@ -287,6 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf97d9429aec5a41a949b95cec52d49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerDiedEvent: {fileID: 0}
 --- !u!114 &8744451723609990132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,3 +303,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e2cd8abd29af644bcacbcfc8d19039, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3163029198683243387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257296264535243330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 032c3d8b1873835498fcc07b16c6fbfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _damageEvent: {fileID: 11400000, guid: 62100c1f9efa3034d86dce2d21dbf5f9, type: 2}
+  _popupEvent: {fileID: 0}
+  textPrefab: {fileID: 3066595854704698543, guid: cd900abcfe87a174fab2d4512b65af2e,
+    type: 3}
+  offset: {x: 0, y: 2, z: 0}
+  healthColor: {r: 1, g: 1, b: 1, a: 1}
+  critColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  staggerColor: {r: 0, g: 1, b: 1, a: 1}
+  narrativeColor: {r: 1, g: 0.5, b: 0, a: 1}
+  barks:
+  - WHAM!
+  - CRUNCH!
+  - ERROR
+  - VOID

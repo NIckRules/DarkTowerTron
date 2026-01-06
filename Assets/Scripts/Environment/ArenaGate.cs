@@ -1,11 +1,15 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
 
 namespace DarkTowerTron.Environment
 {
     public class ArenaGate : MonoBehaviour
     {
+        [Header("Wiring")]
+        [SerializeField] private VoidEventChannelSO _roomClearedEvent;
+
         [Header("Parts")]
         public Transform laserWall;    // The Pivot (Scales up/down)
         public Renderer baseRenderer;  // The Floor Strip
@@ -24,13 +28,21 @@ namespace DarkTowerTron.Environment
         {
             // Initial State: Open
             SetGate(false, true);
-
-            GameEvents.OnRoomCleared += () => SetGate(false);
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            GameEvents.OnRoomCleared -= () => SetGate(false);
+            if (_roomClearedEvent != null) _roomClearedEvent.OnEventRaised += OnRoomCleared;
+        }
+
+        private void OnDisable()
+        {
+            if (_roomClearedEvent != null) _roomClearedEvent.OnEventRaised -= OnRoomCleared;
+        }
+
+        private void OnRoomCleared()
+        {
+            SetGate(false);
         }
 
         public void ForceClose()

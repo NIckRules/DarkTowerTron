@@ -13,6 +13,10 @@ namespace DarkTowerTron.Player.Stats
 
         [Header("Listening")]
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;         // Replaces OnPlayerDied
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;      // Replaces OnWaveCombatStarted
+        [SerializeField] private VoidEventChannelSO _waveClearedEvent;        // Replaces OnWaveCleared
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;        // Replaces OnGameVictory
 
         private float _currentFocus;
         private bool _isDead;
@@ -37,21 +41,20 @@ namespace DarkTowerTron.Player.Stats
             // Subscribe to SO Event
             if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
 
-            // Subscribe to remaining Static Events (Phase 2 migration)
-            GameEvents.OnPlayerDied += OnPlayerDied;
-            GameEvents.OnWaveCombatStarted += EnableDecay;
-            GameEvents.OnWaveCleared += DisableDecay;
-            GameEvents.OnGameVictory += DisableDecay;
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += OnPlayerDied;
+            if (_combatStartedEvent != null) _combatStartedEvent.OnEventRaised += EnableDecay;
+            if (_waveClearedEvent != null) _waveClearedEvent.OnEventRaised += DisableDecay;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised += DisableDecay;
         }
 
         private void OnDisable()
         {
             if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
 
-            GameEvents.OnPlayerDied -= OnPlayerDied;
-            GameEvents.OnWaveCombatStarted -= EnableDecay;
-            GameEvents.OnWaveCleared -= DisableDecay;
-            GameEvents.OnGameVictory -= DisableDecay;
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= OnPlayerDied;
+            if (_combatStartedEvent != null) _combatStartedEvent.OnEventRaised -= EnableDecay;
+            if (_waveClearedEvent != null) _waveClearedEvent.OnEventRaised -= DisableDecay;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised -= DisableDecay;
         }
 
         private void Update()

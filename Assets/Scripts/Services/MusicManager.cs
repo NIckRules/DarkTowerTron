@@ -1,12 +1,16 @@
 using UnityEngine;
 using DG.Tweening;
 using DarkTowerTron.Core; // For GameEvents
+using DarkTowerTron.Core.Events;
 
 namespace DarkTowerTron.Services
 {
     [RequireComponent(typeof(AudioSource))]
     public class MusicManager : MonoBehaviour
     {
+        [Header("Listening")]
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+
         private AudioSource _source;
         private float _originalPitch;
         private float _originalVolume;
@@ -27,14 +31,12 @@ namespace DarkTowerTron.Services
 
         private void OnEnable()
         {
-            // We can listen to Global Events here
-            GameEvents.OnPlayerDied += OnDeath; // Legacy Event
-            // TODO: Subscribe to 'Event_PlayerDeath' SO when migrated
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += OnDeath;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnPlayerDied -= OnDeath;
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= OnDeath;
         }
 
         private void OnDeath()

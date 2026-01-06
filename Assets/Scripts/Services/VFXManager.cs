@@ -1,13 +1,17 @@
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Services; // Add namespace
+using DarkTowerTron.Core.Events; // NEW
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Core.Services
 {
     public class VFXManager : MonoBehaviour
     {
-        // REMOVED: public static VFXManager Instance;
+        [Header("Wiring")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+        [SerializeField] private Vector3EventChannelSO _enemySpawnedEvent; // NEW
 
         [Header("Prefabs")]
         public GameObject explosionPrefab;
@@ -16,29 +20,26 @@ namespace DarkTowerTron.Core.Services
 
         private void Awake()
         {
-            // REMOVED: Singleton check
             if (groundLayer == 0) groundLayer = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
 
         private void OnEnable()
         {
-            // Keep event subscriptions for now (Session 3 will refactor this)
-            GameEvents.OnEnemyKilled += PlayDeathVFX;
-            GameEvents.OnEnemySpawned += PlaySpawnVFX;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += PlayDeathVFX;
+            if (_enemySpawnedEvent) _enemySpawnedEvent.OnEventRaised += PlaySpawnVFX;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnEnemyKilled -= PlayDeathVFX;
-            GameEvents.OnEnemySpawned -= PlaySpawnVFX;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised -= PlayDeathVFX;
+            if (_enemySpawnedEvent) _enemySpawnedEvent.OnEventRaised -= PlaySpawnVFX;
         }
 
         private void PlayDeathVFX(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
-            if (explosionPrefab)
+            if (explosionPrefab && Global.Pool != null)
             {
-                // UPDATED: Use Services.Pool
-                GameObject vfx = Services.Pool.Spawn(explosionPrefab, pos, Quaternion.identity);
+                GameObject vfx = Global.Pool.Spawn(explosionPrefab, pos, Quaternion.identity);
                 var ps = vfx.GetComponent<ParticleSystem>();
                 if (ps) ps.Play();
             }
@@ -46,17 +47,15 @@ namespace DarkTowerTron.Core.Services
 
         private void PlaySpawnVFX(Vector3 pos)
         {
-            if (spawnPrefab)
+            if (spawnPrefab && Global.Pool != null)
             {
                 Vector3 vfxPos = pos + Vector3.up * 0.1f;
-                // Simplified Raycast for brevity
                 if (UnityEngine.Physics.Raycast(pos + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 10f, groundLayer))
                 {
                     vfxPos = hit.point + Vector3.up * 0.1f;
                 }
 
-                // UPDATED: Use Services.Pool
-                GameObject vfx = Services.Pool.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
+                GameObject vfx = Global.Pool.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
                 var ps = vfx.GetComponent<ParticleSystem>();
                 if (ps) ps.Play();
             }

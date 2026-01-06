@@ -22,7 +22,7 @@ namespace DarkTowerTron.Core.Services
             var type = typeof(T);
             if (_services.ContainsKey(type))
             {
-                Debug.LogWarning($"[ServiceLocator] Service {type.Name} is being overwritten.");
+                GameLogger.LogWarning(LogChannel.System, $"[ServiceLocator] Service {type.Name} is being overwritten.");
             }
             _services[type] = service;
         }
