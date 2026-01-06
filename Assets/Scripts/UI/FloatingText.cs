@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.Managers; // Needed to talk to PoolManager
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.UI
 {
@@ -18,35 +18,50 @@ namespace DarkTowerTron.UI
             if (textMesh == null) textMesh = GetComponent<TextMeshPro>();
         }
 
-        public void Initialize(string text, Color color, float sizeScale = 1f)
+        public void Initialize(string text, Color color, float sizeScale = 1f, bool isDramatic = false)
         {
             // 1. Setup Text
             textMesh.text = text;
             textMesh.color = color;
             textMesh.alpha = 1f;
 
-            // 2. Reset Transform
+            // 2. Narrative/Dramatic Polish (Fixing "Underwhelming 1")
+            // If it's a Crit or Narrative word, make it Bold and punchier
+            if (isDramatic)
+            {
+                textMesh.fontStyle = FontStyles.Bold;
+                textMesh.outlineWidth = 0.2f; // Outline makes small numbers pop
+            }
+            else
+            {
+                textMesh.fontStyle = FontStyles.Normal;
+                textMesh.outlineWidth = 0f;
+            }
+
+            // 3. Reset Transform
             transform.localScale = Vector3.one * sizeScale;
 
-            // 3. Animate Move Up
+            // 4. Animate Move Up
             transform.DOMoveY(transform.position.y + floatDistance, duration)
                 .SetEase(motionEase);
 
-            // 4. Animate Fade Out (start halfway through)
+            // 5. Animate Fade Out
             textMesh.DOFade(0f, duration * 0.5f)
                 .SetDelay(duration * 0.5f)
                 .OnComplete(Despawn);
 
-            // 5. Juice: Punch Scale
-            transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
+            // 6. Juice: Punch Scale
+            // Dramatic text punches harder
+            float punchAmount = isDramatic ? 0.8f : 0.5f;
+            transform.DOPunchScale(Vector3.one * punchAmount, 0.2f);
         }
 
         private void Despawn()
         {
-            // Return to pool
-            if (Services.Pool != null)
+            // Safety Check for Scene Unload
+            if (Global.Pool != null)
             {
-                Services.Pool.Despawn(gameObject);
+                Global.Pool.Despawn(gameObject);
             }
             else
             {

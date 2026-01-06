@@ -22,7 +22,8 @@ namespace DarkTowerTron.Combat
         [SerializeField] private int _overrideStagger = 3;
 
         [Header("Aiming Configuration")]
-        [SerializeField] private float _aimCenterOffset = 1.0f;
+        [Tooltip("Assign a child object (e.g. 'CenterMass') to act as the lock-on target.")]
+        [SerializeField] private Transform _aimTarget;
         [SerializeField] private float _magnetismRadius = 0.75f;
 
         [Header("Execution Settings")]
@@ -153,7 +154,15 @@ namespace DarkTowerTron.Combat
         public bool KeepPlayerGrounded => _keepPlayerGrounded;
 
         // --- IAimTarget ---
-        public Vector3 AimPoint => transform.position + (Vector3.up * _aimCenterOffset);
+        public Vector3 AimPoint
+        {
+            get
+            {
+                // Robust Fallback: If designer forgot to assign, guess Chest Height
+                if (_aimTarget == null) return transform.position + Vector3.up * 1.0f;
+                return _aimTarget.position;
+            }
+        }
         public float TargetRadius => _magnetismRadius;
 
         // --- DEBUG GIZMOS ---

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
 using DarkTowerTron.AI.Core;
 using DarkTowerTron.AI.FSM;
 using DarkTowerTron.Enemy.States.Sentinel; // Sub-namespace for States
@@ -16,8 +17,8 @@ namespace DarkTowerTron.Enemy.Agents
         public float combatRange = 10f; // Switch to Combat
         public float huntRange = 15f;   // Switch back to Hunt
 
-        [Header("Combat")]
-        public GameObject projectilePrefab;
+        [Header("Loadout")]
+        public EnemyAttackSO weaponProfile; // <--- REPLACES prefab and speed fields
         public Transform firePoint;
         public float fireRate = 2.0f;
 
@@ -62,12 +63,12 @@ namespace DarkTowerTron.Enemy.Agents
 
         public void HelperFireProjectile()
         {
-            if (projectilePrefab && !_controller.IsStaggered)
+            if (weaponProfile && !_controller.IsStaggered)
             {
-                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
+                Transform fp = firePoint ? firePoint : transform;
 
-                // Use BaseAI helper to spawn via Pool
-                FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 15f);
+                // Pass the Profile, not manual numbers
+                FireAtTarget(weaponProfile, fp);
             }
         }
 

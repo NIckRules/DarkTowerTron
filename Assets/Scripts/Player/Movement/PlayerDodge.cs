@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Services;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Movement
 {
@@ -15,14 +17,11 @@ namespace DarkTowerTron.Player.Movement
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerDodge : MonoBehaviour
     {
-        [Header("Dodge Settings")]
-        public float focusCost = 25f;
-        public float dashDistance = 8f;
-        public float dashDuration = 0.15f;
+        // REMOVED: public float focusCost, dashDistance, dashDuration 
+        // (Moved to PlayerStatsSO)
 
-        [Header("Interaction Settings")]
-        public LayerMask projectileLayer;
-        public LayerMask wallLayer;
+        // REMOVED: public LayerMask projectileLayer, wallLayer
+        // (Moved to GameConstants)
 
         [Header("Audio")]
         public AudioClip dashClip;
@@ -52,8 +51,6 @@ namespace DarkTowerTron.Player.Movement
             _movement = GetComponent<PlayerMovement>();
             _loadout = GetComponent<PlayerLoadout>();
             _stats = GetComponent<PlayerStats>();
-
-            if (wallLayer == 0) wallLayer = GameConstants.MASK_WALLS;
         }
 
         private void Update()
@@ -61,14 +58,12 @@ namespace DarkTowerTron.Player.Movement
             HandleIndicator();
         }
 
-        /// <summary>
-        /// Called by PlayerController when Spacebar/Dash button is pressed.
-        /// </summary>
         public void PerformDodge()
         {
             if (IsDashing) return;
 
-            if (_energy.SpendFocus(focusCost))
+            // CHANGE: Use Stats
+            if (_energy.SpendFocus(_stats.DashCost))
             {
                 StartCoroutine(DodgeRoutine());
             }
@@ -79,75 +74,68 @@ namespace DarkTowerTron.Player.Movement
             IsDashing = true;
             IsInvulnerable = true;
 
-            // Hide indicator during movement
             if (indicatorRef) indicatorRef.gameObject.SetActive(false);
 
-            // --- 1. GRAVITY SUSPENSION ---
-            // We tell movement to ignore gravity for the dash duration + hang time.
-            // This allows "Air Dashing" without falling immediately.
-            _movement.SuspendGravity(dashDuration + _stats.ActionHangTime);
+            // 1. Gravity Suspension (Stats)
+            _movement.SuspendGravity(_stats.DashDuration + _stats.ActionHangTime);
 
-            // --- 2. AUDIO & VISUALS ---
-            if (Services.Audio != null && dashClip)
-                Services.Audio.PlaySound(dashClip, 1f, true);
+            // 2. Audio (Service Locator)
+            if (Global.Audio != null && dashClip)
+                Global.Audio.PlaySound(dashClip, 1f, true);
 
-            // Spawn Decoy from Loadout (Standard or Explosive)
+            // 3. Decoy
             if (_loadout && _loadout.currentDecoy)
                 Instantiate(_loadout.currentDecoy, transform.position, transform.rotation);
 
-            // --- 3. DIRECTION LOGIC ---
+            // 4. Direction
             Vector3 dashDir;
-            // If moving input exists, dash that way. Otherwise dash forward.
             if (_movement.MoveInput.sqrMagnitude > 0.1f)
                 dashDir = _movement.MoveInput.normalized;
             else
                 dashDir = transform.forward;
 
-            // --- 4. PHYSICS LOOP ---
-            float speed = dashDistance / dashDuration;
+            // 5. Physics Loop (Stats)
+            float speed = _stats.DashDistance / _stats.DashDuration;
             float timer = 0f;
 
-            while (timer < dashDuration)
+            while (timer < _stats.DashDuration)
             {
                 float dt = Time.deltaTime;
                 timer += dt;
 
-                // Move via Motor (Pass Velocity)
                 _mover.Move(dashDir * speed);
-
-                // Active Intercept
                 CatchProjectiles();
 
                 yield return null;
             }
 
-            // Small recovery frame before state resets
             yield return new WaitForSeconds(0.05f);
 
             IsInvulnerable = false;
             IsDashing = false;
-
-            // Note: Gravity remains suspended for the duration of ActionHangTime
-            // handled by PlayerMovement timer.
         }
 
         private void CatchProjectiles()
         {
-            // Detect hostile bullets in close range
+            // CHANGE: Use GameConstants
             int layerMask = 1 << GameConstants.LAYER_PROJECTILE;
             Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, layerMask);
 
             foreach (var hit in hits)
             {
+                // Check Interface via Component
                 IReflectable proj = hit.GetComponent<IReflectable>();
+
+                // Check Projectile specific implementation for hostility
+                // (Ideally IReflectable should have IsHostile, but for now we cast to concrete)
                 var pScript = hit.GetComponent<Projectile>();
 
                 if (proj != null && pScript != null && pScript.isHostile)
                 {
-                    // Redirect in the direction we are dashing
+                    // Redirect
                     proj.Redirect(transform.forward, gameObject);
 
-                    // Reward for technical play
+                    // Reward
                     _energy.AddFocus(20f);
                 }
             }
@@ -165,31 +153,31 @@ namespace DarkTowerTron.Player.Movement
 
             indicatorRef.gameObject.SetActive(true);
 
-            // Calculate Destination based on Input
             Vector3 dir;
             if (_movement.MoveInput.sqrMagnitude > 0.1f) dir = _movement.MoveInput.normalized;
             else dir = transform.forward;
 
             Vector3 targetPos;
 
-            // Raycast to stop indicator at walls
-            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, dashDistance, GameConstants.MASK_WALLS))
+            // CHANGE: Use GameConstants and Stats
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, _stats.DashDistance, GameConstants.MASK_WALLS))
             {
                 targetPos = hit.point - (dir * 0.5f);
             }
             else
             {
-                targetPos = transform.position + (dir * dashDistance);
+                targetPos = transform.position + (dir * _stats.DashDistance);
             }
 
             targetPos.y = 0.1f;
             indicatorRef.position = targetPos;
             indicatorRef.rotation = Quaternion.identity;
 
-            // Visual Feedback (Can we afford it?)
+            // Visual Feedback
             if (indicatorRenderer && readyMat && notReadyMat)
             {
-                bool canAfford = _energy.HasFocus(focusCost);
+                // CHANGE: Use Stats
+                bool canAfford = _energy.HasFocus(_stats.DashCost);
                 Material targetMat = canAfford ? readyMat : notReadyMat;
                 if (indicatorRenderer.sharedMaterial != targetMat)
                 {

@@ -5,7 +5,7 @@ using DarkTowerTron.Core.Data;
 
 namespace DarkTowerTron.Enemy
 {
-    [RequireComponent(typeof(KinematicMover))]
+    // Do not require a specific mover so we can swap implementations.
     public class EnemyMotor : MonoBehaviour, IPoolable
     {
         [Header("Data Profile")]
@@ -14,7 +14,7 @@ namespace DarkTowerTron.Enemy
         [Header("Layers")]
         public LayerMask allyLayer;
 
-        private KinematicMover _mover;
+        private IMover _mover;
         private Vector3 _currentVelocity;
         private Vector3 _knockbackForce;
         private float _currentVerticalSpeed;
@@ -22,7 +22,14 @@ namespace DarkTowerTron.Enemy
 
         private void Awake()
         {
-            _mover = GetComponent<KinematicMover>();
+            // Auto-detect any IMover implementation (KinematicMover, UnityCharacterMover, etc.)
+            _mover = GetComponent<IMover>();
+
+            if (_mover == null)
+            {
+                // Safe default
+                _mover = gameObject.AddComponent<KinematicMover>();
+            }
             if (allyLayer == 0) allyLayer = 1 << GameConstants.LAYER_ENEMY;
         }
 

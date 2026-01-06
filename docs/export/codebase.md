@@ -1,9 +1,9 @@
 # 📦 Codebase Export
 - **Profile:** `unity`
-- **Generated:** 2026-01-02 09:12
-- **Files:** 150
-- **Total LOC:** 9450
-- **Estimated tokens:** 74496
+- **Generated:** 2026-01-06 14:44
+- **Files:** 199
+- **Total LOC:** 11650
+- **Estimated tokens:** 92486
 
 ## 📁 Project Tree
 ```
@@ -27,35 +27,51 @@ Assets
       Beh_Orbit_CCW.asset
       Beh_Orbit_CW.asset
       Beh_Seek.asset
+      Beh_VoidAvoidance.asset
     Bosses
       Architect
         ARC_PAT_ClockRotation.asset
         ARC_PAT_HorizontalWall.asset
         ARC_PAT_StraightProjectiles.asset
     Enemies
+      Attack_Sentinel.asset
+      Enemy_Visual_Default.asset
       Stats_Chaser.asset
       Stats_Guardian.asset
       Stats_Sentinel.asset
       Stats_Sniper.asset
+    Events
+      Event_Damage.asset
+      Event_EnemyKilled.asset
+      Event_Focus.asset
+      Event_Grit.asset
+      Event_Hull.asset
+      Event_PlayerHit.asset
+      Event_Popup.asset
+      Event_Score.asset
     Player
       Stats_Player_Default.asset
     Visuals
       Collections
+        Collection_Anchors.asset
         Collection_Enemies.asset
         Collection_Enemies_Core.asset
         Collection_Enemies_Secondary.asset
         Collection_Floors.asset
         Collection_Hazards.asset
         Collection_Player.asset
+        Collection_Player_Beam.asset
         Collection_Player_Core.asset
         Collection_Player_Seconday.asset
         Collection_Projectiles_Friendly.asset
         Collection_Projectiles_Hostile.asset
+        Collection_Void.asset
         Collection_Walls.asset
       Palettes
-        PAL_Alt.asset
         PAL_Neon.asset
         PAL_Nier.asset
+        Pal_Alternative.asset
+        Pal_Stranger.asset
       Themes
         Theme_Enemy_Default.asset
         Theme_Guardian.asset
@@ -65,6 +81,27 @@ Assets
       WA_1_3Mis.asset
       WA_1_3Sen.asset
       WA_1_3Sen_3Chm.asset
+  Modules
+    AI
+      Behaviours
+        AvoidanceBehavior.cs
+        FleeBehaviour.cs
+        OrbitBehavior.cs
+        SeekBehaviour.cs
+        VoidAvoidanceBehavior.cs
+      Core
+        AIData.cs
+        ContextSolver.cs
+        Detector.cs
+        SteeringBehaviour.cs
+      Detectors
+        ObstacleDetector.cs
+        TargetDetector.cs
+      FSM
+        State.cs
+        StateMachine.cs
+      Utils
+        AIDirections.cs
   Scripts
     Combat
       BaseHitbox.cs
@@ -73,12 +110,14 @@ Assets
       HitBox
         ShieldHitbox.cs
         StandardHitbox.cs
-      HitboxRelay.cs
-      HomingMissile.cs
       Modules
         StaggerModule.cs
         VitalityModule.cs
       Projectile.cs
+      Strategies
+        HomingMovement.cs
+        LinearMovement.cs
+        SineWaveMovement.cs
     Core
       CameraRig.cs
       CircleRenderer.cs
@@ -88,29 +127,51 @@ Assets
         AttackPatternSO.cs
         ColorPaletteSO.cs
         DebugProfileSO.cs
+        EnemyAttackSO.cs
         EnemyStatsSO.cs
+        EnemyVisualProfileSO.cs
         FeedbackProfileSO.cs
         MaterialCollectionSO.cs
         PlayerStatsSO.cs
         SoundDef.cs
+        SurfaceType.cs
         UIThemeSO.cs
         WaveDefinitionSO.cs
       Debug
         GameLogger.cs
+      Events
+        BoolEventChannelSO.cs
+        DamageTextEventChannelSO.cs
+        EnemyKilledEventChannelSO.cs
+        FloatFloatEventChannelSO.cs
+        IntIntEventChannelSO.cs
+        VoidEventChannelSO.cs
+        VoidEventListener.cs
       GameConstants.cs
       GameEvents.cs
       GameServices.cs
       GameTime.cs
+      Input
+        InputBuffer.cs
       Interfaces
+        IAimTarget.cs
         ICombatTarget.cs
         IDamageable.cs
+        IMovementStrategy.cs
         IPoolable.cs
         IReflectable.cs
         IWeapon.cs
       LogChannel.cs
+      Services
+        BootLoader.cs
+        GameBootstrap.cs
+        ServiceLocator.cs
+        Services.cs
       Spinner.cs
       Structs
         DamageInfo.cs
+      Utils
+        Rotator.cs
       VoidKiller.cs
     Editor
       SmartDuplicator.cs
@@ -147,6 +208,8 @@ Assets
           SniperState_Firing.cs
           SniperState_Positioning.cs
           SniperState_Teleport.cs
+      Visuals
+        EnemyVisuals.cs
     Environment
       ArenaGate.cs
       CameraZone.cs
@@ -154,49 +217,54 @@ Assets
       LevelModule.cs
       PlayerStart.cs
       Props
-        CombatProp.cs
         Prop_Anchor.cs
         Prop_Explosive.cs
       TileInfo.cs
       WaveTrigger.cs
     Managers
       ArenaSpawner.cs
-      AudioManager.cs
-      DamageTextManager.cs
       DebugController.cs
       FeedbackDirector.cs
-      GameFeel.cs
       GameSession.cs
-      HUDManager.cs
       LevelBuilder.cs
-      MusicManager.cs
-      PaletteManager.cs
-      PoolManager.cs
-      ScoreManager.cs
-      UIManager.cs
-      VFXManager.cs
       WaveDirector.cs
     Physics
       KinematicMover.cs
     Player
-      AfterImage.cs
-      PlayerBeam.cs
-      PlayerController.cs
-      PlayerDodge.cs
-      PlayerEnergy.cs
-      PlayerExecution.cs
-      PlayerGun.cs
-      PlayerHealth.cs
-      PlayerLoadout.cs
-      PlayerMovement.cs
-      PlayerStats.cs
-      TargetScanner.cs
-      WeaponBase.cs
+      Combat
+        PlayerBeam.cs
+        PlayerExecution.cs
+        PlayerGun.cs
+        PlayerWeaponController.cs
+        TargetScanner.cs
+        WeaponBase.cs
+      Controller
+        PlayerController.cs
+        PlayerInputHandler.cs
+      Movement
+        AfterImage.cs
+        PlayerDodge.cs
+        PlayerMovement.cs
+      Stats
+        PlayerEnergy.cs
+        PlayerHealth.cs
+        PlayerLoadout.cs
+        PlayerStats.cs
+    Services
+      AudioManager.cs
+      MusicManager.cs
+      PaletteManager.cs
+      PoolManager.cs
+      ScoreManager.cs
+      VFXManager.cs
     UI
       CountdownUI.cs
+      DamageTextManager.cs
       FloatingText.cs
+      HUDManager.cs
       MenuController.cs
       ResultScreen.cs
+      UIManager.cs
       UIThemeReceiver.cs
     Visuals
       CameraShaker.cs
@@ -206,7 +274,7 @@ Assets
 ## 📄 `Assets\Data\AttackPatterns\Bosses\Architect\ARC_Straight.asset`
 - Lines: 24
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -237,7 +305,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\AttackPatterns\Nova.asset`
 - Lines: 22
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -266,7 +334,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\AttackPatterns\Shotgun.asset`
 - Lines: 22
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -295,7 +363,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\AttackPatterns\Sweep.asset`
 - Lines: 24
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -326,7 +394,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Audio\SFX_Enemy_Explode.asset`
 - Lines: 20
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -353,7 +421,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Audio\SFX_Player_Beam.asset`
 - Lines: 20
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -380,7 +448,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Audio\SFX_Player_Dash.asset`
 - Lines: 20
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -407,7 +475,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Audio\SFX_Player_Shoot.asset`
 - Lines: 21
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -435,7 +503,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Behaviours\Beh_Avoidance.asset`
 - Lines: 17
 - Size: 0.4 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -459,7 +527,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Behaviours\Beh_Flee.asset`
 - Lines: 16
 - Size: 0.4 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -482,7 +550,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Behaviours\Beh_Orbit_CCW.asset`
 - Lines: 18
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 12:18
 
 ```asset
 %YAML 1.1
@@ -499,7 +567,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c3958e979e8ba7438bbb58ca6123f36, type: 3}
   m_Name: Beh_Orbit_CCW
   m_EditorClassIdentifier: 
-  idealDistance: 7
+  idealDistance: 15
   distanceCorrectionStrength: 0.5
   clockwise: 0
 ```
@@ -507,7 +575,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Behaviours\Beh_Orbit_CW.asset`
 - Lines: 18
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 12:18
 
 ```asset
 %YAML 1.1
@@ -524,7 +592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c3958e979e8ba7438bbb58ca6123f36, type: 3}
   m_Name: Beh_Orbit_CW
   m_EditorClassIdentifier: 
-  idealDistance: 7
+  idealDistance: 15
   distanceCorrectionStrength: 0.5
   clockwise: 1
 ```
@@ -532,7 +600,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Behaviours\Beh_Seek.asset`
 - Lines: 15
 - Size: 0.4 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -551,10 +619,34 @@ MonoBehaviour:
   m_EditorClassIdentifier:
 ```
 
+## 📄 `Assets\Data\Behaviours\Beh_VoidAvoidance.asset`
+- Lines: 17
+- Size: 0.4 KB
+- Modified: 2026-01-06 12:30
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69d39b00eb79d3641a66b060ff2cd08b, type: 3}
+  m_Name: Beh_VoidAvoidance
+  m_EditorClassIdentifier: 
+  lookAheadDistance: 2
+  voidDangerWeight: 1
+```
+
 ## 📄 `Assets\Data\Bosses\Architect\ARC_PAT_ClockRotation.asset`
 - Lines: 22
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -583,7 +675,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Bosses\Architect\ARC_PAT_HorizontalWall.asset`
 - Lines: 22
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -612,7 +704,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Bosses\Architect\ARC_PAT_StraightProjectiles.asset`
 - Lines: 22
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -638,10 +730,64 @@ MonoBehaviour:
   shootingPattern: {fileID: 11400000, guid: de571586b8c5c9645ada6df14bda94ef, type: 2}
 ```
 
+## 📄 `Assets\Data\Enemies\Attack_Sentinel.asset`
+- Lines: 22
+- Size: 0.6 KB
+- Modified: 2026-01-06 12:18
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b269f952b696774fb25e5db3b40ed34, type: 3}
+  m_Name: Attack_Sentinel
+  m_EditorClassIdentifier: 
+  damage: 1
+  stagger: 0
+  projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
+    type: 3}
+  projectileSpeed: 25
+  lifetime: 5
+  spreadAngle: 0
+```
+
+## 📄 `Assets\Data\Enemies\Enemy_Visual_Default.asset`
+- Lines: 18
+- Size: 0.5 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8aa1121de5760045a840eb95a0dbc31, type: 3}
+  m_Name: Enemy_Visual_Default
+  m_EditorClassIdentifier: 
+  hitFlashDuration: 0.1
+  staggerPulseDuration: 0.4
+  dangerPulseColor: {r: 1, g: 0, b: 0, a: 1}
+```
+
 ## 📄 `Assets\Data\Enemies\Stats_Chaser.asset`
-- Lines: 32
+- Lines: 33
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 12:21
 
 ```asset
 %YAML 1.1
@@ -663,7 +809,7 @@ MonoBehaviour:
   focusReward: 30
   healsGrit: 0
   gritRewardAmount: 1
-  moveSpeed: 9
+  moveSpeed: 5
   rotationSpeed: 15
   combatRotationSpeed: 3
   acceleration: 20
@@ -671,6 +817,7 @@ MonoBehaviour:
   verticalSmoothTime: 0.5
   separationRadius: 1.5
   separationForce: 8
+  maxHealth: 10
   maxStagger: 5
   staggerDecay: 0.5
   hasFrontalShield: 0
@@ -679,8 +826,8 @@ MonoBehaviour:
 
 ## 📄 `Assets\Data\Enemies\Stats_Guardian.asset`
 - Lines: 33
-- Size: 0.7 KB
-- Modified: 2026-01-01 11:17
+- Size: 0.8 KB
+- Modified: 2026-01-06 09:15
 
 ```asset
 %YAML 1.1
@@ -718,9 +865,9 @@ MonoBehaviour:
 ```
 
 ## 📄 `Assets\Data\Enemies\Stats_Sentinel.asset`
-- Lines: 31
+- Lines: 33
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 12:18
 
 ```asset
 %YAML 1.1
@@ -740,16 +887,18 @@ MonoBehaviour:
   isEssential: 0
   scoreValue: 100
   focusReward: 30
-  healsGrit: 1
+  healsGrit: 0
   gritRewardAmount: 1
   moveSpeed: 7
   rotationSpeed: 15
+  combatRotationSpeed: 3
   acceleration: 20
-  rideHeight: 1.5
+  rideHeight: 1.1
   verticalSmoothTime: 0.5
-  separationRadius: 2
-  separationForce: 5
-  maxStagger: 0.8
+  separationRadius: 5
+  separationForce: 7
+  maxHealth: 3
+  maxStagger: 9
   staggerDecay: 0.5
   hasFrontalShield: 0
   shieldAngle: 0.5
@@ -758,7 +907,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Enemies\Stats_Sniper.asset`
 - Lines: 31
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -793,10 +942,186 @@ MonoBehaviour:
   shieldAngle: 0.5
 ```
 
+## 📄 `Assets\Data\Events\Event_Damage.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 10:20
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 770008717575a6d47963dfa2c4387fb5, type: 3}
+  m_Name: Event_Damage
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_EnemyKilled.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55f9f970bd6bb4641a051f7ba14addb7, type: 3}
+  m_Name: Event_EnemyKilled
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_Focus.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77db8a05c50bf5d48982086d7f89fe36, type: 3}
+  m_Name: Event_Focus
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_Grit.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df1a6f2a16adf0b469b3d2d772e13959, type: 3}
+  m_Name: Event_Grit
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_Hull.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4176f100a9d83234cbbf541c11479c2c, type: 3}
+  m_Name: Event_Hull
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_PlayerHit.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_PlayerHit
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_Popup.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 10:58
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Event_Popup
+  m_EditorClassIdentifier: Assembly-CSharp:DarkTowerTron.Core.Events:PopupTextEventChannelSO
+```
+
+## 📄 `Assets\Data\Events\Event_Score.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df1a6f2a16adf0b469b3d2d772e13959, type: 3}
+  m_Name: Event_Score
+  m_EditorClassIdentifier:
+```
+
 ## 📄 `Assets\Data\Player\Stats_Player_Default.asset`
-- Lines: 34
-- Size: 0.8 KB
-- Modified: 2026-01-01 12:29
+- Lines: 41
+- Size: 0.9 KB
+- Modified: 2026-01-06 09:15
 
 ```asset
 %YAML 1.1
@@ -815,6 +1140,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 12
   acceleration: 60
+  deceleration: 40
+  rotationSpeed: 25
+  gravity: 20
+  wallRepulsionForce: 100
+  actionHangTime: 0.3
+  scanRange: 25
+  scanRadius: 2
   maxGrit: 3
   maxFocus: 100
   focusDecayRate: 5
@@ -822,7 +1154,7 @@ MonoBehaviour:
   dashCost: 25
   dashDistance: 8
   dashCooldown: 0.15
-  gunFireRate: 0.8
+  gunFireRate: 0.3
   gunDamage: 0
   gunStagger: 1
   beamFireRate: 0.4
@@ -834,10 +1166,34 @@ MonoBehaviour:
   overdriveFireRateMult: 1.5
 ```
 
+## 📄 `Assets\Data\Visuals\Collections\Collection_Anchors.asset`
+- Lines: 17
+- Size: 0.5 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1d68db7d881f247a058cdf29aadd45, type: 3}
+  m_Name: Collection_Anchors
+  m_EditorClassIdentifier: 
+  materials:
+  - {fileID: 2100000, guid: 94ba67094e633924b819f87e8c71f644, type: 2}
+```
+
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Enemies.asset`
 - Lines: 18
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -862,7 +1218,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Enemies_Core.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -886,7 +1242,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Enemies_Secondary.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -910,7 +1266,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Floors.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -934,7 +1290,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Hazards.asset`
 - Lines: 18
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -959,7 +1315,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Player.asset`
 - Lines: 19
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -982,10 +1338,34 @@ MonoBehaviour:
   - {fileID: 2100000, guid: b24d715459c93c94c94a3da751904c4b, type: 2}
 ```
 
+## 📄 `Assets\Data\Visuals\Collections\Collection_Player_Beam.asset`
+- Lines: 17
+- Size: 0.5 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1d68db7d881f247a058cdf29aadd45, type: 3}
+  m_Name: Collection_Player_Beam
+  m_EditorClassIdentifier: 
+  materials:
+  - {fileID: 2100000, guid: 5d5a22571b7839b45bc2241ed1188761, type: 2}
+```
+
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Player_Core.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1009,7 +1389,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Player_Seconday.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1033,7 +1413,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Projectiles_Friendly.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1057,7 +1437,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Projectiles_Hostile.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1078,10 +1458,34 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 77736e828f9e8074798c85575b33cf35, type: 2}
 ```
 
+## 📄 `Assets\Data\Visuals\Collections\Collection_Void.asset`
+- Lines: 17
+- Size: 0.5 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1d68db7d881f247a058cdf29aadd45, type: 3}
+  m_Name: Collection_Void
+  m_EditorClassIdentifier: 
+  materials:
+  - {fileID: 2100000, guid: 233ba63db12e9814a8277c02e825374d, type: 2}
+```
+
 ## 📄 `Assets\Data\Visuals\Collections\Collection_Walls.asset`
 - Lines: 17
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1102,10 +1506,10 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 02bb3983b3cf79d46a37acc3579e096d, type: 2}
 ```
 
-## 📄 `Assets\Data\Visuals\Palettes\PAL_Alt.asset`
+## 📄 `Assets\Data\Visuals\Palettes\Pal_Alternative.asset`
 - Lines: 83
-- Size: 2.4 KB
-- Modified: 2025-12-31 09:17
+- Size: 2.5 KB
+- Modified: 2026-01-06 09:15
 
 ```asset
 %YAML 1.1
@@ -1120,7 +1524,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
-  m_Name: PAL_Alt
+  m_Name: Pal_Alternative
   m_EditorClassIdentifier: 
   playerPrimary:
     mainColor: {r: 0.4811321, g: 0, b: 0, a: 0}
@@ -1195,7 +1599,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Palettes\PAL_Neon.asset`
 - Lines: 49
 - Size: 1.3 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 09:15
 
 ```asset
 %YAML 1.1
@@ -1210,7 +1614,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
-  m_Name: PAL_Neon
+  m_Name: Pal_Neon
   m_EditorClassIdentifier: 
   playerPrimary:
     mainColor: {r: 0, g: 8, b: 8, a: 0}
@@ -1249,9 +1653,9 @@ MonoBehaviour:
 ```
 
 ## 📄 `Assets\Data\Visuals\Palettes\PAL_Nier.asset`
-- Lines: 83
-- Size: 2.5 KB
-- Modified: 2025-12-31 09:17
+- Lines: 116
+- Size: 3.6 KB
+- Modified: 2026-01-06 09:15
 
 ```asset
 %YAML 1.1
@@ -1266,7 +1670,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
-  m_Name: PAL_Nier
+  m_Name: Pal_Nier
   m_EditorClassIdentifier: 
   playerPrimary:
     mainColor: {r: 0.5952296, g: 0.5955943, b: 0.6037736, a: 0}
@@ -1299,11 +1703,11 @@ MonoBehaviour:
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
     emissionIntensity: 0
   enemyTertiary:
-    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    mainColor: {r: 0.16660735, g: 0.9056604, b: 0.59294343, a: 1}
     smoothness: 0
-    metallic: 0
-    emissionColor: {r: 0, g: 0, b: 0, a: 0}
-    emissionIntensity: 0
+    metallic: 0.7
+    emissionColor: {r: 0.16470589, g: 0.90588236, b: 0.5921569, a: 1}
+    emissionIntensity: 0.2
   projectileHostile:
     mainColor: {r: 1, g: 0.33965325, b: 0.0990566, a: 0}
     smoothness: 0
@@ -1316,6 +1720,25 @@ MonoBehaviour:
     metallic: 0
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
     emissionIntensity: 0
+  beamAttack:
+    mainColor: {r: 0.035899233, g: 0.02300641, b: 0.4433962, a: 0}
+    smoothness: 0
+    metallic: 0.3
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 1
+  blitzReady:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  blitzCooldown:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   staggerColor: {r: 1, g: 0.8, b: 0, a: 1}
   floor:
     mainColor: {r: 0.8666667, g: 0.7882353, b: 0.7882353, a: 0}
@@ -1335,13 +1758,137 @@ MonoBehaviour:
     metallic: 0
     emissionColor: {r: 1, g: 0.9481132, b: 0.9481132, a: 0}
     emissionIntensity: 0.5
-  skyColor: {r: 0.4009434, g: 1, b: 0.95789695, a: 1}
+  voidZone:
+    mainColor: {r: 0.990566, g: 0.65881985, b: 0.65881985, a: 0.7058824}
+    smoothness: 0.3
+    metallic: 0.2
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  anchor:
+    mainColor: {r: 0, g: 0.3962264, b: 0.18193561, a: 0}
+    smoothness: 0.2
+    metallic: 0.6
+    emissionColor: {r: 0, g: 0.39607844, b: 0.18039216, a: 0}
+    emissionIntensity: 0
+  skyColor: {r: 0.01668743, g: 0.51363224, b: 0.7075472, a: 1}
+  fogDensity: 0.0068
+  variants: []
+```
+
+## 📄 `Assets\Data\Visuals\Palettes\Pal_Stranger.asset`
+- Lines: 103
+- Size: 3.2 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
+  m_Name: Pal_Stranger
+  m_EditorClassIdentifier: 
+  playerPrimary:
+    mainColor: {r: 0.14901961, g: 0.27058825, b: 0.45882353, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  playerSecondary:
+    mainColor: {r: 1, g: 0.84313726, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  playerTertiary:
+    mainColor: {r: 0.627451, g: 0.1254902, b: 0.9411765, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0.627451, g: 0.1254902, b: 0.9411765, a: 0}
+    emissionIntensity: 3
+  enemyPrimary:
+    mainColor: {r: 0.56078434, g: 0.56078434, b: 0.56078434, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  enemySecondary:
+    mainColor: {r: 0.1254902, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  enemyTertiary:
+    mainColor: {r: 1, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 1, g: 0, b: 0, a: 0}
+    emissionIntensity: 3
+  projectileHostile:
+    mainColor: {r: 1, g: 0.27058825, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 1, g: 0.27058825, b: 0, a: 0}
+    emissionIntensity: 3
+  projectileFriendly:
+    mainColor: {r: 0.098002106, g: 0.4811321, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0.09803922, g: 0.48235294, b: 0, a: 0}
+    emissionIntensity: 3
+  beamAttack:
+    mainColor: {r: 0, g: 0.0014649518, b: 0.2264151, a: 1}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  blitzReady:
+    mainColor: {r: 0, g: 1, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 1, b: 0, a: 0}
+    emissionIntensity: 2
+  blitzCooldown:
+    mainColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  hitFlashColor: {r: 0.3160377, g: 0.6067947, b: 1, a: 1}
+  staggerColor: {r: 1.6862745, g: 1.6862745, b: 0, a: 1}
+  floor:
+    mainColor: {r: 0.101960786, g: 0.12156863, b: 0.16862746, a: 0}
+    smoothness: 0.8
+    metallic: 0
+    emissionColor: {r: 0, g: 0.06666667, b: 0.2, a: 0}
+    emissionIntensity: 0.5
+  walls:
+    mainColor: {r: 0.18039216, g: 0.16470589, b: 0.14509805, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0.18039216, g: 0.16470589, b: 0.14509805, a: 0}
+    emissionIntensity: 0
+  hazards:
+    mainColor: {r: 1, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 1, g: 0, b: 0, a: 0}
+    emissionIntensity: 4
+  skyColor: {r: 0.3962264, g: 0.07961101, b: 0.0018689969, a: 0.5882353}
+  variants: []
 ```
 
 ## 📄 `Assets\Data\Visuals\Themes\Theme_Enemy_Default.asset`
 - Lines: 27
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1375,7 +1922,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Themes\Theme_Guardian.asset`
 - Lines: 27
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1409,7 +1956,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Visuals\Themes\Theme_Player_Default.asset`
 - Lines: 27
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1443,7 +1990,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Waves\WA_1_3Mis.asset`
 - Lines: 25
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1475,7 +2022,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Waves\WA_1_3Sen.asset`
 - Lines: 25
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1507,7 +2054,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Waves\WA_1_3Sen_3Chm.asset`
 - Lines: 30
 - Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1544,7 +2091,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Waves\WAV_TEST_Sentinel.asset`
 - Lines: 26
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```asset
 %YAML 1.1
@@ -1574,10 +2121,648 @@ MonoBehaviour:
   gruntSpawnRate: 3
 ```
 
+## 📄 `Assets\Modules\AI\Behaviours\AvoidanceBehavior.cs`
+- Lines: 47
+- Size: 1.7 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Utils;
+using DarkTowerTron.AI.Core;
+
+namespace DarkTowerTron.AI.Core.Behaviors
+{
+    [CreateAssetMenu(fileName = "Beh_Avoidance", menuName = "DarkTowerTron/AI/Behaviors/Obstacle Avoidance")]
+    public class AvoidanceBehavior : SteeringBehavior
+    {
+        public float avoidanceRadius = 2f;
+        public float dangerWeight = 1f;
+
+        public override void GetSteering(float[] interest, float[] danger, AIData aiData)
+        {
+            // 1. Safety Check: Use data from the agent
+            if (aiData.ownerCollider == null) return;
+
+            // 2. Logic
+            if (aiData.obstacles == null || aiData.obstacles.Count == 0) return;
+
+            foreach (Collider obstacle in aiData.obstacles)
+            {
+                // FIX: Access the collider via aiData
+                Vector3 closestPoint = aiData.ownerCollider.ClosestPoint(aiData.transform.position);
+
+                Vector3 dirToObstacle = closestPoint - aiData.transform.position;
+                dirToObstacle.y = 0;
+
+                float distance = dirToObstacle.magnitude;
+
+                if (distance > avoidanceRadius) continue;
+
+                Vector3 dirNormalized = dirToObstacle.normalized;
+
+                for (int i = 0; i < AIDirections.EightDirections.Count; i++)
+                {
+                    float dot = Vector3.Dot(dirNormalized, AIDirections.EightDirections[i]);
+                    if (dot > 0.6f)
+                    {
+                        float weight = dangerWeight * (1 - (distance / avoidanceRadius));
+                        if (weight > danger[i]) danger[i] = weight;
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Behaviours\FleeBehaviour.cs`
+- Lines: 53
+- Size: 1.9 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Utils;
+
+namespace DarkTowerTron.AI.Core.Behaviors
+{
+    [CreateAssetMenu(fileName = "Beh_Flee", menuName = "DarkTowerTron/AI/Behaviors/Flee")]
+    public class FleeBehavior : SteeringBehavior
+    {
+        [Tooltip("Enemy will only flee if target is closer than this distance.")]
+        public float fleeDistance = 10f;
+
+        [Tooltip("Strength of the flee desire (0 to 1).")]
+        public float weight = 1.0f;
+
+        public override void GetSteering(float[] interest, float[] danger, AIData aiData)
+        {
+            // Safety Check
+            if (aiData.currentTarget == null) return;
+
+            // 1. Calculate vector TO the target
+            Vector3 vectorToTarget = aiData.currentTarget.position - aiData.transform.position;
+            vectorToTarget.y = 0; // Keep it flat
+
+            float distanceSqr = vectorToTarget.sqrMagnitude;
+
+            // 2. Distance Check (Optimization)
+            // If we are far enough away, we don't need to flee.
+            if (distanceSqr > fleeDistance * fleeDistance) return;
+
+            // 3. Calculate "Away" Direction
+            Vector3 dirAway = -vectorToTarget.normalized;
+
+            // 4. Map to 8 Directions
+            for (int i = 0; i < interest.Length; i++)
+            {
+                // Dot Product: How well does this compass direction align with "Away"?
+                float dot = Vector3.Dot(dirAway, AIDirections.EightDirections[i]);
+
+                // We only care about directions that actually take us away (> 0)
+                if (dot > 0)
+                {
+                    float value = dot * weight;
+
+                    // If this behavior suggests a stronger interest than existing ones, override it
+                    if (value > interest[i])
+                    {
+                        interest[i] = value;
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Behaviours\OrbitBehavior.cs`
+- Lines: 56
+- Size: 2.1 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Utils;
+
+namespace DarkTowerTron.AI.Core.Behaviors
+{
+    [CreateAssetMenu(fileName = "Beh_Orbit", menuName = "DarkTowerTron/AI/Behaviors/Orbit")]
+    public class OrbitBehavior : SteeringBehavior
+    {
+        [Header("Orbit Settings")]
+        public float idealDistance = 7f;
+        public float distanceCorrectionStrength = 0.5f; // How hard we push back/in
+        public bool clockwise = true;
+
+        public override void GetSteering(float[] interest, float[] danger, AIData aiData)
+        {
+            if (aiData.currentTarget == null) return;
+
+            // 1. Calculate Vectors
+            Vector3 vectorToTarget = aiData.currentTarget.position - aiData.transform.position;
+            vectorToTarget.y = 0; // Flatten
+            float distance = vectorToTarget.magnitude;
+            Vector3 dirToTarget = vectorToTarget.normalized;
+
+            // 2. Calculate Tangent (The Orbit Direction)
+            // Cross product of Up(0,1,0) and Forward gives Right
+            Vector3 tangent = Vector3.Cross(Vector3.up, dirToTarget).normalized;
+            if (!clockwise) tangent = -tangent;
+
+            // 3. Calculate Correction (Push In or Pull Out)
+            Vector3 correction = Vector3.zero;
+
+            // Allow a "dead zone" of 1 unit where we just orbit purely
+            if (distance > idealDistance + 1f)
+            {
+                correction = dirToTarget * distanceCorrectionStrength; // Move closer
+            }
+            else if (distance < idealDistance - 1f)
+            {
+                correction = -dirToTarget * distanceCorrectionStrength; // Back away
+            }
+
+            // 4. Combine
+            Vector3 finalDir = (tangent + correction).normalized;
+
+            // 5. Map to 8 Directions
+            for (int i = 0; i < interest.Length; i++)
+            {
+                float dot = Vector3.Dot(finalDir, AIDirections.EightDirections[i]);
+                if (dot > 0 && dot > interest[i])
+                {
+                    interest[i] = dot;
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Behaviours\SeekBehaviour.cs`
+- Lines: 40
+- Size: 1.4 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Utils;
+
+namespace DarkTowerTron.AI.Core.Behaviors
+{
+    [CreateAssetMenu(fileName = "Beh_Seek", menuName = "DarkTowerTron/AI/Behaviors/Seek")]
+    public class SeekBehavior : SteeringBehavior
+    {
+        public override void GetSteering(float[] interest, float[] danger, AIData aiData)
+        {
+            // Safety Check
+            if (aiData.currentTarget == null) return;
+
+            // 1. Calculate direction to target
+            Vector3 directionToTarget = (aiData.currentTarget.position - aiData.transform.position);
+            directionToTarget.y = 0; // Flatten (keep on ground plane)
+
+            // Normalize
+            directionToTarget.Normalize();
+
+            // 2. Compare against our 8 compass directions
+            for (int i = 0; i < interest.Length; i++)
+            {
+                // Dot Product: 1.0 = Perfect Alignment, 0.0 = 90 deg, -1.0 = Opposite
+                float dot = Vector3.Dot(directionToTarget, AIDirections.EightDirections[i]);
+
+                // We only care if the direction brings us closer (>0)
+                if (dot > 0)
+                {
+                    // Apply interest
+                    // We use the dot value directly (0 to 1) as the weight
+                    if (dot > interest[i])
+                    {
+                        interest[i] = dot;
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Behaviours\VoidAvoidanceBehavior.cs`
+- Lines: 42
+- Size: 1.8 KB
+- Modified: 2026-01-06 12:29
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core; // For GameConstants
+using DarkTowerTron.AI.Utils; // For AIDirections
+
+namespace DarkTowerTron.AI.Core.Behaviors
+{
+    [CreateAssetMenu(fileName = "Beh_VoidAvoidance", menuName = "DarkTowerTron/AI/Behaviors/Void Avoidance")]
+    public class VoidAvoidanceBehavior : SteeringBehavior
+    {
+        [Header("Settings")]
+        public float lookAheadDistance = 2f;
+        public float voidDangerWeight = 1f; // 1.0 means "Absolutely Not"
+
+        public override void GetSteering(float[] interest, float[] danger, AIData aiData)
+        {
+            // Loop through all 8 generic directions (N, NE, E, SE, S, SW, W, NW)
+            for (int i = 0; i < AIDirections.EightDirections.Count; i++)
+            {
+                Vector3 direction = AIDirections.EightDirections[i];
+
+                // 1. Calculate where this direction takes us
+                // We use the AI's current position + direction * distance
+                // Note: AIDirections are usually local or world? Context steering usually uses World Space directions relative to the agent.
+                // Assuming AIDirections are unit vectors.
+
+                Vector3 checkPos = aiData.transform.position + (direction * lookAheadDistance);
+
+                // 2. Check for Ground
+                // Lift origin up slightly to ensure we cast downwards cleanly
+                Vector3 rayOrigin = checkPos + Vector3.up * 2.0f;
+
+                // 3. The Logic: If we DO NOT hit ground, it is DANGEROUS
+                if (!UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, 10f, GameConstants.MASK_GROUND_ONLY))
+                {
+                    // VOID DETECTED!
+                    // Set danger for this specific direction slot
+                    danger[i] = voidDangerWeight;
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Core\AIData.cs`
+- Lines: 25
+- Size: 0.7 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace DarkTowerTron.AI.Core
+{
+    public class AIData : MonoBehaviour
+    {
+        [Header("Targets")]
+        public Transform currentTarget;
+
+        [Header("Dynamic Info (Read Only)")]
+        public List<Transform> targets = new List<Transform>();
+        public List<Collider> obstacles = new List<Collider>();
+
+        // NEW: Cache the owner's collider here
+        public Collider ownerCollider;
+
+        private void Awake()
+        {
+            ownerCollider = GetComponent<Collider>();
+        }
+
+        public int GetTargetsCount() => targets != null ? targets.Count : 0;
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Core\ContextSolver.cs`
+- Lines: 82
+- Size: 2.7 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using System.Collections.Generic;
+using UnityEngine;
+using DarkTowerTron.AI.Utils;
+
+namespace DarkTowerTron.AI.Core
+{
+    [RequireComponent(typeof(AIData))]
+    public class ContextSolver : MonoBehaviour
+    {
+        [Header("Settings")]
+        public List<SteeringBehavior> behaviors;
+        public List<Detector> detectors;
+
+        [Header("Debug")]
+        public bool showGizmos = true;
+
+        private float[] _interestMap = new float[8];
+        private float[] _dangerMap = new float[8];
+        private AIData _aiData;
+        private Collider _ownerCollider;
+
+        private void Awake()
+        {
+            _aiData = GetComponent<AIData>();
+            // Get the AI's own collider (usually on the root)
+            _ownerCollider = GetComponent<Collider>();
+        }
+
+        public Vector3 GetDirectionToMove()
+        {
+            // SAFETY CHECK: If we are called before Awake or missing component
+            if (_aiData == null) return transform.forward;
+
+            // 1. Reset Maps
+            System.Array.Clear(_interestMap, 0, 8);
+            System.Array.Clear(_dangerMap, 0, 8);
+
+            // 2. Run Detectors
+            foreach (var detector in detectors)
+            {
+                // Extra safety check in case a detector slot is null in Inspector
+                if (detector != null) detector.Detect(_aiData);
+            }
+
+            // 3. Run Behaviors
+            foreach (var behavior in behaviors)
+            {
+                if (behavior != null) behavior.GetSteering(_interestMap, _dangerMap, _aiData);
+            }
+
+            // 4. Process Maps
+            for (int i = 0; i < 8; i++)
+            {
+                if (_dangerMap[i] > 0)
+                {
+                    _interestMap[i] = Mathf.Clamp01(_interestMap[i] - _dangerMap[i]);
+                }
+            }
+
+            // 5. Average
+            Vector3 outputDirection = Vector3.zero;
+            for (int i = 0; i < 8; i++)
+            {
+                outputDirection += AIDirections.EightDirections[i] * _interestMap[i];
+            }
+
+            return outputDirection.normalized;
+        }
+
+        private void OnDrawGizmos()
+        {
+            // STRICT SAFETY CHECKS FOR EDITOR GIZMOS
+            if (!showGizmos) return;
+            if (!Application.isPlaying) return; // Only draw when logic is actually running
+            if (_aiData == null) return;        // Don't draw if not initialized
+
+            Gizmos.color = Color.yellow;
+            // This call was causing the crash because it ran when _aiData was null
+            Gizmos.DrawRay(transform.position, GetDirectionToMove() * 2);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Core\Detector.cs`
+- Lines: 9
+- Size: 0.2 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.AI.Core
+{
+    public abstract class Detector : MonoBehaviour
+    {
+        public abstract void Detect(AIData aiData);
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Core\SteeringBehaviour.cs`
+- Lines: 12
+- Size: 0.3 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.AI.Core
+{
+    public abstract class SteeringBehavior : ScriptableObject
+    {
+        // REMOVED: protected Collider ownerCollider;
+        // REMOVED: public virtual void Initialize(...)
+
+        public abstract void GetSteering(float[] interest, float[] danger, AIData aiData);
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Detectors\ObstacleDetector.cs`
+- Lines: 40
+- Size: 1.2 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Core;
+
+namespace DarkTowerTron.AI.Detectors
+{
+    public class ObstacleDetector : Detector
+    {
+        [Header("Settings")]
+        public float detectionRadius = 2f;
+        public LayerMask obstacleMask;
+        public bool showGizmos = true;
+
+        // Optimization: Recycle this array to avoid Garbage Collection
+        private Collider[] _colliders = new Collider[10];
+
+        public override void Detect(AIData aiData)
+        {
+            // Clear previous data
+            aiData.obstacles.Clear();
+
+            // Find physics objects
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, detectionRadius, _colliders, obstacleMask);
+
+            for (int i = 0; i < count; i++)
+            {
+                // Add to the data packet
+                aiData.obstacles.Add(_colliders[i]);
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (showGizmos && Application.isPlaying)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(transform.position, detectionRadius);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Detectors\TargetDetector.cs`
+- Lines: 47
+- Size: 1.5 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Core;
+
+namespace DarkTowerTron.AI.Detectors
+{
+    public class TargetDetector : Detector
+    {
+        [Header("Settings")]
+        public float detectionRange = 20f;
+        public LayerMask targetLayer; // Set to 'Player' and 'AfterImage'
+        public bool showGizmos = false;
+
+        private Collider[] _colliders = new Collider[5];
+
+        public override void Detect(AIData aiData)
+        {
+            // 1. Find potential targets
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, detectionRange, _colliders, targetLayer);
+
+            // 2. Logic: Pick the closest one
+            float closestDist = float.MaxValue;
+            Transform bestTarget = null;
+
+            for (int i = 0; i < count; i++)
+            {
+                float dist = Vector3.SqrMagnitude(_colliders[i].transform.position - transform.position);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    bestTarget = _colliders[i].transform;
+                }
+            }
+
+            // 3. Output
+            aiData.currentTarget = bestTarget;
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (showGizmos && Application.isPlaying)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireSphere(transform.position, detectionRange);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\FSM\State.cs`
+- Lines: 17
+- Size: 0.5 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+namespace DarkTowerTron.AI.FSM
+{
+    public abstract class State
+    {
+        protected StateMachine _stateMachine;
+
+        public void Initialize(StateMachine stateMachine)
+        {
+            _stateMachine = stateMachine;
+        }
+
+        public virtual void Enter() { }
+        public virtual void LogicUpdate() { } // Run every Update
+        public virtual void PhysicsUpdate() { } // Run every FixedUpdate
+        public virtual void Exit() { }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\FSM\StateMachine.cs`
+- Lines: 36
+- Size: 0.9 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.AI.FSM
+{
+    public class StateMachine : MonoBehaviour
+    {
+        public State CurrentState { get; private set; }
+
+        public void Initialize(State startingState)
+        {
+            CurrentState = startingState;
+            CurrentState.Initialize(this);
+            CurrentState.Enter();
+        }
+
+        public void ChangeState(State newState)
+        {
+            if (CurrentState != null)
+                CurrentState.Exit();
+
+            CurrentState = newState;
+            CurrentState.Initialize(this);
+            CurrentState.Enter();
+        }
+
+        private void Update()
+        {
+            if (CurrentState != null) CurrentState.LogicUpdate();
+        }
+
+        private void FixedUpdate()
+        {
+            if (CurrentState != null) CurrentState.PhysicsUpdate();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Utils\AIDirections.cs`
+- Lines: 20
+- Size: 0.7 KB
+- Modified: 2025-12-30 09:50
+
+```csharp
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace DarkTowerTron.AI.Utils
+{
+    public static class AIDirections
+    {
+        public static List<Vector3> EightDirections = new List<Vector3>
+        {
+            new Vector3(0,0,1).normalized,   // 0: North
+            new Vector3(1,0,1).normalized,   // 1: NorthEast
+            new Vector3(1,0,0).normalized,   // 2: East
+            new Vector3(1,0,-1).normalized,  // 3: SouthEast
+            new Vector3(0,0,-1).normalized,  // 4: South
+            new Vector3(-1,0,-1).normalized, // 5: SouthWest
+            new Vector3(-1,0,0).normalized,  // 6: West
+            new Vector3(-1,0,1).normalized   // 7: NorthWest
+        };
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Combat\BaseHitbox.cs`
 - Lines: 32
 - Size: 0.9 KB
-- Modified: 2026-01-01 09:48
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -1615,9 +2800,9 @@ namespace DarkTowerTron.Combat
 ```
 
 ## 📄 `Assets\Scripts\Combat\DamageReceiver.cs`
-- Lines: 178
-- Size: 5.8 KB
-- Modified: 2026-01-01 12:17
+- Lines: 198
+- Size: 6.6 KB
+- Modified: 2026-01-06 11:43
 
 ```csharp
 using UnityEngine;
@@ -1633,7 +2818,7 @@ namespace DarkTowerTron.Combat
 {
     [RequireComponent(typeof(VitalityModule))]
     [RequireComponent(typeof(StaggerModule))]
-    public class DamageReceiver : MonoBehaviour, IDamageable, IPoolable, ICombatTarget
+    public class DamageReceiver : MonoBehaviour, IDamageable, IPoolable, ICombatTarget, IAimTarget
     {
         // --- DEBUG SWITCH ---
         public static bool EnableDebugGizmos = false;
@@ -1642,6 +2827,14 @@ namespace DarkTowerTron.Combat
         public bool useOverrides = false;
         [SerializeField] private float _overrideHealth = 50f;
         [SerializeField] private int _overrideStagger = 3;
+
+        [Header("Aiming Configuration")]
+        [Tooltip("Assign a child object (e.g. 'CenterMass') to act as the lock-on target.")]
+        [SerializeField] private Transform _aimTarget;
+        [SerializeField] private float _magnetismRadius = 0.75f;
+
+        [Header("Execution Settings")]
+        [SerializeField] private bool _keepPlayerGrounded = true; // Default True for Enemies
 
         // Dependencies
         private VitalityModule _vitality;
@@ -1765,7 +2958,19 @@ namespace DarkTowerTron.Combat
 
         // --- ICombatTarget ---
         public void OnExecutionHit() => Kill(true);
-        public bool KeepPlayerGrounded => true;
+        public bool KeepPlayerGrounded => _keepPlayerGrounded;
+
+        // --- IAimTarget ---
+        public Vector3 AimPoint
+        {
+            get
+            {
+                // Robust Fallback: If designer forgot to assign, guess Chest Height
+                if (_aimTarget == null) return transform.position + Vector3.up * 1.0f;
+                return _aimTarget.position;
+            }
+        }
+        public float TargetRadius => _magnetismRadius;
 
         // --- DEBUG GIZMOS ---
 #if UNITY_EDITOR
@@ -1803,7 +3008,7 @@ namespace DarkTowerTron.Combat
 ## 📄 `Assets\Scripts\Combat\HazardZone.cs`
 - Lines: 91
 - Size: 3.0 KB
-- Modified: 2025-12-31 12:27
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -1900,15 +3105,18 @@ namespace DarkTowerTron.Combat
 ```
 
 ## 📄 `Assets\Scripts\Combat\HitBox\ShieldHitbox.cs`
-- Lines: 128
-- Size: 4.0 KB
-- Modified: 2026-01-01 09:49
+- Lines: 153
+- Size: 4.8 KB
+- Modified: 2026-01-06 09:45
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Events; // NEW: For Popup Text
 using DG.Tweening;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Combat
 {
@@ -1917,23 +3125,38 @@ namespace DarkTowerTron.Combat
         [Header("Heat Mechanics")]
         public float maxHeat = 10f;
         public float coolDownRate = 2f;
-        public float staggerToHeatMultiplier = 10f; 
-        
+        public float staggerToHeatMultiplier = 10f;
+
         public bool isBroken = false;
-        
+
         [Header("Advanced Mechanics")]
-        public bool reflectProjectiles = false; 
+        public bool reflectProjectiles = false;
 
         [Header("Visuals")]
         public Renderer shieldRenderer;
         public Color coldColor = Color.grey;
-        public Color hotColor = new Color(1f, 0.3f, 0f); 
+        [ColorUsage(true, true)] public Color hotColor = new Color(1f, 0.3f, 0f);
 
-        [Header("Audio")]
+        [Header("Feedback")]
+        [SerializeField] private PopupTextEventChannelSO _popupEvent;
         public AudioClip breakClip;
 
         private float _currentHeat;
         private float _lastHitTime;
+
+        // Optimization: Property Block
+        private MaterialPropertyBlock _propBlock;
+        private int _baseColorID;
+        private int _emissionColorID;
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            _propBlock = new MaterialPropertyBlock();
+            _baseColorID = Shader.PropertyToID("_BaseColor");
+            _emissionColorID = Shader.PropertyToID("_EmissionColor");
+        }
 
         private void OnEnable()
         {
@@ -1956,9 +3179,8 @@ namespace DarkTowerTron.Combat
 
         public override bool TakeDamage(DamageInfo info)
         {
-            // CHANGED: Use _receiver
             if (_receiver == null) return false;
-            
+
             if (isBroken) return base.TakeDamage(info);
 
             _lastHitTime = Time.time;
@@ -1966,14 +3188,14 @@ namespace DarkTowerTron.Combat
             if (info.isRedirected)
             {
                 BreakShield();
-                return true; 
+                return true;
             }
 
             if (info.damageType == DamageType.Projectile || info.damageType == DamageType.Generic)
             {
                 float heatAdded = info.damageAmount + (info.staggerAmount * staggerToHeatMultiplier);
                 _currentHeat += heatAdded;
-                
+
                 if (shieldRenderer) shieldRenderer.transform.DOPunchScale(Vector3.one * 0.05f, 0.1f);
                 UpdateVisuals();
 
@@ -1983,26 +3205,30 @@ namespace DarkTowerTron.Combat
                     if (proj != null)
                     {
                         proj.DeflectByEnemy(transform.forward);
-                        GameEvents.OnPopupText?.Invoke(transform.position, "REFLECT");
-                        return true; 
+
+                        // CRITICAL FIX: Claim ownership so the bullet doesn't hit us again instantly
+                        proj.SetSource(this.gameObject);
+
+                        _popupEvent?.Raise(transform.position, "REFLECT");
+                        return true;
                     }
                 }
 
-                GameEvents.OnPopupText?.Invoke(transform.position, "DEFLECT");
-                return true; 
+                _popupEvent?.Raise(transform.position, "DEFLECT");
+                return true;
             }
-            
+
             else if (info.damageType == DamageType.Melee)
             {
                 if (_currentHeat >= maxHeat)
                 {
                     BreakShield();
-                    return true; 
+                    return true;
                 }
                 else
                 {
-                    GameEvents.OnPopupText?.Invoke(transform.position, "ARMORED");
-                    return false; 
+                    _popupEvent?.Raise(transform.position, "ARMORED");
+                    return false;
                 }
             }
 
@@ -2013,13 +3239,11 @@ namespace DarkTowerTron.Combat
         {
             isBroken = true;
             if (shieldRenderer) shieldRenderer.enabled = false;
-            
-            GameEvents.OnPopupText?.Invoke(transform.position, "SHATTERED");
-            
-            if (AudioManager.Instance && breakClip)
-                 AudioManager.Instance.PlaySound(breakClip, 1.0f);
-                 
-            // TODO: Spawn AOE Explosion Hazard here if you want the "Exploding Shield" perk
+
+            _popupEvent?.Raise(transform.position, "SHATTERED");
+
+            if (Global.Audio != null && breakClip)
+                Global.Audio.PlaySound(breakClip, 1.0f);
         }
 
         private void UpdateVisuals()
@@ -2027,8 +3251,14 @@ namespace DarkTowerTron.Combat
             if (shieldRenderer)
             {
                 float t = Mathf.Clamp01(_currentHeat / maxHeat);
-                shieldRenderer.material.color = Color.Lerp(coldColor, hotColor, t);
-                shieldRenderer.material.SetColor("_EmissionColor", Color.Lerp(coldColor, hotColor, t) * (1 + t * 2)); 
+                Color c = Color.Lerp(coldColor, hotColor, t);
+                Color e = Color.Lerp(coldColor, hotColor, t) * (1 + t * 2);
+
+                // Use Property Block to avoid creating Material Instances
+                shieldRenderer.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor(_baseColorID, c);
+                _propBlock.SetColor(_emissionColorID, e);
+                shieldRenderer.SetPropertyBlock(_propBlock);
             }
         }
     }
@@ -2038,7 +3268,7 @@ namespace DarkTowerTron.Combat
 ## 📄 `Assets\Scripts\Combat\HitBox\StandardHitbox.cs`
 - Lines: 15
 - Size: 0.3 KB
-- Modified: 2026-01-01 09:48
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using DarkTowerTron.Core;
@@ -2058,142 +3288,10 @@ namespace DarkTowerTron.Combat
 }
 ```
 
-## 📄 `Assets\Scripts\Combat\HitboxRelay.cs`
-- Lines: 67
-- Size: 2.4 KB
-- Modified: 2025-12-31 17:15
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Combat
-{
-    public class HitboxRelay : MonoBehaviour, IDamageable
-    {
-        [Header("Link")]
-        // CHANGED: Serialized Object reference, cast to Interface at runtime
-        // Why GameObject? Unity can't serialize Interfaces directly in Inspector easily.
-        [SerializeField] private GameObject _mainControllerObject;
-
-        private IDamageable _mainController;
-
-        [Header("Settings")]
-        [SerializeField] private float _damageMultiplier = 1.0f;
-
-        private void Awake()
-        {
-            // Manual Assignment Logic
-            if (_mainControllerObject != null)
-            {
-                _mainController = _mainControllerObject.GetComponent<IDamageable>();
-            }
-
-            // Auto-Link Fallback (If empty)
-            if (_mainController == null)
-            {
-                // Try parent first
-                _mainController = GetComponentInParent<IDamageable>();
-
-                // If this object IS the parent (recursion risk), look specifically for other components?
-                // No, Relay is usually on a child. 
-                // But wait! If Relay is on Child, and Parent has Controller, GetComponentInParent works.
-                // Note: GetComponentsInParent includes THIS object. We must ensure we don't find ourselves!
-
-                if (_mainController == this as IDamageable)
-                {
-                    // If we found ourselves, look at parent specifically
-                    if (transform.parent != null)
-                        _mainController = transform.parent.GetComponentInParent<IDamageable>();
-                }
-            }
-
-            if (_mainController == null)
-            {
-                GameLogger.LogWarning(LogChannel.Combat, $"HitboxRelay on {name} could not find an IDamageable parent!", gameObject);
-            }
-        }
-
-        public bool TakeDamage(DamageInfo info)
-        {
-            if (_mainController == null) return false;
-
-            // Apply multiplier
-            info.damageAmount *= _damageMultiplier;
-
-            // Forward the hit
-            return _mainController.TakeDamage(info);
-        }
-
-        public void Kill(bool instant)
-        {
-            if (_mainController != null) _mainController.Kill(instant);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Combat\HomingMissile.cs`
-- Lines: 49
-- Size: 1.7 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Player; // To access TargetScanner
-
-namespace DarkTowerTron.Combat
-{
-    public class HomingMissile : MonoBehaviour
-    {
-        public float turnSpeed = 5f;
-
-        private Transform _target;
-        private Projectile _projectile;
-
-        private void OnEnable()
-        {
-            _projectile = GetComponent<Projectile>();
-
-            // Find Target from Player's Scanner
-            var player = GameObject.FindGameObjectWithTag(GameConstants.TAG_PLAYER);
-            if (player)
-            {
-                var scanner = player.GetComponent<TargetScanner>();
-                if (scanner && scanner.CurrentTarget != null)
-                {
-                    // Target the collider center or transform
-                    _target = scanner.CurrentTarget.transform;
-                }
-            }
-        }
-
-        private void Update()
-        {
-            if (_target == null || _projectile == null) return;
-
-            Vector3 dirToTarget = (_target.position - transform.position).normalized;
-
-            // Smoothly rotate towards target
-            // The Projectile script moves 'Forward', so this curves the flight path
-            Vector3 newDir = Vector3.RotateTowards(transform.forward, dirToTarget, turnSpeed * Time.deltaTime, 0.0f);
-
-            transform.rotation = Quaternion.LookRotation(newDir);
-
-            // Update the Projectile's internal direction vector so it doesn't fight us
-            // (Only needed if Projectile uses a cached vector instead of transform.forward)
-            // Our Projectile.cs uses a cached `_direction`. We need to update it.
-            _projectile.Initialize(newDir);
-        }
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Combat\Modules\StaggerModule.cs`
 - Lines: 79
 - Size: 2.2 KB
-- Modified: 2026-01-01 11:40
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -2280,7 +3378,7 @@ namespace DarkTowerTron.Combat
 ## 📄 `Assets\Scripts\Combat\Modules\VitalityModule.cs`
 - Lines: 58
 - Size: 1.5 KB
-- Modified: 2026-01-01 11:40
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -2344,14 +3442,17 @@ namespace DarkTowerTron.Combat
 ```
 
 ## 📄 `Assets\Scripts\Combat\Projectile.cs`
-- Lines: 210
-- Size: 7.2 KB
-- Modified: 2026-01-01 14:57
+- Lines: 176
+- Size: 6.0 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Combat.Strategies;
+
+// ALIAS: Resolves the conflict between 'Services' (Namespace) and 'Services' (Class)
+using Global = DarkTowerTron.Core.Services.Services; 
 
 namespace DarkTowerTron.Combat
 {
@@ -2360,123 +3461,93 @@ namespace DarkTowerTron.Combat
     public class Projectile : MonoBehaviour, IReflectable, IPoolable
     {
         [Header("Ballistics")]
-        public float speed = 15f;
+        public float speed = 25f;
         public float lifetime = 5f;
         public bool isHostile = true;
         
-        [Header("Safety")]
-        public float gracePeriod = 0.05f; // Ignore hits for first 0.05s
-        public LayerMask wallLayer;
-
-        [Header("Damage Stats")]
+        [Header("Damage")]
         public float damage = 10f;
-        [Min(0)] public int stagger = 1; // Changed to Int
-        public DamageType damageType = DamageType.Projectile; // NEW
+        public int stagger = 1;
+        public DamageType damageType = DamageType.Projectile;
 
         [Header("Visuals")]
         public Renderer meshRenderer; 
-        public Material friendlyMaterial; // Used when Player Blitzes
-        public Material hostileMaterial;  // NEW: Used when Enemy Shield Reflects
+        public Material friendlyMaterial; 
+        public Material hostileMaterial; 
 
-        private Material _originalMaterial;
-        private Vector3 _direction;
+        private Vector3 _direction; 
         private GameObject _source;
+        private IMovementStrategy _movementStrategy;
+        
         private bool _isInitialized = false;
         private bool _isRedirected = false; 
         private float _lifeTimer;
-        // NEW: State to prevent self-destruction on bounce
         private bool _wasDeflectedThisFrame = false;
-        private float _graceTimer;
 
-        private void Awake()
-        {
-            if (meshRenderer) _originalMaterial = meshRenderer.sharedMaterial;
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
-        }
+        public void OnSpawn() { }
 
-        public void OnSpawn()
+        public void OnDespawn() 
         {
-            _lifeTimer = lifetime;
-        }
-
-        public void OnDespawn()
-        {
-            CancelInvoke();
             _isInitialized = false;
+            _movementStrategy = null; 
         }
 
         public void Initialize(Vector3 dir)
         {
+            if (_movementStrategy == null) SetStrategy(new LinearMovement());
+
             _direction = dir.normalized;
+            _movementStrategy.Initialize(transform, _direction, speed);
+
             _isInitialized = true;
             _lifeTimer = lifetime;
-            _graceTimer = gracePeriod; // RESET TIMER
-            _isRedirected = false; 
+            _isRedirected = false;
             
-            if (meshRenderer && _originalMaterial) meshRenderer.material = _originalMaterial;
+            UpdateVisuals();
         }
 
-        public void ResetHostility(bool startHostile) { isHostile = startHostile; }
-
-        public void SetSource(GameObject source)
-        {
-            _source = source;
-        }
+        public void SetStrategy(IMovementStrategy strategy) => _movementStrategy = strategy;
+        public void SetSource(GameObject source) => _source = source;
+        public void ResetHostility(bool startHostile) { isHostile = startHostile; UpdateVisuals(); }
 
         private void Update()
         {
             if (!_isInitialized) return;
-            _wasDeflectedThisFrame = false; // Reset flag every frame
+            _wasDeflectedThisFrame = false;
+            float dt = Time.deltaTime;
 
-            // Countdown Grace Period
-            if (_graceTimer > 0) _graceTimer -= Time.deltaTime;
+            Vector3 oldPos = transform.position;
+            _movementStrategy.Move(transform, dt);
+            
+            Vector3 newPos = transform.position;
+            Vector3 travelVec = newPos - oldPos;
+            float moveDistance = travelVec.magnitude;
 
-            float moveDistance = speed * Time.deltaTime;
-
-            // --- ANTI-TUNNELING RAYCAST ---
-            // Cast a ray forward equal to the distance we are about to move
-            // We combine all relevant layers into one mask
-            int layerMask = LayerMask.GetMask("Default", "Wall", "Player", "Enemy");
-
-            if (UnityEngine.Physics.Raycast(transform.position, _direction, out RaycastHit hit, moveDistance, layerMask))
+            if (moveDistance > 0)
             {
-                // IGNORE SELF / SOURCE
-                if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform))) 
+                int mask = GameConstants.MASK_PROJECTILE_COLLISION;
+
+                if (UnityEngine.Physics.Raycast(oldPos, travelVec.normalized, out RaycastHit hit, moveDistance, mask))
                 {
-                    // Move normally if we hit the shooter (avoid stuck bullets)
-                    transform.Translate(_direction * moveDistance, Space.World);
-                }
-                else
-                {
-                    // WE HIT SOMETHING!
-                    // Move to the hit point
+                    if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform)))
+                    {
+                        return; 
+                    }
+
                     transform.position = hit.point;
-                    // Trigger collision logic manually
                     HandleCollision(hit.collider);
-                    return; // Stop moving this frame
                 }
             }
-            else
-            {
-                // Clear path, move forward
-                transform.Translate(_direction * moveDistance, Space.World);
-            }
-            // -----------------------------
 
-            _lifeTimer -= Time.deltaTime;
+            _lifeTimer -= dt;
             if (_lifeTimer <= 0) Despawn();
         }
 
-        // Refactored logic from OnTriggerEnter to a shared method
         private void HandleCollision(Collider other)
         {
-            // Respect grace period
-            if (_graceTimer > 0) return;
+            if (other.isTrigger && other.GetComponent<ShieldHitbox>() == null) return;
 
-            if (other.isTrigger && other.GetComponent<ShieldHitbox>() == null) return; // Ignore random triggers, but hit Shields
-
-            // Wall Check
-            if ((wallLayer.value & (1 << other.gameObject.layer)) > 0)
+            if (other.gameObject.layer == GameConstants.LAYER_WALL || other.gameObject.layer == GameConstants.LAYER_DEFAULT)
             {
                 Despawn();
                 return;
@@ -2492,9 +3563,9 @@ namespace DarkTowerTron.Combat
                 {
                     damageAmount = this.damage,
                     staggerAmount = this.stagger,
-                    pushDirection = _direction,
+                    pushDirection = transform.forward,
                     pushForce = 5f,
-                    source = gameObject,
+                    source = _source,
                     isRedirected = this._isRedirected,
                     damageType = this.damageType
                 };
@@ -2506,56 +3577,195 @@ namespace DarkTowerTron.Combat
             }
         }
 
-        // Keep OnTriggerEnter as a backup for overlaps
-        private void OnTriggerEnter(Collider other)
-        {
-             HandleCollision(other);
-        }
+        private void OnTriggerEnter(Collider other) { }
 
-        // --- NEW METHOD FOR SHIELDS ---
-        public void DeflectByEnemy(Vector3 surfaceNormal)
+        public void DeflectByEnemy(Vector3 surfaceNormal, IMovementStrategy overrideStrategy = null)
         {
             _wasDeflectedThisFrame = true;
-            isHostile = true; // Now it hurts the player!
-
-            // 1. Physics Math
+            isHostile = true; 
             _direction = Vector3.Reflect(_direction, surfaceNormal).normalized;
-            transform.rotation = Quaternion.LookRotation(_direction);
-            speed *= 1.2f;
-
-            // 2. Visual Change
-            if (meshRenderer)
-            {
-                if (hostileMaterial)
-                {
-                    meshRenderer.material = hostileMaterial;
-                }
-                else
-                {
-                    // Fallback
-                    meshRenderer.material.color = Color.red;
-                }
-            }
-            
-            // 3. Reset Timer
-            _lifeTimer = lifetime;
+            _source = null; 
+            ApplyStrategy(overrideStrategy ?? new LinearMovement());
+            UpdateVisuals();
         }
 
-        public void Redirect(Vector3 newDirection, GameObject newOwner)
+        public void Redirect(Vector3 newDirection, GameObject newOwner, IMovementStrategy overrideStrategy = null)
         {
+            _wasDeflectedThisFrame = true;
             isHostile = false; 
             _isRedirected = true;
             _direction = newDirection.normalized;
-            speed *= 1.5f; 
-            if (meshRenderer && friendlyMaterial) meshRenderer.material = friendlyMaterial;
-            else if (meshRenderer) meshRenderer.material.color = Color.cyan;
-            _lifeTimer = 3.0f; 
+            _source = newOwner;
+            speed *= 1.5f;
+            _lifeTimer = 3.0f;
+            ApplyStrategy(overrideStrategy ?? new LinearMovement());
+            UpdateVisuals();
+        }
+
+        private void ApplyStrategy(IMovementStrategy strategy)
+        {
+            SetStrategy(strategy);
+            _movementStrategy.Initialize(transform, _direction, speed);
+        }
+
+        private void UpdateVisuals()
+        {
+            // CRITICAL FIX: Use sharedMaterial to respect the Palette Manager
+            if (meshRenderer) 
+                meshRenderer.sharedMaterial = isHostile ? hostileMaterial : friendlyMaterial;
         }
 
         private void Despawn()
         {
-            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
+            // USE ALIAS 'Global' to avoid namespace collision
+            if (Global.Pool) Global.Pool.Despawn(gameObject);
             else Destroy(gameObject);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\Strategies\HomingMovement.cs`
+- Lines: 45
+- Size: 1.4 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+
+namespace DarkTowerTron.Combat.Strategies
+{
+    public class HomingMovement : IMovementStrategy
+    {
+        private Transform _target;
+        private float _turnSpeed;
+        private float _speed;
+        private Vector3 _currentDirection;
+
+        public HomingMovement(Transform target, float turnSpeed)
+        {
+            _target = target;
+            _turnSpeed = turnSpeed;
+        }
+
+        public void Initialize(Transform transform, Vector3 direction, float speed)
+        {
+            _speed = speed;
+            _currentDirection = direction.normalized;
+            transform.rotation = Quaternion.LookRotation(_currentDirection);
+        }
+
+        public void Move(Transform transform, float deltaTime)
+        {
+            if (_target != null)
+            {
+                Vector3 dirToTarget = (_target.position - transform.position).normalized;
+                
+                // Rotate towards target
+                _currentDirection = Vector3.RotateTowards(
+                    _currentDirection, 
+                    dirToTarget, 
+                    _turnSpeed * Mathf.Deg2Rad * deltaTime, 
+                    0.0f
+                );
+            }
+
+            transform.rotation = Quaternion.LookRotation(_currentDirection);
+            transform.Translate(_currentDirection * _speed * deltaTime, Space.World);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\Strategies\LinearMovement.cs`
+- Lines: 23
+- Size: 0.6 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+
+namespace DarkTowerTron.Combat.Strategies
+{
+    public class LinearMovement : IMovementStrategy
+    {
+        private float _speed;
+        private Vector3 _direction;
+
+        public void Initialize(Transform transform, Vector3 direction, float speed)
+        {
+            _speed = speed;
+            _direction = direction.normalized;
+            transform.rotation = Quaternion.LookRotation(_direction);
+        }
+
+        public void Move(Transform transform, float deltaTime)
+        {
+            transform.Translate(_direction * _speed * deltaTime, Space.World);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\Strategies\SineWaveMovement.cs`
+- Lines: 54
+- Size: 1.9 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+
+namespace DarkTowerTron.Combat.Strategies
+{
+    public class SineWaveMovement : IMovementStrategy
+    {
+        private float _speed;
+        private Vector3 _forward;
+        private Vector3 _right;
+        private float _frequency = 5f;
+        private float _amplitude = 2f;
+        private float _timeAlive;
+
+        // You could pass config in a Constructor if you weren't using simple interfaces
+        // For now, hardcoded or set via property setters
+        public SineWaveMovement(float freq, float amp)
+        {
+            _frequency = freq;
+            _amplitude = amp;
+        }
+
+        public void Initialize(Transform transform, Vector3 direction, float speed)
+        {
+            _speed = speed;
+            _forward = direction.normalized;
+            _right = Vector3.Cross(_forward, Vector3.up); // Calculate "Right" relative to bullet
+            _timeAlive = 0f;
+            
+            transform.rotation = Quaternion.LookRotation(_forward);
+        }
+
+        public void Move(Transform transform, float deltaTime)
+        {
+            _timeAlive += deltaTime;
+
+            // 1. Move Forward
+            Vector3 forwardMove = _forward * _speed * deltaTime;
+
+            // 2. Calculate Sine Offset (Mathf.Sin)
+            // We apply velocity to the "Right" based on the derivative of Sine, 
+            // OR simpler: just offset position (which interacts weirdly with Physics Raycasts).
+            
+            // Better approach for Raycast-based projectiles: 
+            // Calculate current velocity vector and move along it.
+            
+            // For simplicity in this demo: We will just mutate direction slightly
+            float wave = Mathf.Cos(_timeAlive * _frequency) * _amplitude;
+            Vector3 finalMove = forwardMove + (_right * wave * deltaTime);
+
+            transform.Translate(finalMove, Space.World);
         }
     }
 }
@@ -2564,7 +3774,7 @@ namespace DarkTowerTron.Combat
 ## 📄 `Assets\Scripts\Core\CameraRig.cs`
 - Lines: 83
 - Size: 2.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -2655,7 +3865,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\CircleRenderer.cs`
 - Lines: 51
 - Size: 1.4 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-11 07:51
 
 ```csharp
 using UnityEngine;
@@ -2714,7 +3924,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\Data\ActorThemeSO.cs`
 - Lines: 13
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -2735,7 +3945,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Data\ArchitectPatternSO.cs`
 - Lines: 29
 - Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -2772,7 +3982,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Data\AttackPatternSO.cs`
 - Lines: 30
 - Size: 1.1 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -2808,12 +4018,14 @@ namespace DarkTowerTron.Core.Data
 ```
 
 ## 📄 `Assets\Scripts\Core\Data\ColorPaletteSO.cs`
-- Lines: 47
-- Size: 1.8 KB
-- Modified: 2025-12-31 09:17
+- Lines: 174
+- Size: 6.6 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 namespace DarkTowerTron.Core.Data
 {
@@ -2825,39 +4037,164 @@ namespace DarkTowerTron.Core.Data
         [Range(0f, 1f)] public float metallic;
         
         [ColorUsage(true, true)] public Color emissionColor;
-        [Tooltip("How bright is the emission? (Use HDR)")]
         public float emissionIntensity;
+    }
+
+    [System.Serializable]
+    public struct SurfaceOverride
+    {
+        // Legacy (string-based) surface name. Kept for migration/backward compatibility.
+        [HideInInspector] public string surfaceName; // e.g., "EnemyTertiary"
+
+        public SurfaceType surfaceType;
+        public SurfaceDefinition definition;
+    }
+
+    [System.Serializable]
+    public class PaletteVariant
+    {
+        public string variantName; // e.g., "Enraged"
+        public List<SurfaceOverride> overrides;
     }
 
     [CreateAssetMenu(fileName = "NewPalette", menuName = "DarkTowerTron/Visuals/Color Palette")]
     public class ColorPaletteSO : ScriptableObject
     {
         [Header("Player Theme")]
-        public SurfaceDefinition playerPrimary;   // Body
-        public SurfaceDefinition playerSecondary; // Visor / Details
-        public SurfaceDefinition playerTertiary;  // Lights / Engine
+        public SurfaceDefinition playerPrimary;   
+        public SurfaceDefinition playerSecondary; 
+        public SurfaceDefinition playerTertiary;  
 
         [Header("Enemy Theme")]
-        public SurfaceDefinition enemyPrimary;    // Body (Red)
-        public SurfaceDefinition enemySecondary;  // Joints (Grey/Dark)
-        public SurfaceDefinition enemyTertiary;   // Eyes / Cores (Bright)
+        public SurfaceDefinition enemyPrimary;    
+        public SurfaceDefinition enemySecondary;  
+        public SurfaceDefinition enemyTertiary;   
 
-        // Keep legacy references for PaletteReceiver defaults
-        // We can construct ActorThemeSO at runtime or just reference these values directly
-        // For simplicity, PaletteManager will read these specific fields.
-
-        [Header("Combat")]
+        [Header("Combat & FX")]
         public SurfaceDefinition projectileHostile;
         public SurfaceDefinition projectileFriendly;
+        public SurfaceDefinition beamAttack;
+        public SurfaceDefinition blitzReady;
+        public SurfaceDefinition blitzCooldown;
+        [ColorUsage(true, true)] public Color hitFlashColor = Color.white;
         [ColorUsage(true, true)] public Color staggerColor = Color.yellow;
 
         [Header("Environment")]
         public SurfaceDefinition floor;
         public SurfaceDefinition walls;
         public SurfaceDefinition hazards;
+        public SurfaceDefinition voidZone;
+        public SurfaceDefinition anchor;
 
-        [Header("Global")]
+        [Header("Global Environment")]
         public Color skyColor = Color.black;
+
+        [Range(0f, 0.1f)]
+        public float fogDensity = 0.02f; // Default "Atmosphere"
+
+        [Header("Variants")]
+        public List<PaletteVariant> variants;
+
+        // --- LOGIC ---
+
+        /// <summary>
+        /// Returns the base definition, or an override if the active variant has one.
+        /// </summary>
+        public SurfaceDefinition GetSurface(SurfaceType type, string activeVariantName)
+        {
+            // 1. Check Variant Override
+            if (!string.IsNullOrEmpty(activeVariantName) && variants != null)
+            {
+                PaletteVariant activeVariant = variants.Find(v => v.variantName == activeVariantName);
+                if (activeVariant != null && activeVariant.overrides != null)
+                {
+                    // Find specific override
+                    int index = activeVariant.overrides.FindIndex(o => o.surfaceType == type);
+                    if (index >= 0) return activeVariant.overrides[index].definition;
+
+                    // Backward compatibility: if the asset still uses legacy strings,
+                    // resolve them on the fly.
+                    index = activeVariant.overrides.FindIndex(o =>
+                        o.surfaceType == SurfaceType.None &&
+                        TryParseSurfaceType(o.surfaceName, out var parsed) &&
+                        parsed == type);
+                    if (index >= 0) return activeVariant.overrides[index].definition;
+                }
+            }
+
+            // 2. Return Base
+            return GetBaseSurface(type);
+        }
+
+        private SurfaceDefinition GetBaseSurface(SurfaceType type)
+        {
+            switch (type)
+            {
+                case SurfaceType.None: return new SurfaceDefinition();
+                case SurfaceType.PlayerPrimary: return playerPrimary;
+                case SurfaceType.PlayerSecondary: return playerSecondary;
+                case SurfaceType.PlayerTertiary: return playerTertiary;
+
+                case SurfaceType.EnemyPrimary: return enemyPrimary;
+                case SurfaceType.EnemySecondary: return enemySecondary;
+                case SurfaceType.EnemyTertiary: return enemyTertiary;
+
+                case SurfaceType.ProjectileHostile: return projectileHostile;
+                case SurfaceType.ProjectileFriendly: return projectileFriendly;
+                case SurfaceType.BeamAttack: return beamAttack;
+                case SurfaceType.BlitzReady: return blitzReady;
+                case SurfaceType.BlitzCooldown: return blitzCooldown;
+
+                case SurfaceType.Floor: return floor;
+                case SurfaceType.Walls: return walls;
+                case SurfaceType.Hazards: return hazards;
+                case SurfaceType.VoidZone: return voidZone;
+                case SurfaceType.Anchor: return anchor;
+
+                default:
+                    return new SurfaceDefinition();
+            }
+        }
+
+        private static bool TryParseSurfaceType(string surfaceName, out SurfaceType type)
+        {
+            if (string.IsNullOrWhiteSpace(surfaceName))
+            {
+                type = SurfaceType.None;
+                return false;
+            }
+
+            return Enum.TryParse(surfaceName.Trim(), true, out type) && type != SurfaceType.None;
+        }
+
+        private void OnValidate()
+        {
+            // Migrate legacy string overrides into enum values.
+            if (variants == null) return;
+
+            for (int variantIndex = 0; variantIndex < variants.Count; variantIndex++)
+            {
+                PaletteVariant variant = variants[variantIndex];
+                if (variant == null || variant.overrides == null) continue;
+
+                bool changed = false;
+                for (int overrideIndex = 0; overrideIndex < variant.overrides.Count; overrideIndex++)
+                {
+                    SurfaceOverride ov = variant.overrides[overrideIndex];
+                    if (ov.surfaceType == SurfaceType.None && TryParseSurfaceType(ov.surfaceName, out var parsed))
+                    {
+                        ov.surfaceType = parsed;
+                        variant.overrides[overrideIndex] = ov;
+                        changed = true;
+                    }
+                }
+
+                if (changed)
+                {
+                    variants[variantIndex] = variant;
+                }
+            }
+        }
     }
 }
 ```
@@ -2865,7 +4202,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Data\DebugProfileSO.cs`
 - Lines: 53
 - Size: 1.8 KB
-- Modified: 2025-12-31 14:46
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -2923,10 +4260,40 @@ namespace DarkTowerTron.Core.Data
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Data\EnemyAttackSO.cs`
+- Lines: 22
+- Size: 0.7 KB
+- Modified: 2026-01-06 12:10
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Data
+{
+    [CreateAssetMenu(fileName = "Attack_New", menuName = "DarkTowerTron/Combat/Enemy Attack Profile")]
+    public class EnemyAttackSO : ScriptableObject
+    {
+        [Header("Offensive Stats")]
+        public float damage = 10f;
+        [Min(0)] public int stagger = 1;
+
+        [Header("Projectile Settings")]
+        [Tooltip("Leave empty if this is a melee attack.")]
+        public GameObject projectilePrefab;
+        public float projectileSpeed = 15f;
+        public float lifetime = 5f;
+
+        [Header("Accuracy")]
+        [Tooltip("0 = Perfect Aim. Higher = More spread.")]
+        public float spreadAngle = 0f;
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Data\EnemyStatsSO.cs`
 - Lines: 66
 - Size: 2.4 KB
-- Modified: 2026-01-01 09:03
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -2997,10 +4364,38 @@ namespace DarkTowerTron.Core.Data
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Data\EnemyVisualProfileSO.cs`
+- Lines: 20
+- Size: 0.7 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Data
+{
+    [CreateAssetMenu(fileName = "Visuals_Default", menuName = "DarkTowerTron/Visuals/Enemy Visual Profile")]
+    public class EnemyVisualProfileSO : ScriptableObject
+    {
+        [Header("Impact Feel")]
+        [Tooltip("How long the white flash lasts on impact.")]
+        public float hitFlashDuration = 0.1f;
+
+        [Header("Status Effects")]
+        [Tooltip("Time for one full pulse (Stagger -> Danger -> Stagger).")]
+        public float staggerPulseDuration = 0.4f;
+        
+        [Tooltip("Color to pulse to during stagger (usually Red for danger).")]
+        [ColorUsage(true, true)] 
+        public Color dangerPulseColor = Color.red; 
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Data\FeedbackProfileSO.cs`
 - Lines: 18
 - Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3026,7 +4421,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Data\MaterialCollectionSO.cs`
 - Lines: 12
 - Size: 0.4 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3044,12 +4439,13 @@ namespace DarkTowerTron.Core.Data
 ```
 
 ## 📄 `Assets\Scripts\Core\Data\PlayerStatsSO.cs`
-- Lines: 68
-- Size: 2.6 KB
-- Modified: 2026-01-01 12:23
+- Lines: 91
+- Size: 3.5 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Core.Data
 {
@@ -3059,6 +4455,19 @@ namespace DarkTowerTron.Core.Data
         [Header("Movement")]
         public float moveSpeed = 12f;
         public float acceleration = 60f;
+        public float deceleration = 40f;
+        public float rotationSpeed = 25f;
+
+        [Header("Physics & Feel")]
+        public float gravity = 20f;
+        public float wallRepulsionForce = 5f;
+        [Tooltip("Time gravity is suspended after a dash/kill")]
+        [FormerlySerializedAs("postActionHangTime")]
+        public float actionHangTime = 0.2f;
+
+        [Header("Scanner")]
+        public float scanRange = 25f;
+        public float scanRadius = 2f;
 
         [Header("Resources")]
         public int maxGrit = 2;
@@ -3086,6 +4495,15 @@ namespace DarkTowerTron.Core.Data
         {
             moveSpeed = Mathf.Max(0f, moveSpeed);
             acceleration = Mathf.Max(0.01f, acceleration);
+            deceleration = Mathf.Max(0f, deceleration);
+            rotationSpeed = Mathf.Max(0f, rotationSpeed);
+
+            gravity = Mathf.Max(0f, gravity);
+            wallRepulsionForce = Mathf.Max(0f, wallRepulsionForce);
+            actionHangTime = Mathf.Max(0f, actionHangTime);
+
+            scanRange = Mathf.Max(0f, scanRange);
+            scanRadius = Mathf.Max(0f, scanRadius);
 
             maxGrit = Mathf.Max(1, maxGrit);
             maxFocus = Mathf.Max(0f, maxFocus);
@@ -3122,7 +4540,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Data\SoundDef.cs`
 - Lines: 33
 - Size: 1.0 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3160,10 +4578,53 @@ namespace DarkTowerTron.Core.Data
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Data\SurfaceType.cs`
+- Lines: 35
+- Size: 0.6 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+namespace DarkTowerTron.Core.Data
+{
+    public enum SurfaceType
+    {
+
+        None = 0, // <--- ADD THIS. Acts as a "Null" safety.
+
+        // Actors
+        PlayerPrimary,
+        PlayerSecondary,
+        PlayerTertiary,
+        
+        EnemyPrimary,
+        EnemySecondary,
+        EnemyTertiary,
+        
+        // Combat
+        ProjectileHostile,
+        ProjectileFriendly,
+        BeamAttack,
+        BlitzReady,
+        BlitzCooldown,
+        
+        // Environment
+        Floor,
+        Walls,
+        Hazards,
+        VoidZone,
+        Anchor,
+        
+        // UI/VFX
+        UI_Main,
+        VFX_General
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Data\UIThemeSO.cs`
 - Lines: 23
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3194,7 +4655,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Data\WaveDefinitionSO.cs`
 - Lines: 30
 - Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3232,7 +4693,7 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Debug\GameLogger.cs`
 - Lines: 51
 - Size: 1.9 KB
-- Modified: 2025-12-31 14:47
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -3288,27 +4749,258 @@ namespace DarkTowerTron.Core
 }
 ```
 
-## 📄 `Assets\Scripts\Core\GameConstants.cs`
+## 📄 `Assets\Scripts\Core\Events\BoolEventChannelSO.cs`
 - Lines: 17
-- Size: 0.5 KB
-- Modified: 2025-12-31 09:17
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Bool Event Channel")]
+    public class BoolEventChannelSO : ScriptableObject
+    {
+        public UnityAction<bool> OnEventRaised;
+
+        public void Raise(bool value)
+        {
+            OnEventRaised?.Invoke(value);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\DamageTextEventChannelSO.cs`
+- Lines: 23
+- Size: 0.8 KB
+- Modified: 2026-01-06 09:52
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Damage Text Channel")]
+    public class DamageTextEventChannelSO : ScriptableObject
+    {
+        // Added 'isStagger' bool to the signature
+        public UnityAction<Vector3, float, bool, bool> OnEventRaised;
+
+        public void Raise(Vector3 pos, float amount, bool isCrit, bool isStagger)
+            => OnEventRaised?.Invoke(pos, amount, isCrit, isStagger);
+    }
+
+    [CreateAssetMenu(menuName = "Events/Popup Text Channel")]
+    public class PopupTextEventChannelSO : ScriptableObject
+    {
+        public UnityAction<Vector3, string> OnEventRaised;
+        public void Raise(Vector3 pos, string message)
+            => OnEventRaised?.Invoke(pos, message);
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\EnemyKilledEventChannelSO.cs`
+- Lines: 18
+- Size: 0.6 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+using DarkTowerTron.Core.Data; // For EnemyStatsSO
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Enemy Killed Channel")]
+    public class EnemyKilledEventChannelSO : ScriptableObject
+    {
+        // The action signature matches your old GameEvents logic
+        public UnityAction<Vector3, EnemyStatsSO, bool> OnEventRaised;
+
+        public void Raise(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
+        {
+            OnEventRaised?.Invoke(position, stats, rewardPlayer);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\FloatFloatEventChannelSO.cs`
+- Lines: 17
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Float Float Event Channel")]
+    public class FloatFloatEventChannelSO : ScriptableObject
+    {
+        public UnityAction<float, float> OnEventRaised;
+
+        public void Raise(float current, float max)
+        {
+            OnEventRaised?.Invoke(current, max);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\IntIntEventChannelSO.cs`
+- Lines: 17
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Int Int Event Channel")]
+    public class IntIntEventChannelSO : ScriptableObject
+    {
+        public UnityAction<int, int> OnEventRaised;
+
+        public void Raise(int current, int max)
+        {
+            OnEventRaised?.Invoke(current, max);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\VoidEventChannelSO.cs`
+- Lines: 19
+- Size: 0.5 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Void Event Channel")]
+    public class VoidEventChannelSO : ScriptableObject
+    {
+        public UnityAction OnEventRaised;
+
+        public void Raise()
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke();
+            else
+                Debug.LogWarning($"Void Event [{name}] was raised but nothing picked it up.");
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\VoidEventListener.cs`
+- Lines: 29
+- Size: 0.7 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    public class VoidEventListener : MonoBehaviour
+    {
+        [Tooltip("The Event to listen to")]
+        public VoidEventChannelSO channel;
+
+        [Tooltip("What to do when the event triggers")]
+        public UnityEvent response;
+
+        private void OnEnable()
+        {
+            if (channel != null) channel.OnEventRaised += Respond;
+        }
+
+        private void OnDisable()
+        {
+            if (channel != null) channel.OnEventRaised -= Respond;
+        }
+
+        private void Respond()
+        {
+            response?.Invoke();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\GameConstants.cs`
+- Lines: 55
+- Size: 3.0 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+
 namespace DarkTowerTron.Core
 {
     public static class GameConstants
     {
-        // Layers
-        public const string LAYER_PLAYER = "Player";
-        public const string LAYER_ENEMY = "Enemy";
-        public const string LAYER_PROJECTILE = "Projectile";
-        public const string LAYER_AFTERIMAGE = "AfterImage";
-        public const string LAYER_GROUND = "Ground";
-        public const string LAYER_WALL = "Wall";
-
-        // Tags
+        // ========================================================================
+        // 🏷️ TAGS
+        // ========================================================================
         public const string TAG_PLAYER = "Player";
         public const string TAG_ENEMY = "Enemy";
+        public const string TAG_PROJECTILE = "Projectile";
+        public const string TAG_UNTAGGED = "Untagged";
+
+        // ========================================================================
+        // 🧱 LAYERS (Indices - for gameObject.layer check)
+        // ========================================================================
+        // Note: These must match your Project Settings -> Tags and Layers
+        public static readonly int LAYER_DEFAULT = LayerMask.NameToLayer("Default");
+        public static readonly int LAYER_TRANSPARENT_FX = LayerMask.NameToLayer("TransparentFX");
+        public static readonly int LAYER_IGNORE_RAYCAST = LayerMask.NameToLayer("Ignore Raycast");
+        public static readonly int LAYER_WATER = LayerMask.NameToLayer("Water");
+        public static readonly int LAYER_UI = LayerMask.NameToLayer("UI");
+        
+        // Custom Layers
+        public static readonly int LAYER_PLAYER = LayerMask.NameToLayer("Player");
+        public static readonly int LAYER_ENEMY = LayerMask.NameToLayer("Enemy");
+        public static readonly int LAYER_PROJECTILE = LayerMask.NameToLayer("Projectile");
+        public static readonly int LAYER_WALL = LayerMask.NameToLayer("Wall");
+        public static readonly int LAYER_GROUND = LayerMask.NameToLayer("Ground");
+
+        // ========================================================================
+        // 🎭 MASKS (Bitmasks - for Physics.Raycast / OverlapSphere)
+        // ========================================================================
+        
+        // Used by Player Movement / KinematicMover
+        // What stops a character from walking? (Walls + Floor + Default objects)
+        public static readonly int MASK_PHYSICS_OBSTACLES = LayerMask.GetMask("Default", "Wall", "Ground");
+
+        // Used by Projectiles / Shooting
+        // What stops a bullet? (Walls + Default + Players + Enemies)
+        // Note: Ground is usually excluded if bullets fly high, included if they can hit floor.
+        // Let's stick to the mask we defined in Session 4.
+        public static readonly int MASK_PROJECTILE_COLLISION = LayerMask.GetMask("Default", "Wall", "Player", "Enemy");
+
+        // Used by Wall Detection (Pushback)
+        public static readonly int MASK_WALLS = LayerMask.GetMask("Default", "Wall");
+
+        // Used by "Safe Ground" checks (Falling into void)
+        public static readonly int MASK_GROUND_ONLY = LayerMask.GetMask("Ground");
+        
+        // Used by Enemy AI (Line of Sight)
+        public static readonly int MASK_SIGHT_BLOCKING = LayerMask.GetMask("Default", "Wall", "Ground");
     }
 }
 ```
@@ -3316,7 +5008,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\GameEvents.cs`
 - Lines: 73
 - Size: 2.5 KB
-- Modified: 2025-12-31 17:15
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using System;
@@ -3395,14 +5087,15 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Core\GameServices.cs`
-- Lines: 52
-- Size: 2.0 KB
-- Modified: 2025-12-31 17:15
+- Lines: 53
+- Size: 2.1 KB
+- Modified: 2026-01-06 10:39
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Managers;
-using DarkTowerTron.Player;
+using DarkTowerTron.Player.Controller;
+using DarkTowerTron.UI;
 
 namespace DarkTowerTron.Core
 {
@@ -3413,10 +5106,10 @@ namespace DarkTowerTron.Core
 
         [Header("System Services")]
         [SerializeField] private WaveDirector _waveDirector;
-        [SerializeField] private ScoreManager _scoreManager;
-        [SerializeField] private PoolManager _poolManager;
-        [SerializeField] private VFXManager _vfxManager;
-        [SerializeField] private AudioManager _audioManager;
+        //[SerializeField] private ScoreManager _scoreManager;
+        //[SerializeField] private PoolManager _poolManager;
+        //[SerializeField] private VFXManager _vfxManager;
+        //[SerializeField] private AudioManager _audioManager;
         [SerializeField] private DamageTextManager _damageTextManager;
 
         // Dynamic Services (Set at runtime)
@@ -3424,10 +5117,10 @@ namespace DarkTowerTron.Core
 
         // Public Accessors
         public static WaveDirector WaveDirector => Instance != null ? Instance._waveDirector : null;
-        public static ScoreManager Score => Instance != null ? Instance._scoreManager : null;
-        public static PoolManager Pool => Instance != null ? Instance._poolManager : null;
-        public static VFXManager VFX => Instance != null ? Instance._vfxManager : null;
-        public static AudioManager Audio => Instance != null ? Instance._audioManager : null;
+        //public static ScoreManager Score => Instance != null ? Instance._scoreManager : null;
+        //public static PoolManager Pool => Instance != null ? Instance._poolManager : null;
+        //public static VFXManager VFX => Instance != null ? Instance._vfxManager : null;
+        //public static AudioManager Audio => Instance != null ? Instance._audioManager : null;
         public static DamageTextManager DamageText => Instance != null ? Instance._damageTextManager : null;
 
         private void Awake()
@@ -3455,30 +5148,24 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Core\GameTime.cs`
-- Lines: 35
-- Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Lines: 29
+- Size: 0.7 KB
+- Modified: 2026-01-06 10:32
 
 ```csharp
 using UnityEngine;
 using System.Collections;
 
-namespace DarkTowerTron.Core
+namespace DarkTowerTron.Services
 {
     public class GameTime : MonoBehaviour
     {
-        public static GameTime Instance;
         private bool _isFrozen = false;
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
 
         public void HitStop(float duration)
         {
             if (_isFrozen) return;
+            if (duration <= 0) return;
             StartCoroutine(DoHitStop(duration));
         }
 
@@ -3497,10 +5184,84 @@ namespace DarkTowerTron.Core
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Input\InputBuffer.cs`
+- Lines: 41
+- Size: 1.2 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace DarkTowerTron.Core.Input
+{
+    /// <summary>
+    /// queues inputs for a short time to allow "Early" presses to register.
+    /// </summary>
+    public class InputBuffer
+    {
+        private float _bufferTime;
+        private Dictionary<string, float> _queuedActions = new Dictionary<string, float>();
+
+        public InputBuffer(float bufferTime = 0.15f)
+        {
+            _bufferTime = bufferTime;
+        }
+
+        public void BufferAction(string actionID)
+        {
+            // Record the timestamp of the press
+            _queuedActions[actionID] = Time.time;
+        }
+
+        public bool TryConsumeAction(string actionID)
+        {
+            if (_queuedActions.TryGetValue(actionID, out float timeStamp))
+            {
+                // Is the press recent enough?
+                if (Time.time - timeStamp <= _bufferTime)
+                {
+                    _queuedActions.Remove(actionID); // Consume it
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void Clear() => _queuedActions.Clear();
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Interfaces\IAimTarget.cs`
+- Lines: 17
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core
+{
+    public interface IAimTarget
+    {
+        /// <summary>
+        /// The world-space position aiming systems should target (Center of Mass).
+        /// </summary>
+        Vector3 AimPoint { get; }
+
+        /// <summary>
+        /// Approximate radius for magnetism forgiveness.
+        /// </summary>
+        float TargetRadius { get; }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Interfaces\ICombatTarget.cs`
 - Lines: 15
 - Size: 0.3 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3523,7 +5284,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\Interfaces\IDamageable.cs`
 - Lines: 8
 - Size: 0.2 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 namespace DarkTowerTron.Core
@@ -3536,10 +5297,28 @@ namespace DarkTowerTron.Core
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Interfaces\IMovementStrategy.cs`
+- Lines: 10
+- Size: 0.2 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core
+{
+    public interface IMovementStrategy
+    {
+        void Initialize(Transform transform, Vector3 direction, float speed);
+        void Move(Transform transform, float deltaTime);
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Interfaces\IPoolable.cs`
 - Lines: 8
 - Size: 0.1 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 namespace DarkTowerTron.Core
@@ -3553,18 +5332,19 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Core\Interfaces\IReflectable.cs`
-- Lines: 9
+- Lines: 10
 - Size: 0.2 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
+using DarkTowerTron.Combat.Strategies; 
 
 namespace DarkTowerTron.Core
 {
     public interface IReflectable
     {
-        void Redirect(Vector3 newDirection, GameObject newOwner);
+        void Redirect(Vector3 newDirection, GameObject newOwner, IMovementStrategy overrideStrategy = null);
     }
 }
 ```
@@ -3572,7 +5352,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\Interfaces\IWeapon.cs`
 - Lines: 7
 - Size: 0.1 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 namespace DarkTowerTron.Core
@@ -3587,7 +5367,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\LogChannel.cs`
 - Lines: 14
 - Size: 0.4 KB
-- Modified: 2025-12-31 14:46
+- Modified: 2026-01-06 09:15
 
 ```csharp
 namespace DarkTowerTron.Core
@@ -3606,10 +5386,198 @@ namespace DarkTowerTron.Core
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Services\BootLoader.cs`
+- Lines: 31
+- Size: 1.0 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Services
+{
+    /// <summary>
+    /// Automatically loads the SystemBootloader prefab before any scene loads.
+    /// </summary>
+    public static class Bootloader
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Execute()
+        {
+            // 1. Check if it already exists (prevent duplicates in Editor)
+            if (Object.FindObjectOfType<GameBootstrap>() != null) return;
+
+            // 2. Load from Resources
+            var prefab = Resources.Load<GameObject>("SystemBootloader");
+            if (prefab == null)
+            {
+                Debug.LogError("CRITICAL: Missing 'SystemBootloader' in Resources folder!");
+                return;
+            }
+
+            // 3. Spawn
+            var instance = Object.Instantiate(prefab);
+            instance.name = "[SYSTEM_BOOT]";
+            
+            // Note: DontDestroyOnLoad is handled by the GameBootstrap component in Awake.
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Services\GameBootstrap.cs`
+- Lines: 42
+- Size: 1.3 KB
+- Modified: 2026-01-06 10:45
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Managers;
+using DarkTowerTron.Services;
+
+namespace DarkTowerTron.Core.Services
+{
+    [DefaultExecutionOrder(-1000)]
+    public class GameBootstrap : MonoBehaviour
+    {
+        private void Awake()
+        {
+            ServiceLocator.Clear();
+            DontDestroyOnLoad(gameObject);
+
+            // 1. Register Core Systems
+            Register<AudioManager>();
+            Register<GameTime>();
+            Register<MusicManager>();
+            Register<PaletteManager>();
+            Register<PoolManager>();
+            Register<ScoreManager>(); 
+            Register<VFXManager>();
+            
+            GameLogger.Log(LogChannel.System, "System Core & Managers Initialized.");
+        }
+
+        private void Register<T>() where T : MonoBehaviour
+        {
+            var component = GetComponentInChildren<T>();
+            if (component != null)
+            {
+                ServiceLocator.Register(component);
+            }
+            else
+            {
+                // Fallback: Try to add it if missing? 
+                // Better to error so you fix the prefab.
+                GameLogger.LogError(LogChannel.System, $"[BOOT] Critical: Missing {typeof(T).Name} on SystemBootloader!", gameObject);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Services\ServiceLocator.cs`
+- Lines: 68
+- Size: 2.1 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Services
+{
+    /// <summary>
+    /// A simple, static registry for game systems.
+    /// Replaces the Singleton pattern for Managers.
+    /// </summary>
+    public static class ServiceLocator
+    {
+        private static readonly Dictionary<Type, object> _services = new();
+
+        public static bool IsInitialized => _services.Count > 0;
+
+        /// <summary>
+        /// Registers a service instance. Overwrites if type already exists.
+        /// </summary>
+        public static void Register<T>(T service) where T : class
+        {
+            var type = typeof(T);
+            if (_services.ContainsKey(type))
+            {
+                Debug.LogWarning($"[ServiceLocator] Service {type.Name} is being overwritten.");
+            }
+            _services[type] = service;
+        }
+
+        /// <summary>
+        /// Gets a service instance. Throws error if missing.
+        /// </summary>
+        public static T Get<T>() where T : class
+        {
+            var type = typeof(T);
+            if (_services.TryGetValue(type, out var service))
+            {
+                return service as T;
+            }
+
+            throw new InvalidOperationException($"[ServiceLocator] Service {type.Name} not registered! Ensure SystemBootloader is running.");
+        }
+
+        /// <summary>
+        /// Safely tries to get a service. Useful for optional dependencies (e.g. testing AI without UI).
+        /// </summary>
+        public static bool TryGet<T>(out T service) where T : class
+        {
+            var type = typeof(T);
+            if (_services.TryGetValue(type, out var obj))
+            {
+                service = obj as T;
+                return true;
+            }
+
+            service = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Clears all services. Call on Domain Reload or Application Quit.
+        /// </summary>
+        public static void Clear()
+        {
+            _services.Clear();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Services\Services.cs`
+- Lines: 15
+- Size: 0.7 KB
+- Modified: 2026-01-06 10:33
+
+```csharp
+using DarkTowerTron.Services;
+
+namespace DarkTowerTron.Core.Services
+{
+    public static class Services
+    {
+        public static AudioManager Audio => ServiceLocator.Get<AudioManager>();
+        public static MusicManager Music => ServiceLocator.Get<MusicManager>();
+        public static PaletteManager Palette => ServiceLocator.Get<PaletteManager>();
+        public static PoolManager Pool => ServiceLocator.Get<PoolManager>();
+        public static ScoreManager Score => ServiceLocator.Get<ScoreManager>();
+        public static GameTime Time => ServiceLocator.Get<GameTime>();
+        public static VFXManager VFX => ServiceLocator.Get<VFXManager>();
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Spinner.cs`
 - Lines: 15
 - Size: 0.3 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-11 07:51
 
 ```csharp
 using UnityEngine;
@@ -3632,7 +5600,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\Structs\DamageInfo.cs`
 - Lines: 18
 - Size: 0.5 KB
-- Modified: 2026-01-01 08:58
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -3655,14 +5623,67 @@ namespace DarkTowerTron.Core
 }
 ```
 
-## 📄 `Assets\Scripts\Core\VoidKiller.cs`
-- Lines: 33
-- Size: 1.0 KB
-- Modified: 2025-12-31 09:17
+## 📄 `Assets\Scripts\Core\Utils\Rotator.cs`
+- Lines: 45
+- Size: 1.3 KB
+- Modified: 2026-01-06 11:54
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Player; // Access PlayerHealth directly for special void logic
+
+namespace DarkTowerTron.Core.Utils
+{
+    public class Rotator : MonoBehaviour
+    {
+        public enum RotateDirection
+        {
+            Clockwise = 1,
+            CounterClockwise = -1
+        }
+
+        [Header("Settings")]
+        public Vector3 axis = Vector3.up;
+        public float speed = 100f;
+
+        [Tooltip("Direction of rotation relative to the axis.")]
+        public RotateDirection direction = RotateDirection.Clockwise;
+
+        public bool localSpace = true;
+
+        private void Update()
+        {
+            if (speed == 0) return;
+
+            // Math: Speed * Direction (1 or -1) * DeltaTime
+            float finalStep = speed * (int)direction * Time.deltaTime;
+
+            if (localSpace)
+                transform.Rotate(axis, finalStep, Space.Self);
+            else
+                transform.Rotate(axis, finalStep, Space.World);
+        }
+
+        // API for AI/Events to change direction at runtime
+        public void SetDirection(RotateDirection newDir) => direction = newDir;
+
+        public void ToggleDirection()
+        {
+            direction = direction == RotateDirection.Clockwise ?
+                        RotateDirection.CounterClockwise :
+                        RotateDirection.Clockwise;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\VoidKiller.cs`
+- Lines: 33
+- Size: 1.1 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Player.Stats; // Access PlayerHealth directly for special void logic
 
 namespace DarkTowerTron.Core
 {
@@ -3699,7 +5720,7 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Editor\SmartDuplicator.cs`
 - Lines: 70
 - Size: 2.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -3777,7 +5798,7 @@ namespace DarkTowerTron.EditorTools
 ## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Chaser.cs`
 - Lines: 136
 - Size: 4.2 KB
-- Modified: 2025-12-31 12:26
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -3921,7 +5942,7 @@ namespace DarkTowerTron.Enemy.Agents
 ## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Guardian.cs`
 - Lines: 152
 - Size: 5.1 KB
-- Modified: 2025-12-31 17:14
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -4079,14 +6100,15 @@ namespace DarkTowerTron.Enemy.Agents
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Sentinel.cs`
-- Lines: 88
+- Lines: 89
 - Size: 3.0 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 12:15
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
 using DarkTowerTron.AI.Core;
 using DarkTowerTron.AI.FSM;
 using DarkTowerTron.Enemy.States.Sentinel; // Sub-namespace for States
@@ -4102,8 +6124,8 @@ namespace DarkTowerTron.Enemy.Agents
         public float combatRange = 10f; // Switch to Combat
         public float huntRange = 15f;   // Switch back to Hunt
 
-        [Header("Combat")]
-        public GameObject projectilePrefab;
+        [Header("Loadout")]
+        public EnemyAttackSO weaponProfile; // <--- REPLACES prefab and speed fields
         public Transform firePoint;
         public float fireRate = 2.0f;
 
@@ -4148,12 +6170,12 @@ namespace DarkTowerTron.Enemy.Agents
 
         public void HelperFireProjectile()
         {
-            if (projectilePrefab && !_controller.IsStaggered)
+            if (weaponProfile && !_controller.IsStaggered)
             {
-                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
+                Transform fp = firePoint ? firePoint : transform;
 
-                // Use BaseAI helper to spawn via Pool
-                FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, 15f);
+                // Pass the Profile, not manual numbers
+                FireAtTarget(weaponProfile, fp);
             }
         }
 
@@ -4177,7 +6199,7 @@ namespace DarkTowerTron.Enemy.Agents
 ## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Sniper.cs`
 - Lines: 86
 - Size: 2.9 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -4231,7 +6253,7 @@ namespace DarkTowerTron.Enemy.Agents
             Brain = GetComponent<ContextSolver>();
             FSM = GetComponent<StateMachine>();
 
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", GameConstants.LAYER_WALL);
+            if (wallLayer == 0) wallLayer = GameConstants.MASK_WALLS;
 
             // Initialize States
             StatePositioning = new SniperState_Positioning(this);
@@ -4269,9 +6291,9 @@ namespace DarkTowerTron.Enemy.Agents
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Bosses\Architect\ArchitectController.cs`
-- Lines: 298
-- Size: 9.2 KB
-- Modified: 2025-12-31 09:17
+- Lines: 285
+- Size: 8.7 KB
+- Modified: 2026-01-06 09:37
 
 ```csharp
 using UnityEngine;
@@ -4279,14 +6301,17 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.AI.FSM; // State Machine System
-using DarkTowerTron.Managers; // VFX & Pool
+using DarkTowerTron.Core.Events; // NEW: Events
+using DarkTowerTron.Core.Services;
+using DarkTowerTron.AI.FSM;
 using DG.Tweening;
+
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
     [RequireComponent(typeof(StateMachine))]
-    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget
+    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget, IAimTarget // NEW: IAimTarget
     {
         [Header("Parts")]
         public Transform rotationRig;
@@ -4299,9 +6324,9 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         public float rotationSpeedCombat = 30f;
 
         [Header("Configuration")]
-        public float radiusOuter = 2.5f; // Local distance for "Outer" position
-        public float radiusInner = 0.8f; // Local distance for "Inner" position
-        public float patternInterval = 2.0f; // Time between patterns
+        public float radiusOuter = 2.5f;
+        public float radiusInner = 0.8f;
+        public float patternInterval = 2.0f;
 
         [Header("Patterns")]
         public List<ArchitectPatternSO> phase1Patterns;
@@ -4309,7 +6334,22 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         [Header("Debug")]
         public bool autoStartCombat = false;
 
+        [Header("Events (Wiring)")]
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
+        [SerializeField] private IntIntEventChannelSO _waveAnnounceEvent; // For "Wave 666"
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;
+        // Note: Popup/Damage text might still be static or you can inject a channel if you have one.
+        // Assuming GameEvents.OnPopupText is still static for now as per previous sessions.
+
+        [Header("Aiming")]
+        [SerializeField] private float _aimOffset = 0f;
+        [SerializeField] private float _coreRadius = 1.5f;
+
         public bool KeepPlayerGrounded => true;
+
+        // IAimTarget Implementation
+        public Vector3 AimPoint => transform.position + (Vector3.up * _aimOffset);
+        public float TargetRadius => _coreRadius;
 
         // State
         private bool _isCombatActive = false;
@@ -4321,53 +6361,55 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         // Components
         private StateMachine _fsm;
 
-        // NEW: Idle State reference
+        // State Cache (No more GC allocation)
         public ArchitectState_Idle StateIdle { get; private set; }
+        private List<ArchitectState_Pattern> _patternStates = new List<ArchitectState_Pattern>();
 
         private void Awake()
         {
             _fsm = GetComponent<StateMachine>();
-            StateIdle = new ArchitectState_Idle(); // Initialize it
+            StateIdle = new ArchitectState_Idle();
         }
 
         private void Start()
         {
-            // Use Service Locator for player reference
             if (GameServices.Player != null)
-            {
                 _player = GameServices.Player.transform;
+
+            // Pre-allocate Pattern States
+            foreach (var pattern in phase1Patterns)
+            {
+                _patternStates.Add(new ArchitectState_Pattern(this, pattern));
             }
 
-            // Setup
             SetShield(true);
             _currentRotationSpeed = rotationSpeedIdle;
 
             if (autoStartCombat)
-            {
                 Invoke(nameof(ActivateBoss), 1.0f);
-            }
         }
 
         private void Update()
         {
-            // 1. Constant Rotation
             if (rotationRig)
-            {
                 rotationRig.Rotate(Vector3.up, _currentRotationSpeed * Time.deltaTime);
-            }
 
             if (!_isCombatActive) return;
 
-            // 2. Check Hands (Phase Transition)
+            // Phase Transition Check
             if (!_isVulnerable)
             {
-                int livingHands = 0;
+                bool anyHandAlive = false;
                 foreach (var h in hands)
                 {
-                    if (h != null && h.IsAlive()) livingHands++;
+                    if (h != null && h.IsAlive())
+                    {
+                        anyHandAlive = true;
+                        break;
+                    }
                 }
 
-                if (livingHands == 0)
+                if (!anyHandAlive)
                 {
                     StartCoroutine(EnterVulnerablePhase());
                 }
@@ -4383,74 +6425,54 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _isCombatActive = true;
             _currentRotationSpeed = rotationSpeedCombat;
 
-            // Start the first pattern
             StartNextPattern();
 
-            // UI / Audio Juice
-            GameEvents.OnWaveAnnounce?.Invoke(666); // Custom ID for Boss
-            GameEvents.OnWaveCombatStarted?.Invoke();
+            // Juice
+            _waveAnnounceEvent?.Raise(666, 0); // Custom ID for Boss
+            _combatStartedEvent?.Raise();
         }
 
         public void StartNextPattern()
         {
-            if (_isVulnerable) return; // Stop patterns if phase 2
-            if (phase1Patterns == null || phase1Patterns.Count == 0) return;
+            if (_isVulnerable) return;
+            if (_patternStates.Count == 0) return;
 
-            // Pick pattern
-            ArchitectPatternSO pattern = phase1Patterns[_currentPatternIndex];
+            // Pick pre-cached state
+            ArchitectState_Pattern nextState = _patternStates[_currentPatternIndex];
 
-            // Increment index loop
-            _currentPatternIndex = (_currentPatternIndex + 1) % phase1Patterns.Count;
+            // Increment loop
+            _currentPatternIndex = (_currentPatternIndex + 1) % _patternStates.Count;
 
-            // Change State (Creates a new state instance for the specific pattern)
-            _fsm.ChangeState(new ArchitectState_Pattern(this, pattern));
+            _fsm.ChangeState(nextState);
         }
 
-        /// <summary>
-        /// Called by the State when it finishes its duration.
-        /// </summary>
         public void OnPatternFinished()
         {
             if (_isVulnerable) return;
-            // Switch to Idle immediately to cleanup the old pattern state
             _fsm.ChangeState(StateIdle);
-
-            // Start the delay timer
             StartCoroutine(WaitAndNextPattern());
         }
 
         private IEnumerator WaitAndNextPattern()
         {
-            // Reset to neutral rotation speed or idle behavior?
-            // _currentRotationSpeed = rotationSpeedCombat; 
-
             yield return new WaitForSeconds(patternInterval);
             StartNextPattern();
         }
 
-        // --- HELPER METHODS FOR STATES ---
+        // --- HELPER METHODS ---
 
-        public void SetRotationSpeed(float speed)
-        {
-            _currentRotationSpeed = speed;
-        }
+        public void SetRotationSpeed(float speed) => _currentRotationSpeed = speed;
 
-        // 1. Move Hands (Inner vs Outer)
         public void MoveHands(bool[] extendConfig)
         {
             for (int i = 0; i < hands.Count; i++)
             {
                 if (hands[i] == null) continue;
-
-                // Check config, default to Inner (false) if array is short
                 bool extend = (extendConfig != null && i < extendConfig.Length) ? extendConfig[i] : false;
-                
-                float targetDist = extend ? radiusOuter : radiusInner;
-                hands[i].MoveToDistance(targetDist);
+                hands[i].MoveToDistance(extend ? radiusOuter : radiusInner);
             }
         }
 
-        // 2. Telegraph Walls (Rotate)
         public void TelegraphWalls(bool[] wallConfig)
         {
             for (int i = 0; i < hands.Count; i++)
@@ -4461,7 +6483,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        // 3. Activate Walls (Laser On)
         public void ActivateWalls(bool[] wallConfig)
         {
             for (int i = 0; i < hands.Count; i++)
@@ -4472,25 +6493,21 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        // 4. Reset All (Cleanup)
         public void ResetHands()
         {
             foreach (var h in hands)
             {
                 if (h == null) continue;
-                h.MoveToDistance(radiusInner); // Retract
-                h.SetWall(false);              // Off
-                h.PrepareWall(false);          // Rotate Flat
+                h.MoveToDistance(radiusInner);
+                h.SetWall(false);
+                h.PrepareWall(false);
             }
         }
 
         public Transform GetTarget()
         {
-            if (_player == null)
-            {
-                // Re-acquire if lost via Service Locator
-                if (GameServices.Player != null) _player = GameServices.Player.transform;
-            }
+            if (_player == null && GameServices.Player != null)
+                _player = GameServices.Player.transform;
             return _player;
         }
 
@@ -4500,14 +6517,10 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         {
             _isVulnerable = true;
             SetShield(false);
+            _fsm.ChangeState(null); // Stop AI
+            _currentRotationSpeed = 60f; // Panic
 
-            // Stop FSM patterns
-            _fsm.ChangeState(null); // Or switch to a VulnerableState if you want complex logic
-
-            _currentRotationSpeed = 60f; // Panic Spin
-
-            GameEvents.OnPopupText?.Invoke(transform.position, "SHIELD DOWN");
-
+            GameEvents.OnPopupText?.Invoke(transform.position, "SHIELD DOWN"); // Legacy Event
             yield return null;
         }
 
@@ -4516,7 +6529,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             if (shieldVisual) shieldVisual.SetActive(state);
         }
 
-        // --- IDAMAGEABLE (THE CORE) ---
+        // --- IDAMAGEABLE ---
 
         public bool TakeDamage(DamageInfo info)
         {
@@ -4528,8 +6541,8 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
             coreHealth -= info.damageAmount;
 
-            // Show Damage Numbers
-            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, true); // true = Critical visual
+            // Legacy Events for text
+            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, true);
 
             if (coreHealth <= 0) Kill(true);
             return true;
@@ -4540,22 +6553,19 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _isCombatActive = false;
             _currentRotationSpeed = 0;
 
-            // Spawn BIG explosion
-            if (VFXManager.Instance && VFXManager.Instance.explosionPrefab)
+            if (Global.VFX != null && Global.VFX.explosionPrefab)
             {
-                // Spawn a few explosions for effect
-                PoolManager.Instance.Spawn(VFXManager.Instance.explosionPrefab, transform.position, Quaternion.identity);
+                Global.Pool?.Spawn(Global.VFX.explosionPrefab, transform.position, Quaternion.identity);
             }
 
-            // Win Game
-            GameEvents.OnGameVictory?.Invoke();
+            _gameVictoryEvent?.Raise(); // Updated
 
             Destroy(gameObject, 0.5f);
         }
 
-        // --- ICOMBATTARGET (EXECUTION) ---
+        // --- ICOMBATTARGET ---
 
-        public bool IsStaggered => false; // Boss Core doesn't stagger via normal means
+        public bool IsStaggered => false;
 
         public void OnExecutionHit()
         {
@@ -4566,7 +6576,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
             else
             {
-                // Optional: Push player back if they try to teleport to shield
                 GameEvents.OnPopupText?.Invoke(transform.position, "SHIELDED");
             }
         }
@@ -4575,57 +6584,100 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Bosses\Architect\ArchitectHand.cs`
-- Lines: 132
-- Size: 4.2 KB
-- Modified: 2025-12-31 09:17
+- Lines: 197
+- Size: 6.3 KB
+- Modified: 2026-01-06 09:33
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Environment; // Access to Prop_Explosive
 using DarkTowerTron.Combat;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Enemy.Visuals; // For Visuals
 using DG.Tweening;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
-    // dependency on the new Prop system
-    [RequireComponent(typeof(Prop_Explosive))]
+    [RequireComponent(typeof(DamageReceiver))]
+    [RequireComponent(typeof(EnemyVisuals))]
     public class ArchitectHand : MonoBehaviour
     {
         [Header("Visual Components")]
         public Transform visualRoot;    // The object that slides In/Out
-        public Transform meshPivot;     // The object that rotates 90 degrees (Telegraph)
+        public Transform meshPivot;     // The object that rotates 90 degrees
         public GameObject wallObject;   // The Laser Hazard (Child)
         public Transform firePoint;     // Where bullets spawn
 
-        [Header("Combat")]
+        [Header("Combat Configuration")]
         public GameObject projectilePrefab;
+        public GameObject deathExplosionEffect; // Optional: Explosion VFX on disable
+
+        [Header("Animation")]
         public float slideDuration = 1.0f;
         public float rotateDuration = 0.5f;
 
-        private Prop_Explosive _prop;
+        // Dependencies
+        private DamageReceiver _receiver;
+        private EnemyVisuals _visuals;
         private bool _isDead = false;
 
         private void Awake()
         {
-            _prop = GetComponent<Prop_Explosive>();
+            _receiver = GetComponent<DamageReceiver>();
+            _visuals = GetComponent<EnemyVisuals>();
 
             // Ensure wall is off by default
             if (wallObject) wallObject.SetActive(false);
         }
 
-        private void Update()
+        private void Start()
         {
-            // Check if the Prop took enough damage to "Die"
-            // Note: Prop_Explosive handles the explosion VFX internally via its own Die() method,
-            // but we need to handle the visual shutdown of the hand here.
-            if (!_isDead && _prop.health <= 0)
+            // Initialize DamageReceiver (No Stats SO needed, uses Inspector overrides)
+            _receiver.Initialize(null);
+        }
+
+        private void OnEnable()
+        {
+            _receiver.OnDeathProcessed += HandleDeath;
+            _receiver.OnHitProcessed += HandleHit;
+
+            // Wire up Stagger Visuals
+            if (_receiver.Stagger != null)
             {
-                Die();
+                _receiver.Stagger.OnStaggerBreak += _visuals.StartStaggerEffect;
+                _receiver.Stagger.OnStaggerRecover += _visuals.StopStaggerEffect;
+            }
+        }
+
+        private void OnDisable()
+        {
+            _receiver.OnDeathProcessed -= HandleDeath;
+            _receiver.OnHitProcessed -= HandleHit;
+
+            if (_receiver.Stagger != null)
+            {
+                _receiver.Stagger.OnStaggerBreak -= _visuals.StartStaggerEffect;
+                _receiver.Stagger.OnStaggerRecover -= _visuals.StopStaggerEffect;
             }
         }
 
         public bool IsAlive() => !_isDead;
+
+        // --- HANDLERS ---
+
+        private void HandleHit(Core.DamageInfo info)
+        {
+            if (!_receiver.IsStaggered)
+                _visuals.PlayHitFlash();
+        }
+
+        private void HandleDeath(EnemyStatsSO stats, bool reward)
+        {
+            if (_isDead) return;
+            Die();
+        }
 
         // --- MOVEMENT ---
 
@@ -4638,9 +6690,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
         // --- COMBAT ACTIONS ---
 
-        /// <summary>
-        /// Telegraphs the wall attack by rotating the hand 90 degrees.
-        /// </summary>
         public void PrepareWall(bool willBeActive)
         {
             if (_isDead || meshPivot == null) return;
@@ -4672,8 +6721,8 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
                 dir = (targetPos - firePoint.position).normalized; // Tracking aim
             }
 
-            // Spawn from Pool
-            GameObject p = PoolManager.Instance.Spawn(projectilePrefab, firePoint.position, Quaternion.LookRotation(dir));
+            // Spawn from Pool using Global Alias
+            GameObject p = Global.Pool.Spawn(projectilePrefab, firePoint.position, Quaternion.LookRotation(dir));
             p.transform.localScale = Vector3.one * scale;
 
             var proj = p.GetComponent<Projectile>();
@@ -4681,8 +6730,10 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             {
                 proj.ResetHostility(true);
                 proj.speed = 15f;
-                // Ignore the hand itself to prevent instant self-collision
+
+                // CRITICAL: Set Source so the bullet ignores the HandCollider immediately
                 proj.SetSource(gameObject);
+
                 proj.Initialize(dir);
             }
         }
@@ -4694,20 +6745,43 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _isDead = true;
             SetWall(false);
 
-            // Visual Shutdown
+            // 1. VFX
+            if (deathExplosionEffect && Global.Pool != null)
+            {
+                Global.Pool.Spawn(deathExplosionEffect, transform.position, Quaternion.identity);
+            }
+
+            // 2. Visual Shutdown (Shrink)
             if (meshPivot) meshPivot.DOKill();
             visualRoot.DOKill();
             visualRoot.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+
+            // 3. Disable Logic (but keep GameObject active for Revive)
+            // We disable the collider via the DamageReceiver's component or manually?
+            // Usually simpler to just rely on _isDead flag to ignore logic, 
+            // but we should disable collider to stop blocking shots.
+            var col = GetComponent<Collider>();
+            if (col) col.enabled = false;
         }
 
         public void Revive()
         {
             _isDead = false;
-            _prop.OnSpawn(); // Reset Health in the prop component
 
-            // Hard reset visuals
+            // revive modules
+            _receiver.Vitality.Revive();
+            _receiver.Stagger.ResetStagger();
+            _visuals.ResetVisuals();
+
+            // Enable collider
+            var col = GetComponent<Collider>();
+            if (col) col.enabled = true;
+
+            // Visual Pop-in
             gameObject.SetActive(true);
-            visualRoot.localScale = Vector3.one;
+            visualRoot.localScale = Vector3.zero;
+            visualRoot.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+
             if (meshPivot) meshPivot.localRotation = Quaternion.identity;
         }
     }
@@ -4715,16 +6789,20 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyBaseAI.cs`
-- Lines: 111
-- Size: 3.5 KB
-- Modified: 2025-12-31 09:17
+- Lines: 214
+- Size: 7.2 KB
+- Modified: 2026-01-06 12:13
 
 ```csharp
 using UnityEngine;
 using DG.Tweening; // Logic relies on Tweening
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
+
+using Global = DarkTowerTron.Core.Services.Services; 
 
 namespace DarkTowerTron.Enemy
 {
@@ -4814,7 +6892,7 @@ namespace DarkTowerTron.Enemy
             if (prefab == null) return;
 
             // 1. Spawn via Pool
-            GameObject p = PoolManager.Instance.Spawn(prefab, position, rotation);
+            GameObject p = Global.Pool.Spawn(prefab, position, rotation);
 
             // 2. Setup Logic
             Projectile proj = p.GetComponent<Projectile>();
@@ -4826,6 +6904,105 @@ namespace DarkTowerTron.Enemy
             }
         }
 
+        /// <summary>
+        /// Smart Firing Logic: Calculates vector to Target's Center of Mass.
+        /// </summary>
+        protected void FireAtTarget(GameObject prefab, Transform firePointOrigin, float speed, float accuracyError = 0f)
+        {
+            if (prefab == null || _currentTarget == null) return;
+
+            // 1. Determine Origin
+            Vector3 origin = firePointOrigin ? firePointOrigin.position : transform.position;
+
+            // 2. Determine Destination (AimPoint)
+            Vector3 targetPos;
+            var aimTarget = _currentTarget.GetComponent<IAimTarget>();
+
+            if (aimTarget != null)
+            {
+                targetPos = aimTarget.AimPoint;
+            }
+            else
+            {
+                // Fallback for dumb objects
+                targetPos = _currentTarget.position + Vector3.up * 1.0f;
+            }
+
+            // 3. Calculate Vector
+            Vector3 direction = (targetPos - origin).normalized;
+
+            // 4. Apply Inaccuracy (Optional)
+            if (accuracyError > 0f)
+            {
+                direction = ApplySpread(direction, accuracyError);
+            }
+
+            // 5. Spawn & Init
+            GameObject p = Global.Pool.Spawn(prefab, origin, Quaternion.LookRotation(direction));
+
+            var proj = p.GetComponent<Projectile>();
+            if (proj)
+            {
+                proj.ResetHostility(true);
+                proj.speed = speed;
+
+                // CRITICAL: Set Source to SELF (The Root Enemy Object)
+                // This ensures the bullet ignores the enemy's own colliders
+                proj.SetSource(this.gameObject);
+
+                proj.Initialize(direction);
+            }
+        }
+
+        /// <summary>
+        /// Fires using a specific Attack Profile (Single Source of Truth).
+        /// </summary>
+        protected void FireAtTarget(EnemyAttackSO attackProfile, Transform firePointOrigin)
+        {
+            if (attackProfile == null || attackProfile.projectilePrefab == null || _currentTarget == null) return;
+
+            // 1. Origin
+            Vector3 origin = firePointOrigin ? firePointOrigin.position : transform.position;
+
+            // 2. Destination (Smart Aim)
+            Vector3 targetPos;
+            var aimTarget = _currentTarget.GetComponent<IAimTarget>();
+
+            if (aimTarget != null) targetPos = aimTarget.AimPoint;
+            else targetPos = _currentTarget.position + Vector3.up * 1.0f;
+
+            // 3. Vector
+            Vector3 direction = (targetPos - origin).normalized;
+
+            // 4. Spread (From Profile)
+            if (attackProfile.spreadAngle > 0f)
+            {
+                direction = ApplySpread(direction, attackProfile.spreadAngle);
+            }
+
+            // 5. Spawn & Inject Data
+            GameObject p = Global.Pool.Spawn(attackProfile.projectilePrefab, origin, Quaternion.LookRotation(direction));
+
+            var proj = p.GetComponent<Projectile>();
+            if (proj)
+            {
+                // INJECT DATA FROM SO
+                proj.damage = attackProfile.damage;
+                proj.stagger = attackProfile.stagger;
+                proj.speed = attackProfile.projectileSpeed;
+                proj.lifetime = attackProfile.lifetime;
+
+                proj.ResetHostility(true);
+                proj.SetSource(this.gameObject);
+                proj.Initialize(direction);
+            }
+        }
+
+        private Vector3 ApplySpread(Vector3 dir, float angle)
+        {
+            return Quaternion.Euler(Random.Range(-angle, angle), Random.Range(-angle, angle), 0f) * dir;
+        }
+
         // --- EVENTS ---
         private void OnDecoySpawned(Transform decoy) { _currentTarget = decoy; }
         private void OnDecoyExpired() { if (_player != null) _currentTarget = _player; }
@@ -4834,237 +7011,178 @@ namespace DarkTowerTron.Enemy
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyController.cs`
-- Lines: 220
-- Size: 7.3 KB
-- Modified: 2026-01-01 11:15
+- Lines: 161
+- Size: 5.2 KB
+- Modified: 2026-01-06 09:55
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Events; // Event Channels
 using DarkTowerTron.Combat;
-using DG.Tweening;
+using DarkTowerTron.Enemy.Visuals;
+
+// ALIAS: Prevents conflict between 'Services' (Namespace) and 'Services' (Class)
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(EnemyMotor))]
     [RequireComponent(typeof(DamageReceiver))]
+    [RequireComponent(typeof(EnemyVisuals))]
     public class EnemyController : MonoBehaviour, IPoolable, ICombatTarget
     {
+        // --- Dependencies ---
         private DamageReceiver _receiver;
         private EnemyMotor _motor;
+        private EnemyVisuals _visuals;
         private EnemyStatsSO _stats;
 
-        [Header("Visuals")]
-        public Renderer meshRenderer;
-        public ColorPaletteSO palette;
+        // --- Event Wiring ---
+        [Header("Broadcasting")]
+        [Tooltip("Notifies ScoreManager and WaveDirector when this enemy dies.")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+
+        [Header("Visual Feedback")]
+        [Tooltip("Spawns floating damage numbers.")]
+        [SerializeField] private DamageTextEventChannelSO _damageEvent;
+
+        [Tooltip("Spawns status text (e.g. STAGGER).")]
+        [SerializeField] private PopupTextEventChannelSO _popupEvent;
+
         [Header("Audio")]
         public AudioClip staggerClip;
 
-        // Visual State
-        private Color _normalColor;
-        private Color _staggerColor;
-        private MaterialPropertyBlock _propBlock;
-        private Tween _flashTween; 
-        private int _colorPropID;
-        private int _emissionPropID;
-
-        // Facade Property
+        // --- Public Accessors ---
         public bool IsStaggered => _receiver != null && _receiver.IsStaggered;
+        public EnemyVisuals Visuals => _visuals;
+
+        // --- Lifecycle ---
 
         private void Awake()
         {
             _motor = GetComponent<EnemyMotor>();
-            _receiver = GetComponent<DamageReceiver>(); 
-            
-            if(meshRenderer == null) meshRenderer = GetComponent<Renderer>();
-            
-            _propBlock = new MaterialPropertyBlock();
-            _colorPropID = Shader.PropertyToID("_BaseColor"); 
-            _emissionPropID = Shader.PropertyToID("_EmissionColor");
-
-            LoadColors();
+            _receiver = GetComponent<DamageReceiver>();
+            _visuals = GetComponent<EnemyVisuals>();
         }
 
         private void Start()
         {
-            // 1. Get stats reference from Motor (if not already set)
             if (_motor != null) _stats = _motor.stats;
-			
-            // 2. SELF-INITIALIZATION (The Fix)
-            // If we were placed in the scene manually, OnSpawn() was never called.
-            // We check if the Receiver has 0 Health (uninitialized) to decide.
-            // Or simpler: Just initialize. It's safe to call twice (it just resets HP to max).
-            if (_receiver != null && _stats != null)
-            {
-                // DamageReceiver.CurrentHealth defaults to 0 before initialization.
-                if (_receiver.CurrentHealth <= 0)
-                {
-                    _receiver.Initialize(_stats);
-                }
-            }
-			
-            // 3. Visuals
-            LoadColors();
-            SetColor(_normalColor);
-        }
 
-        private void OnEnable()
-        {
-            if (_receiver == null) _receiver = GetComponent<DamageReceiver>();
-
-            _receiver.OnHitProcessed += HandleHit;
-            _receiver.OnDeathProcessed += HandleDeath;
-            
-            if (_receiver.Stagger != null)
+            // Self-Initialization safety check
+            if (_receiver != null && _stats != null && _receiver.CurrentHealth <= 0)
             {
-                _receiver.Stagger.OnStaggerBreak += HandleStaggerEnter;
-                _receiver.Stagger.OnStaggerRecover += HandleStaggerExit;
-            }
-        }
-        
-        private void OnDisable()
-        {
-            if (_receiver != null)
-            {
-                _receiver.OnHitProcessed -= HandleHit;
-                _receiver.OnDeathProcessed -= HandleDeath;
-                if (_receiver.Stagger != null)
-                {
-                    _receiver.Stagger.OnStaggerBreak -= HandleStaggerEnter;
-                    _receiver.Stagger.OnStaggerRecover -= HandleStaggerExit;
-                }
+                _receiver.Initialize(_stats);
             }
         }
 
         public void OnSpawn()
         {
             if (_motor != null) _stats = _motor.stats;
-            
-            // Initialize the Receiver (which inits Vitality/Stagger)
             _receiver.Initialize(_stats);
-            
-            LoadColors();
-            SetColor(_normalColor);
+            _visuals.ResetVisuals();
         }
 
         public void OnDespawn()
         {
-            transform.DOKill();
-            if (_flashTween != null) _flashTween.Kill();
-            SetColor(_normalColor);
+            _visuals.ResetVisuals();
         }
 
-        // --- IDamageable Proxy ---
-        public bool TakeDamage(DamageInfo info)
+        private void OnEnable()
         {
-            // FIX: DamageReceiver implements IDamageable, so the method is TakeDamage, not ApplyDamage
-            return _receiver.TakeDamage(info);
+            if (_receiver == null) return;
+
+            _receiver.OnHitProcessed += HandleHit;
+            _receiver.OnDeathProcessed += HandleDeath;
+
+            if (_receiver.Stagger != null)
+            {
+                _receiver.Stagger.OnStaggerBreak += HandleStaggerEnter;
+                _receiver.Stagger.OnStaggerRecover += HandleStaggerExit;
+            }
         }
 
-        public void Kill(bool instant) => _receiver.Kill(true); 
-        public void SelfDestruct() => _receiver.Kill(false);    
-
-        // --- ICombatTarget ---
-        public void OnExecutionHit()
+        private void OnDisable()
         {
-            _receiver.Kill(true); 
-        }
-        
-        // Proxy property
-        public bool KeepPlayerGrounded => _receiver.KeepPlayerGrounded;
-        
-        // FIX: Removed 'public Transform transform => base.transform' to fix warning CS0108.
-        // MonoBehaviour already satisfies this interface requirement.
+            if (_receiver == null) return;
 
-        // --- HANDLERS ---
-        
+            _receiver.OnHitProcessed -= HandleHit;
+            _receiver.OnDeathProcessed -= HandleDeath;
+
+            if (_receiver.Stagger != null)
+            {
+                _receiver.Stagger.OnStaggerBreak -= HandleStaggerEnter;
+                _receiver.Stagger.OnStaggerRecover -= HandleStaggerExit;
+            }
+        }
+
+        // --- Handlers ---
+
         private void HandleHit(DamageInfo info)
         {
             _motor.ApplyKnockback(info.pushDirection * info.pushForce);
-            if (!IsStaggered) Flash();
-            
-            bool isCrit = IsStaggered;
-            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, isCrit);
-        }
 
-        private void HandleDeath(EnemyStatsSO stats, bool reward)
-        {
-            GameEvents.OnEnemyKilled?.Invoke(transform.position, stats, reward);
-            
-            if (PoolManager.Instance) PoolManager.Instance.Despawn(gameObject);
-            else Destroy(gameObject);
+            // Visuals
+            if (!IsStaggered) _visuals.PlayHitFlash();
+
+            bool isCrit = IsStaggered;
+
+            // LOGIC FIX:
+            // If Health damage is > 0, we show Health Damage (White/Yellow).
+            // If Health damage is 0 but Stagger > 0, we show Stagger Damage (Cyan).
+            if (info.damageAmount > 0)
+            {
+                _damageEvent?.Raise(transform.position, info.damageAmount, isCrit, false);
+            }
+            else if (info.staggerAmount > 0)
+            {
+                _damageEvent?.Raise(transform.position, info.staggerAmount, false, true);
+            }
         }
 
         private void HandleStaggerEnter()
         {
-            GameEvents.OnPopupText?.Invoke(transform.position, "STAGGER");
+            // Popup Text (New Event System)
+            _popupEvent?.Raise(transform.position, "STAGGER");
 
-            if (AudioManager.Instance && staggerClip)
-                AudioManager.Instance.PlaySound(staggerClip, 1f, true);
+            // Audio via Service Locator
+            if (Global.Audio != null && staggerClip)
+                Global.Audio.PlaySound(staggerClip, 1f, true);
 
-            if (_flashTween != null) _flashTween.Kill();
-            
-            float flashLerp = 0f;
-            _flashTween = DOTween.To(()=> flashLerp, x=> flashLerp = x, 1f, 0.2f)
-                .SetLoops(-1, LoopType.Yoyo)
-                .SetEase(Ease.Linear)
-                .OnUpdate(() => {
-                    Color c = Color.Lerp(_staggerColor, Color.red, flashLerp);
-                    SetColor(c);
-                });
+            _visuals.StartStaggerEffect();
         }
 
         private void HandleStaggerExit()
         {
-            if (_flashTween != null) _flashTween.Kill();
-            SetColor(_normalColor);
+            _visuals.StopStaggerEffect();
         }
 
-        private void Flash()
+        private void HandleDeath(EnemyStatsSO stats, bool reward)
         {
-            if (_flashTween != null) _flashTween.Kill();
-            SetColor(Color.white);
-            _flashTween = DOVirtual.DelayedCall(0.1f, () => SetColor(_normalColor)).SetId(gameObject);
+            // Notify Game Logic
+            _enemyKilledEvent?.Raise(transform.position, stats, reward);
+
+            // Despawn via Service Locator
+            if (Global.Pool != null) Global.Pool.Despawn(gameObject);
+            else Destroy(gameObject);
         }
 
-        private void SetColor(Color c)
-        {
-            if (meshRenderer)
-            {
-                meshRenderer.GetPropertyBlock(_propBlock);
-                _propBlock.SetColor(_colorPropID, c);
-                _propBlock.SetColor(_emissionPropID, c);
-                meshRenderer.SetPropertyBlock(_propBlock);
-            }
-        }
-        
-        private void LoadColors()
-        {
-            _normalColor = Color.red;
-            _staggerColor = Color.yellow;
-
-            if (palette != null)
-            {
-                // FIX: Access flattened properties directly
-                // (We previously removed the nested 'defaultEnemyTheme' object)
-                if (palette.enemyPrimary.mainColor != Color.clear)
-                {
-                     _normalColor = palette.enemyPrimary.mainColor;
-                }
-                
-                _staggerColor = palette.staggerColor; 
-            }
-        }
+        // --- Interface Implementation ---
+        public bool TakeDamage(DamageInfo info) => _receiver.TakeDamage(info);
+        public void Kill(bool instant) => _receiver.Kill(true);
+        public void SelfDestruct() => _receiver.Kill(false);
+        public void OnExecutionHit() => _receiver.Kill(true);
+        public bool KeepPlayerGrounded => _receiver.KeepPlayerGrounded;
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyMotors.cs`
-- Lines: 172
-- Size: 5.7 KB
-- Modified: 2025-12-31 09:17
+- Lines: 192
+- Size: 6.6 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -5092,7 +7210,7 @@ namespace DarkTowerTron.Enemy
         private void Awake()
         {
             _mover = GetComponent<KinematicMover>();
-            if (allyLayer == 0) allyLayer = LayerMask.GetMask(GameConstants.LAYER_ENEMY);
+            if (allyLayer == 0) allyLayer = 1 << GameConstants.LAYER_ENEMY;
         }
 
         private void OnEnable()
@@ -5155,12 +7273,32 @@ namespace DarkTowerTron.Enemy
             // 5. VERTICAL LOGIC (Flight vs Gravity)
             if (stats.rideHeight > 0)
             {
-                // FLYING: Calculate vertical velocity to reach height
+                // A. Determine Ground Height
+                float groundY = -999f; // Fallback (Void)
+
+                // Start raycast slightly above current position to catch the floor even if we clipped in slightly
+                Vector3 rayOrigin = transform.position + Vector3.up * 1.0f;
+
+                // Cast down 20 units (Enough for high hoverers)
+                // Use OBSTACLES mask (Ground + Default + Wall) so they hover over bridges/crates too
+                if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f, GameConstants.MASK_PHYSICS_OBSTACLES))
+                {
+                    groundY = hit.point.y;
+                }
+                else
+                {
+                    // No ground found? Maintain current height (don't fall into void)
+                    groundY = transform.position.y - stats.rideHeight;
+                }
+
+                // B. Calculate Target Y
+                float targetY = groundY + stats.rideHeight;
+
+                // C. Smoothly Fly There
                 float currentY = transform.position.y;
-                float targetY = stats.rideHeight;
                 float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime);
 
-                // Convert distance delta back to velocity for the motor
+                // D. Convert to Velocity for the KinematicMover
                 float verticalVel = (newY - currentY) / dt;
                 finalVelocity.y = verticalVel;
             }
@@ -5244,7 +7382,7 @@ namespace DarkTowerTron.Enemy
 ## 📄 `Assets\Scripts\Enemy\PatrolPath.cs`
 - Lines: 28
 - Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5280,7 +7418,7 @@ namespace DarkTowerTron.Enemy
 ## 📄 `Assets\Scripts\Enemy\States\Bosses\Architect\ArchitectState_Idle.cs`
 - Lines: 10
 - Size: 0.3 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using DarkTowerTron.AI.FSM;
@@ -5298,7 +7436,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ## 📄 `Assets\Scripts\Enemy\States\Bosses\Architect\ArchitectState_Pattern.cs`
 - Lines: 153
 - Size: 5.4 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5459,7 +7597,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ## 📄 `Assets\Scripts\Enemy\States\Chaser\ChaserState_Chase.cs`
 - Lines: 52
 - Size: 1.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5517,9 +7655,9 @@ namespace DarkTowerTron.Enemy.States.Chaser
 ```
 
 ## 📄 `Assets\Scripts\Enemy\States\Chaser\ChaserState_Primer.cs`
-- Lines: 63
-- Size: 1.9 KB
-- Modified: 2025-12-31 09:17
+- Lines: 65
+- Size: 1.8 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -5534,7 +7672,6 @@ namespace DarkTowerTron.Enemy.States.Chaser
     {
         private EnemyAgent_Chaser _agent;
         private float _timer;
-        private Tween _shakeTween;
 
         public ChaserState_Priming(EnemyAgent_Chaser agent)
         {
@@ -5548,15 +7685,14 @@ namespace DarkTowerTron.Enemy.States.Chaser
 
             _timer = _agent.fuseDuration;
 
-            // VISUAL WARNING: Shake the mesh
-            // (Assumes Art is a child, so we shake the child or local rotation)
-            // A simple scale punch or color flash works too.
-            // Let's do a Color Flash + Scale Shake
-
-            if (_agent.GetController().meshRenderer)
+            // 1. VISUAL WARNING (The Fix)
+            // Use the Visuals component via the Controller
+            if (_agent.GetController() != null && _agent.GetController().Visuals != null)
             {
-                _agent.GetController().meshRenderer.material.DOColor(Color.red, 0.1f).SetLoops(-1, LoopType.Yoyo);
+                _agent.GetController().Visuals.StartPrimingEffect();
             }
+
+            // 2. PHYSICAL WARNING (Shake)
             _agent.transform.DOShakeScale(_agent.fuseDuration, 0.5f, 20, 90);
         }
 
@@ -5564,7 +7700,7 @@ namespace DarkTowerTron.Enemy.States.Chaser
         {
             _timer -= Time.deltaTime;
 
-            // Lock rotation to target so it looks aggressive
+            // Lock rotation to target
             if (_agent.GetTarget() != null)
             {
                 _agent.GetMotor().FaceTarget(_agent.GetTarget().position);
@@ -5572,16 +7708,20 @@ namespace DarkTowerTron.Enemy.States.Chaser
 
             if (_timer <= 0)
             {
-                _agent.DeployMine(); // CHANGED: Was Detonate()
+                _agent.DeployMine();
             }
         }
 
         public override void Exit()
         {
-            // Cleanup tweens if we get stunned/killed during priming
+            // Cleanup tweens
             _agent.transform.DOKill();
-            if (_agent.GetController().meshRenderer)
-                _agent.GetController().meshRenderer.material.DOKill();
+            
+            // Reset Color (The Fix)
+            if (_agent.GetController() != null && _agent.GetController().Visuals != null)
+            {
+                _agent.GetController().Visuals.StopPrimingEffect();
+            }
         }
     }
 }
@@ -5590,7 +7730,7 @@ namespace DarkTowerTron.Enemy.States.Chaser
 ## 📄 `Assets\Scripts\Enemy\States\Guardian\GuardianState_Attack.cs`
 - Lines: 63
 - Size: 2.0 KB
-- Modified: 2025-12-31 17:13
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -5661,7 +7801,7 @@ namespace DarkTowerTron.Enemy.States.Guardian
 ## 📄 `Assets\Scripts\Enemy\States\Guardian\GuardianState_Move.cs`
 - Lines: 75
 - Size: 2.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5744,7 +7884,7 @@ namespace DarkTowerTron.Enemy.States.Guardian
 ## 📄 `Assets\Scripts\Enemy\States\Sentinel\SentinelState_Combat.cs`
 - Lines: 56
 - Size: 1.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5808,7 +7948,7 @@ namespace DarkTowerTron.Enemy.States.Sentinel
 ## 📄 `Assets\Scripts\Enemy\States\Sentinel\SentinelState_Hunt.cs`
 - Lines: 44
 - Size: 1.2 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5860,7 +8000,7 @@ namespace DarkTowerTron.Enemy.States.Sentinel
 ## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Aiming.cs`
 - Lines: 65
 - Size: 1.9 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -5933,7 +8073,7 @@ namespace DarkTowerTron.Enemy.States.Sniper
 ## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Firing.cs`
 - Lines: 24
 - Size: 0.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using DarkTowerTron.AI.FSM;
@@ -5965,7 +8105,7 @@ namespace DarkTowerTron.Enemy.States.Sniper
 ## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Positioning.cs`
 - Lines: 54
 - Size: 1.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6027,7 +8167,7 @@ namespace DarkTowerTron.Enemy.States.Sniper
 ## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Teleport.cs`
 - Lines: 61
 - Size: 1.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6093,10 +8233,226 @@ namespace DarkTowerTron.Enemy.States.Sniper
 }
 ```
 
+## 📄 `Assets\Scripts\Enemy\Visuals\EnemyVisuals.cs`
+- Lines: 208
+- Size: 7.0 KB
+- Modified: 2026-01-06 11:56
+
+```csharp
+using UnityEngine;
+using DG.Tweening;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services;
+using DarkTowerTron.Services; // PaletteManager
+using UnityEngine.Serialization;
+
+namespace DarkTowerTron.Enemy.Visuals
+{
+    public class EnemyVisuals : MonoBehaviour
+    {
+        [Header("Configuration")]
+        [Tooltip("Leave EMPTY to use the Global Palette.")]
+        [FormerlySerializedAs("palette")]
+        public ColorPaletteSO paletteOverride;
+
+        [Tooltip("Defines timing and animation curves. Required.")]
+        public EnemyVisualProfileSO profile;
+
+        [Header("References")]
+        [Tooltip("Assign all mesh parts here. If empty, auto-finds in children.")]
+        [SerializeField] private Renderer[] _renderers;
+
+        // Internal
+        private MaterialPropertyBlock _propBlock;
+        private int _colorPropID;
+        private int _emissionPropID;
+
+        // State
+        private Color[] _baseColors; // Snapshot of original colors per renderer
+        private Color _staggerColor;
+        private Color _hitColor;
+        private Tween _flashTween;
+
+        private void Awake()
+        {
+            // Auto-find if not assigned (Convenience)
+            if (_renderers == null || _renderers.Length == 0)
+                _renderers = GetComponentsInChildren<Renderer>();
+
+            // Validate
+            if (_renderers.Length == 0)
+            {
+                // Warn but don't crash, logic will just loop 0 times
+                Debug.LogWarning($"[EnemyVisuals] No Renderers found on {name}", gameObject);
+            }
+
+            _baseColors = new Color[_renderers.Length];
+            _propBlock = new MaterialPropertyBlock();
+
+            _colorPropID = Shader.PropertyToID("_BaseColor");
+            _emissionPropID = Shader.PropertyToID("_EmissionColor");
+        }
+
+        private void Start()
+        {
+            if (profile == null)
+            {
+                Debug.LogError($"[EnemyVisuals] Profile missing on {gameObject.name}. Animations will fail.", gameObject);
+                enabled = false;
+                return;
+            }
+
+            // Wait one frame to ensure PaletteReceiver has run (Execution Order usually handles this, but safety first)
+            InitializeColors();
+        }
+
+        public void InitializeColors()
+        {
+            // 1. Resolve Palette (Override -> Service -> Instance)
+            ColorPaletteSO activePalette = paletteOverride;
+
+            if (activePalette == null)
+            {
+                if (ServiceLocator.TryGet<PaletteManager>(out var manager))
+                    activePalette = manager.activePalette;
+                else if (PaletteManager.Instance != null)
+                    activePalette = PaletteManager.Instance.activePalette;
+            }
+
+            // 2. Cache Flash Colors
+            if (activePalette != null)
+            {
+                _staggerColor = activePalette.staggerColor;
+                _hitColor = activePalette.hitFlashColor;
+            }
+            else
+            {
+                _staggerColor = Color.yellow;
+                _hitColor = Color.white;
+            }
+
+            // 3. Snapshot Base Colors (The "Memory")
+            // We read what is currently on the mesh (set by PaletteReceiver or Material)
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                Renderer r = _renderers[i];
+                if (r == null) continue;
+
+                r.GetPropertyBlock(_propBlock);
+
+                // If MPB is empty, fall back to material color
+                if (_propBlock.isEmpty || _propBlock.GetColor(_colorPropID) == Color.clear)
+                {
+                    if (r.sharedMaterial != null && r.sharedMaterial.HasProperty(_colorPropID))
+                        _baseColors[i] = r.sharedMaterial.GetColor(_colorPropID);
+                    else
+                        _baseColors[i] = Color.white;
+                }
+                else
+                {
+                    _baseColors[i] = _propBlock.GetColor(_colorPropID);
+                }
+            }
+        }
+
+        // --- VISUAL FX METHODS ---
+
+        public void PlayHitFlash()
+        {
+            if (profile == null) return;
+            if (_flashTween != null && _flashTween.IsActive()) _flashTween.Kill();
+
+            // Flash all parts to pure White
+            SetAllColors(_hitColor);
+
+            _flashTween = DOVirtual.DelayedCall(profile.hitFlashDuration, ResetVisuals);
+        }
+
+        public void StartStaggerEffect()
+        {
+            if (profile == null) return;
+            if (_flashTween != null) _flashTween.Kill();
+
+            float lerpVal = 0f;
+            _flashTween = DOTween.To(() => lerpVal, x => lerpVal = x, 1f, profile.staggerPulseDuration / 2f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.Linear)
+                .OnUpdate(() =>
+                {
+                    Color c = Color.Lerp(_staggerColor, profile.dangerPulseColor, lerpVal);
+                    SetAllColors(c);
+                });
+        }
+
+        public void StopStaggerEffect() => ResetVisuals();
+
+        public void StartPrimingEffect()
+        {
+            if (profile == null) return;
+            if (_flashTween != null) _flashTween.Kill();
+
+            float lerpVal = 0f;
+            _flashTween = DOTween.To(() => lerpVal, x => lerpVal = x, 1f, 0.1f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.Linear)
+                .OnUpdate(() =>
+                {
+                    Color c = Color.Lerp(GetBaseColorSafe(0), profile.dangerPulseColor, lerpVal);
+                    SetAllColors(c);
+                });
+        }
+
+        public void StopPrimingEffect() => ResetVisuals();
+
+        public void ResetVisuals()
+        {
+            if (_flashTween != null) _flashTween.Kill();
+
+            // Restore individual colors
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                ApplyColorToRenderer(_renderers[i], _baseColors[i]);
+            }
+        }
+
+        // --- HELPERS ---
+
+        private void SetAllColors(Color c)
+        {
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                ApplyColorToRenderer(_renderers[i], c);
+            }
+        }
+
+        private void ApplyColorToRenderer(Renderer r, Color c)
+        {
+            if (r == null) return;
+            r.GetPropertyBlock(_propBlock);
+            _propBlock.SetColor(_colorPropID, c);
+            _propBlock.SetColor(_emissionPropID, c);
+            r.SetPropertyBlock(_propBlock);
+        }
+
+        private Color GetBaseColorSafe(int index)
+        {
+            if (_baseColors != null && index < _baseColors.Length)
+                return _baseColors[index];
+            return Color.white;
+        }
+
+        private void OnDestroy()
+        {
+            if (_flashTween != null) _flashTween.Kill();
+        }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Environment\ArenaGate.cs`
 - Lines: 77
 - Size: 2.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6181,7 +8537,7 @@ namespace DarkTowerTron.Environment
 ## 📄 `Assets\Scripts\Environment\CameraZone.cs`
 - Lines: 48
 - Size: 1.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6237,7 +8593,7 @@ namespace DarkTowerTron.Environment
 ## 📄 `Assets\Scripts\Environment\LevelEndTrigger.cs`
 - Lines: 32
 - Size: 0.9 KB
-- Modified: 2025-12-31 17:14
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -6277,7 +8633,7 @@ namespace DarkTowerTron.Environment
 ## 📄 `Assets\Scripts\Environment\LevelModule.cs`
 - Lines: 49
 - Size: 1.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6334,7 +8690,7 @@ namespace DarkTowerTron.Environment
 ## 📄 `Assets\Scripts\Environment\PlayerStart.cs`
 - Lines: 26
 - Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6365,274 +8721,245 @@ namespace DarkTowerTron.Environment
 }
 ```
 
-## 📄 `Assets\Scripts\Environment\Props\CombatProp.cs`
-- Lines: 126
-- Size: 3.6 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Managers;
-using DG.Tweening;
-
-namespace DarkTowerTron.Environment
-{
-    public abstract class CombatProp : MonoBehaviour, IDamageable, ICombatTarget, IPoolable
-    {
-        [Header("Base Stats")]
-        public float health = 10f;
-        public float maxStagger = 1.0f;
-        public float staggerDecay = 1.0f;
-
-        [Header("Base Visuals")]
-        public Renderer meshRenderer;
-        public Color normalColor = Color.cyan;
-        public Color staggerColor = Color.yellow;
-        public Color flashColor = Color.white;
-
-        // State
-        protected float _currentHealth;
-        protected float _currentStagger;
-        public bool IsStaggered { get; protected set; }
-
-        private Tween _flashTween;
-
-        protected virtual void Awake()
-        {
-            if (meshRenderer == null) meshRenderer = GetComponent<Renderer>();
-        }
-
-        public virtual void OnSpawn()
-        {
-            _currentHealth = health;
-            _currentStagger = 0;
-            IsStaggered = false;
-            ResetVisuals();
-        }
-
-        public virtual void OnDespawn()
-        {
-            transform.DOKill();
-            if (_flashTween != null) _flashTween.Kill();
-        }
-
-        private void Update()
-        {
-            if (!IsStaggered && _currentStagger > 0)
-            {
-                _currentStagger -= staggerDecay * Time.deltaTime;
-                if (_currentStagger < 0) _currentStagger = 0;
-            }
-        }
-
-        // --- IDAMAGEABLE ---
-        public virtual bool TakeDamage(DamageInfo info)
-        {
-            Flash();
-
-            if (!IsStaggered)
-            {
-                _currentStagger += info.staggerAmount;
-                if (_currentStagger >= maxStagger) EnterStaggerState();
-            }
-
-            // Crit multiplier if staggered
-            float finalDmg = IsStaggered ? info.damageAmount * 2f : info.damageAmount;
-
-            _currentHealth -= finalDmg;
-
-            if (finalDmg > 0)
-                GameEvents.OnDamageDealt?.Invoke(transform.position, finalDmg, IsStaggered);
-
-            if (_currentHealth <= 0)
-            {
-                Die();
-            }
-
-            return true;
-        }
-
-        public void Kill(bool instant) => Die();
-
-        // --- ABSTRACT METHODS ---
-        protected abstract void Die();
-        public abstract void OnExecutionHit();
-
-        // --- HELPERS ---
-        protected void EnterStaggerState()
-        {
-            IsStaggered = true;
-            GameEvents.OnPopupText?.Invoke(transform.position, "READY");
-
-            if (meshRenderer)
-                meshRenderer.material.DOColor(staggerColor, 0.2f);
-
-            DOVirtual.DelayedCall(2.0f, () =>
-            {
-                IsStaggered = false;
-                _currentStagger = 0;
-                ResetVisuals();
-            }).SetId(gameObject);
-        }
-
-        protected void Flash()
-        {
-            if (!IsStaggered && meshRenderer)
-            {
-                if (_flashTween != null) _flashTween.Kill();
-                meshRenderer.material.DOColor(flashColor, 0.1f)
-                    .OnComplete(() => ResetVisuals());
-            }
-        }
-
-        protected void ResetVisuals()
-        {
-            if (meshRenderer) meshRenderer.material.color = IsStaggered ? staggerColor : normalColor;
-        }
-
-        // --- ICOMBATTARGET ---
-        // 'transform' property is inherited from MonoBehaviour, so we don't define it here.
-
-        public virtual bool KeepPlayerGrounded => true;
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Environment\Props\Prop_Anchor.cs`
-- Lines: 75
-- Size: 2.2 KB
-- Modified: 2025-12-31 09:17
+- Lines: 118
+- Size: 4.1 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
 using System.Collections;
-using DarkTowerTron.Core;
+using DarkTowerTron.Combat; // For DamageReceiver
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Enemy.Visuals; // For EnemyVisuals
 using DG.Tweening;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace DarkTowerTron.Environment
+namespace DarkTowerTron.Environment.Props
 {
-    public class Prop_Anchor : CombatProp
+    [MovedFrom(true, "DarkTowerTron.Environment", "Assembly-CSharp", "Prop_Anchor")]
+    [RequireComponent(typeof(DamageReceiver))]
+    [RequireComponent(typeof(EnemyVisuals))]
+    public class Prop_Anchor : MonoBehaviour
     {
         [Header("Anchor Settings")]
-        public float respawnTime = 3.0f;
-        public bool keepPlayerInAir = true; // True for traversal
+        public float respawnTime = 5.0f;
+        public GameObject visualRoot; // Assign the mesh object
+        public Collider mainCollider;
 
-        private Collider _col;
+        private DamageReceiver _receiver;
+        private EnemyVisuals _visuals;
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
-            _col = GetComponent<Collider>();
+            _receiver = GetComponent<DamageReceiver>();
+            _visuals = GetComponent<EnemyVisuals>();
+
+            if (visualRoot == null && transform.childCount > 0) visualRoot = transform.GetChild(0).gameObject;
+            if (mainCollider == null) mainCollider = GetComponent<Collider>();
         }
 
-        // Override: Anchors don't die from damage
-        public override bool TakeDamage(DamageInfo info)
+        private void Start()
         {
-            // Only take stagger, ignore health damage
-            if (!IsStaggered)
+            // Trigger the DamageReceiver to read the Inspector Overrides
+            // We pass 'null' for stats because we are using overrides
+            if (_receiver != null) _receiver.Initialize(null);
+        }
+
+        private void OnEnable()
+        {
+            if (_receiver != null)
             {
-                // We barely invoke base just for the Flash/Stagger logic
-                // We hack the info to deal 0 health damage
-                info.damageAmount = 0;
-                base.TakeDamage(info);
+                _receiver.OnDeathProcessed += HandleDeath;
+                _receiver.OnHitProcessed += HandleHit;
+
+                // Wire up Stagger Visuals
+                if (_receiver.Stagger != null && _visuals != null)
+                {
+                    _receiver.Stagger.OnStaggerBreak += _visuals.StartStaggerEffect;
+                    _receiver.Stagger.OnStaggerRecover += _visuals.StopStaggerEffect;
+                }
             }
-            return true;
         }
 
-        protected override void Die() 
+        private void OnDisable()
         {
-            // Impossible state, but handle gracefully
-            StartCoroutine(RespawnRoutine());
+            if (_receiver != null)
+            {
+                _receiver.OnDeathProcessed -= HandleDeath;
+                _receiver.OnHitProcessed -= HandleHit;
+
+                if (_receiver.Stagger != null && _visuals != null)
+                {
+                    _receiver.Stagger.OnStaggerBreak -= _visuals.StartStaggerEffect;
+                    _receiver.Stagger.OnStaggerRecover -= _visuals.StopStaggerEffect;
+                }
+            }
         }
 
-        public override void OnExecutionHit()
+        private void HandleHit(DarkTowerTron.Core.DamageInfo info)
         {
-            // When player teleports here:
-            // 1. Visual Bounce
-            transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
-            
-            // 2. Hide (Respawn)
+            // Trigger the Flash via the Visuals component
+            if (_receiver != null && _visuals != null && !_receiver.IsStaggered)
+            {
+                _visuals.PlayHitFlash();
+            }
+        }
+
+        private void HandleDeath(EnemyStatsSO stats, bool rewardPlayer)
+        {
+            // The PlayerExecution just triggered Kill().
+            // Instead of destroying the object, we "Disable" it temporarily.
             StartCoroutine(RespawnRoutine());
         }
 
         private IEnumerator RespawnRoutine()
         {
-            // Hide
-            if (meshRenderer) meshRenderer.enabled = false;
-            if (_col) _col.enabled = false;
-            
-            // Reset internal state
-            OnSpawn(); 
+            // 1. Hide
+            if (visualRoot) visualRoot.SetActive(false);
+            if (mainCollider) mainCollider.enabled = false;
 
+            // 2. Wait
             yield return new WaitForSeconds(respawnTime);
 
-            // Show
-            if (meshRenderer) meshRenderer.enabled = true;
-            if (_col) _col.enabled = true;
-            
-            // Juice
-            transform.localScale = Vector3.zero;
-            transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
-        }
+            // 3. Reset Health
+            // We need to revive the Vitality/Stagger modules manually
+            if (_receiver != null)
+            {
+                if (_receiver.Vitality != null) _receiver.Vitality.Revive();
+                if (_receiver.Stagger != null) _receiver.Stagger.ResetStagger();
+            }
 
-        // ICombatTarget Override
-        public override bool KeepPlayerGrounded => !keepPlayerInAir;
+            if (_visuals != null) _visuals.ResetVisuals();
+
+            // 4. Show (with Pop-in animation)
+            if (visualRoot)
+            {
+                visualRoot.SetActive(true);
+                visualRoot.transform.DOKill();
+                visualRoot.transform.localScale = Vector3.zero;
+                visualRoot.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+            }
+
+            if (mainCollider) mainCollider.enabled = true;
+        }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Environment\Props\Prop_Explosive.cs`
-- Lines: 48
-- Size: 1.4 KB
-- Modified: 2025-12-31 09:17
+- Lines: 110
+- Size: 3.5 KB
+- Modified: 2026-01-06 10:00
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Enemy.Visuals;
 
-namespace DarkTowerTron.Environment
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Environment.Props
 {
-    public class Prop_Explosive : CombatProp
+    [RequireComponent(typeof(DamageReceiver))]
+    [RequireComponent(typeof(EnemyVisuals))]
+    public class Prop_Explosive : MonoBehaviour
     {
         [Header("Explosive Settings")]
-        public GameObject spawnOnDeath; // Hazard Zone
-        public bool volatileOnStagger = true; // Stagger damage hurts HP
+        public GameObject hazardZonePrefab;
 
-        public override bool TakeDamage(DamageInfo info)
+        [Tooltip("If true, Stagger Damage from weapons is applied directly to Health.")]
+        public bool volatileOnStagger = true;
+
+        [Header("Visual Feedback")]
+        [SerializeField] private DamageTextEventChannelSO _damageTextEvent;
+
+        // References
+        private DamageReceiver _receiver;
+        private EnemyVisuals _visuals;
+
+        private void Awake()
         {
-            // Override to allow Stagger damage to hurt Health (Volatile)
-            if (volatileOnStagger)
-            {
-                // Add stagger amount to damage
-                info.damageAmount += info.staggerAmount;
-            }
-            return base.TakeDamage(info);
+            _receiver = GetComponent<DamageReceiver>();
+            _visuals = GetComponent<EnemyVisuals>();
         }
 
-        public override void OnExecutionHit()
+        private void Start()
         {
-            // Execution = Instant Explosion
-            Die();
+            _receiver.Initialize(null);
         }
 
-        protected override void Die()
+        private void OnEnable()
         {
-            // 1. Spawn Hazard
-            if (spawnOnDeath)
+            _receiver.OnHitProcessed += HandleHit;
+            _receiver.OnDeathProcessed += HandleDeath;
+
+            if (_receiver.Stagger != null)
             {
-                PoolManager.Instance.Spawn(spawnOnDeath, transform.position, Quaternion.identity);
+                _receiver.Stagger.OnStaggerBreak += _visuals.StartStaggerEffect;
+                _receiver.Stagger.OnStaggerRecover += _visuals.StopStaggerEffect;
+            }
+        }
+
+        private void OnDisable()
+        {
+            _receiver.OnHitProcessed -= HandleHit;
+            _receiver.OnDeathProcessed -= HandleDeath;
+
+            if (_receiver.Stagger != null)
+            {
+                _receiver.Stagger.OnStaggerBreak -= _visuals.StartStaggerEffect;
+                _receiver.Stagger.OnStaggerRecover -= _visuals.StopStaggerEffect;
+            }
+        }
+
+        private void HandleHit(DarkTowerTron.Core.DamageInfo info)
+        {
+            // 1. Visual Flash
+            if (!_receiver.IsStaggered)
+                _visuals.PlayHitFlash();
+
+            // 2. Damage Numbers (Updated Logic)
+            bool isCrit = _receiver.IsStaggered;
+
+            if (info.damageAmount > 0)
+            {
+                // Show Health Damage (White/Yellow)
+                _damageTextEvent?.Raise(transform.position, info.damageAmount, isCrit, false);
+            }
+            else if (info.staggerAmount > 0)
+            {
+                // Show Stagger Damage (Cyan) - Fixes the "0 Damage" issue
+                _damageTextEvent?.Raise(transform.position, info.staggerAmount, false, true);
             }
 
-            // 2. VFX
-            if (VFXManager.Instance)
+            // 3. Volatile Logic
+            // If this prop is volatile, Stagger actually hurts it
+            if (volatileOnStagger && info.staggerAmount > 0)
             {
-                PoolManager.Instance.Spawn(VFXManager.Instance.explosionPrefab, transform.position, Quaternion.identity);
+                _receiver.Vitality.TakeDamage(info.staggerAmount);
             }
+        }
 
-            // 3. Despawn Self
-            PoolManager.Instance.Despawn(gameObject);
+        private void HandleDeath(EnemyStatsSO stats, bool rewardPlayer)
+        {
+            Explode();
+        }
+
+        private void Explode()
+        {
+            Vector3 pos = transform.position;
+
+            if (hazardZonePrefab)
+                Global.Pool.Spawn(hazardZonePrefab, pos, Quaternion.identity);
+
+            if (Global.VFX != null && Global.VFX.explosionPrefab)
+                Global.Pool.Spawn(Global.VFX.explosionPrefab, pos, Quaternion.identity);
+
+            Global.Pool.Despawn(gameObject);
         }
     }
 }
@@ -6641,7 +8968,7 @@ namespace DarkTowerTron.Environment
 ## 📄 `Assets\Scripts\Environment\TileInfo.cs`
 - Lines: 48
 - Size: 1.5 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -6697,7 +9024,7 @@ namespace DarkTowerTron.Environment
 ## 📄 `Assets\Scripts\Environment\WaveTrigger.cs`
 - Lines: 70
 - Size: 2.0 KB
-- Modified: 2025-12-31 17:13
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -6773,14 +9100,17 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Managers\ArenaSpawner.cs`
-- Lines: 77
-- Size: 3.2 KB
-- Modified: 2025-12-31 17:12
+- Lines: 87
+- Size: 3.4 KB
+- Modified: 2026-01-06 09:37
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Managers; // For PoolManager
-using DarkTowerTron.Core;
+using DarkTowerTron.Core;          // For GameConstants, GameLogger
+using DarkTowerTron.Core.Services; // For Services
+
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
 {
@@ -6791,7 +9121,7 @@ namespace DarkTowerTron.Managers
 
         [Header("Debug")]
         public bool showDebugRays = true;
-        public float debugLineDuration = 20f; // Long time to analyze in Scene view
+        public float debugLineDuration = 20f;
 
         public GameObject SpawnEnemy(GameObject prefab, int forcedIndex = -1)
         {
@@ -6808,6 +9138,7 @@ namespace DarkTowerTron.Managers
 
             // 3. Find Floor
             Vector3 spawnPos;
+
             int mask = LayerMask.GetMask("Ground", "Default", "Wall");
             Vector3 rayOrigin = attemptPos + Vector3.up * 50f;
 
@@ -6827,7 +9158,7 @@ namespace DarkTowerTron.Managers
                 if (showDebugRays) VisualizeSpawn(rayOrigin, new RaycastHit(), false);
             }
 
-            return PoolManager.Instance.Spawn(prefab, spawnPos, Quaternion.LookRotation(sp.forward));
+            return Global.Pool.Spawn(prefab, spawnPos, Quaternion.LookRotation(sp.forward));
         }
 
         // --- NEW DEBUG METHOD ---
@@ -6844,134 +9175,19 @@ namespace DarkTowerTron.Managers
 
                 // Log details
                 string layerName = LayerMask.LayerToName(hit.collider.gameObject.layer);
-                GameLogger.Log(LogChannel.System, $"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>", hit.collider.gameObject);
+
+                GameLogger.Log(LogChannel.System,
+                    $"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>",
+                    hit.collider.gameObject);
             }
             else
             {
                 // Draw Red Line all the way down
                 Debug.DrawRay(origin, Vector3.down * 100f, Color.red, debugLineDuration);
-                GameLogger.LogError(LogChannel.System, $"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.", gameObject);
-            }
-        }
-    }
-}
-```
 
-## 📄 `Assets\Scripts\Managers\AudioManager.cs`
-- Lines: 40
-- Size: 1.3 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core.Data; // Access SoundDef
-
-namespace DarkTowerTron.Managers
-{
-    [RequireComponent(typeof(AudioSource))]
-    public class AudioManager : MonoBehaviour
-    {
-        public static AudioManager Instance;
-        [SerializeField] private AudioSource _sfxSource;
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-
-            if (_sfxSource == null) _sfxSource = GetComponent<AudioSource>();
-        }
-
-        // --- NEW METHOD ---
-        public void PlaySound(SoundDef soundDef)
-        {
-            if (soundDef == null || _sfxSource == null) return;
-
-            AudioClip clip = soundDef.GetClip();
-            if (clip == null) return;
-
-            _sfxSource.pitch = soundDef.GetPitch();
-            _sfxSource.PlayOneShot(clip, soundDef.volume);
-        }
-
-        // Keep legacy method for compatibility until migration is complete
-        public void PlaySound(AudioClip clip, float volume = 1f, bool randomizePitch = false)
-        {
-            if (clip == null || _sfxSource == null) return;
-            _sfxSource.pitch = randomizePitch ? Random.Range(0.9f, 1.1f) : 1f;
-            _sfxSource.PlayOneShot(clip, volume);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\DamageTextManager.cs`
-- Lines: 65
-- Size: 2.2 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Managers
-{
-    public class DamageTextManager : MonoBehaviour
-    {
-        [Header("Setup")]
-        public GameObject textPrefab; // Assign the prefab here
-
-        [Header("Settings")]
-        public Vector3 offset = new Vector3(0, 2f, 0); // Spawn above enemy head
-        public Color normalColor = Color.white;
-        public Color critColor = Color.yellow;
-        public Color infoColor = Color.cyan; // For "STAGGER"
-
-        private void OnEnable()
-        {
-            GameEvents.OnDamageDealt += ShowDamage;
-            GameEvents.OnPopupText += ShowPopup;
-        }
-
-        private void OnDisable()
-        {
-            GameEvents.OnDamageDealt -= ShowDamage;
-            GameEvents.OnPopupText -= ShowPopup;
-        }
-
-        private void ShowDamage(Vector3 pos, float amount, bool isCrit)
-        {
-            if (textPrefab == null || PoolManager.Instance == null) return;
-
-            // Spawn
-            GameObject obj = PoolManager.Instance.Spawn(textPrefab, pos + offset, Quaternion.identity);
-
-            // Configure
-            var floatingText = obj.GetComponent<DarkTowerTron.UI.FloatingText>();
-            if (floatingText)
-            {
-                Color c = isCrit ? critColor : normalColor;
-                float scale = isCrit ? 1.5f : 1.0f;
-
-                // N0 formats to integer (10 instead of 10.0)
-                floatingText.Initialize(amount.ToString("N0"), c, scale);
-
-                // Billboarding: Make text face the camera
-                obj.transform.forward = Camera.main.transform.forward;
-            }
-        }
-
-        private void ShowPopup(Vector3 pos, string message)
-        {
-            if (textPrefab == null || PoolManager.Instance == null) return;
-
-            GameObject obj = PoolManager.Instance.Spawn(textPrefab, pos + offset, Quaternion.identity);
-            var floatingText = obj.GetComponent<DarkTowerTron.UI.FloatingText>();
-
-            if (floatingText)
-            {
-                floatingText.Initialize(message, infoColor, 1.2f);
-                obj.transform.forward = Camera.main.transform.forward;
+                GameLogger.LogError(LogChannel.System,
+                    $"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.",
+                    gameObject);
             }
         }
     }
@@ -6979,30 +9195,35 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\DebugController.cs`
-- Lines: 115
-- Size: 4.0 KB
-- Modified: 2026-01-01 12:31
+- Lines: 137
+- Size: 4.7 KB
+- Modified: 2026-01-06 10:06
 
 ```csharp
 using UnityEngine;
-using System.Collections; // Required for IEnumerator
+using UnityEngine.InputSystem; // NEW: For Keyboard
+using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Player.Controller;
+using DarkTowerTron.Player.Stats;
+using DarkTowerTron.Combat; // For DamageReceiver
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
 {
     public class DebugController : MonoBehaviour
     {
         [Header("Workflow")]
-        public bool autoStartGame = false; // Check this to skip Main Menu
+        public bool autoStartGame = false;
 
         [Header("Cheats")]
         public bool godMode = false;
         public bool infiniteFocus = false;
 
-		[Header("Visualization")]
-		public bool showEnemyStats = true; // Toggle this in Inspector
+        [Header("Visualization")]
+        public bool showEnemyStats = true;
 
         [Header("Spawn Keys (NumPad)")]
         public GameObject[] enemiesToSpawn;
@@ -7015,11 +9236,10 @@ namespace DarkTowerTron.Managers
         private PlayerHealth _health;
         private PlayerLoadout _loadout;
 
-        // Changed void to IEnumerator to allow waiting
         private IEnumerator Start()
         {
-            // Wait one frame so core systems (GameSession, GameServices) can boot
-            yield return null; 
+            // Wait for Bootloader and Scene Init
+            yield return null;
 
             // 1. Auto-Start Logic
             if (autoStartGame)
@@ -7027,118 +9247,149 @@ namespace DarkTowerTron.Managers
                 var session = FindObjectOfType<GameSession>();
                 if (session)
                 {
-                    Debug.Log("<color=yellow>[DEBUG] Auto-Starting Game...</color>");
+                    GameLogger.Log(LogChannel.System, "[DEBUG] Auto-Starting Game...", gameObject);
                     session.BeginGame();
 
-                    // Force combat state so focus decay and combat systems are active while testing
+                    // Force combat state active
                     GameEvents.OnWaveCombatStarted?.Invoke();
                 }
             }
 
-            // 2. Locate player via GameServices
-            if (GameServices.Player != null)
+            // 2. Locate Player (Robust Find)
+            var player = FindObjectOfType<PlayerController>();
+            if (player != null)
             {
-                _energy = GameServices.Player.GetComponent<PlayerEnergy>();
-                _health = GameServices.Player.GetComponent<PlayerHealth>();
-                _loadout = GameServices.Player.GetComponent<PlayerLoadout>();
+                _energy = player.GetComponent<PlayerEnergy>();
+                _health = player.GetComponent<PlayerHealth>();
+                _loadout = player.GetComponent<PlayerLoadout>();
             }
         }
 
         private void Update()
         {
-            // Sync the static flag for enemy debug gizmos
-            DarkTowerTron.Combat.DamageReceiver.EnableDebugGizmos = showEnemyStats;
+            // Safety check for Input System
+            if (Keyboard.current == null) return;
 
-            // Keyboard Shortcut (e.g. Tab) to toggle
-            if (Input.GetKeyDown(KeyCode.Tab))
+            // Sync debug flag
+            DamageReceiver.EnableDebugGizmos = showEnemyStats;
+
+            // [TAB] Toggle Visuals
+            if (Keyboard.current.tabKey.wasPressedThisFrame)
             {
                 showEnemyStats = !showEnemyStats;
             }
 
-            // 1. Time Control
-            if (Input.GetKeyDown(KeyCode.T))
+            // [T] Time Control
+            if (Keyboard.current.tKey.wasPressedThisFrame)
             {
                 Time.timeScale = (Time.timeScale == 1f) ? 0.1f : 1f;
+                GameLogger.Log(LogChannel.System, $"Time Scale: {Time.timeScale}");
             }
 
-            // 2. Kill All
-            if (Input.GetKeyDown(KeyCode.K))
+            // [K] Kill All Enemies
+            if (Keyboard.current.kKey.wasPressedThisFrame)
             {
                 var enemies = FindObjectsOfType<DarkTowerTron.Enemy.EnemyController>();
                 foreach (var e in enemies) e.Kill(true);
+                GameLogger.Log(LogChannel.Combat, "Nuke Triggered.");
             }
 
-            // 3. Recharge
-            if (Input.GetKeyDown(KeyCode.R) && _energy)
+            // [R] Recharge Stats
+            if (Keyboard.current.rKey.wasPressedThisFrame && _energy)
             {
                 _energy.AddFocus(100f);
                 if (_health) _health.HealGrit(2);
             }
 
-            // 4. Manual Spawning (NumPad 1-4)
-            if (Input.GetKeyDown(KeyCode.Keypad1)) Spawn(0);
-            if (Input.GetKeyDown(KeyCode.Keypad2)) Spawn(1);
-            if (Input.GetKeyDown(KeyCode.Keypad3)) Spawn(2);
-            if (Input.GetKeyDown(KeyCode.Keypad4)) Spawn(3);
+            // [NumPad 1-4] Spawning
+            if (Keyboard.current.numpad1Key.wasPressedThisFrame) Spawn(0);
+            if (Keyboard.current.numpad2Key.wasPressedThisFrame) Spawn(1);
+            if (Keyboard.current.numpad3Key.wasPressedThisFrame) Spawn(2);
+            if (Keyboard.current.numpad4Key.wasPressedThisFrame) Spawn(3);
 
-            // 5. Cheats Application
+            // Cheats Application (Continuous)
             if (infiniteFocus && _energy) _energy.AddFocus(100f);
             if (godMode && _health) _health.HealGrit(2);
 
-            // 6. Perk Toggles
-            if (Input.GetKeyDown(KeyCode.H) && _loadout) _loadout.EquipProjectile(homingPrefab);
-            if (Input.GetKeyDown(KeyCode.J) && _loadout) _loadout.EquipDecoy(explosiveDecoyPrefab);
+            // [H / J] Perk Testing
+            if (Keyboard.current.hKey.wasPressedThisFrame && _loadout)
+            {
+                _loadout.EquipProjectile(homingPrefab);
+                GameLogger.Log(LogChannel.Player, "Equipped Homing Projectile");
+            }
+
+            if (Keyboard.current.jKey.wasPressedThisFrame && _loadout)
+            {
+                _loadout.EquipDecoy(explosiveDecoyPrefab);
+                GameLogger.Log(LogChannel.Player, "Equipped Explosive Decoy");
+            }
         }
 
         private void Spawn(int index)
         {
-            if (index < 0 || index >= enemiesToSpawn.Length) return;
+            if (enemiesToSpawn == null || index < 0 || index >= enemiesToSpawn.Length) return;
+
             Vector3 spawnPos = Vector3.zero + Random.insideUnitSphere * 5f;
-            spawnPos.y = 0;
-            PoolManager.Instance.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
+            spawnPos.y = 0; // Reset height (Motors will handle hovering)
+
+            if (Global.Pool != null)
+                Global.Pool.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Managers\FeedbackDirector.cs`
-- Lines: 78
-- Size: 2.5 KB
-- Modified: 2025-12-31 09:17
+- Lines: 93
+- Size: 3.2 KB
+- Modified: 2026-01-06 10:36
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Visuals; // <--- THIS WAS MISSING
+using DarkTowerTron.Core.Events; // NEW: Event Channels
+using DarkTowerTron.Visuals;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
 {
     public class FeedbackDirector : MonoBehaviour
     {
+        [Header("Event Wiring")]
+        [SerializeField] private VoidEventChannelSO _playerHitEvent;
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+        [SerializeField] private BoolEventChannelSO _hullEvent;
+
         [Header("Profiles")]
-        public FeedbackProfileSO hitProfile;
         public FeedbackProfileSO killProfile;
         public FeedbackProfileSO playerHurtProfile;
 
-        [Header("Hull")]
-        public AudioClip hullBreakClip; // Drag "Glass Shatter" or "Alarm" here
+        // Note: 'hitProfile' seemed unused in your previous logic, 
+        // kept here if you plan to wire it to an EnemyHit event later.
+        public FeedbackProfileSO hitProfile;
 
+        [Header("Hull")]
+        public AudioClip hullBreakClip;
+
+        // State for Edge Detection
         private bool _hasLastHullState;
         private bool _lastHasHull;
 
         private void OnEnable()
         {
-            GameEvents.OnPlayerHit += OnPlayerHit;
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            GameEvents.OnHullStateChanged += OnHullChanged;
+            if (_playerHitEvent != null) _playerHitEvent.OnEventRaised += OnPlayerHit;
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+            if (_hullEvent != null) _hullEvent.OnEventRaised += OnHullChanged;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnPlayerHit -= OnPlayerHit;
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
-            GameEvents.OnHullStateChanged -= OnHullChanged;
+            if (_playerHitEvent != null) _playerHitEvent.OnEventRaised -= OnPlayerHit;
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+            if (_hullEvent != null) _hullEvent.OnEventRaised -= OnHullChanged;
         }
 
         private void OnHullChanged(bool hasHull)
@@ -7151,9 +9402,11 @@ namespace DarkTowerTron.Managers
             // Only play feedback if we LOST the hull (became false)
             if (!lostHull) return;
 
-            if (AudioManager.Instance) AudioManager.Instance.PlaySound(hullBreakClip, 1.0f);
-            if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.5f, 0.7f); // Big shake
-            if (GameTime.Instance) GameTime.Instance.HitStop(0.2f); // Dramatic pause
+            if (Global.Audio != null) Global.Audio.PlaySound(hullBreakClip, 1.0f);
+
+            // Legacy Singletons (Consider refactoring these to Services later)
+            if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.5f, 0.7f);
+            if (Global.Time != null) Global.Time.HitStop(0.2f);
         }
 
         private void OnPlayerHit()
@@ -7172,137 +9425,32 @@ namespace DarkTowerTron.Managers
             if (profile == null) return;
 
             // 1. Audio
-            if (profile.sound && Managers.AudioManager.Instance)
-                Managers.AudioManager.Instance.PlaySound(profile.sound);
+            if (profile.sound && Global.Audio != null)
+                Global.Audio.PlaySound(profile.sound);
 
             // 2. Camera
-            if (Visuals.CameraShaker.Instance)
-                Visuals.CameraShaker.Instance.Shake(profile.shakeDuration, profile.shakeStrength);
+            if (CameraShaker.Instance)
+                CameraShaker.Instance.Shake(profile.shakeDuration, profile.shakeStrength);
 
             // 3. Time
-            if (Core.GameTime.Instance && profile.hitStopDuration > 0)
-                Core.GameTime.Instance.HitStop(profile.hitStopDuration);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\GameFeel.cs`
-- Lines: 98
-- Size: 3.0 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DG.Tweening; // Requires DOTween
-
-namespace DarkTowerTron.Core
-{
-    public class GameFeel : MonoBehaviour
-    {
-        public static GameFeel Instance;
-
-        [Header("Audio Settings")]
-        [SerializeField] private AudioSource _sfxSource;
-        [SerializeField] private AudioClip _hitClip;
-        [SerializeField] private AudioClip _killClip;
-        [SerializeField] private AudioClip _playerHurtClip;
-
-        private Camera _childCam; // The camera we shake (Child of Rig)
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-
-            // Find the Main Camera (which should be the Child of CameraRig)
-            _childCam = Camera.main;
-            if (_sfxSource == null) _sfxSource = GetComponent<AudioSource>();
-        }
-
-        private void OnEnable()
-        {
-            // Auto-hook into events for generic feedback
-            GameEvents.OnPlayerHit += OnPlayerHit;
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-        }
-
-        private void OnDisable()
-        {
-            GameEvents.OnPlayerHit -= OnPlayerHit;
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
-        }
-
-        // --- PUBLIC API ---
-
-        public void CameraShake(float duration, float strength)
-        {
-            if (_childCam == null) return;
-            // Shake local position so it doesn't fight the CameraRig's smooth follow
-            _childCam.transform.DOShakePosition(duration, strength, 20, 90, false, true);
-        }
-
-        public void HitStop(float duration)
-        {
-            if (Time.timeScale < 0.1f) return; // Don't stack stops
-            StartCoroutine(DoHitStop(duration));
-        }
-
-        // Updated API: Added 'randomizePitch' bool
-        public void PlaySound(AudioClip clip, float volume = 1f, bool randomizePitch = false)
-        {
-            if (!clip || !_sfxSource) return;
-
-            if (randomizePitch)
-            {
-                _sfxSource.pitch = Random.Range(0.9f, 1.1f);
-            }
-            else
-            {
-                _sfxSource.pitch = 1.0f;
-            }
-
-            _sfxSource.PlayOneShot(clip, volume);
-        }
-
-        // --- EVENT HANDLERS ---
-
-        private void OnPlayerHit()
-        {
-            PlaySound(_playerHurtClip);
-            CameraShake(0.3f, 0.5f); // Heavy shake on damage
-            HitStop(0.1f);
-        }
-
-        // Update the signature
-        private void OnEnemyKilled(Vector3 pos, DarkTowerTron.Core.Data.EnemyStatsSO stats, bool rewardPlayer)
-        {
-            PlaySound(_killClip, 0.8f);
-            CameraShake(0.15f, 0.2f); 
-        }
-
-        // --- INTERNAL ---
-
-        System.Collections.IEnumerator DoHitStop(float duration)
-        {
-            Time.timeScale = 0.0f;
-            yield return new WaitForSecondsRealtime(duration);
-            Time.timeScale = 1.0f;
+            if (Global.Time != null && profile.hitStopDuration > 0)
+                Global.Time.HitStop(profile.hitStopDuration);
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Managers\GameSession.cs`
-- Lines: 172
+- Lines: 173
 - Size: 5.1 KB
-- Modified: 2025-12-31 17:13
+- Modified: 2026-01-06 10:38
 
 ```csharp
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player;
+using DarkTowerTron.Player.Stats;
+using DarkTowerTron.UI;
 
 namespace DarkTowerTron.Managers
 {
@@ -7473,174 +9621,10 @@ namespace DarkTowerTron.Managers
 }
 ```
 
-## 📄 `Assets\Scripts\Managers\HUDManager.cs`
-- Lines: 156
-- Size: 5.3 KB
-- Modified: 2026-01-01 19:24
-
-```csharp
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
-using TMPro; // TextMeshPro
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Managers
-{
-    public class HUDManager : MonoBehaviour
-    {
-        [Header("Focus (Energy)")]
-        public Slider focusSlider;
-        public Image focusFillImage;
-        public Color normalFocusColor = Color.cyan;
-        public Color fullFocusColor = new Color(1f, 0f, 1f); // Purple/Pink for Overdrive
-
-        [Header("Grit (Health)")]
-        public Transform gritContainer; // Assign a HorizontalLayoutGroup object here
-        public GameObject pipPrefab;    // Prefab with just an Image component
-        public Color activePipColor = Color.white;
-        public Color inactivePipColor = new Color(1, 1, 1, 0.2f); // Faded
-
-        [Header("Hull (Shield)")]
-        public Image hullIcon;
-        public Color hullActiveColor = Color.cyan;
-        public Color hullBrokenColor = new Color(1, 0, 0, 0.3f);
-
-        [Header("Score & System")]
-        public TextMeshProUGUI scoreText;
-        public TextMeshProUGUI multiplierText;
-        public TextMeshProUGUI timerText;
-
-        // Internal State
-        private List<Image> _spawnedPips = new List<Image>();
-
-        private void OnEnable()
-        {
-            GameEvents.OnFocusChanged += UpdateFocus;
-            GameEvents.OnGritChanged += UpdateGrit;
-            GameEvents.OnHullStateChanged += UpdateHull;
-            GameEvents.OnScoreChanged += UpdateScoreUI;
-        }
-
-        private void OnDisable()
-        {
-            GameEvents.OnFocusChanged -= UpdateFocus;
-            GameEvents.OnGritChanged -= UpdateGrit;
-            GameEvents.OnHullStateChanged -= UpdateHull;
-            GameEvents.OnScoreChanged -= UpdateScoreUI;
-        }
-
-        private void Update()
-        {
-            // Update Timer every frame directly from Manager (no event needed)
-            if (timerText && ScoreManager.Instance)
-            {
-                float t = ScoreManager.Instance.GameTime;
-                string minutes = Mathf.Floor(t / 60).ToString("00");
-                string seconds = (t % 60).ToString("00");
-                timerText.text = $"{minutes}:{seconds}";
-            }
-        }
-
-        // --- EVENT HANDLERS ---
-
-        private void UpdateFocus(float current, float max)
-        {
-            if (focusSlider)
-            {
-                // Ensure slider is 0-1
-                focusSlider.value = current / max;
-            }
-
-            if (focusFillImage)
-            {
-                // Visual feedback for Overdrive (Full Bar)
-                bool isFull = current >= (max * 0.8f); // 80% threshold
-                focusFillImage.color = isFull ? fullFocusColor : normalFocusColor;
-            }
-        }
-
-        private void UpdateGrit(int currentGrit, int maxGrit)
-        {
-
-            // 1. Check if we need to rebuild the layout
-            // (Happens on Start or if Max HP changes via Upgrade)
-            if (_spawnedPips.Count != maxGrit)
-            {
-                RebuildGritLayout(maxGrit);
-            }
-
-            // 2. Update Colors
-            for (int i = 0; i < _spawnedPips.Count; i++)
-            {
-                if (_spawnedPips[i] == null) continue;
-
-                // Example: Grit 2. 
-                // i=0 (<2) -> Active. 
-                // i=1 (<2) -> Active. 
-                // i=2 (>=2) -> Inactive.
-                _spawnedPips[i].color = (i < currentGrit) ? activePipColor : inactivePipColor;
-            }
-        }
-
-        private void UpdateHull(bool hasHull)
-        {
-            if (hullIcon)
-            {
-                GameLogger.Log(LogChannel.UI, $"[HUDManager] Updating Hull Icon. Has Hull: {hasHull}", gameObject);
-
-                Color targetColor = hasHull ? hullActiveColor : hullBrokenColor;
-                hullIcon.color = targetColor;
-            }else{
-                GameLogger.Log(LogChannel.UI, $"[HUDManager] Hull Icon reference is missing!", gameObject);
-            }
-        }
-
-        private void UpdateScoreUI(int score, int multiplier)
-        {
-            if (scoreText) scoreText.text = score.ToString("N0");
-            if (multiplierText) multiplierText.text = $"x{multiplier}";
-        }
-
-        // --- HELPERS ---
-
-        private void RebuildGritLayout(int max)
-        {
-
-            GameLogger.Log(LogChannel.UI, $"[HUDManager] Rebuilding Grit Layout for Max Grit: {max}", gameObject);
-
-            if (gritContainer == null || pipPrefab == null) return;
-
-            // Clear existing
-            foreach (Transform child in gritContainer)
-            {
-                Destroy(child.gameObject);
-            }
-            _spawnedPips.Clear();
-
-            // Spawn new
-            for (int i = 0; i < max; i++)
-            {
-
-                GameLogger.Log(LogChannel.UI, $"[HUDManager] Spawning Grit Pip {i + 1}/{max}", gameObject);
-
-                GameObject newPip = Instantiate(pipPrefab, gritContainer);
-                Image img = newPip.GetComponent<Image>();
-                if (img)
-                {
-                    GameLogger.Log(LogChannel.UI, $"[HUDManager] Successfully spawned pip and added to list.", newPip);
-                    _spawnedPips.Add(img);
-                }
-            }
-        }
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Managers\LevelBuilder.cs`
 - Lines: 43
 - Size: 1.1 KB
-- Modified: 2025-12-31 17:13
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -7688,552 +9672,10 @@ namespace DarkTowerTron.Managers
 }
 ```
 
-## 📄 `Assets\Scripts\Managers\MusicManager.cs`
-- Lines: 53
-- Size: 1.5 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DG.Tweening; // For smooth pitch fade
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Managers
-{
-    [RequireComponent(typeof(AudioSource))]
-    public class MusicManager : MonoBehaviour
-    {
-        private AudioSource _source;
-        private float _originalPitch;
-        private float _originalVolume;
-
-        private void Awake()
-        {
-            _source = GetComponent<AudioSource>();
-            _originalPitch = _source.pitch;
-            _originalVolume = _source.volume;
-        }
-
-        private void OnEnable()
-        {
-            GameEvents.OnPlayerDied += OnDeath;
-        }
-
-        private void OnDisable()
-        {
-            GameEvents.OnPlayerDied -= OnDeath;
-        }
-
-        private void Start()
-        {
-            // Ensure loop is on
-            _source.loop = true;
-            if (!_source.isPlaying) _source.Play();
-        }
-
-        private void OnDeath()
-        {
-            // The "Power Down" Effect
-            // Drop pitch to 0.5 and volume to 0.5 over 1 second
-            _source.DOPitch(_originalPitch * 0.5f, 1.0f).SetUpdate(true); // SetUpdate(true) ignores Time.timeScale = 0
-            _source.DOFade(_originalVolume * 0.5f, 1.0f).SetUpdate(true);
-        }
-
-        // Called automatically when scene reloads
-        public void ResetMusic()
-        {
-            _source.pitch = _originalPitch;
-            _source.volume = _originalVolume;
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\PaletteManager.cs`
-- Lines: 146
-- Size: 5.5 KB
-- Modified: 2025-12-31 17:13
-
-```csharp
-using UnityEngine;
-using System;
-using System.Collections.Generic;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core;
-using DarkTowerTron.Visuals; // For Receiver
-
-namespace DarkTowerTron.Managers
-{
-    [ExecuteAlways]
-    public class PaletteManager : MonoBehaviour
-    {
-        public static PaletteManager Instance;
-        public ColorPaletteSO activePalette;
-
-        // Event for Receivers
-        public event Action OnPaletteChanged;
-
-        [Header("Actor Collections")]
-        public MaterialCollectionSO playerPrimaryCols;
-        public MaterialCollectionSO playerSecondaryCols;
-        public MaterialCollectionSO playerTertiaryCols;
-
-        public MaterialCollectionSO enemyPrimaryCols;
-        public MaterialCollectionSO enemySecondaryCols;
-        public MaterialCollectionSO enemyTertiaryCols;
-
-        [Header("Environment Collections")]
-        public MaterialCollectionSO floorCols;
-        public MaterialCollectionSO wallCols;
-        public MaterialCollectionSO hazardCols;
-        public MaterialCollectionSO projectileHostileCols;
-        public MaterialCollectionSO projectileFriendlyCols;
-
-        public bool refreshNow = false;
-
-        private void Awake()
-        {
-            if (Application.isPlaying)
-            {
-                if (Instance == null) Instance = this;
-                else Destroy(gameObject);
-            }
-            else
-            {
-                // In Editor mode, allow temporary instance
-                Instance = this;
-            }
-        }
-
-        private void Update()
-        {
-            if (refreshNow)
-            {
-                ApplyPalette();
-                refreshNow = false;
-            }
-        }
-
-        private void Start()
-        {
-            if (Application.isPlaying) ApplyPalette();
-        }
-
-        public void ApplyPalette()
-        {
-            if (activePalette == null) return;
-
-            // 1. Player (Global Materials)
-            ApplySurface(playerPrimaryCols, activePalette.playerPrimary);
-            ApplySurface(playerSecondaryCols, activePalette.playerSecondary);
-            ApplySurface(playerTertiaryCols, activePalette.playerTertiary);
-
-            // 2. Enemies (Global Materials)
-            ApplySurface(enemyPrimaryCols, activePalette.enemyPrimary);
-            ApplySurface(enemySecondaryCols, activePalette.enemySecondary);
-            ApplySurface(enemyTertiaryCols, activePalette.enemyTertiary);
-
-            // 3. Environment (Global Materials)
-            ApplySurface(floorCols, activePalette.floor);
-            ApplySurface(wallCols, activePalette.walls);
-            ApplySurface(hazardCols, activePalette.hazards);
-            ApplySurface(projectileHostileCols, activePalette.projectileHostile);
-            ApplySurface(projectileFriendlyCols, activePalette.projectileFriendly);
-
-            if (Camera.main)
-                Camera.main.backgroundColor = activePalette.skyColor;
-
-            // 2. Notify Actors (Local Property Blocks)
-            OnPaletteChanged?.Invoke();
-
-            // Force update editor-time receivers
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                var receivers = FindObjectsOfType<PaletteReceiver>();
-                foreach (var r in receivers) r.ManualRefresh();
-            }
-#endif
-
-            GameLogger.Log(LogChannel.VFX, $"Palette Applied: {activePalette.name}", this.gameObject);
-        }
-
-        // ApplySurface helper remains the same...
-        private void ApplySurface(MaterialCollectionSO collection, SurfaceDefinition surf)
-        {
-            if (collection == null || collection.materials == null) return;
-            foreach (var mat in collection.materials)
-            {
-                if (mat == null) continue;
-
-                // --- 1. BASE COLOR ---
-                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", surf.mainColor);
-                else if (mat.HasProperty("_Color")) mat.SetColor("_Color", surf.mainColor);
-
-                // --- 2. GLOW / EMISSION (The Fix) ---
-                // Option A: Standard URP Lit
-                if (mat.HasProperty("_EmissionColor"))
-                {
-                    // Use the specific emission color defined in the palette
-                    mat.SetColor("_EmissionColor", surf.emissionColor);
-                    // Handle Intensity (HDR math)
-                    // If the shader supports a separate intensity float, set it.
-                    // Otherwise, we assume surf.emissionColor already has HDR intensity baked in.
-                    if (mat.HasProperty("_EmissionIntensity"))
-                    {
-                        mat.SetFloat("_EmissionIntensity", surf.emissionIntensity);
-                    }
-                    mat.EnableKeyword("_EMISSION");
-                }
-                // Option B: Your Custom Shader (GlowColor)
-                // We check for the specific reference name used in Shader Graph
-                else if (mat.HasProperty("_GlowColor"))
-                {
-                    // Combine Color * Intensity for the final HDR result
-                    Color finalGlow = surf.emissionColor * Mathf.LinearToGammaSpace(surf.emissionIntensity);
-                    mat.SetColor("_GlowColor", finalGlow);
-                }
-
-                // --- 3. PHYSICS ---
-                if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", surf.smoothness);
-                if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", surf.metallic);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\PoolManager.cs`
-- Lines: 87
-- Size: 3.0 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using System.Collections.Generic;
-using DarkTowerTron.Core; // For IPoolable
-
-namespace DarkTowerTron.Managers
-{
-    public class PoolManager : MonoBehaviour
-    {
-        public static PoolManager Instance;
-
-        // Dictionary mapping Prefab InstanceID -> Queue of Objects
-        private Dictionary<int, Queue<GameObject>> _poolDictionary = new Dictionary<int, Queue<GameObject>>();
-        // Dictionary mapping Spawned Object InstanceID -> Prefab InstanceID
-        private Dictionary<int, int> _spawnedObjectsParentId = new Dictionary<int, int>();
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
-
-        public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
-        {
-            int poolKey = prefab.GetInstanceID();
-
-            if (!_poolDictionary.ContainsKey(poolKey))
-            {
-                _poolDictionary.Add(poolKey, new Queue<GameObject>());
-            }
-
-            GameObject objectToSpawn;
-
-            if (_poolDictionary[poolKey].Count > 0)
-            {
-                objectToSpawn = _poolDictionary[poolKey].Dequeue();
-                // Move before waking up to prevent visual flicker/logic errors
-                objectToSpawn.transform.position = position;
-                objectToSpawn.transform.rotation = rotation;
-                objectToSpawn.SetActive(true);
-            }
-            else
-            {
-                objectToSpawn = Instantiate(prefab, position, rotation);
-            }
-
-            // Call IPoolable.OnSpawn
-            var poolables = objectToSpawn.GetComponentsInChildren<IPoolable>();
-            foreach (var p in poolables) p.OnSpawn();
-
-            // Track relationship
-            int instanceKey = objectToSpawn.GetInstanceID();
-            if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
-            {
-                _spawnedObjectsParentId.Add(instanceKey, poolKey);
-            }
-
-            return objectToSpawn;
-        }
-
-        public void Despawn(GameObject obj)
-        {
-            int instanceKey = obj.GetInstanceID();
-
-            if (_spawnedObjectsParentId.ContainsKey(instanceKey))
-            {
-                // Call IPoolable.OnDespawn
-                var poolables = obj.GetComponentsInChildren<IPoolable>();
-                foreach (var p in poolables) p.OnDespawn();
-
-                int poolKey = _spawnedObjectsParentId[instanceKey];
-
-                // CRITICAL FIX-001: Remove tracking entry to prevent memory leak
-                _spawnedObjectsParentId.Remove(instanceKey);
-
-                obj.SetActive(false);
-                obj.transform.SetParent(transform);
-
-                _poolDictionary[poolKey].Enqueue(obj);
-            }
-            else
-            {
-                // Not a pooled object? Just destroy it.
-                Destroy(obj);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\ScoreManager.cs`
-- Lines: 98
-- Size: 2.7 KB
-- Modified: 2025-12-31 17:13
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
-
-namespace DarkTowerTron.Managers
-{
-    public class ScoreManager : MonoBehaviour
-    {
-        public static ScoreManager Instance;
-
-        [Header("Score Settings")]
-        public int baseScorePerKill = 100;
-        public int gloryKillBonus = 500;
-
-        [Header("Multiplier Settings")]
-        public int currentMultiplier = 1;
-        public int maxMultiplier = 5;
-
-        public int TotalScore { get; private set; }
-        public float GameTime { get; private set; }
-
-        private bool _isTracking = false;
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
-
-        private void Start()
-        {
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            GameEvents.OnPlayerHit += OnPlayerHit;
-            _isTracking = true;
-            UpdateUI();
-        }
-
-        private void OnDestroy()
-        {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
-            GameEvents.OnPlayerHit -= OnPlayerHit;
-        }
-
-        private void Update()
-        {
-            if (_isTracking) GameTime += Time.deltaTime;
-        }
-
-        // --- FIXED METHOD SIGNATURE ---
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
-        {
-            if (!rewardPlayer) return;
-
-            // Determine score from Stats asset, or use default if missing
-            int scoreValue = (stats != null) ? stats.scoreValue : baseScorePerKill;
-
-            // Apply Multiplier
-            AddScore(scoreValue * currentMultiplier);
-
-            // Increase Multiplier
-            if (currentMultiplier < maxMultiplier)
-            {
-                currentMultiplier++;
-                UpdateUI();
-            }
-        }
-        // -----------------------------
-
-        private void OnPlayerHit()
-        {
-            if (currentMultiplier > 1)
-            {
-                currentMultiplier = 1;
-                UpdateUI();
-            }
-        }
-
-        public void StopTracking() { _isTracking = false; }
-
-        public void AddScore(int amount)
-        {
-            TotalScore += amount;
-            UpdateUI();
-        }
-
-        public void TriggerGloryKillBonus()
-        {
-            int bonus = gloryKillBonus * currentMultiplier;
-            GameLogger.Log(LogChannel.Combat, $"<color=yellow>GLORY KILL! +{bonus}</color>", this.gameObject);
-            AddScore(bonus);
-        }
-
-        private void UpdateUI()
-        {
-            GameEvents.OnScoreChanged?.Invoke(TotalScore, currentMultiplier);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\UIManager.cs`
-- Lines: 35
-- Size: 1.3 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-
-namespace DarkTowerTron.Managers
-{
-    public class UIManager : MonoBehaviour
-    {
-        [Header("Panels")]
-        public GameObject startPanel;
-        public GameObject tutorialPanel;
-        public GameObject hudPanel;
-        public GameObject pausePanel;
-        public GameObject gameOverPanel;
-        public GameObject victoryPanel;
-
-        public void ShowStartMenu() => SetPanelActive(startPanel);
-        public void ShowTutorial() => SetPanelActive(tutorialPanel);
-        public void ShowHUD() => SetPanelActive(hudPanel);
-        public void ShowPause() => SetPanelActive(pausePanel);
-        public void ShowGameOver() => SetPanelActive(gameOverPanel);
-        public void ShowVictory() => SetPanelActive(victoryPanel);
-
-        // Helper to ensure exclusive visibility
-        private void SetPanelActive(GameObject activePanel)
-        {
-            if (startPanel) startPanel.SetActive(false);
-            if (tutorialPanel) tutorialPanel.SetActive(false);
-            if (hudPanel) hudPanel.SetActive(false);
-            if (pausePanel) pausePanel.SetActive(false);
-            if (gameOverPanel) gameOverPanel.SetActive(false);
-            if (victoryPanel) victoryPanel.SetActive(false);
-
-            if (activePanel) activePanel.SetActive(true);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Managers\VFXManager.cs`
-- Lines: 75
-- Size: 2.6 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-
-namespace DarkTowerTron.Managers
-{
-    public class VFXManager : MonoBehaviour
-    {
-        public static VFXManager Instance;
-
-        [Header("Prefabs")]
-        public GameObject explosionPrefab;
-        public GameObject spawnPrefab;
-
-        [Header("Settings")]
-        public LayerMask groundLayer; // Set to 'Ground', 'Default', 'Wall'
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-
-            // Default mask if forgotten
-            if (groundLayer == 0) groundLayer = LayerMask.GetMask("Ground", "Default", "Wall");
-        }
-
-        private void OnEnable()
-        {
-            GameEvents.OnEnemyKilled += PlayDeathVFX;
-            GameEvents.OnEnemySpawned += PlaySpawnVFX;
-        }
-
-        private void OnDisable()
-        {
-            GameEvents.OnEnemyKilled -= PlayDeathVFX;
-            GameEvents.OnEnemySpawned -= PlaySpawnVFX;
-        }
-
-        private void PlayDeathVFX(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
-        {
-            if (explosionPrefab && PoolManager.Instance)
-            {
-                // Explosion happens exactly where the enemy died (center mass)
-                GameObject vfx = PoolManager.Instance.Spawn(explosionPrefab, pos, Quaternion.identity);
-                var ps = vfx.GetComponent<ParticleSystem>();
-                if (ps) ps.Play();
-            }
-        }
-
-        private void PlaySpawnVFX(Vector3 pos)
-        {
-            if (spawnPrefab && PoolManager.Instance)
-            {
-                // FIX: Find the actual floor below the spawn position
-                Vector3 vfxPos = pos;
-
-                // Cast from slightly above the spawn point downwards
-                if (UnityEngine.Physics.Raycast(pos + Vector3.up * 2.0f, Vector3.down, out RaycastHit hit, 10f, groundLayer))
-                {
-                    // Found ground! Snap visual to it + slight offset to prevent z-fighting
-                    vfxPos = hit.point + Vector3.up * 0.1f;
-                }
-                else
-                {
-                    // Fallback: Just put it at the enemy's feet (assuming pos is feet)
-                    vfxPos = pos + Vector3.up * 0.1f;
-                }
-
-                GameObject vfx = PoolManager.Instance.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
-                var ps = vfx.GetComponent<ParticleSystem>();
-                if (ps) ps.Play();
-            }
-        }
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Managers\WaveDirector.cs`
-- Lines: 193
-- Size: 6.6 KB
-- Modified: 2025-12-31 17:13
+- Lines: 218
+- Size: 7.5 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -8241,22 +9683,27 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+using DarkTowerTron.Core.Services;    // For Logger
 
 namespace DarkTowerTron.Managers
 {
     [RequireComponent(typeof(ArenaSpawner))]
     public class WaveDirector : MonoBehaviour
     {
+        [Header("Wiring")]
+        [Tooltip("Listens for enemy deaths to track wave progress.")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+
         [Header("Configuration")]
         public List<WaveDefinitionSO> waves;
         public float timeBetweenWaves = 3.0f;
 
+        // Internal State
         private ArenaSpawner _spawner;
-
         private int _currentWaveIndex = 0;
         private int _essentialEnemiesAlive = 0;
         private int _gruntsAlive = 0;
-
         private bool _isSpawningMain = false;
         private bool _gameStarted = false;
         private Coroutine _gruntRoutine;
@@ -8266,8 +9713,19 @@ namespace DarkTowerTron.Managers
             _spawner = GetComponent<ArenaSpawner>();
         }
 
-        private void OnEnable() => GameEvents.OnEnemyKilled += OnEnemyKilled;
-        private void OnDisable() => GameEvents.OnEnemyKilled -= OnEnemyKilled;
+        private void OnEnable()
+        {
+            if (_enemyKilledEvent != null) 
+                _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent != null) 
+                _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+        }
+
+        // --- PUBLIC API ---
 
         public void StartGame()
         {
@@ -8276,9 +9734,11 @@ namespace DarkTowerTron.Managers
             StartCoroutine(StartGameRoutine());
         }
 
+        // --- CORE LOGIC ---
+
         private IEnumerator StartGameRoutine()
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.5f);
             StartCoroutine(RunWave(_currentWaveIndex));
         }
 
@@ -8288,29 +9748,33 @@ namespace DarkTowerTron.Managers
             if (index >= waves.Count)
             {
                 GameLogger.Log(LogChannel.System, "ROOM CLEARED", gameObject);
-                // Open the doors. Boss script will handle Victory separately.
-                GameEvents.OnRoomCleared?.Invoke();
+                
+                // Triggers doors opening, etc.
+                GameEvents.OnRoomCleared?.Invoke(); 
                 yield break;
             }
 
             WaveDefinitionSO wave = waves[index];
-            GameLogger.Log(LogChannel.System, $"WAVE {index + 1}: {wave.waveName}", gameObject);
+            GameLogger.Log(LogChannel.System, $"STARTING WAVE {index + 1}: {wave.waveName}", gameObject);
 
-            // --- COUNTDOWN ---
+            // --- UI ANNOUNCEMENT (Legacy Static Events) ---
             GameEvents.OnWaveAnnounce?.Invoke(index);
             yield return new WaitForSeconds(1.0f);
-            for (int c = 3; c > 0; c--)
-            {
-                GameEvents.OnCountdownChange?.Invoke(c.ToString());
-                yield return new WaitForSeconds(1.0f);
-            }
+            
+            GameEvents.OnCountdownChange?.Invoke("3");
+            yield return new WaitForSeconds(1.0f);
+            GameEvents.OnCountdownChange?.Invoke("2");
+            yield return new WaitForSeconds(1.0f);
+            GameEvents.OnCountdownChange?.Invoke("1");
+            yield return new WaitForSeconds(1.0f);
+            
             GameEvents.OnCountdownChange?.Invoke("ENGAGE");
             GameEvents.OnWaveCombatStarted?.Invoke();
             yield return new WaitForSeconds(0.5f);
             GameEvents.OnCountdownChange?.Invoke("");
             // -----------------
 
-            // Reset
+            // Reset Counters
             _isSpawningMain = true;
             _essentialEnemiesAlive = 0;
             _gruntsAlive = 0;
@@ -8330,6 +9794,9 @@ namespace DarkTowerTron.Managers
             }
 
             _isSpawningMain = false;
+            
+            // Check victory in case everything died while we were still spawning
+            CheckVictory();
         }
 
         private IEnumerator GruntLogic(WaveDefinitionSO wave)
@@ -8337,7 +9804,7 @@ namespace DarkTowerTron.Managers
             if (wave.maxGrunts <= 0 || wave.gruntPrefabs == null || wave.gruntPrefabs.Length == 0)
                 yield break;
 
-            // Anchor Logic: Keep spawning ONLY while VIPs are alive
+            // Anchor Logic: Keep spawning ONLY while VIPs are alive (or main force is still spawning)
             while (_essentialEnemiesAlive > 0 || _isSpawningMain)
             {
                 if (_gruntsAlive < wave.maxGrunts)
@@ -8349,24 +9816,16 @@ namespace DarkTowerTron.Managers
             }
         }
 
-        // Updated Spawn Method
         private void SpawnEnemy(GameObject prefab, int forcedIndex)
         {
-            if (_spawner == null) return;
-            
-            if (prefab == null)
-            {
-                GameLogger.LogError(LogChannel.System, $"WaveDirector: Attempted to spawn NULL prefab.", gameObject);
-                return;
-            }
+            if (_spawner == null || prefab == null) return;
 
-            // CRITICAL FIX-002: Get the actual spawned instance
+            // Spawn via Pool
             GameObject instance = _spawner.SpawnEnemy(prefab, forcedIndex);
-
             if (instance == null) return;
 
-            // Check the INSTANCE stats, not the PREFAB stats
-            var motor = instance.GetComponentInChildren<DarkTowerTron.Enemy.EnemyMotor>();
+            // Determine if Essential based on the Instance's Stats
+            var motor = instance.GetComponent<DarkTowerTron.Enemy.EnemyMotor>();
             bool countAsEssential = false;
 
             if (motor != null && motor.stats != null)
@@ -8375,7 +9834,7 @@ namespace DarkTowerTron.Managers
             }
             else
             {
-                GameLogger.LogWarning(LogChannel.System, $"Enemy {instance.name} missing Stats! Defaulting to Essential.", instance);
+                // Fallback for safety
                 countAsEssential = true;
             }
 
@@ -8383,15 +9842,19 @@ namespace DarkTowerTron.Managers
             else _gruntsAlive++;
         }
 
+        // --- EVENT HANDLERS ---
+
         private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!_gameStarted) return;
 
+            // Logic: Identify who died based on the Stats passed by the event
             if (stats != null && stats.isEssential)
             {
                 _essentialEnemiesAlive--;
+                GameLogger.Log(LogChannel.System, $"VIP Killed. Remaining: {_essentialEnemiesAlive}", gameObject);
 
-                // ANCHOR: If VIPs are dead, cut the reinforcement line immediately
+                // Cut reinforcements immediately if VIPs are dead
                 if (_essentialEnemiesAlive <= 0)
                 {
                     if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
@@ -8403,7 +9866,10 @@ namespace DarkTowerTron.Managers
                 _gruntsAlive--;
             }
 
-            // Check victory on EVERY death (Grunt or VIP)
+            // Safety clamp
+            if (_essentialEnemiesAlive < 0) _essentialEnemiesAlive = 0;
+            if (_gruntsAlive < 0) _gruntsAlive = 0;
+
             CheckVictory();
         }
 
@@ -8416,7 +9882,8 @@ namespace DarkTowerTron.Managers
 
                 if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
 
-                GameEvents.OnWaveCleared?.Invoke();
+                GameEvents.OnWaveCleared?.Invoke(); // UI/FX Feedback
+                
                 _currentWaveIndex++;
                 StartCoroutine(NextWaveRoutine());
             }
@@ -8434,7 +9901,7 @@ namespace DarkTowerTron.Managers
 ## 📄 `Assets\Scripts\Physics\KinematicMover.cs`
 - Lines: 276
 - Size: 11.2 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
@@ -8485,7 +9952,7 @@ namespace DarkTowerTron.Physics
         {
             _capsule = GetComponent<CapsuleCollider>();
             if (Camera.main) _camTransform = Camera.main.transform;
-            if (_obstacleMask == 0) _obstacleMask = 1;
+            if (_obstacleMask == 0) _obstacleMask = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
 
         public void Move(Vector3 desiredVelocity)
@@ -8715,87 +10182,44 @@ namespace DarkTowerTron.Physics
 }
 ```
 
-## 📄 `Assets\Scripts\Player\AfterImage.cs`
-- Lines: 34
-- Size: 0.9 KB
-- Modified: 2025-12-31 09:17
+## 📄 `Assets\Scripts\Player\Combat\PlayerBeam.cs`
+- Lines: 83
+- Size: 2.8 KB
+- Modified: 2026-01-06 09:39
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Core;
+using DarkTowerTron.Core; // DamageInfo
 using DG.Tweening;
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
 
-namespace DarkTowerTron.Player
+namespace DarkTowerTron.Player.Combat
 {
-    public class AfterImage : MonoBehaviour
-    {
-        public float lifetime = 1.0f; // Decoy lasts 1 second (longer than dash)
-
-        private void Start()
-        {
-            // 1. Notify Enemies: "Look at me!"
-            GameEvents.OnDecoySpawned?.Invoke(transform);
-
-            // 2. Visual Fade
-            Renderer rend = GetComponentInChildren<Renderer>();
-            if (rend)
-            {
-                // Fade alpha to 0
-                rend.material.DOFade(0f, lifetime).SetEase(Ease.Linear);
-            }
-
-            // 3. Self Destruct
-            Destroy(gameObject, lifetime);
-        }
-
-        private void OnDestroy()
-        {
-            // 4. Notify Enemies: "I'm dead, look at Player!"
-            GameEvents.OnDecoyExpired?.Invoke();
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\PlayerBeam.cs`
-- Lines: 84
-- Size: 2.7 KB
-- Modified: 2025-12-31 12:25
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DG.Tweening;
-
-namespace DarkTowerTron.Player
-{
-    // RENAMED: Was PlayerAttack
     public class PlayerBeam : WeaponBase
     {
         [Header("Beam Specifics")]
         public float range = 7f;
         public float beamRadius = 0.5f;
         public float selfRecoil = 15f;
-        public LayerMask hitLayers;
         public GameObject beamVisualPrefab;
 
-        private PlayerMovement _movement;
+        private DarkTowerTron.Player.Movement.PlayerMovement _movement;
 
         protected override void Awake()
         {
             base.Awake();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<DarkTowerTron.Player.Movement.PlayerMovement>();
         }
 
-        // Implement Abstract Method from WeaponBase
         protected override float GetCurrentFireRate()
         {
-            // Read specific Beam stat
             return _stats.BeamRate;
         }
 
         protected override void Fire()
         {
+            // Use Smart Aim (Magnetism)
             Vector3 fireDir = GetAimDirection();
 
             // 1. Visuals
@@ -8820,7 +10244,10 @@ namespace DarkTowerTron.Player
             }
 
             // 3. Hit Detection
-            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, hitLayers))
+            // Use Mask from Constants
+            int mask = GameConstants.MASK_WALLS | (1 << GameConstants.LAYER_ENEMY);
+
+            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, mask))
             {
                 IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
 
@@ -8828,20 +10255,17 @@ namespace DarkTowerTron.Player
                 {
                     DamageInfo info = new DamageInfo
                     {
-                        // Read Stats
                         damageAmount = _stats.BeamDamage,
                         staggerAmount = _stats.BeamStagger,
-
                         pushDirection = fireDir,
                         pushForce = 10f,
-                        source = gameObject
-                        ,
-                        // NEW: Explicitly Melee
+                        source = gameObject,
                         damageType = DamageType.Melee
                     };
 
                     target.TakeDamage(info);
-                    GameEvents.OnPlayerHit?.Invoke();
+
+                    // Optional: Call Global.Audio.PlaySound(hitSound) here
                 }
             }
         }
@@ -8849,606 +10273,39 @@ namespace DarkTowerTron.Player
 }
 ```
 
-## 📄 `Assets\Scripts\Player\PlayerController.cs`
-- Lines: 216
-- Size: 6.9 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using UnityEngine.InputSystem;
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Player
-{
-    [RequireComponent(typeof(PlayerMovement))]
-    [RequireComponent(typeof(PlayerDodge))]
-    [RequireComponent(typeof(PlayerExecution))]
-    public class PlayerController : MonoBehaviour
-    {
-        [Header("Components")]
-        private PlayerMovement _movement;
-        private PlayerDodge _dodge;
-        private PlayerExecution _execution;
-        private TargetScanner _scanner;
-
-        // Weapon References
-        private PlayerBeam _beamWeapon; // Left Trigger / LMB
-        private PlayerGun _gunWeapon;     // Right Trigger / RMB
-
-        // Input State
-        private GameControls _controls;
-        private bool _inputEnabled = true;
-        private float _safetyTimer = 0f; // Prevents UI clicks from firing weapons
-        private Camera _cam;
-
-        // Cached Actions (Optimization)
-        private InputAction _moveAction;
-        private InputAction _lookPadAction;
-        private InputAction _lookMouseAction;
-        private InputAction _fireBeamAction;
-        private InputAction _fireGunAction;
-
-        private void Awake()
-        {
-            // 1. Get Components
-            _movement = GetComponent<PlayerMovement>();
-            _dodge = GetComponent<PlayerDodge>();
-            _execution = GetComponent<PlayerExecution>();
-            _scanner = GetComponent<TargetScanner>();
-
-            _beamWeapon = GetComponent<PlayerBeam>();
-            _gunWeapon = GetComponent<PlayerGun>();
-
-            _cam = Camera.main;
-
-            // 2. Initialize Input System
-            _controls = new GameControls();
-
-            // 3. Cache Actions
-            _moveAction = _controls.Gameplay.Move;
-            _lookPadAction = _controls.Gameplay.LookGamepad;
-            _lookMouseAction = _controls.Gameplay.LookMouse;
-
-            // Use safe lookups
-            _fireBeamAction = _controls.asset.FindAction("Melee");
-            _fireGunAction = _controls.asset.FindAction("Gun");
-
-            // 4. Bind One-Shot Actions
-            var dodgeAction = _controls.asset.FindAction("Blitz");
-            if (dodgeAction != null) dodgeAction.performed += ctx => OnDodge();
-
-            var killAction = _controls.asset.FindAction("GloryKill");
-            if (killAction != null) killAction.performed += ctx => OnGloryKill();
-
-            // NEW: Register self
-            GameServices.RegisterPlayer(this);
-        }
-
-        private void OnEnable()
-        {
-            if (_inputEnabled) _controls.Enable();
-        }
-
-        private void OnDisable()
-        {
-            _controls.Disable();
-        }
-
-        private void Update()
-        {
-            if (!_inputEnabled) return;
-
-            // SAFETY CHECK:
-            // Prevents shooting immediately after clicking a UI button
-            if (_safetyTimer > 0)
-            {
-                _safetyTimer -= Time.deltaTime;
-
-                // Ensure weapons are silent while safety is active
-                if (_beamWeapon) _beamWeapon.SetFiring(false);
-                if (_gunWeapon) _gunWeapon.SetFiring(false);
-
-                // Still allow movement processing so it doesn't feel stuck
-                HandleMovement();
-                return;
-            }
-
-            // Normal Loop
-            HandleMovement();
-            HandleAimingAndScanning();
-            HandleFiring();
-        }
-
-        // --- INPUT HANDLERS ---
-
-        private void HandleMovement()
-        {
-            if (_moveAction == null) return;
-
-            Vector2 input = _moveAction.ReadValue<Vector2>();
-            Vector3 dir = new Vector3(input.x, 0, input.y).normalized;
-
-            _movement.SetMoveInput(dir);
-        }
-
-        private void HandleAimingAndScanning()
-        {
-            Vector3 aimDir = transform.forward;
-
-            // Priority 1: Gamepad Stick
-            if (_lookPadAction != null)
-            {
-                Vector2 stickInput = _lookPadAction.ReadValue<Vector2>();
-                if (stickInput.sqrMagnitude > 0.05f)
-                {
-                    aimDir = new Vector3(stickInput.x, 0, stickInput.y).normalized;
-                    _movement.LookAtDirection(aimDir);
-                    UpdateScanner(aimDir);
-                    return; // Stick overrides mouse
-                }
-            }
-
-            // Priority 2: Mouse Position
-            if (_lookMouseAction != null)
-            {
-                Vector2 mousePos = _lookMouseAction.ReadValue<Vector2>();
-                Ray ray = _cam.ScreenPointToRay(mousePos);
-                Plane ground = new Plane(Vector3.up, Vector3.zero);
-
-                if (ground.Raycast(ray, out float enter))
-                {
-                    Vector3 worldPoint = ray.GetPoint(enter);
-                    Vector3 lookDir = (worldPoint - transform.position);
-                    lookDir.y = 0;
-
-                    if (lookDir != Vector3.zero)
-                    {
-                        aimDir = lookDir.normalized;
-                        _movement.LookAtDirection(aimDir);
-                    }
-                }
-            }
-
-            UpdateScanner(aimDir);
-        }
-
-        private void UpdateScanner(Vector3 dir)
-        {
-            if (_scanner != null) _scanner.UpdateScanner(dir);
-        }
-
-        private void HandleFiring()
-        {
-            // 1. BEAM (Left Trigger / Left Click)
-            if (_beamWeapon != null && _fireBeamAction != null)
-            {
-                bool isBeam = _fireBeamAction.ReadValue<float>() > 0.5f;
-                _beamWeapon.SetFiring(isBeam);
-            }
-
-            // 2. GUN (Right Trigger / Right Click)
-            if (_gunWeapon != null && _fireGunAction != null)
-            {
-                bool isGun = _fireGunAction.ReadValue<float>() > 0.5f;
-                _gunWeapon.SetFiring(isGun);
-            }
-        }
-
-        private void OnDodge()
-        {
-            if (_inputEnabled && _safetyTimer <= 0 && _dodge != null)
-                _dodge.PerformDodge();
-        }
-
-        private void OnGloryKill()
-        {
-            if (_inputEnabled && _safetyTimer <= 0 && _execution != null)
-                _execution.PerformGloryKill();
-        }
-
-        // --- PUBLIC API ---
-
-        public void ToggleInput(bool state)
-        {
-            _inputEnabled = state;
-
-            if (state)
-            {
-                _controls.Enable();
-                // Add small delay to prevent click-through
-                _safetyTimer = 0.2f;
-            }
-            else
-            {
-                _controls.Disable();
-
-                // Reset everything
-                _movement.SetMoveInput(Vector3.zero);
-                if (_beamWeapon) _beamWeapon.SetFiring(false);
-                if (_gunWeapon) _gunWeapon.SetFiring(false);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\PlayerDodge.cs`
-- Lines: 199
-- Size: 6.6 KB
-- Modified: 2025-12-31 09:17
+## 📄 `Assets\Scripts\Player\Combat\PlayerExecution.cs`
+- Lines: 116
+- Size: 3.7 KB
+- Modified: 2026-01-06 10:36
 
 ```csharp
 using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Physics;
-using DarkTowerTron.Combat;
+using DarkTowerTron.Player.Stats;
+using DarkTowerTron.Player.Movement;
 
-namespace DarkTowerTron.Player
-{
-    [RequireComponent(typeof(KinematicMover))]
-    [RequireComponent(typeof(PlayerEnergy))]
-    [RequireComponent(typeof(PlayerMovement))]
-    [RequireComponent(typeof(PlayerLoadout))]
-    public class PlayerDodge : MonoBehaviour
-    {
-        [Header("Dodge Settings")]
-        public float focusCost = 25f;
-        public float dashDistance = 8f;
-        public float dashDuration = 0.15f;
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
-        [Header("Traversal (Gravity Control)")]
-        [Tooltip("How long to suspend gravity AFTER the dash ends (Coyote Time).")]
-        public float hangTime = 0.2f;
-
-        [Header("Interaction Settings")]
-        public LayerMask projectileLayer;
-        public LayerMask wallLayer;
-
-        [Header("Audio")]
-        public AudioClip dashClip;
-
-        [Header("Visual Indicator")]
-        public Transform indicatorRef;
-        public Renderer indicatorRenderer;
-        public Material readyMat;
-        public Material notReadyMat;
-        public bool showIndicator = true;
-
-        // State Properties
-        public bool IsInvulnerable { get; private set; }
-        public bool IsDashing { get; private set; }
-
-        // Dependencies
-        private KinematicMover _mover;
-        private PlayerEnergy _energy;
-        private PlayerMovement _movement;
-        private PlayerLoadout _loadout;
-
-        private void Awake()
-        {
-            _mover = GetComponent<KinematicMover>();
-            _energy = GetComponent<PlayerEnergy>();
-            _movement = GetComponent<PlayerMovement>();
-            _loadout = GetComponent<PlayerLoadout>();
-
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask("Default", "Wall");
-        }
-
-        private void Update()
-        {
-            HandleIndicator();
-        }
-
-        /// <summary>
-        /// Called by PlayerController when Spacebar/Dash button is pressed.
-        /// </summary>
-        public void PerformDodge()
-        {
-            if (IsDashing) return;
-
-            if (_energy.SpendFocus(focusCost))
-            {
-                StartCoroutine(DodgeRoutine());
-            }
-        }
-
-        private IEnumerator DodgeRoutine()
-        {
-            IsDashing = true;
-            IsInvulnerable = true;
-
-            // Hide indicator during movement
-            if (indicatorRef) indicatorRef.gameObject.SetActive(false);
-
-            // --- 1. GRAVITY SUSPENSION ---
-            // We tell movement to ignore gravity for the dash duration + hang time.
-            // This allows "Air Dashing" without falling immediately.
-            _movement.SuspendGravity(dashDuration + hangTime);
-
-            // --- 2. AUDIO & VISUALS ---
-            if (Managers.AudioManager.Instance && dashClip)
-                Managers.AudioManager.Instance.PlaySound(dashClip, 1f, true);
-
-            // Spawn Decoy from Loadout (Standard or Explosive)
-            if (_loadout && _loadout.currentDecoy)
-                Instantiate(_loadout.currentDecoy, transform.position, transform.rotation);
-
-            // --- 3. DIRECTION LOGIC ---
-            Vector3 dashDir;
-            // If moving input exists, dash that way. Otherwise dash forward.
-            if (_movement.MoveInput.sqrMagnitude > 0.1f)
-                dashDir = _movement.MoveInput.normalized;
-            else
-                dashDir = transform.forward;
-
-            // --- 4. PHYSICS LOOP ---
-            float speed = dashDistance / dashDuration;
-            float timer = 0f;
-
-            while (timer < dashDuration)
-            {
-                float dt = Time.deltaTime;
-                timer += dt;
-
-                // Move via Motor (Pass Velocity)
-                _mover.Move(dashDir * speed);
-
-                // Active Intercept
-                CatchProjectiles();
-
-                yield return null;
-            }
-
-            // Small recovery frame before state resets
-            yield return new WaitForSeconds(0.05f);
-
-            IsInvulnerable = false;
-            IsDashing = false;
-
-            // Note: Gravity remains suspended for the duration of 'hangTime' 
-            // handled by PlayerMovement timer.
-        }
-
-        private void CatchProjectiles()
-        {
-            // Detect hostile bullets in close range
-            Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, projectileLayer);
-
-            foreach (var hit in hits)
-            {
-                IReflectable proj = hit.GetComponent<IReflectable>();
-                var pScript = hit.GetComponent<Projectile>();
-
-                if (proj != null && pScript != null && pScript.isHostile)
-                {
-                    // Redirect in the direction we are dashing
-                    proj.Redirect(transform.forward, gameObject);
-
-                    // Reward for technical play
-                    _energy.AddFocus(20f);
-                }
-            }
-        }
-
-        private void HandleIndicator()
-        {
-            if (!indicatorRef) return;
-
-            if (!showIndicator || IsDashing)
-            {
-                indicatorRef.gameObject.SetActive(false);
-                return;
-            }
-
-            indicatorRef.gameObject.SetActive(true);
-
-            // Calculate Destination based on Input
-            Vector3 dir;
-            if (_movement.MoveInput.sqrMagnitude > 0.1f) dir = _movement.MoveInput.normalized;
-            else dir = transform.forward;
-
-            Vector3 targetPos;
-
-            // Raycast to stop indicator at walls
-            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, dashDistance, wallLayer))
-            {
-                targetPos = hit.point - (dir * 0.5f);
-            }
-            else
-            {
-                targetPos = transform.position + (dir * dashDistance);
-            }
-
-            targetPos.y = 0.1f;
-            indicatorRef.position = targetPos;
-            indicatorRef.rotation = Quaternion.identity;
-
-            // Visual Feedback (Can we afford it?)
-            if (indicatorRenderer && readyMat && notReadyMat)
-            {
-                bool canAfford = _energy.HasFocus(focusCost);
-                Material targetMat = canAfford ? readyMat : notReadyMat;
-                if (indicatorRenderer.sharedMaterial != targetMat)
-                {
-                    indicatorRenderer.sharedMaterial = targetMat;
-                }
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\PlayerEnergy.cs`
-- Lines: 133
-- Size: 4.0 KB
-- Modified: 2025-12-31 14:58
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-
-namespace DarkTowerTron.Player
-{
-    [RequireComponent(typeof(PlayerStats))]
-    public class PlayerEnergy : MonoBehaviour
-    {
-        // NO INSPECTOR VARIABLES! All data comes from PlayerStats.
-
-        private float _currentFocus;
-        private bool _isDead;
-        private bool _isCombatActive = false; 
-
-        private PlayerStats _stats;
-
-        private void Awake()
-        {
-            _stats = GetComponent<PlayerStats>();
-        }
-
-        private void Start()
-        {
-            if (_stats == null)
-            {
-                GameLogger.LogError(LogChannel.Player, "PlayerEnergy missing PlayerStats component!", gameObject);
-                return;
-            }
-
-            // Init
-            _currentFocus = _stats.MaxFocus;
-            GameLogger.Log(LogChannel.Player, $"Energy Initialized. Max: {_stats.MaxFocus}", gameObject);
-
-            // Subscriptions
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            GameEvents.OnPlayerDied += OnPlayerDied;
-            
-            GameEvents.OnWaveCombatStarted += EnableDecay;
-            GameEvents.OnWaveCleared += DisableDecay;
-            GameEvents.OnGameVictory += DisableDecay;
-            
-            UpdateUI();
-        }
-
-        private void OnDestroy()
-        {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
-            GameEvents.OnPlayerDied -= OnPlayerDied;
-            
-            GameEvents.OnWaveCombatStarted -= EnableDecay;
-            GameEvents.OnWaveCleared -= DisableDecay;
-            GameEvents.OnGameVictory -= DisableDecay;
-        }
-
-        private void Update()
-        {
-            if (_isDead) return;
-
-            // Check Overdrive Threshold via Stats
-            // (We assume the threshold is static in SO for now)
-            bool shouldBeOverdrive = _currentFocus >= _stats.baseStats.overdriveThreshold;
-            _stats.SetOverdrive(shouldBeOverdrive);
-
-            // Decay Logic
-            if (_isCombatActive && _currentFocus > 0)
-            {
-                _currentFocus -= _stats.FocusDecayRate * Time.deltaTime;
-                if (_currentFocus < 0) _currentFocus = 0;
-                
-                UpdateUI();
-            }
-        }
-
-        // --- PUBLIC API ---
-
-        public bool HasFocus(float amount)
-        {
-            return _currentFocus >= amount;
-        }
-
-        public bool SpendFocus(float amount)
-        {
-            if (_currentFocus >= amount)
-            {
-                _currentFocus -= amount;
-                UpdateUI();
-                return true;
-            }
-            return false;
-        }
-
-        public void AddFocus(float amount)
-        {
-            float max = _stats.MaxFocus;
-            _currentFocus += amount;
-            if (_currentFocus > max) _currentFocus = max;
-            UpdateUI();
-        }
-
-        // --- EVENT HANDLERS ---
-
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
-        {
-            if (!rewardPlayer) return;
-
-            // Use enemy specific reward, or fallback to player base stat
-            float gain = (stats != null) ? stats.focusReward : _stats.BaseFocusOnKill;
-            
-            GameLogger.Log(LogChannel.Player, $"Enemy Killed. +{gain} Focus.", gameObject);
-            AddFocus(gain);
-        }
-
-        private void EnableDecay() 
-        { 
-            _isCombatActive = true;
-            GameLogger.Log(LogChannel.System, "Combat Started. Focus Decay ON.");
-        }
-
-        private void DisableDecay() 
-        { 
-            _isCombatActive = false; 
-            GameLogger.Log(LogChannel.System, "Combat Ended. Focus Decay OFF.");
-        }
-
-        private void OnPlayerDied() { _isDead = true; }
-
-        private void UpdateUI()
-        {
-            GameEvents.OnFocusChanged?.Invoke(_currentFocus, _stats.MaxFocus);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\PlayerExecution.cs`
-- Lines: 122
-- Size: 4.0 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using System.Collections;
-using DarkTowerTron.Core;
-using DarkTowerTron.Managers; // For ScoreManager
-
-namespace DarkTowerTron.Player
+namespace DarkTowerTron.Player.Combat
 {
     [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerHealth))]
     [RequireComponent(typeof(TargetScanner))]
     [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerStats))]
     public class PlayerExecution : MonoBehaviour
     {
         [Header("Settings")]
         public float killRewardFocus = 50f;
-        public float postKillHangTime = 0.4f; // NEW: Time to float after teleport
-        public AudioClip executeClip; // Assign in Inspector
+        public AudioClip executeClip;
 
         private PlayerEnergy _energy;
         private PlayerHealth _health;
         private TargetScanner _scanner;
         private PlayerMovement _movement;
+        private PlayerStats _stats;
         private bool _isBusy;
 
         private void Awake()
@@ -9457,6 +10314,7 @@ namespace DarkTowerTron.Player
             _health = GetComponent<PlayerHealth>();
             _scanner = GetComponent<TargetScanner>();
             _movement = GetComponent<PlayerMovement>();
+            _stats = GetComponent<PlayerStats>();
         }
 
         public void PerformGloryKill()
@@ -9464,35 +10322,26 @@ namespace DarkTowerTron.Player
             if (_isBusy) return;
 
             // Logic Checks
-            if (_scanner == null || _scanner.CurrentTarget == null)
-            {
-                // Optional: Play "Error" sound
-                return;
-            }
+            if (_scanner == null || _scanner.CurrentTarget == null) return;
 
-            if (!_scanner.CurrentTarget.IsStaggered)
-            {
-                // Optional: Play "Denied" sound
-                return;
-            }
+            if (!_scanner.CurrentTarget.IsStaggered) return;
 
             StartCoroutine(ExecutionRoutine(_scanner.CurrentTarget));
         }
 
-        // Change parameter type to Interface
         private IEnumerator ExecutionRoutine(ICombatTarget target)
         {
             _isBusy = true;
 
             // 1. Calculate Position
             Vector3 targetPos = target.transform.position;
-            Vector3 attackPos = targetPos - (transform.forward * 1.0f); 
+            Vector3 attackPos = targetPos - (transform.forward * 1.0f);
 
-            // 2. Y-Axis Logic (The Fix)
+            // 2. Y-Axis Logic (Verticality Support)
             if (target.KeepPlayerGrounded)
             {
-                // Find the ground below the target
-                if (UnityEngine.Physics.Raycast(targetPos + Vector3.up, Vector3.down, out RaycastHit hit, 10f, LayerMask.GetMask("Ground")))
+                // HYGIENE: Use Constant Mask
+                if (UnityEngine.Physics.Raycast(targetPos + Vector3.up, Vector3.down, out RaycastHit hit, 10f, GameConstants.MASK_GROUND_ONLY))
                 {
                     attackPos.y = hit.point.y;
                 }
@@ -9509,39 +10358,36 @@ namespace DarkTowerTron.Player
 
             transform.position = attackPos;
 
-            // 2. Suspend Gravity (The "Matrix" Pause)
+            // 3. Suspend Gravity (The "Matrix" Pause)
             if (_movement)
             {
                 _movement.ResetVelocity();
-                _movement.SuspendGravity(postKillHangTime);
+                _movement.SuspendGravity(_stats.ActionHangTime);
             }
 
-            // 3. Trigger Target Reaction (Die or Reset)
+            // 4. Trigger Target Reaction (Die or Reset)
             target.OnExecutionHit();
 
-            // PLAY SOUND
-            if (GameFeel.Instance && executeClip) 
-                GameFeel.Instance.PlaySound(executeClip, 1f);
+            // 5. Audio (Service Locator)
+            if (executeClip && Global.Audio != null)
+                Global.Audio.PlaySound(executeClip, 1f);
 
-            // 3. Rewards
-            // We assume execution always gives Focus (movement fuel)
+            // 6. Rewards
             _energy.AddFocus(killRewardFocus);
-            
-            // LOGIC CHECK: Only heal if it was a living enemy? 
-            // Or rely on OnEnemyKilled event?
-            // Since EnemyController.Kill fires OnEnemyKilled, the health will update automatically.
-            // DamageableProp DOES NOT fire OnEnemyKilled (usually), so Anchors won't heal you.
-            // This is correct behavior!
 
-            if (ScoreManager.Instance)
-                ScoreManager.Instance.TriggerGloryKillBonus();
+            if (Global.Score != null)
+                Global.Score.TriggerGloryKillBonus();
 
-            // 4. Juice
-            if (GameFeel.Instance)
-            {
-                GameFeel.Instance.HitStop(0.1f);
-                GameFeel.Instance.CameraShake(0.2f, 0.5f);
-            }
+            // 7. Juice
+            // Replaced GameFeel with specific services
+
+            // A. Time Stop
+            if (Global.Time != null)
+                Global.Time.HitStop(0.1f);
+
+            // B. Shake (CameraShaker is still a Scene Singleton for now)
+            if (DarkTowerTron.Visuals.CameraShaker.Instance)
+                DarkTowerTron.Visuals.CameraShaker.Instance.Shake(0.2f, 0.5f);
 
             yield return new WaitForSeconds(0.1f);
 
@@ -9551,21 +10397,23 @@ namespace DarkTowerTron.Player
 }
 ```
 
-## 📄 `Assets\Scripts\Player\PlayerGun.cs`
-- Lines: 58
-- Size: 1.8 KB
-- Modified: 2025-12-31 18:22
+## 📄 `Assets\Scripts\Player\Combat\PlayerGun.cs`
+- Lines: 59
+- Size: 1.6 KB
+- Modified: 2026-01-06 09:42
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Combat;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Player.Stats;
 
-namespace DarkTowerTron.Player
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Player.Combat
 {
-    // Inherits from WeaponBase instead of MonoBehaviour
-    [RequireComponent(typeof(PlayerLoadout))]
-    public class PlayerGun : WeaponBase 
+    [RequireComponent(typeof(DarkTowerTron.Player.Stats.PlayerLoadout))]
+    public class PlayerGun : WeaponBase
     {
         [Header("Gun Specifics")]
         public float bulletSpeed = 25f;
@@ -9580,35 +10428,34 @@ namespace DarkTowerTron.Player
 
         protected override void Fire()
         {
-            // Read from loadout
             GameObject prefabToSpawn = _loadout.currentProjectile;
 
             if (prefabToSpawn && firePoint)
             {
+                // Use Smart Aim
                 Vector3 aimDir = GetAimDirection();
-                GameObject p = Managers.PoolManager.Instance.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
-                
-                var proj = p.GetComponent<Combat.Projectile>();
+
+                // Use Global Pool
+                GameObject p = Global.Pool.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
+
+                var proj = p.GetComponent<Projectile>();
                 if (proj)
                 {
                     proj.speed = bulletSpeed;
-                    proj.isHostile = false; 
-                    
-                    // --- DATA INJECTION ---
-                    // Overwrite the Prefab's damage with our RPG stats
+                    proj.isHostile = false;
+
+                    // Stats Injection
                     proj.damage = _stats.GunDamage;
                     proj.stagger = _stats.GunStagger;
-                    // ---------------------
 
+                    // CRITICAL: Self-Hit Protection
+                    proj.SetSource(gameObject);
 
-                    Debug.Log($"[GUN DEBUG] Firing Bullet. Damage: {proj.damage} | Stagger: {proj.stagger}");
-                    
                     proj.Initialize(aimDir);
                 }
             }
         }
 
-        // 1. Return the rate from Stats
         protected override float GetCurrentFireRate()
         {
             return _stats.GunRate;
@@ -9617,545 +10464,65 @@ namespace DarkTowerTron.Player
 }
 ```
 
-## 📄 `Assets\Scripts\Player\PlayerHealth.cs`
-- Lines: 172
-- Size: 5.1 KB
-- Modified: 2025-12-31 14:52
+## 📄 `Assets\Scripts\Player\Combat\PlayerWeaponController.cs`
+- Lines: 35
+- Size: 1.1 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
 
-namespace DarkTowerTron.Player
+namespace DarkTowerTron.Player.Combat
 {
-    [RequireComponent(typeof(PlayerMovement))]
-    [RequireComponent(typeof(PlayerStats))] // NEW DEPENDENCY
-    public class PlayerHealth : MonoBehaviour, IDamageable
+    public class PlayerWeaponController : MonoBehaviour
     {
-        [Header("Configuration")]
-        public bool startWithHull = true;
-
-        // State
-        private int _currentGrit;
-        private bool _hasHull;
-        private bool _isDead;
-        
-        // Dependencies
-        private PlayerMovement _movement;
-        private PlayerDodge _dodge;
-        private PlayerStats _stats; // NEW
+        [Header("Inventory")]
+        // We link these in Inspector or Awake
+        [SerializeField] private WeaponBase _primaryWeapon;   // Beam
+        [SerializeField] private WeaponBase _secondaryWeapon; // Gun
 
         private void Awake()
         {
-            _movement = GetComponent<PlayerMovement>();
-            _dodge = GetComponent<PlayerDodge>();
-            _stats = GetComponent<PlayerStats>();
+            // Auto-link if empty (Backwards compatibility with current prefab setup)
+            if (_primaryWeapon == null) _primaryWeapon = GetComponent<PlayerBeam>();
+            if (_secondaryWeapon == null) _secondaryWeapon = GetComponent<PlayerGun>();
         }
 
-        private void Start()
+        public void SetPrimaryFire(bool isFiring)
         {
-            // FIX: Read Max Grit from Data, not Inspector
-            if (_stats != null && _stats.baseStats != null)
-            {
-                _currentGrit = _stats.baseStats.maxGrit;
-                GameLogger.Log(LogChannel.Player, $"Health Initialized. Max Grit: {_currentGrit}", gameObject);
-            }
-            else
-            {
-                _currentGrit = 2; // Fallback
-                GameLogger.LogError(LogChannel.Player, "Missing PlayerStatsSO! Defaulting to 2 Grit.", gameObject);
-            }
-
-            _hasHull = startWithHull;
-            
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            
-            UpdateUI();
+            if (_primaryWeapon) _primaryWeapon.SetFiring(isFiring);
         }
 
-        private void OnDestroy()
+        public void SetSecondaryFire(bool isFiring)
         {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
+            if (_secondaryWeapon) _secondaryWeapon.SetFiring(isFiring);
         }
 
-        public bool TakeDamage(DamageInfo info)
+        public void StopAll()
         {
-            if (_isDead) return false;
-
-            if (_dodge != null && _dodge.IsInvulnerable) 
-            {
-                GameLogger.Log(LogChannel.Combat, "Damage Dodged (Invulnerable)", gameObject);
-                return false;
-            }
-
-            int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
-
-            if (_currentGrit > 0)
-            {
-                _currentGrit -= dmg;
-                if (_currentGrit < 0) _currentGrit = 0; 
-                
-                GameLogger.Log(LogChannel.Combat, $"Player Hit! Grit: {_currentGrit}", gameObject);
-                GameEvents.OnPlayerHit?.Invoke(); 
-            }
-            else if (_hasHull)
-            {
-                _hasHull = false;
-                
-                GameLogger.Log(LogChannel.Combat, "HULL BREACHED!", gameObject);
-                GameEvents.OnPlayerHit?.Invoke(); 
-                GameEvents.OnHullStateChanged?.Invoke(false); 
-            }
-            else
-            {
-                Kill(false);
-            }
-
-            if (!_isDead && _movement) 
-                _movement.ApplyKnockback(info.pushDirection * info.pushForce);
-
-            UpdateUI();
-            return true;
-        }
-
-        public void TakeVoidDamage()
-        {
-            if (_isDead) return;
-
-            GameLogger.Log(LogChannel.Physics, "Fell into Void. Respawning.", gameObject);
-
-            if (_movement)
-            {
-                _movement.ResetVelocity();
-                var motor = GetComponent<DarkTowerTron.Physics.KinematicMover>();
-                if (motor) motor.Teleport(_movement.LastSafePosition);
-                else transform.position = _movement.LastSafePosition;
-            }
-
-            DamageInfo info = new DamageInfo
-            {
-                damageAmount = 1f,
-                pushDirection = Vector3.zero,
-                pushForce = 0f,
-                source = null,
-                damageType = DamageType.Environment
-            };
-            
-            TakeDamage(info); 
-        }
-
-        public void Kill(bool instant)
-        {
-            if (_isDead) return;
-            _isDead = true;
-            _currentGrit = 0;
-            _hasHull = false;
-            UpdateUI();
-            
-            GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
-            GameEvents.OnPlayerDied?.Invoke();
-        }
-
-        public void HealGrit(int amount = 1)
-        {
-            if (_isDead) return;
-            
-            int max = _stats ? _stats.baseStats.maxGrit : 2;
-            _currentGrit = Mathf.Min(_currentGrit + amount, max);
-            
-            UpdateUI();
-        }
-
-        private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
-        {
-            if (!rewardPlayer) return;
-
-            if (stats != null)
-            {
-                if (stats.healsGrit) HealGrit(stats.gritRewardAmount);
-            }
-            else
-            {
-                HealGrit(1);
-            }
-        }
-
-        public void ForceUpdateUI()
-        {
-            UpdateUI();
-        }
-
-        private void UpdateUI()
-        {
-            int max = _stats ? _stats.baseStats.maxGrit : 2;
-            GameEvents.OnGritChanged?.Invoke(_currentGrit, max);
-            GameEvents.OnHullStateChanged?.Invoke(_hasHull);
+            SetPrimaryFire(false);
+            SetSecondaryFire(false);
         }
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Player\PlayerLoadout.cs`
-- Lines: 37
-- Size: 0.9 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-
-namespace DarkTowerTron.Player
-{
-    public class PlayerLoadout : MonoBehaviour
-    {
-        [Header("Defaults")]
-        public GameObject defaultProjectile;
-        public GameObject defaultDecoy;
-
-        [Header("Active Loadout (Debug/Runtime)")]
-        public GameObject currentProjectile;
-        public GameObject currentDecoy;
-
-        private void Awake()
-        {
-            // Initialize with defaults on start
-            ResetLoadout();
-        }
-
-        public void ResetLoadout()
-        {
-            currentProjectile = defaultProjectile;
-            currentDecoy = defaultDecoy;
-        }
-
-        public void EquipProjectile(GameObject newPrefab)
-        {
-            if (newPrefab != null) currentProjectile = newPrefab;
-        }
-
-        public void EquipDecoy(GameObject newPrefab)
-        {
-            if (newPrefab != null) currentDecoy = newPrefab;
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\PlayerMovement.cs`
-- Lines: 236
-- Size: 8.0 KB
-- Modified: 2025-12-31 09:17
+## 📄 `Assets\Scripts\Player\Combat\TargetScanner.cs`
+- Lines: 111
+- Size: 3.9 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Physics;
+using DarkTowerTron.Player.Stats;
 
-namespace DarkTowerTron.Player
+namespace DarkTowerTron.Player.Combat
 {
-    [RequireComponent(typeof(KinematicMover))]
     [RequireComponent(typeof(PlayerStats))]
-    public class PlayerMovement : MonoBehaviour
-    {
-        [Header("Motion Settings")]
-        public float deceleration = 40f;
-        public float rotationSpeed = 25f;
-
-        [Header("Wall Repulsion (Anti-Stick)")]
-        public float wallBuffer = 0.6f; // How close before we push back (0.5 is player radius)
-        public float repulsionForce = 5f; // How hard we push
-        public LayerMask wallLayer;
-
-        [Header("Physics")]
-        public float gravity = 20f; // Gravity is controlled here
-
-        [Header("Safety Net")]
-        public float safeGroundTimer = 0.5f; // Time required to be grounded to count as "Safe"
-        
-        // Read-only property for the Health script to access
-        public Vector3 LastSafePosition { get; private set; }
-
-        // Expose input for Blitz
-        public Vector3 MoveInput => _inputDir;
-
-        private KinematicMover _mover;
-        private Camera _cam;
-        private PlayerStats _stats;
-
-        private Vector3 _inputDir;
-        private Vector3 _currentVelocity;
-        private Vector3 _externalForce;
-        private float _groundedTimer;
-        private float _gravitySuspendTimer = 0f;
-        
-        // Cache for optimization
-        private Collider[] _wallBuffer = new Collider[5];
-
-        private void Awake()
-        {
-            _mover = GetComponent<KinematicMover>();
-            _cam = Camera.main;
-            _stats = GetComponent<PlayerStats>();
-
-            // Default mask if not set
-            if (wallLayer == 0) wallLayer = LayerMask.GetMask(GameConstants.LAYER_WALL, "Default");
-        }
-
-        private void Start()
-        {
-            LastSafePosition = transform.position;
-        }
-
-        public void SetMoveInput(Vector3 dir)
-        {
-            _inputDir = dir;
-        }
-
-        public void LookAtDirection(Vector3 direction)
-        {
-            direction.y = 0;
-            if (direction.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
-            }
-        }
-
-        public void LookAtMouse(Vector2 mouseScreenPos)
-        {
-            Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
-            // Use UnityEngine.Physics to disambiguate
-            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
-            {
-                Vector3 lookDir = hit.point - transform.position;
-                LookAtDirection(lookDir);
-            }
-        }
-
-        public void ApplyKnockback(Vector3 force)
-        {
-            force.y = 0;
-            _externalForce += force;
-        }
-
-        private void Update()
-        {
-
-            if (_gravitySuspendTimer > 0) _gravitySuspendTimer -= Time.deltaTime;
-
-            HandleVelocity();
-            HandleSafeGround();
-        }
-
-        private void HandleVelocity()
-        {
-            float dt = Time.deltaTime;
-
-            // 1. Calculate Target (Inputs)
-            Vector3 targetVel = _inputDir * _stats.MoveSpeed;
-            Vector3 wallPush = CalculateWallRepulsion();
-            targetVel += wallPush;
-
-            // 2. Acceleration
-            if (_inputDir.magnitude > 0.1f)
-            {
-                _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, _stats.Acceleration * dt);
-            }
-            else
-            {
-                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, deceleration * dt);
-                if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
-            }
-
-            // 3. External Forces (Recoil/Knockback)
-            if (_externalForce.magnitude > 0.1f)
-            {
-                _externalForce = Vector3.Lerp(_externalForce, Vector3.zero, 5f * dt);
-            }
-            else
-            {
-                _externalForce = Vector3.zero;
-            }
-
-            // 4. COMBINE (No dt multiplication here!)
-            Vector3 finalVelocity = _currentVelocity + _externalForce;
-
-            // --- GRAVITY LOGIC UPDATE ---
-            // Only apply gravity if NOT grounded AND NOT suspended
-            if (!_mover.IsGrounded && _gravitySuspendTimer <= 0)
-            {
-                finalVelocity.y -= gravity;
-            }
-            else if (_mover.IsGrounded)
-            {
-                finalVelocity.y = -2f; // Stick to ground
-            }
-            else
-            {
-                // We are in Air + Suspended = Zero Gravity (Hover)
-                finalVelocity.y = 0f;
-            }
-            // ----------------------------
-
-            // 6. EXECUTE
-            _mover.Move(finalVelocity);
-        }
-
-        // NEW METHOD: Call this when teleporting/respawning
-        public void ResetVelocity()
-        {
-            _currentVelocity = Vector3.zero;
-            _externalForce = Vector3.zero;
-            _inputDir = Vector3.zero; // Optional: Stop input until player presses again
-        }
-
-        private void HandleSafeGround()
-        {
-            // STRICT CHECK:
-            // 1. Must be physically grounded (Motor check)
-            // 2. Must have ground directly beneath center (Raycast check)
-            // This prevents saving "The Edge" as a safe spot.
-            
-            bool isCenterSupported = false;
-            
-            // Cast from slightly up, downwards. Check GROUND layer only.
-            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, 2.0f, LayerMask.GetMask(GameConstants.LAYER_GROUND)))
-            {
-                isCenterSupported = true;
-            }
-
-            if (_mover.IsGrounded && isCenterSupported)
-            {
-                _groundedTimer += Time.deltaTime;
-                if (_groundedTimer > safeGroundTimer)
-                {
-                    // Save position slightly higher to prevent floor clipping
-                    LastSafePosition = transform.position + Vector3.up * 0.2f;
-                }
-            }
-            else
-            {
-                _groundedTimer = 0f;
-            }
-        }
-
-        private Vector3 CalculateWallRepulsion()
-        {
-            Vector3 push = Vector3.zero;
-
-            // Find walls within buffer range
-            // We use the player's position + slight up offset (center of mass)
-            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, _wallBuffer, wallLayer);
-
-            for (int i = 0; i < count; i++)
-            {
-                Collider wall = _wallBuffer[i];
-
-                // Find the closest point on the wall's surface to the player
-                Vector3 closestPoint = wall.ClosestPoint(transform.position + Vector3.up);
-
-                // Calculate direction AWAY from wall
-                Vector3 dir = (transform.position - closestPoint);
-                dir.y = 0; // Keep it flat
-
-                float dist = dir.magnitude;
-
-                // If we are actually inside/touching/near the wall
-                if (dist < wallBuffer)
-                {
-                    // The closer we are, the stronger the push
-                    // Normalized push * strength
-                    push += dir.normalized * repulsionForce;
-                }
-            }
-
-            return push;
-        }
-
-        public void SuspendGravity(float duration)
-        {
-            _gravitySuspendTimer = duration;
-
-            // CRITICAL: Kill existing downward momentum immediately
-            // so we don't carry "falling speed" into the hover.
-            if (_externalForce.y < 0) _externalForce.y = 0;
-            if (_currentVelocity.y < 0) _currentVelocity.y = 0;
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\PlayerStats.cs`
-- Lines: 46
-- Size: 1.9 KB
-- Modified: 2026-01-01 09:05
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core.Data;
-
-namespace DarkTowerTron.Player
-{
-    public class PlayerStats : MonoBehaviour
-    {
-        [Header("Base Configuration")]
-        public PlayerStatsSO baseStats;
-
-        public bool IsOverdrive { get; private set; }
-
-        // --- MOVEMENT ---
-        public float MoveSpeed => IsOverdrive ? baseStats.moveSpeed * baseStats.overdriveSpeedMult : baseStats.moveSpeed;
-        public float Acceleration => baseStats.acceleration;
-
-        // --- ABILITIES ---
-        public float DashCost => baseStats.dashCost;
-        public float DashDistance => baseStats.dashDistance;
-        public float DashDuration => baseStats.dashCooldown;
-
-        // --- WEAPON: GUN ---
-        public float GunDamage => IsOverdrive ? baseStats.gunDamage * baseStats.overdriveDamageMult : baseStats.gunDamage;
-        public int GunStagger => baseStats.gunStagger;
-        // Rate: Lower is faster. If OverdriveMult is 1.5 (Faster), we divide the delay.
-        public float GunRate => IsOverdrive ? baseStats.gunFireRate / baseStats.overdriveFireRateMult : baseStats.gunFireRate;
-
-        // --- WEAPON: BEAM ---
-        public float BeamDamage => IsOverdrive ? baseStats.beamDamage * baseStats.overdriveDamageMult : baseStats.beamDamage;
-        public int BeamStagger => baseStats.beamStagger;
-        public float BeamRate => IsOverdrive ? baseStats.beamFireRate / baseStats.overdriveFireRateMult : baseStats.beamFireRate;
-
-        // --- RESOURCES ---
-        public int MaxGrit => baseStats.maxGrit;
-        public float MaxFocus => baseStats.maxFocus;
-        
-        // Future proofing: Modifiers could change these later
-        public float FocusDecayRate => baseStats.focusDecayRate; 
-        public float BaseFocusOnKill => baseStats.baseFocusOnKill;
-
-        public void SetOverdrive(bool state)
-        {
-            IsOverdrive = state;
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Player\TargetScanner.cs`
-- Lines: 95
-- Size: 3.3 KB
-- Modified: 2025-12-31 09:17
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Player
-{
     public class TargetScanner : MonoBehaviour
     {
         [Header("Settings")]
-        public float scanRange = 25f; // Increased Default
-        public float scanRadius = 2.0f; // Thicker Default
         public LayerMask enemyLayer;
 
         [Header("Visuals")]
@@ -10170,6 +10537,12 @@ namespace DarkTowerTron.Player
 
         private Transform _reticleInstance;
         private LineRenderer _reticleLine; // Assuming we use the LineRenderer reticle
+        private PlayerStats _stats;
+
+        private void Awake()
+        {
+            _stats = GetComponent<PlayerStats>();
+        }
 
         private void Start()
         {
@@ -10183,10 +10556,20 @@ namespace DarkTowerTron.Player
 
         public void UpdateScanner(Vector3 aimDirection)
         {
-            // Lift origin slightly to avoid floor clipping
-            Vector3 origin = transform.position + Vector3.up * 1.0f;
+            // NEW: Create a tall vertical capsule
+            // From: 5 units below feet (catch things down stairs)
+            // To: 10 units above feet (catch flying drones)
+            Vector3 p1 = transform.position + (Vector3.down * 5f);
+            Vector3 p2 = transform.position + (Vector3.up * 10f);
+            
+            int layerMask = 1 << GameConstants.LAYER_ENEMY;
 
-            if (UnityEngine.Physics.SphereCast(origin, scanRadius, aimDirection, out RaycastHit hit, scanRange, enemyLayer))
+            // Use Stats for width/range
+            float range = _stats ? _stats.ScanRange : 25f;
+            float rad = _stats ? _stats.ScanRadius : 2f; // Width of the pole
+
+            // Change SphereCast to CapsuleCast
+            if (UnityEngine.Physics.CapsuleCast(p1, p2, rad, aimDirection, out RaycastHit hit, range, layerMask))
             {
                 // FIX: Look for Interface instead of EnemyController
                 ICombatTarget target = hit.collider.GetComponentInParent<ICombatTarget>();
@@ -10243,43 +10626,47 @@ namespace DarkTowerTron.Player
 }
 ```
 
-## 📄 `Assets\Scripts\Player\WeaponBase.cs`
-- Lines: 110
-- Size: 3.3 KB
-- Modified: 2025-12-31 17:58
+## 📄 `Assets\Scripts\Player\Combat\WeaponBase.cs`
+- Lines: 153
+- Size: 4.9 KB
+- Modified: 2026-01-06 09:39
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; 
+using DarkTowerTron.Core.Data;
 using DarkTowerTron.Managers;
+using DarkTowerTron.Player.Stats;
 
-namespace DarkTowerTron.Player
+// ALIAS: Safety against namespace collisions
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Player.Combat
 {
     [RequireComponent(typeof(PlayerStats))]
     public abstract class WeaponBase : MonoBehaviour, IWeapon
     {
         [Header("Weapon Base Stats")]
         public Transform firePoint;
-        
+
         [Header("Behavior")]
-        public bool isAutomatic = true; // Gun = True, Beam = False
+        public bool isAutomatic = true;
 
         [Header("Audio")]
-        public SoundDef fireSound; 
+        public SoundDef fireSound;
 
         [Header("Feel")]
         public float inputBufferTime = 0.2f;
 
         protected PlayerStats _stats;
         protected TargetScanner _scanner;
-        
+
         protected float _timer;
         protected float _bufferTimer;
         protected bool _isFiring;
-        
-        // NEW: Tracks if we already shot during this specific button press
+
         private bool _hasFiredThisPress = false;
+        private RaycastHit[] _aimBuffer = new RaycastHit[10];
 
         protected virtual void Awake()
         {
@@ -10290,12 +10677,7 @@ namespace DarkTowerTron.Player
         public void SetFiring(bool state)
         {
             _isFiring = state;
-            
-            // RESET Logic: If we released the button, we can fire again
-            if (!state)
-            {
-                _hasFiredThisPress = false;
-            }
+            if (!state) _hasFiredThisPress = false;
         }
 
         protected virtual void Update()
@@ -10305,57 +10687,1953 @@ namespace DarkTowerTron.Player
 
             if (_isFiring)
             {
-                // Only fill buffer if we are allowed to fire (for Semi-Auto)
                 if (isAutomatic || !_hasFiredThisPress)
-                {
                     _bufferTimer = inputBufferTime;
-                }
             }
 
-            // TRIGGER LOGIC
             if (_bufferTimer > 0 && _timer <= 0)
             {
-                // Semi-Auto Check
-                if (!isAutomatic && _hasFiredThisPress)
-                {
-                    // Do nothing, waiting for release
-                    return;
-                }
+                if (!isAutomatic && _hasFiredThisPress) return;
 
                 Fire();
                 PlayFireSound();
-                
+
                 _timer = GetCurrentFireRate();
                 _bufferTimer = 0;
-                
-                // Mark as fired
-                _hasFiredThisPress = true; 
+                _hasFiredThisPress = true;
             }
         }
 
-        // ... (Rest of script: GetCurrentFireRate, Fire, Helpers match previous) ...
         protected abstract float GetCurrentFireRate();
         protected abstract void Fire();
 
         protected void PlayFireSound()
         {
-            if (fireSound && AudioManager.Instance)
-                AudioManager.Instance.PlaySound(fireSound); 
+            // CHANGE: Services -> Global
+            if (fireSound && Global.Audio != null)
+                Global.Audio.PlaySound(fireSound);
         }
 
         protected Vector3 GetAimDirection()
         {
             if (firePoint == null) return transform.forward;
-            Vector3 aimDir = firePoint.forward;
 
+            // 1. HARD LOCK
             if (_scanner != null && _scanner.CurrentTarget != null)
             {
-                Vector3 targetPos = _scanner.CurrentTarget.transform.position;
-                var col = _scanner.CurrentTarget.transform.GetComponent<Collider>();
-                if (col != null) targetPos = col.bounds.center;
-                aimDir = (targetPos - firePoint.position).normalized;
+                if (_scanner.CurrentTarget is IAimTarget aimTarget)
+                    return (aimTarget.AimPoint - firePoint.position).normalized;
+
+                return (_scanner.CurrentTarget.transform.position - firePoint.position).normalized;
             }
-            return aimDir;
+
+            Vector3 inputDir = transform.forward;
+
+            // 2. SMART MAGNETISM
+            float range = _stats ? _stats.ScanRange : 20f;
+            float radius = 1.5f;
+            int mask = (1 << GameConstants.LAYER_ENEMY) | GameConstants.MASK_WALLS;
+
+            Vector3 p1 = transform.position + (Vector3.down * 2f);
+            Vector3 p2 = transform.position + (Vector3.up * 8f);
+
+            int hitCount = UnityEngine.Physics.CapsuleCastNonAlloc(
+                p1, p2, radius, inputDir, _aimBuffer, range, mask
+            );
+
+            IAimTarget bestTarget = null;
+            float bestScore = -1f;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                RaycastHit hit = _aimBuffer[i];
+                IAimTarget candidate = hit.collider.GetComponentInParent<IAimTarget>();
+
+                if (candidate == null) continue;
+
+                // A. Wall Check
+                Vector3 directionToTarget = candidate.AimPoint - firePoint.position;
+                float distToTarget = directionToTarget.magnitude;
+
+                if (UnityEngine.Physics.Raycast(firePoint.position, directionToTarget, distToTarget, GameConstants.MASK_WALLS))
+                    continue;
+
+                // B. Priority Scoring
+                float angleScore = Vector3.Dot(inputDir, directionToTarget.normalized);
+
+                if (angleScore > bestScore)
+                {
+                    bestScore = angleScore;
+                    bestTarget = candidate;
+                }
+            }
+
+            if (bestTarget != null)
+            {
+                return (bestTarget.AimPoint - firePoint.position).normalized;
+            }
+
+            // 3. TERRAIN FALLBACK
+            Vector3 futurePos = transform.position + (inputDir * 15f);
+            if (UnityEngine.Physics.Raycast(futurePos + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 20f, GameConstants.MASK_GROUND_ONLY))
+            {
+                Vector3 aimAtPoint = groundHit.point + (Vector3.up * 1.5f);
+                return (aimAtPoint - firePoint.position).normalized;
+            }
+
+            return inputDir;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Controller\PlayerController.cs`
+- Lines: 94
+- Size: 3.0 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Player.Combat;   // Ensure these match your folders
+using DarkTowerTron.Player.Movement;
+using DarkTowerTron.Player.Stats;
+
+namespace DarkTowerTron.Player.Controller
+{
+    [RequireComponent(typeof(PlayerInputHandler))]
+    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerDodge))]
+    [RequireComponent(typeof(PlayerExecution))]
+    [RequireComponent(typeof(PlayerWeaponController))]
+    public class PlayerController : MonoBehaviour
+    {
+        // --- Dependencies ---
+        private PlayerInputHandler _input;
+        private PlayerMovement _movement;
+        private PlayerDodge _dodge;
+        private PlayerExecution _execution;
+        private PlayerWeaponController _weapons;
+        private TargetScanner _scanner;
+
+        private void Awake()
+        {
+            // 1. Get Components
+            _input = GetComponent<PlayerInputHandler>();
+            _movement = GetComponent<PlayerMovement>();
+            _dodge = GetComponent<PlayerDodge>();
+            _execution = GetComponent<PlayerExecution>();
+            _weapons = GetComponent<PlayerWeaponController>();
+            _scanner = GetComponent<TargetScanner>();
+
+            // 2. Bind Input Events
+            _input.OnDash += PerformDodge;
+            _input.OnGloryKill += PerformGloryKill;
+
+            // 3. Register Service
+            GameServices.RegisterPlayer(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (_input)
+            {
+                _input.OnDash -= PerformDodge;
+                _input.OnGloryKill -= PerformGloryKill;
+            }
+        }
+
+        private void Update()
+        {
+            // 1. Movement
+            // We read from the Handler. If Handler is crashing (null refs), this returns (0,0)
+            Vector3 moveDir = new Vector3(_input.MoveInput.x, 0, _input.MoveInput.y).normalized;
+            _movement.SetMoveInput(moveDir);
+
+            // 2. Looking / Aiming
+            Vector3 aimDir = _input.LookDirection;
+            if (aimDir == Vector3.zero) aimDir = transform.forward; 
+            
+            _movement.LookAtDirection(aimDir);
+            if (_scanner) _scanner.UpdateScanner(aimDir);
+
+            // 3. Weapons
+            _weapons.SetPrimaryFire(_input.FirePrimary);
+            _weapons.SetSecondaryFire(_input.FireSecondary);
+        }
+
+        // --- ACTION HANDLERS ---
+
+        private void PerformDodge()
+        {
+            if (_dodge) _dodge.PerformDodge();
+        }
+
+        private void PerformGloryKill()
+        {
+            if (_execution) _execution.PerformGloryKill();
+        }
+
+        // --- PUBLIC API ---
+
+        public void ToggleInput(bool state)
+        {
+            if (_input) _input.ToggleInput(state);
+            if (!state)
+            {
+                _movement.SetMoveInput(Vector3.zero);
+                _weapons.StopAll();
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Controller\PlayerInputHandler.cs`
+- Lines: 207
+- Size: 7.0 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using UnityEngine.InputSystem;
+using System;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Input; // Namespace for Buffer
+
+namespace DarkTowerTron.Player.Controller
+{
+    public class PlayerInputHandler : MonoBehaviour
+    {
+        [Header("Input Assets")]
+        [SerializeField] private InputActionReference _moveAction;
+        [SerializeField] private InputActionReference _aimGamepadAction;
+        [SerializeField] private InputActionReference _aimMouseAction;
+        
+        [Header("Actions")]
+        [SerializeField] private InputActionReference _firePrimaryAction;   // Beam
+        [SerializeField] private InputActionReference _fireSecondaryAction; // Gun
+        [SerializeField] private InputActionReference _dashAction;
+        [SerializeField] private InputActionReference _gloryKillAction;
+
+        [Header("Settings")]
+        public float bufferTime = 0.15f;
+
+        // --- PUBLIC DATA ---
+        public Vector2 MoveInput { get; private set; }
+        public Vector3 LookDirection { get; private set; } 
+        public bool FirePrimary { get; private set; }   
+        public bool FireSecondary { get; private set; } 
+
+        // --- EVENTS ---
+        public event Action OnDash;
+        public event Action OnGloryKill;
+
+        // --- INTERNAL ---
+        private InputBuffer _buffer;
+        private bool _inputEnabled = true;
+        private Camera _cam;
+
+        private void Awake()
+        {
+            // 1. Dependency Validation
+            if (!AreInputsBound())
+            {
+                GameLogger.LogError(DarkTowerTron.Core.LogChannel.Player,
+                    "CRITICAL: Missing Input Action References! Disabling InputHandler to prevent crash.", gameObject);
+
+                enabled = false; // Stop Update() from running
+                return;
+            }
+
+            // 2. Normal Init
+            _cam = Camera.main;
+            _buffer = new InputBuffer(bufferTime);
+        }
+
+        private void OnEnable()
+        {
+            EnableActions();
+        }
+
+        private void OnDisable()
+        {
+            DisableActions();
+        }
+
+        private void Update()
+        {
+            // 1. Always Read Continuous Input (Move/Aim)
+            // Even if input is "disabled" via gameplay state, we might want to read it 
+            // but return zero in the properties.
+            if (_inputEnabled)
+            {
+                ProcessContinuousInputs();
+                ProcessBufferedInputs();
+            }
+            else
+            {
+                ClearInputs();
+            }
+        }
+
+        private void ProcessContinuousInputs()
+        {
+            // 1. Movement
+            MoveInput = _moveAction.action.ReadValue<Vector2>();
+
+            // 2. Aiming
+            HandleAiming();
+
+            // 3. Weapons (Hold)
+            FirePrimary = _firePrimaryAction.action.ReadValue<float>() > 0.5f;
+            FireSecondary = _fireSecondaryAction.action.ReadValue<float>() > 0.5f;
+        }
+
+        private void ProcessBufferedInputs()
+        {
+            // Check buffer for queued actions
+            if (_buffer.TryConsumeAction("Dash")) OnDash?.Invoke();
+            if (_buffer.TryConsumeAction("GloryKill")) OnGloryKill?.Invoke();
+        }
+
+        private void HandleAiming()
+        {
+            // Similar logic to before, but using References
+            Vector2 stick = _aimGamepadAction.action.ReadValue<Vector2>();
+            if (stick.sqrMagnitude > 0.05f)
+            {
+                LookDirection = new Vector3(stick.x, 0, stick.y).normalized;
+                return; 
+            }
+
+            Vector2 mousePos = _aimMouseAction.action.ReadValue<Vector2>();
+            Ray ray = _cam.ScreenPointToRay(mousePos);
+            Plane ground = new Plane(Vector3.up, Vector3.zero);
+
+            if (ground.Raycast(ray, out float enter))
+            {
+                Vector3 worldPoint = ray.GetPoint(enter);
+                Vector3 dir = (worldPoint - transform.position);
+                dir.y = 0;
+                
+                if (dir.sqrMagnitude > 0.001f) LookDirection = dir.normalized;
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        // We bind these in Enable/Disable
+        private void OnDashPerformed(InputAction.CallbackContext ctx) => _buffer.BufferAction("Dash");
+        private void OnKillPerformed(InputAction.CallbackContext ctx) => _buffer.BufferAction("GloryKill");
+
+        private void ClearInputs()
+        {
+            MoveInput = Vector2.zero;
+            FirePrimary = false;
+            FireSecondary = false;
+            _buffer.Clear();
+        }
+
+        public void ToggleInput(bool state)
+        {
+            _inputEnabled = state;
+            if (!state) ClearInputs();
+        }
+
+        // --- HELPER: BOILERPLATE BINDING ---
+        private void EnableActions()
+        {
+            SetActionState(_moveAction, true);
+            SetActionState(_aimGamepadAction, true);
+            SetActionState(_aimMouseAction, true);
+            SetActionState(_firePrimaryAction, true);
+            SetActionState(_fireSecondaryAction, true);
+
+            if (_dashAction != null)
+            {
+                _dashAction.action.performed += OnDashPerformed;
+                _dashAction.action.Enable();
+            }
+            if (_gloryKillAction != null)
+            {
+                _gloryKillAction.action.performed += OnKillPerformed;
+                _gloryKillAction.action.Enable();
+            }
+        }
+
+        private void DisableActions()
+        {
+            SetActionState(_moveAction, false);
+            SetActionState(_aimGamepadAction, false);
+            SetActionState(_aimMouseAction, false);
+            SetActionState(_firePrimaryAction, false);
+            SetActionState(_fireSecondaryAction, false);
+
+            if (_dashAction != null)
+            {
+                _dashAction.action.performed -= OnDashPerformed;
+                _dashAction.action.Disable();
+            }
+            if (_gloryKillAction != null)
+            {
+                _gloryKillAction.action.performed -= OnKillPerformed;
+                _gloryKillAction.action.Disable();
+            }
+        }
+
+        private void SetActionState(InputActionReference refAction, bool enable)
+        {
+            if (refAction == null) return;
+            if (enable) refAction.action.Enable();
+            else refAction.action.Disable();
+        }
+
+        private bool AreInputsBound()
+        {
+            // Check the essential ones.
+            // If secondary weapons/abilities are optional, you can leave them out of this check.
+            if (_moveAction == null) return false;
+            if (_aimGamepadAction == null) return false;
+            if (_aimMouseAction == null) return false;
+            if (_firePrimaryAction == null) return false;
+            // if (_dashAction == null) return false; // Uncomment if Dash is mandatory
+
+            return true;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Movement\AfterImage.cs`
+- Lines: 88
+- Size: 2.3 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Combat;
+using DG.Tweening;
+
+namespace DarkTowerTron.Player.Movement
+{
+    public class AfterImage : MonoBehaviour, IDamageable, ICombatTarget
+    {
+        [Header("Stats")]
+        public float lifetime = 1.0f;
+        public float health = 10f; // Default hp
+
+        // State
+        private bool _isDead = false;
+        private Tween _fadeTween;
+
+        // ICombatTarget
+        public bool IsStaggered => false; // Decoys cannot be staggered
+        public bool KeepPlayerGrounded => false;
+        // Transform property is inherited from MonoBehaviour
+
+        private void Start()
+        {
+            // 1. Notify AI
+            GameEvents.OnDecoySpawned?.Invoke(transform);
+
+            // 2. Visual Fade
+            Renderer rend = GetComponentInChildren<Renderer>();
+            if (rend)
+            {
+                // Ensure we don't crash if material is missing
+                _fadeTween = rend.material.DOFade(0f, lifetime).SetEase(Ease.Linear);
+            }
+
+            // 3. Schedule Death (Use Invoke to be safe against Tween errors)
+            Invoke(nameof(Expire), lifetime);
+        }
+
+        private void OnDestroy()
+        {
+            // Cleanup
+            if (_fadeTween != null) _fadeTween.Kill();
+            
+            GameEvents.OnDecoyExpired?.Invoke();
+        }
+
+        public void OnExecutionHit()
+        {
+            // If player attacks their own decoy, pop it
+            Kill(true);
+        }
+
+        public bool TakeDamage(DamageInfo info)
+        {
+            if (_isDead) return false;
+
+            // Take damage
+            health -= info.damageAmount;
+
+            // Visual Shake (Feedback)
+            transform.DOPunchScale(Vector3.one * 0.2f, 0.1f);
+
+            if (health <= 0)
+            {
+                Kill(false);
+            }
+            
+            // Return true so bullets register a hit and despawn
+            return true; 
+        }
+
+        public void Kill(bool instant)
+        {
+            if (_isDead) return;
+            _isDead = true;
+
+            // Optional: Play "Pop" sound here via Services.Audio
+
+            Destroy(gameObject);
+        }
+
+        private void Expire()
+        {
+            Kill(false);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Movement\PlayerDodge.cs`
+- Lines: 189
+- Size: 6.0 KB
+- Modified: 2026-01-06 10:04
+
+```csharp
+using UnityEngine;
+using System.Collections;
+using DarkTowerTron.Core;
+using DarkTowerTron.Physics;
+using DarkTowerTron.Combat;
+using DarkTowerTron.Player.Stats;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Player.Movement
+{
+    [RequireComponent(typeof(KinematicMover))]
+    [RequireComponent(typeof(PlayerEnergy))]
+    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerLoadout))]
+    [RequireComponent(typeof(PlayerStats))]
+    public class PlayerDodge : MonoBehaviour
+    {
+        // REMOVED: public float focusCost, dashDistance, dashDuration 
+        // (Moved to PlayerStatsSO)
+
+        // REMOVED: public LayerMask projectileLayer, wallLayer
+        // (Moved to GameConstants)
+
+        [Header("Audio")]
+        public AudioClip dashClip;
+
+        [Header("Visual Indicator")]
+        public Transform indicatorRef;
+        public Renderer indicatorRenderer;
+        public Material readyMat;
+        public Material notReadyMat;
+        public bool showIndicator = true;
+
+        // State Properties
+        public bool IsInvulnerable { get; private set; }
+        public bool IsDashing { get; private set; }
+
+        // Dependencies
+        private KinematicMover _mover;
+        private PlayerEnergy _energy;
+        private PlayerMovement _movement;
+        private PlayerLoadout _loadout;
+        private PlayerStats _stats;
+
+        private void Awake()
+        {
+            _mover = GetComponent<KinematicMover>();
+            _energy = GetComponent<PlayerEnergy>();
+            _movement = GetComponent<PlayerMovement>();
+            _loadout = GetComponent<PlayerLoadout>();
+            _stats = GetComponent<PlayerStats>();
+        }
+
+        private void Update()
+        {
+            HandleIndicator();
+        }
+
+        public void PerformDodge()
+        {
+            if (IsDashing) return;
+
+            // CHANGE: Use Stats
+            if (_energy.SpendFocus(_stats.DashCost))
+            {
+                StartCoroutine(DodgeRoutine());
+            }
+        }
+
+        private IEnumerator DodgeRoutine()
+        {
+            IsDashing = true;
+            IsInvulnerable = true;
+
+            if (indicatorRef) indicatorRef.gameObject.SetActive(false);
+
+            // 1. Gravity Suspension (Stats)
+            _movement.SuspendGravity(_stats.DashDuration + _stats.ActionHangTime);
+
+            // 2. Audio (Service Locator)
+            if (Global.Audio != null && dashClip)
+                Global.Audio.PlaySound(dashClip, 1f, true);
+
+            // 3. Decoy
+            if (_loadout && _loadout.currentDecoy)
+                Instantiate(_loadout.currentDecoy, transform.position, transform.rotation);
+
+            // 4. Direction
+            Vector3 dashDir;
+            if (_movement.MoveInput.sqrMagnitude > 0.1f)
+                dashDir = _movement.MoveInput.normalized;
+            else
+                dashDir = transform.forward;
+
+            // 5. Physics Loop (Stats)
+            float speed = _stats.DashDistance / _stats.DashDuration;
+            float timer = 0f;
+
+            while (timer < _stats.DashDuration)
+            {
+                float dt = Time.deltaTime;
+                timer += dt;
+
+                _mover.Move(dashDir * speed);
+                CatchProjectiles();
+
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(0.05f);
+
+            IsInvulnerable = false;
+            IsDashing = false;
+        }
+
+        private void CatchProjectiles()
+        {
+            // CHANGE: Use GameConstants
+            int layerMask = 1 << GameConstants.LAYER_PROJECTILE;
+            Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, layerMask);
+
+            foreach (var hit in hits)
+            {
+                // Check Interface via Component
+                IReflectable proj = hit.GetComponent<IReflectable>();
+
+                // Check Projectile specific implementation for hostility
+                // (Ideally IReflectable should have IsHostile, but for now we cast to concrete)
+                var pScript = hit.GetComponent<Projectile>();
+
+                if (proj != null && pScript != null && pScript.isHostile)
+                {
+                    // Redirect
+                    proj.Redirect(transform.forward, gameObject);
+
+                    // Reward
+                    _energy.AddFocus(20f);
+                }
+            }
+        }
+
+        private void HandleIndicator()
+        {
+            if (!indicatorRef) return;
+
+            if (!showIndicator || IsDashing)
+            {
+                indicatorRef.gameObject.SetActive(false);
+                return;
+            }
+
+            indicatorRef.gameObject.SetActive(true);
+
+            Vector3 dir;
+            if (_movement.MoveInput.sqrMagnitude > 0.1f) dir = _movement.MoveInput.normalized;
+            else dir = transform.forward;
+
+            Vector3 targetPos;
+
+            // CHANGE: Use GameConstants and Stats
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, out RaycastHit hit, _stats.DashDistance, GameConstants.MASK_WALLS))
+            {
+                targetPos = hit.point - (dir * 0.5f);
+            }
+            else
+            {
+                targetPos = transform.position + (dir * _stats.DashDistance);
+            }
+
+            targetPos.y = 0.1f;
+            indicatorRef.position = targetPos;
+            indicatorRef.rotation = Quaternion.identity;
+
+            // Visual Feedback
+            if (indicatorRenderer && readyMat && notReadyMat)
+            {
+                // CHANGE: Use Stats
+                bool canAfford = _energy.HasFocus(_stats.DashCost);
+                Material targetMat = canAfford ? readyMat : notReadyMat;
+                if (indicatorRenderer.sharedMaterial != targetMat)
+                {
+                    indicatorRenderer.sharedMaterial = targetMat;
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Movement\PlayerMovement.cs`
+- Lines: 228
+- Size: 7.7 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Physics;
+using DarkTowerTron.Player.Stats;
+
+namespace DarkTowerTron.Player.Movement
+{
+    [RequireComponent(typeof(KinematicMover))]
+    [RequireComponent(typeof(PlayerStats))]
+    public class PlayerMovement : MonoBehaviour
+    {
+        [Header("Wall Repulsion")]
+        public float wallBuffer = 0.6f; // Keep this (Collider size dependency)
+
+        [Header("Safety Net")]
+        public float safeGroundTimer = 0.5f; // Time required to be grounded to count as "Safe"
+        
+        // Read-only property for the Health script to access
+        public Vector3 LastSafePosition { get; private set; }
+
+        // Expose input for Blitz
+        public Vector3 MoveInput => _inputDir;
+
+        private KinematicMover _mover;
+        private Camera _cam;
+        private PlayerStats _stats;
+
+        private Vector3 _inputDir;
+        private Vector3 _currentVelocity;
+        private Vector3 _externalForce;
+        private float _groundedTimer;
+        private float _gravitySuspendTimer = 0f;
+        
+        // Cache for optimization
+        private Collider[] _wallBuffer = new Collider[5];
+
+        private void Awake()
+        {
+            _mover = GetComponent<KinematicMover>();
+            _cam = Camera.main;
+            _stats = GetComponent<PlayerStats>();
+        }
+
+        private void Start()
+        {
+            LastSafePosition = transform.position;
+        }
+
+        public void SetMoveInput(Vector3 dir)
+        {
+            _inputDir = dir;
+        }
+
+        public void LookAtDirection(Vector3 direction)
+        {
+            direction.y = 0;
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, _stats.RotationSpeed * Time.deltaTime);
+            }
+        }
+
+        public void LookAtMouse(Vector2 mouseScreenPos)
+        {
+            Ray ray = _cam.ScreenPointToRay(mouseScreenPos);
+            // Use UnityEngine.Physics to disambiguate
+            if (UnityEngine.Physics.Raycast(ray, out RaycastHit hit, 100f, GameConstants.MASK_GROUND_ONLY))
+            {
+                Vector3 lookDir = hit.point - transform.position;
+                LookAtDirection(lookDir);
+            }
+        }
+
+        public void ApplyKnockback(Vector3 force)
+        {
+            force.y = 0;
+            _externalForce += force;
+        }
+
+        private void Update()
+        {
+
+            if (_gravitySuspendTimer > 0) _gravitySuspendTimer -= Time.deltaTime;
+
+            HandleVelocity();
+            HandleSafeGround();
+        }
+
+        private void HandleVelocity()
+        {
+            float dt = Time.deltaTime;
+
+            // 1. Calculate Target (Inputs)
+            Vector3 targetVel = _inputDir * _stats.MoveSpeed;
+            Vector3 wallPush = CalculateWallRepulsion();
+            targetVel += wallPush;
+
+            // 2. Acceleration
+            if (_inputDir.magnitude > 0.1f)
+            {
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, _stats.Acceleration * dt);
+            }
+            else
+            {
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, _stats.Deceleration * dt);
+                if (_currentVelocity.magnitude < 0.01f) _currentVelocity = Vector3.zero;
+            }
+
+            // 3. External Forces (Recoil/Knockback)
+            if (_externalForce.magnitude > 0.1f)
+            {
+                _externalForce = Vector3.Lerp(_externalForce, Vector3.zero, 5f * dt);
+            }
+            else
+            {
+                _externalForce = Vector3.zero;
+            }
+
+            // 4. COMBINE (No dt multiplication here!)
+            Vector3 finalVelocity = _currentVelocity + _externalForce;
+
+            // --- GRAVITY LOGIC UPDATE ---
+            // Only apply gravity if NOT grounded AND NOT suspended
+            if (!_mover.IsGrounded && _gravitySuspendTimer <= 0)
+            {
+                finalVelocity.y -= _stats.Gravity;
+            }
+            else if (_mover.IsGrounded)
+            {
+                finalVelocity.y = -2f; // Stick to ground
+            }
+            else
+            {
+                // We are in Air + Suspended = Zero Gravity (Hover)
+                finalVelocity.y = 0f;
+            }
+            // ----------------------------
+
+            // 6. EXECUTE
+            _mover.Move(finalVelocity);
+        }
+
+        // NEW METHOD: Call this when teleporting/respawning
+        public void ResetVelocity()
+        {
+            _currentVelocity = Vector3.zero;
+            _externalForce = Vector3.zero;
+            _inputDir = Vector3.zero; // Optional: Stop input until player presses again
+        }
+
+        private void HandleSafeGround()
+        {
+            // STRICT CHECK:
+            // 1. Must be physically grounded (Motor check)
+            // 2. Must have ground directly beneath center (Raycast check)
+            // This prevents saving "The Edge" as a safe spot.
+            
+            bool isCenterSupported = false;
+            
+            // Cast from slightly up, downwards. Check GROUND layer only.
+            if (UnityEngine.Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, 2.0f, GameConstants.MASK_GROUND_ONLY))
+            {
+                isCenterSupported = true;
+            }
+
+            if (_mover.IsGrounded && isCenterSupported)
+            {
+                _groundedTimer += Time.deltaTime;
+                if (_groundedTimer > safeGroundTimer)
+                {
+                    // Save position slightly higher to prevent floor clipping
+                    LastSafePosition = transform.position + Vector3.up * 0.2f;
+                }
+            }
+            else
+            {
+                _groundedTimer = 0f;
+            }
+        }
+
+        private Vector3 CalculateWallRepulsion()
+        {
+            Vector3 push = Vector3.zero;
+
+            // CHANGE: Use Constant instead of variable
+            int layerMask = GameConstants.MASK_WALLS;
+
+            // Find walls within buffer range
+            // We use the player's position + slight up offset (center of mass)
+            int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position + Vector3.up, wallBuffer, _wallBuffer, layerMask);
+
+            for (int i = 0; i < count; i++)
+            {
+                Collider wall = _wallBuffer[i];
+
+                // Find the closest point on the wall's surface to the player
+                Vector3 closestPoint = wall.ClosestPoint(transform.position + Vector3.up);
+
+                // Calculate direction AWAY from wall
+                Vector3 dir = (transform.position - closestPoint);
+                dir.y = 0; // Keep it flat
+
+                float dist = dir.magnitude;
+
+                // If we are actually inside/touching/near the wall
+                if (dist < wallBuffer)
+                {
+                    // The closer we are, the stronger the push
+                    // Normalized push * strength
+                    push += dir.normalized * _stats.WallRepulsion;
+                }
+            }
+
+            return push;
+        }
+
+        public void SuspendGravity(float duration)
+        {
+            _gravitySuspendTimer = duration;
+
+            // CRITICAL: Kill existing downward momentum immediately
+            // so we don't carry "falling speed" into the hover.
+            if (_externalForce.y < 0) _externalForce.y = 0;
+            if (_currentVelocity.y < 0) _currentVelocity.y = 0;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Stats\PlayerEnergy.cs`
+- Lines: 112
+- Size: 3.5 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+
+namespace DarkTowerTron.Player.Stats
+{
+    [RequireComponent(typeof(PlayerStats))]
+    public class PlayerEnergy : MonoBehaviour
+    {
+        [Header("Broadcasting")]
+        [SerializeField] private FloatFloatEventChannelSO _focusEvent; // Replaces OnFocusChanged
+
+        [Header("Listening")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+
+        private float _currentFocus;
+        private bool _isDead;
+        private bool _isCombatActive = false; 
+
+        private PlayerStats _stats;
+
+        private void Awake()
+        {
+            _stats = GetComponent<PlayerStats>();
+        }
+
+        private void Start()
+        {
+            if (_stats == null) return;
+            _currentFocus = _stats.MaxFocus;
+            UpdateUI();
+        }
+
+        private void OnEnable()
+        {
+            // Subscribe to SO Event
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+
+            // Subscribe to remaining Static Events (Phase 2 migration)
+            GameEvents.OnPlayerDied += OnPlayerDied;
+            GameEvents.OnWaveCombatStarted += EnableDecay;
+            GameEvents.OnWaveCleared += DisableDecay;
+            GameEvents.OnGameVictory += DisableDecay;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+
+            GameEvents.OnPlayerDied -= OnPlayerDied;
+            GameEvents.OnWaveCombatStarted -= EnableDecay;
+            GameEvents.OnWaveCleared -= DisableDecay;
+            GameEvents.OnGameVictory -= DisableDecay;
+        }
+
+        private void Update()
+        {
+            if (_isDead) return;
+
+            bool shouldBeOverdrive = _currentFocus >= _stats.baseStats.overdriveThreshold;
+            _stats.SetOverdrive(shouldBeOverdrive);
+
+            if (_isCombatActive && _currentFocus > 0)
+            {
+                _currentFocus -= _stats.FocusDecayRate * Time.deltaTime;
+                if (_currentFocus < 0) _currentFocus = 0;
+                UpdateUI();
+            }
+        }
+
+        // --- PUBLIC API ---
+        public bool HasFocus(float amount) => _currentFocus >= amount;
+
+        public bool SpendFocus(float amount)
+        {
+            if (_currentFocus >= amount)
+            {
+                _currentFocus -= amount;
+                UpdateUI();
+                return true;
+            }
+            return false;
+        }
+
+        public void AddFocus(float amount)
+        {
+            _currentFocus += amount;
+            if (_currentFocus > _stats.MaxFocus) _currentFocus = _stats.MaxFocus;
+            UpdateUI();
+        }
+
+        // --- HANDLERS ---
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
+        {
+            if (!rewardPlayer) return;
+            float gain = (stats != null) ? stats.focusReward : _stats.BaseFocusOnKill;
+            AddFocus(gain);
+        }
+
+        private void EnableDecay() { _isCombatActive = true; }
+        private void DisableDecay() { _isCombatActive = false; }
+        private void OnPlayerDied() { _isDead = true; }
+
+        private void UpdateUI()
+        {
+            // NEW: Raise via Channel
+            if (_focusEvent != null) 
+                _focusEvent.Raise(_currentFocus, _stats.MaxFocus);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Stats\PlayerHealth.cs`
+- Lines: 173
+- Size: 5.4 KB
+- Modified: 2026-01-06 11:43
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+using DarkTowerTron.Core.Services;    // For GameLogger
+using DarkTowerTron.Player.Movement;
+using DarkTowerTron.Player.Stats;
+
+namespace DarkTowerTron.Player.Stats
+{
+    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerDodge))]
+    [RequireComponent(typeof(PlayerStats))]
+    public class PlayerHealth : MonoBehaviour, IDamageable, IAimTarget
+    {
+        [Header("Configuration")]
+        public bool startWithHull = true;
+
+        [Header("Aiming")]
+        [SerializeField] private Transform _aimTarget; // Assign 'CameraTarget' or 'Visuals/Spine'
+
+        [Header("Broadcasting")]
+        [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
+        [SerializeField] private BoolEventChannelSO _hullEvent;        // Replaces OnHullStateChanged
+        [SerializeField] private VoidEventChannelSO _playerHitEvent;   // Replaces OnPlayerHit
+
+        [Header("Listening")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+
+        private int _currentGrit;
+        private bool _hasHull;
+        private bool _isDead;
+        
+        private PlayerMovement _movement;
+        private PlayerDodge _dodge;
+        private PlayerStats _stats;
+
+        private void Awake()
+        {
+            _movement = GetComponent<PlayerMovement>();
+            _dodge = GetComponent<PlayerDodge>();
+            _stats = GetComponent<PlayerStats>();
+        }
+
+        private void Start()
+        {
+            _currentGrit = _stats ? _stats.MaxGrit : 2;
+            _hasHull = startWithHull;
+            UpdateUI();
+        }
+
+        private void OnEnable()
+        {
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+        }
+
+        public bool TakeDamage(DamageInfo info)
+        {
+            if (_isDead) return false;
+            if (_dodge != null && _dodge.IsInvulnerable) return false;
+
+            int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
+
+            if (_currentGrit > 0)
+            {
+                _currentGrit -= dmg;
+                if (_currentGrit < 0) _currentGrit = 0;
+
+                // NEW: Raise Void Event for FX/Camera Shake
+                _playerHitEvent?.Raise();
+            }
+            else if (_hasHull)
+            {
+                _hasHull = false;
+                _playerHitEvent?.Raise();
+            }
+            else
+            {
+                Kill(false);
+            }
+
+            if (!_isDead && _movement) 
+                _movement.ApplyKnockback(info.pushDirection * info.pushForce);
+
+            UpdateUI();
+            return true;
+        }
+
+        public void TakeVoidDamage()
+        {
+            if (_isDead) return;
+            
+            if (_movement)
+            {
+                _movement.ResetVelocity();
+                var motor = GetComponent<DarkTowerTron.Physics.KinematicMover>();
+                if (motor) motor.Teleport(_movement.LastSafePosition);
+                else transform.position = _movement.LastSafePosition;
+            }
+
+            // Simulate Environment Damage
+            TakeDamage(new DamageInfo { damageAmount = 1f, damageType = DamageType.Environment });
+        }
+
+        public void Kill(bool instant)
+        {
+            if (_isDead) return;
+            _isDead = true;
+            _currentGrit = 0;
+            _hasHull = false;
+            UpdateUI();
+            
+            GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
+            GameEvents.OnPlayerDied?.Invoke(); // Still static for now
+        }
+
+        public void HealGrit(int amount = 1)
+        {
+            if (_isDead) return;
+            int max = _stats ? _stats.MaxGrit : 2;
+            _currentGrit = Mathf.Min(_currentGrit + amount, max);
+            UpdateUI();
+        }
+
+        private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
+        {
+            if (!rewardPlayer) return;
+
+            // Case A: Stats exist (Standard Enemy)
+            if (stats != null)
+            {
+                if (stats.healsGrit)
+                {
+                    HealGrit(stats.gritRewardAmount);
+                }
+                // If !healsGrit, do nothing. Correct.
+            }
+            // Case B: No Stats (Debug Enemy / Test Dummy)
+            else
+            {
+                // Fallback: Default behavior for untyped enemies
+                HealGrit(1);
+            }
+        }
+
+        public void ForceUpdateUI() => UpdateUI();
+
+        private void UpdateUI()
+        {
+            int max = _stats ? _stats.MaxGrit : 2;
+            
+            // NEW: Raise Typed Events
+            _gritEvent?.Raise(_currentGrit, max);
+            _hullEvent?.Raise(_hasHull);
+        }
+
+        // --- IAimTarget ---
+        public Vector3 AimPoint
+        {
+            get
+            {
+                if (_aimTarget == null) return transform.position + Vector3.up * 1.2f;
+                return _aimTarget.position;
+            }
+        }
+        public float TargetRadius => 0.5f;
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Stats\PlayerLoadout.cs`
+- Lines: 37
+- Size: 0.9 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Player.Stats
+{
+    public class PlayerLoadout : MonoBehaviour
+    {
+        [Header("Defaults")]
+        public GameObject defaultProjectile;
+        public GameObject defaultDecoy;
+
+        [Header("Active Loadout (Debug/Runtime)")]
+        public GameObject currentProjectile;
+        public GameObject currentDecoy;
+
+        private void Awake()
+        {
+            // Initialize with defaults on start
+            ResetLoadout();
+        }
+
+        public void ResetLoadout()
+        {
+            currentProjectile = defaultProjectile;
+            currentDecoy = defaultDecoy;
+        }
+
+        public void EquipProjectile(GameObject newPrefab)
+        {
+            if (newPrefab != null) currentProjectile = newPrefab;
+        }
+
+        public void EquipDecoy(GameObject newPrefab)
+        {
+            if (newPrefab != null) currentDecoy = newPrefab;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Stats\PlayerStats.cs`
+- Lines: 78
+- Size: 3.0 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core.Data;
+
+namespace DarkTowerTron.Player.Stats
+{
+    public class PlayerStats : MonoBehaviour
+    {
+        [Header("Base Configuration")]
+        public PlayerStatsSO baseStats;
+
+        public bool IsOverdrive { get; private set; }
+
+        // Helper property to shorten null checks
+        private PlayerStatsSO Base => baseStats;
+
+        private void Awake()
+        {
+            if (baseStats == null)
+            {
+                Debug.LogError(
+                    $"[PlayerStats] CRITICAL: Missing PlayerStatsSO on {name}! Drag 'Stats_Player_Default' into the inspector.",
+                    gameObject);
+            }
+        }
+
+        // --- MOVEMENT & PHYSICS ---
+        public float MoveSpeed => IsOverdrive
+            ? (Base?.moveSpeed ?? 12f) * (Base?.overdriveSpeedMult ?? 1f)
+            : (Base?.moveSpeed ?? 12f);
+        public float Acceleration => Base?.acceleration ?? 60f;
+        public float Deceleration => Base?.deceleration ?? 40f;
+        public float RotationSpeed => Base?.rotationSpeed ?? 25f;
+        public float Gravity => Base?.gravity ?? 20f;
+        public float WallRepulsion => Base?.wallRepulsionForce ?? 5f;
+        public float ActionHangTime => Base?.actionHangTime ?? 0.2f;
+
+        // --- SCANNER ---
+        public float ScanRange => Base?.scanRange ?? 25f;
+        public float ScanRadius => Base?.scanRadius ?? 2f;
+
+        // --- ABILITIES ---
+        public float DashCost => Base?.dashCost ?? 0f;
+        public float DashDistance => Base?.dashDistance ?? 0f;
+        public float DashDuration => Base?.dashCooldown ?? 0f;
+
+        // --- WEAPON: GUN ---
+        public float GunDamage => IsOverdrive
+            ? (Base?.gunDamage ?? 1f) * (Base?.overdriveDamageMult ?? 1f)
+            : (Base?.gunDamage ?? 1f);
+        public int GunStagger => Base?.gunStagger ?? 0;
+        // Rate: Lower is faster. If OverdriveMult is 1.5 (Faster), we divide the delay.
+        public float GunRate => IsOverdrive
+            ? (Base?.gunFireRate ?? 0.2f) / (Base?.overdriveFireRateMult ?? 1f)
+            : (Base?.gunFireRate ?? 0.2f);
+
+        // --- WEAPON: BEAM ---
+        public float BeamDamage => IsOverdrive
+            ? (Base?.beamDamage ?? 1f) * (Base?.overdriveDamageMult ?? 1f)
+            : (Base?.beamDamage ?? 1f);
+        public int BeamStagger => Base?.beamStagger ?? 0;
+        public float BeamRate => IsOverdrive
+            ? (Base?.beamFireRate ?? 0.2f) / (Base?.overdriveFireRateMult ?? 1f)
+            : (Base?.beamFireRate ?? 0.2f);
+
+        // --- RESOURCES ---
+        public int MaxGrit => Base?.maxGrit ?? 3;
+        public float MaxFocus => Base?.maxFocus ?? 100f;
+        
+        // Future proofing: Modifiers could change these later
+        public float FocusDecayRate => Base?.focusDecayRate ?? 5f; 
+        public float BaseFocusOnKill => Base?.baseFocusOnKill ?? 20f;
+
+        public void SetOverdrive(bool state)
+        {
+            IsOverdrive = state;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Services\AudioManager.cs`
+- Lines: 38
+- Size: 1.2 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core; // For GameLogger
+
+namespace DarkTowerTron.Core.Services
+{
+    [RequireComponent(typeof(AudioSource))]
+    public class AudioManager : MonoBehaviour
+    {
+        // REMOVED: public static AudioManager Instance;
+
+        [SerializeField] private AudioSource _sfxSource;
+
+        private void Awake()
+        {
+            // REMOVED: Singleton check
+            if (_sfxSource == null) _sfxSource = GetComponent<AudioSource>();
+        }
+
+        public void PlaySound(SoundDef soundDef)
+        {
+            if (soundDef == null || _sfxSource == null) return;
+
+            AudioClip clip = soundDef.GetClip();
+            if (clip == null) return;
+
+            _sfxSource.pitch = soundDef.GetPitch();
+            _sfxSource.PlayOneShot(clip, soundDef.volume);
+        }
+
+        public void PlaySound(AudioClip clip, float volume = 1f, bool randomizePitch = false)
+        {
+            if (clip == null || _sfxSource == null) return;
+            _sfxSource.pitch = randomizePitch ? Random.Range(0.9f, 1.1f) : 1f;
+            _sfxSource.PlayOneShot(clip, volume);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Services\MusicManager.cs`
+- Lines: 59
+- Size: 1.6 KB
+- Modified: 2026-01-06 10:31
+
+```csharp
+using UnityEngine;
+using DG.Tweening;
+using DarkTowerTron.Core; // For GameEvents
+
+namespace DarkTowerTron.Services
+{
+    [RequireComponent(typeof(AudioSource))]
+    public class MusicManager : MonoBehaviour
+    {
+        private AudioSource _source;
+        private float _originalPitch;
+        private float _originalVolume;
+
+        private void Awake()
+        {
+            _source = GetComponent<AudioSource>();
+            _originalPitch = _source.pitch;
+            _originalVolume = _source.volume;
+        }
+
+        private void Start()
+        {
+            // Auto-start if not playing
+            if (!_source.isPlaying && _source.clip != null)
+                _source.Play();
+        }
+
+        private void OnEnable()
+        {
+            // We can listen to Global Events here
+            GameEvents.OnPlayerDied += OnDeath; // Legacy Event
+            // TODO: Subscribe to 'Event_PlayerDeath' SO when migrated
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnPlayerDied -= OnDeath;
+        }
+
+        private void OnDeath()
+        {
+            // "Power Down" Effect
+            _source.DOPitch(_originalPitch * 0.5f, 1.0f).SetUpdate(true);
+            _source.DOFade(_originalVolume * 0.5f, 1.0f).SetUpdate(true);
+        }
+
+        public void ResetMusic()
+        {
+            _source.DOKill();
+            _source.pitch = _originalPitch;
+            _source.volume = _originalVolume;
+        }
+
+        public void SetVolume(float volume)
+        {
+            _source.volume = volume;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Services\PaletteManager.cs`
+- Lines: 137
+- Size: 4.5 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using System; // <--- REQUIRED for Action
+using System.Collections.Generic;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services;
+using DarkTowerTron.Core;
+using UnityEngine.Serialization;
+
+namespace DarkTowerTron.Services
+{
+    [ExecuteAlways]
+    public class PaletteManager : MonoBehaviour
+    {
+        public static PaletteManager Instance;
+
+        // --- NEW: Restore the Event ---
+        public event Action OnPaletteChanged;
+
+        [Header("Active Configuration")]
+        public ColorPaletteSO activePalette;
+        public string activeVariant = "";
+
+        [Header("Material Bindings")]
+        public List<SurfaceBinding> bindings;
+
+        [System.Serializable]
+        public struct SurfaceBinding
+        {
+            // Legacy (string-based) surface name. Kept for migration/backward compatibility.
+            [HideInInspector] public string surfaceName;
+
+            [FormerlySerializedAs("surfaceType")]
+            public SurfaceType type;
+            public MaterialCollectionSO collection;
+        }
+
+        [Header("Debug")]
+        public bool refreshNow = false;
+
+        private void Awake()
+        {
+            if (Application.isPlaying)
+            {
+                if (Instance == null) Instance = this;
+                else Destroy(gameObject);
+            }
+            else
+            {
+                Instance = this;
+            }
+        }
+
+        private void Start()
+        {
+            if (Application.isPlaying) ApplyPalette();
+        }
+
+        private void Update()
+        {
+            if (refreshNow)
+            {
+                ApplyPalette();
+                refreshNow = false;
+            }
+        }
+
+        public void SetVariant(string variantName)
+        {
+            activeVariant = variantName;
+            ApplyPalette();
+        }
+
+        public void ApplyPalette()
+        {
+            if (activePalette == null) return;
+
+            // 1. Apply Surfaces
+            foreach (var binding in bindings)
+            {
+
+                GameLogger.Log(DarkTowerTron.Core.LogChannel.VFX, $"Applying Surface: {binding.type} to Collection: {binding.collection?.name}", gameObject);
+
+                if (binding.collection == null) continue;
+
+                // Pass the Enum
+                SurfaceDefinition def = activePalette.GetSurface(binding.type, activeVariant);
+                ApplyToCollection(binding.collection, def);
+            }
+
+            // 2. Apply Globals
+            if (Camera.main != null)
+            {
+                // URP: This sets the "Background Type" to Solid Color
+                Camera.main.clearFlags = CameraClearFlags.SolidColor;
+                Camera.main.backgroundColor = activePalette.skyColor;
+            }
+
+            // 3. Apply Fog (The Infinite Void)
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.ExponentialSquared; // Best for "Void" look
+            RenderSettings.fogColor = activePalette.skyColor;
+            RenderSettings.fogDensity = activePalette.fogDensity;
+
+            // 4. Notify Listeners (PaletteReceiver)
+            OnPaletteChanged?.Invoke(); // <--- RESTORED
+
+            GameLogger.Log(DarkTowerTron.Core.LogChannel.VFX, $"Palette Applied: {activePalette.name} [{activeVariant}]", gameObject);
+        }
+
+        private void ApplyToCollection(MaterialCollectionSO col, SurfaceDefinition def)
+        {
+            if (col.materials == null) return;
+
+            foreach (Material mat in col.materials)
+            {
+                if (mat == null) continue;
+
+                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", def.mainColor);
+                else if (mat.HasProperty("_Color")) mat.SetColor("_Color", def.mainColor);
+
+                if (mat.HasProperty("_EmissionColor"))
+                {
+                    mat.SetColor("_EmissionColor", def.emissionColor);
+                    mat.EnableKeyword("_EMISSION");
+                }
+                else if (mat.HasProperty("_GlowColor"))
+                {
+                    Color hdrGlow = def.emissionColor * Mathf.LinearToGammaSpace(def.emissionIntensity > 0 ? def.emissionIntensity : 1f);
+                    mat.SetColor("_GlowColor", hdrGlow);
+                }
+
+                if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", def.smoothness);
+                if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", def.metallic);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Services\PoolManager.cs`
+- Lines: 129
+- Size: 4.4 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement; // Needed for cleanup
+using DarkTowerTron.Core;
+
+namespace DarkTowerTron.Core.Services
+{
+    public class PoolManager : MonoBehaviour
+    {
+        // REMOVED: public static PoolManager Instance;
+
+        private Dictionary<int, Queue<GameObject>> _poolDictionary = new Dictionary<int, Queue<GameObject>>();
+        private Dictionary<int, int> _spawnedObjectsParentId = new Dictionary<int, int>();
+
+        private void Awake()
+        {
+            // REMOVED: Singleton check
+        }
+
+        private void OnEnable() => SceneManager.activeSceneChanged += OnSceneChanged;
+        private void OnDisable() => SceneManager.activeSceneChanged -= OnSceneChanged;
+
+        // CRITICAL FIX: When scene changes, all GameObjects in the scene are destroyed.
+        // We must clear our references, or we hold onto "Missing" objects.
+        private void OnSceneChanged(Scene current, Scene next)
+        {
+            ClearPools();
+        }
+
+        public void ClearPools()
+        {
+            _poolDictionary.Clear();
+            _spawnedObjectsParentId.Clear();
+            
+            // Destroy any children still hanging under this transform (if any were reparented)
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+            
+            GameLogger.Log(LogChannel.System, "PoolManager cleaned up for new scene.", gameObject);
+        }
+
+        public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
+        {
+            if (prefab == null) return null;
+
+            int poolKey = prefab.GetInstanceID();
+
+            if (!_poolDictionary.ContainsKey(poolKey))
+            {
+                _poolDictionary.Add(poolKey, new Queue<GameObject>());
+            }
+
+            GameObject objectToSpawn;
+
+            // Simple validation: Ensure queue item isn't null (destroyed externally)
+            if (_poolDictionary[poolKey].Count > 0)
+            {
+                objectToSpawn = _poolDictionary[poolKey].Dequeue();
+                
+                // Safety check: Was it destroyed?
+                while (objectToSpawn == null && _poolDictionary[poolKey].Count > 0)
+                {
+                    objectToSpawn = _poolDictionary[poolKey].Dequeue();
+                }
+
+                if (objectToSpawn == null)
+                {
+                    objectToSpawn = Instantiate(prefab, position, rotation);
+                }
+                else
+                {
+                    objectToSpawn.transform.position = position;
+                    objectToSpawn.transform.rotation = rotation;
+                    objectToSpawn.SetActive(true);
+                }
+            }
+            else
+            {
+                objectToSpawn = Instantiate(prefab, position, rotation);
+            }
+
+            // Interface Logic
+            var poolables = objectToSpawn.GetComponentsInChildren<IPoolable>();
+            foreach (var p in poolables) p.OnSpawn();
+
+            // Track ID
+            int instanceKey = objectToSpawn.GetInstanceID();
+            if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
+            {
+                _spawnedObjectsParentId.Add(instanceKey, poolKey);
+            }
+
+            return objectToSpawn;
+        }
+
+        public void Despawn(GameObject obj)
+        {
+            if (obj == null) return;
+
+            int instanceKey = obj.GetInstanceID();
+
+            if (_spawnedObjectsParentId.ContainsKey(instanceKey))
+            {
+                var poolables = obj.GetComponentsInChildren<IPoolable>();
+                foreach (var p in poolables) p.OnDespawn();
+
+                int poolKey = _spawnedObjectsParentId[instanceKey];
+                
+                // PREVENT LEAK: Remove from tracking
+                _spawnedObjectsParentId.Remove(instanceKey);
+
+                obj.SetActive(false);
+                obj.transform.SetParent(transform); // Store under manager
+
+                // Add back to queue
+                if (!_poolDictionary.ContainsKey(poolKey)) 
+                    _poolDictionary[poolKey] = new Queue<GameObject>();
+                    
+                _poolDictionary[poolKey].Enqueue(obj);
+            }
+            else
+            {
+                Destroy(obj);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Services\ScoreManager.cs`
+- Lines: 98
+- Size: 3.0 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+
+namespace DarkTowerTron.Services
+{
+    public class ScoreManager : MonoBehaviour
+    {
+        // Note: ScoreManager is likely registered in Bootloader or Scene Context via ServiceLocator
+        // But internal logic remains MonoBehaviour-based for now.
+
+        [Header("Broadcasting")]
+        [SerializeField] private IntIntEventChannelSO _scoreEvent; // Replaces OnScoreChanged
+
+        [Header("Listening")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+        [SerializeField] private VoidEventChannelSO _playerHitEvent; // Replaces OnPlayerHit
+
+        [Header("Score Settings")]
+        public int baseScorePerKill = 100;
+        public int gloryKillBonus = 500;
+        public int maxMultiplier = 5;
+
+        public int currentMultiplier = 1;
+        public int TotalScore { get; private set; }
+        public float GameTime { get; private set; }
+
+        private bool _isTracking = false;
+
+        private void Start()
+        {
+            _isTracking = true;
+            UpdateUI();
+        }
+
+        private void OnEnable()
+        {
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+            if (_playerHitEvent) _playerHitEvent.OnEventRaised += OnPlayerHit;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+            if (_playerHitEvent) _playerHitEvent.OnEventRaised -= OnPlayerHit;
+        }
+
+        private void Update()
+        {
+            if (_isTracking) GameTime += Time.deltaTime;
+        }
+
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
+        {
+            if (!rewardPlayer) return;
+
+            int scoreValue = (stats != null) ? stats.scoreValue : baseScorePerKill;
+            AddScore(scoreValue * currentMultiplier);
+
+            if (currentMultiplier < maxMultiplier)
+            {
+                currentMultiplier++;
+                UpdateUI();
+            }
+        }
+
+        private void OnPlayerHit()
+        {
+            if (currentMultiplier > 1)
+            {
+                currentMultiplier = 1;
+                UpdateUI();
+            }
+        }
+
+        public void StopTracking() { _isTracking = false; }
+
+        public void AddScore(int amount)
+        {
+            TotalScore += amount;
+            UpdateUI();
+        }
+
+        public void TriggerGloryKillBonus()
+        {
+            int bonus = gloryKillBonus * currentMultiplier;
+            GameLogger.Log(LogChannel.Combat, $"GLORY KILL! +{bonus}", gameObject);
+            AddScore(bonus);
+        }
+
+        private void UpdateUI()
+        {
+            // NEW: Raise event via Channel
+            _scoreEvent?.Raise(TotalScore, currentMultiplier);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Services\VFXManager.cs`
+- Lines: 65
+- Size: 2.1 KB
+- Modified: 2026-01-06 09:15
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services; // Add namespace
+
+namespace DarkTowerTron.Core.Services
+{
+    public class VFXManager : MonoBehaviour
+    {
+        // REMOVED: public static VFXManager Instance;
+
+        [Header("Prefabs")]
+        public GameObject explosionPrefab;
+        public GameObject spawnPrefab;
+        public LayerMask groundLayer;
+
+        private void Awake()
+        {
+            // REMOVED: Singleton check
+            if (groundLayer == 0) groundLayer = GameConstants.MASK_PHYSICS_OBSTACLES;
+        }
+
+        private void OnEnable()
+        {
+            // Keep event subscriptions for now (Session 3 will refactor this)
+            GameEvents.OnEnemyKilled += PlayDeathVFX;
+            GameEvents.OnEnemySpawned += PlaySpawnVFX;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnEnemyKilled -= PlayDeathVFX;
+            GameEvents.OnEnemySpawned -= PlaySpawnVFX;
+        }
+
+        private void PlayDeathVFX(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
+        {
+            if (explosionPrefab)
+            {
+                // UPDATED: Use Services.Pool
+                GameObject vfx = Services.Pool.Spawn(explosionPrefab, pos, Quaternion.identity);
+                var ps = vfx.GetComponent<ParticleSystem>();
+                if (ps) ps.Play();
+            }
+        }
+
+        private void PlaySpawnVFX(Vector3 pos)
+        {
+            if (spawnPrefab)
+            {
+                Vector3 vfxPos = pos + Vector3.up * 0.1f;
+                // Simplified Raycast for brevity
+                if (UnityEngine.Physics.Raycast(pos + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 10f, groundLayer))
+                {
+                    vfxPos = hit.point + Vector3.up * 0.1f;
+                }
+
+                // UPDATED: Use Services.Pool
+                GameObject vfx = Services.Pool.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
+                var ps = vfx.GetComponent<ParticleSystem>();
+                if (ps) ps.Play();
+            }
         }
     }
 }
@@ -10364,7 +12642,7 @@ namespace DarkTowerTron.Player
 ## 📄 `Assets\Scripts\UI\CountdownUI.cs`
 - Lines: 68
 - Size: 2.2 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-11 07:51
 
 ```csharp
 using UnityEngine;
@@ -10437,16 +12715,123 @@ namespace DarkTowerTron.UI
 }
 ```
 
+## 📄 `Assets\Scripts\UI\DamageTextManager.cs`
+- Lines: 98
+- Size: 3.5 KB
+- Modified: 2026-01-06 10:37
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+using DarkTowerTron.Core.Events;
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.UI
+{
+    public class DamageTextManager : MonoBehaviour
+    {
+        [Header("Wiring")]
+        [SerializeField] private DamageTextEventChannelSO _damageEvent;
+        [SerializeField] private PopupTextEventChannelSO _popupEvent;
+
+        [Header("Setup")]
+        public GameObject textPrefab;
+
+        [Header("Damage Settings")]
+        public Vector3 offset = new Vector3(0, 2f, 0);
+        public Color healthColor = Color.white;
+        public Color critColor = Color.yellow;
+        public Color staggerColor = Color.cyan; // Distinct color for Stagger Damage
+
+        [Header("Narrative Settings")]
+        public Color narrativeColor = new Color(1f, 0.5f, 0f); // Orange
+        [Tooltip("Words to inject via the Popup channel")]
+        public List<string> barks = new List<string> { "WHAM!", "CRUNCH!", "ERROR", "VOID" };
+
+        private void OnEnable()
+        {
+            if (_damageEvent != null) _damageEvent.OnEventRaised += ShowDamage;
+            if (_popupEvent != null) _popupEvent.OnEventRaised += ShowPopup;
+        }
+
+        private void OnDisable()
+        {
+            if (_damageEvent != null) _damageEvent.OnEventRaised -= ShowDamage;
+            if (_popupEvent != null) _popupEvent.OnEventRaised -= ShowPopup;
+        }
+
+        private void ShowDamage(Vector3 pos, float amount, bool isCrit, bool isStagger)
+        {
+            if (textPrefab == null || Global.Pool == null) return;
+
+            // 1. Determine Appearance
+            Color finalColor;
+            float finalScale;
+            string text;
+            bool isDramatic = isCrit;
+
+            if (isStagger)
+            {
+                finalColor = staggerColor;
+                finalScale = 0.8f; // Stagger numbers slightly smaller
+                text = amount.ToString("N0"); // e.g. "5"
+            }
+            else
+            {
+                finalColor = isCrit ? critColor : healthColor;
+                finalScale = isCrit ? 1.5f : 1.0f;
+                text = amount.ToString("N0");
+            }
+
+            // 2. Spawn & Init
+            SpawnText(pos, text, finalColor, finalScale, isDramatic);
+        }
+
+        private void ShowPopup(Vector3 pos, string message)
+        {
+            // If the message is a keyword like "BARK", pick a random narrative word
+            if (message == "BARK" && barks.Count > 0)
+            {
+                message = barks[Random.Range(0, barks.Count)];
+                SpawnText(pos, message, narrativeColor, 1.3f, true); // Dramatic!
+            }
+            else
+            {
+                // Standard Popup (e.g. "REFLECT", "ARMORED")
+                SpawnText(pos, message, critColor, 1.2f, true);
+            }
+        }
+
+        private void SpawnText(Vector3 pos, string text, Color color, float scale, bool dramatic)
+        {
+            if (textPrefab == null || Global.Pool == null) return;
+
+            GameObject obj = Global.Pool.Spawn(textPrefab, pos + offset, Quaternion.identity);
+            var floatingText = obj.GetComponent<DarkTowerTron.UI.FloatingText>();
+
+            if (floatingText)
+            {
+                floatingText.Initialize(text, color, scale, dramatic);
+                // Billboarding
+                obj.transform.forward = Camera.main.transform.forward;
+            }
+        }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\UI\FloatingText.cs`
-- Lines: 56
-- Size: 1.6 KB
-- Modified: 2025-12-31 09:17
+- Lines: 72
+- Size: 2.2 KB
+- Modified: 2026-01-06 09:50
 
 ```csharp
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-using DarkTowerTron.Managers; // Needed to talk to PoolManager
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.UI
 {
@@ -10462,35 +12847,50 @@ namespace DarkTowerTron.UI
             if (textMesh == null) textMesh = GetComponent<TextMeshPro>();
         }
 
-        public void Initialize(string text, Color color, float sizeScale = 1f)
+        public void Initialize(string text, Color color, float sizeScale = 1f, bool isDramatic = false)
         {
             // 1. Setup Text
             textMesh.text = text;
             textMesh.color = color;
             textMesh.alpha = 1f;
 
-            // 2. Reset Transform
+            // 2. Narrative/Dramatic Polish (Fixing "Underwhelming 1")
+            // If it's a Crit or Narrative word, make it Bold and punchier
+            if (isDramatic)
+            {
+                textMesh.fontStyle = FontStyles.Bold;
+                textMesh.outlineWidth = 0.2f; // Outline makes small numbers pop
+            }
+            else
+            {
+                textMesh.fontStyle = FontStyles.Normal;
+                textMesh.outlineWidth = 0f;
+            }
+
+            // 3. Reset Transform
             transform.localScale = Vector3.one * sizeScale;
 
-            // 3. Animate Move Up
+            // 4. Animate Move Up
             transform.DOMoveY(transform.position.y + floatDistance, duration)
                 .SetEase(motionEase);
 
-            // 4. Animate Fade Out (start halfway through)
+            // 5. Animate Fade Out
             textMesh.DOFade(0f, duration * 0.5f)
                 .SetDelay(duration * 0.5f)
                 .OnComplete(Despawn);
 
-            // 5. Juice: Punch Scale
-            transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
+            // 6. Juice: Punch Scale
+            // Dramatic text punches harder
+            float punchAmount = isDramatic ? 0.8f : 0.5f;
+            transform.DOPunchScale(Vector3.one * punchAmount, 0.2f);
         }
 
         private void Despawn()
         {
-            // Return to pool
-            if (PoolManager.Instance != null)
+            // Safety Check for Scene Unload
+            if (Global.Pool != null)
             {
-                PoolManager.Instance.Despawn(gameObject);
+                Global.Pool.Despawn(gameObject);
             }
             else
             {
@@ -10501,10 +12901,158 @@ namespace DarkTowerTron.UI
 }
 ```
 
+## 📄 `Assets\Scripts\UI\HUDManager.cs`
+- Lines: 140
+- Size: 4.8 KB
+- Modified: 2026-01-06 10:37
+
+```csharp
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Services; // Needed for ServiceLocator types
+
+// ALIAS: Prevents conflict if you later import DarkTowerTron.Services
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.UI
+{
+    public class HUDManager : MonoBehaviour
+    {
+        [Header("Event Channels")]
+        [SerializeField] private FloatFloatEventChannelSO _focusEvent;
+        [SerializeField] private IntIntEventChannelSO _gritEvent;
+        [SerializeField] private BoolEventChannelSO _hullEvent;
+        [SerializeField] private IntIntEventChannelSO _scoreEvent;
+
+        [Header("Focus (Energy)")]
+        public Slider focusSlider;
+        public Image focusFillImage;
+        public Color normalFocusColor = Color.cyan;
+        public Color fullFocusColor = new Color(1f, 0f, 1f);
+
+        [Header("Grit (Health)")]
+        public Transform gritContainer;
+        public GameObject pipPrefab;
+        public Color activePipColor = Color.white;
+        public Color inactivePipColor = new Color(1, 1, 1, 0.2f);
+
+        [Header("Hull (Shield)")]
+        public Image hullIcon;
+        public Color hullActiveColor = Color.cyan;
+        public Color hullBrokenColor = new Color(1, 0, 0, 0.3f);
+
+        [Header("Score & System")]
+        public TextMeshProUGUI scoreText;
+        public TextMeshProUGUI multiplierText;
+        public TextMeshProUGUI timerText;
+
+        // Internal State
+        private List<Image> _spawnedPips = new List<Image>();
+
+        private void OnEnable()
+        {
+            if (_focusEvent != null) _focusEvent.OnEventRaised += UpdateFocus;
+            if (_gritEvent != null) _gritEvent.OnEventRaised += UpdateGrit;
+            if (_hullEvent != null) _hullEvent.OnEventRaised += UpdateHull;
+            if (_scoreEvent != null) _scoreEvent.OnEventRaised += UpdateScoreUI;
+        }
+
+        private void OnDisable()
+        {
+            if (_focusEvent != null) _focusEvent.OnEventRaised -= UpdateFocus;
+            if (_gritEvent != null) _gritEvent.OnEventRaised -= UpdateGrit;
+            if (_hullEvent != null) _hullEvent.OnEventRaised -= UpdateHull;
+            if (_scoreEvent != null) _scoreEvent.OnEventRaised -= UpdateScoreUI;
+        }
+
+        private void Update()
+        {
+            // CHANGE: Services -> Global
+            if (timerText && Global.Score != null)
+            {
+                float t = Global.Score.GameTime;
+                int minutes = Mathf.FloorToInt(t / 60f);
+                int seconds = Mathf.FloorToInt(t % 60f);
+                timerText.text = $"{minutes:00}:{seconds:00}";
+            }
+        }
+
+        // --- EVENT HANDLERS ---
+
+        private void UpdateFocus(float current, float max)
+        {
+            if (focusSlider) focusSlider.value = current / max;
+
+            if (focusFillImage)
+            {
+                bool isFull = current >= (max * 0.8f);
+                focusFillImage.color = isFull ? fullFocusColor : normalFocusColor;
+            }
+        }
+
+        private void UpdateGrit(int currentGrit, int maxGrit)
+        {
+            if (_spawnedPips.Count != maxGrit)
+            {
+                RebuildGritLayout(maxGrit);
+            }
+
+            for (int i = 0; i < _spawnedPips.Count; i++)
+            {
+                if (_spawnedPips[i] == null) continue;
+                _spawnedPips[i].color = (i < currentGrit) ? activePipColor : inactivePipColor;
+            }
+        }
+
+        private void UpdateHull(bool hasHull)
+        {
+            // Kept logs for debugging, remove later if spammy
+            GameLogger.Log(LogChannel.UI, $"[HUD] Hull Event: {hasHull}", gameObject);
+
+            if (hullIcon)
+            {
+                hullIcon.color = hasHull ? hullActiveColor : hullBrokenColor;
+            }
+            else
+            {
+                GameLogger.LogError(LogChannel.UI, "[HUDManager] Hull Icon reference is missing!", gameObject);
+            }
+        }
+
+        private void UpdateScoreUI(int score, int multiplier)
+        {
+            if (scoreText) scoreText.text = score.ToString("N0");
+            if (multiplierText) multiplierText.text = $"x{multiplier}";
+        }
+
+        // --- HELPERS ---
+
+        private void RebuildGritLayout(int max)
+        {
+            if (gritContainer == null || pipPrefab == null) return;
+
+            foreach (Transform child in gritContainer) Destroy(child.gameObject);
+            _spawnedPips.Clear();
+
+            for (int i = 0; i < max; i++)
+            {
+                GameObject newPip = Instantiate(pipPrefab, gritContainer);
+                Image img = newPip.GetComponent<Image>();
+                if (img) _spawnedPips.Add(img);
+            }
+        }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\UI\MenuController.cs`
 - Lines: 30
 - Size: 0.8 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -10540,14 +13088,16 @@ namespace DarkTowerTron.UI
 ```
 
 ## 📄 `Assets\Scripts\UI\ResultScreen.cs`
-- Lines: 56
-- Size: 1.8 KB
-- Modified: 2025-12-31 09:17
+- Lines: 78
+- Size: 2.4 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
 using TMPro;
 using DarkTowerTron.Managers;
+// ALIAS: Prevents conflict if you later add 'using DarkTowerTron.Services;' for Audio
+using Global = DarkTowerTron.Core.Services.Services; 
 
 namespace DarkTowerTron.UI
 {
@@ -10563,41 +13113,104 @@ namespace DarkTowerTron.UI
         public int rankA_Threshold = 25000;
         public int rankB_Threshold = 10000;
 
-        // Called automatically when the GameObject is enabled (SetActive true)
         private void OnEnable()
         {
-            if (ScoreManager.Instance == null) return;
+            // Note: Global.Score throws an error if missing (Hard Dependency), 
+            // so we don't strictly need a null check here unless using TryGet.
+            // We assume the Bootloader has run.
 
             // 1. Stop the Timer
-            ScoreManager.Instance.StopTracking();
+            Global.Score.StopTracking();
 
             // 2. Get Stats
-            int finalScore = ScoreManager.Instance.TotalScore;
-            float finalTime = ScoreManager.Instance.GameTime;
+            int finalScore = Global.Score.TotalScore;
+            float finalTime = Global.Score.GameTime;
 
             // 3. Format Text
             if (scoreText) scoreText.text = finalScore.ToString("N0");
 
             if (timeText)
             {
-                string minutes = Mathf.Floor(finalTime / 60).ToString("00");
-                string seconds = (finalTime % 60).ToString("00");
-                timeText.text = $"{minutes}:{seconds}";
+                // Use FloorToInt for cleaner casting
+                int minutes = Mathf.FloorToInt(finalTime / 60f);
+                int seconds = Mathf.FloorToInt(finalTime % 60f);
+                timeText.text = $"{minutes:00}:{seconds:00}";
             }
 
             // 4. Calculate Rank
             if (rankText)
             {
-                string rank = "C";
-                Color rankColor = Color.grey;
-
-                if (finalScore >= rankS_Threshold) { rank = "S"; rankColor = Color.cyan; }
-                else if (finalScore >= rankA_Threshold) { rank = "A"; rankColor = Color.green; }
-                else if (finalScore >= rankB_Threshold) { rank = "B"; rankColor = Color.yellow; }
-
-                rankText.text = rank;
-                rankText.color = rankColor;
+                CalculateRank(finalScore);
             }
+        }
+
+        private void CalculateRank(int score)
+        {
+            string rank = "C";
+            Color rankColor = Color.grey; 
+            // Note: In the future, these colors could come from a UIThemeSO or Palette
+
+            if (score >= rankS_Threshold) 
+            { 
+                rank = "S"; 
+                rankColor = Color.cyan; 
+            }
+            else if (score >= rankA_Threshold) 
+            { 
+                rank = "A"; 
+                rankColor = Color.green; 
+            }
+            else if (score >= rankB_Threshold) 
+            { 
+                rank = "B"; 
+                rankColor = Color.yellow; 
+            }
+
+            rankText.text = rank;
+            rankText.color = rankColor;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\UI\UIManager.cs`
+- Lines: 35
+- Size: 1.3 KB
+- Modified: 2026-01-06 10:37
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.UI
+{
+    public class UIManager : MonoBehaviour
+    {
+        [Header("Panels")]
+        public GameObject startPanel;
+        public GameObject tutorialPanel;
+        public GameObject hudPanel;
+        public GameObject pausePanel;
+        public GameObject gameOverPanel;
+        public GameObject victoryPanel;
+
+        public void ShowStartMenu() => SetPanelActive(startPanel);
+        public void ShowTutorial() => SetPanelActive(tutorialPanel);
+        public void ShowHUD() => SetPanelActive(hudPanel);
+        public void ShowPause() => SetPanelActive(pausePanel);
+        public void ShowGameOver() => SetPanelActive(gameOverPanel);
+        public void ShowVictory() => SetPanelActive(victoryPanel);
+
+        // Helper to ensure exclusive visibility
+        private void SetPanelActive(GameObject activePanel)
+        {
+            if (startPanel) startPanel.SetActive(false);
+            if (tutorialPanel) tutorialPanel.SetActive(false);
+            if (hudPanel) hudPanel.SetActive(false);
+            if (pausePanel) pausePanel.SetActive(false);
+            if (gameOverPanel) gameOverPanel.SetActive(false);
+            if (victoryPanel) victoryPanel.SetActive(false);
+
+            if (activePanel) activePanel.SetActive(true);
         }
     }
 }
@@ -10606,7 +13219,7 @@ namespace DarkTowerTron.UI
 ## 📄 `Assets\Scripts\UI\UIThemeReceiver.cs`
 - Lines: 48
 - Size: 1.6 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -10662,7 +13275,7 @@ namespace DarkTowerTron.UI
 ## 📄 `Assets\Scripts\Visuals\CameraShaker.cs`
 - Lines: 29
 - Size: 0.7 KB
-- Modified: 2025-12-31 09:17
+- Modified: 2025-12-30 09:50
 
 ```csharp
 using UnityEngine;
@@ -10697,15 +13310,16 @@ namespace DarkTowerTron.Visuals
 ```
 
 ## 📄 `Assets\Scripts\Visuals\PaletteReceiver.cs`
-- Lines: 107
-- Size: 3.6 KB
-- Modified: 2025-12-31 09:17
+- Lines: 136
+- Size: 4.6 KB
+- Modified: 2026-01-06 09:15
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Services;      // NEW: Where PaletteManager lives
+using DarkTowerTron.Core.Services; // NEW: For ServiceLocator
 
 namespace DarkTowerTron.Visuals
 {
@@ -10718,7 +13332,7 @@ namespace DarkTowerTron.Visuals
         public ActorType actorType = ActorType.Enemy;
 
         [Header("Override (Optional)")]
-        [Tooltip("Leave empty to use Global Default. Assign 'Elite_Gold' here to override.")]
+        [Tooltip("Leave empty to use Global Default.")]
         public ActorThemeSO themeOverride;
 
         [Header("Renderer Bindings")]
@@ -10728,16 +13342,19 @@ namespace DarkTowerTron.Visuals
 
         private MaterialPropertyBlock _propBlock;
 
+        // --- LIFECYCLE ---
+
         private void OnEnable()
         {
-            if (PaletteManager.Instance != null)
-                PaletteManager.Instance.OnPaletteChanged += ApplyTheme;
+            if (TryGetManager(out var pm))
+                pm.OnPaletteChanged += ApplyTheme;
         }
 
         private void OnDisable()
         {
-            if (PaletteManager.Instance != null)
-                PaletteManager.Instance.OnPaletteChanged -= ApplyTheme;
+            // Safety check prevents errors on quit
+            if (TryGetManager(out var pm))
+                pm.OnPaletteChanged -= ApplyTheme;
         }
 
         private void Start()
@@ -10747,11 +13364,13 @@ namespace DarkTowerTron.Visuals
 
         public void ManualRefresh() => ApplyTheme();
 
+        // --- LOGIC ---
+
         private void ApplyTheme()
         {
             if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
 
-            // 1. CASE A: Use Local Override (Elite/Boss)
+            // 1. CASE A: Use Local Override
             if (themeOverride != null)
             {
                 ApplySurfaceToList(primaryRenderers, themeOverride.primary);
@@ -10760,10 +13379,11 @@ namespace DarkTowerTron.Visuals
                 return;
             }
 
-            // 2. CASE B: Use Global Defaults
-            if (PaletteManager.Instance == null || PaletteManager.Instance.activePalette == null) return;
+            // 2. CASE B: Use Global Service
+            // We use TryGetManager helper to handle both Runtime (Services) and Editor (Instance)
+            if (!TryGetManager(out var pm) || pm.activePalette == null) return;
 
-            var global = PaletteManager.Instance.activePalette;
+            var global = pm.activePalette;
 
             if (actorType == ActorType.Player)
             {
@@ -10792,7 +13412,8 @@ namespace DarkTowerTron.Visuals
                 else if (HasProp(r, "_Color")) _propBlock.SetColor("_Color", surf.mainColor);
 
                 // Set Emission
-                if (HasProp(r, "_EmissionColor")) _propBlock.SetColor("_EmissionColor", surf.mainColor);
+                if (HasProp(r, "_EmissionColor")) 
+                    _propBlock.SetColor("_EmissionColor", surf.emissionColor);
 
                 // Set Physics
                 if (HasProp(r, "_Smoothness")) _propBlock.SetFloat("_Smoothness", surf.smoothness);
@@ -10802,10 +13423,31 @@ namespace DarkTowerTron.Visuals
             }
         }
 
+        /// <summary>
+        /// Helper to find the manager safely in both Play Mode and Editor Mode.
+        /// </summary>
+        private bool TryGetManager(out PaletteManager pm)
+        {
+            // 1. Runtime: Use Service Locator (Safe, no singleton dependency)
+            if (ServiceLocator.TryGet(out pm)) return true;
+
+            // 2. Editor Mode: Use the static Instance (Legacy support for ExecuteAlways)
+            if (!Application.isPlaying)
+            {
+                pm = PaletteManager.Instance;
+                return pm != null;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// CRITICAL FIX: Actually checks the material properties.
+        /// </summary>
         private bool HasProp(Renderer r, string name)
         {
-            // Simplified check
-            return true;
+            if (r.sharedMaterial == null) return false;
+            return r.sharedMaterial.HasProperty(name);
         }
     }
 }

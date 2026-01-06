@@ -422,6 +422,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5274871221729560924
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6510081702476418290}
+  m_Layer: 6
+  m_Name: AimTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6510081702476418290
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5274871221729560924}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7576279871074212748}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6707888363146532995
 GameObject:
   m_ObjectHideFlags: 0
@@ -755,6 +786,7 @@ Transform:
   - {fileID: 8608103599068932834}
   - {fileID: 192944804307636621}
   - {fileID: 5938182085543417046}
+  - {fileID: 6510081702476418290}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &9183884152685474308
@@ -920,15 +952,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e814617e436ff4ab728df419a20819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  focusCost: 25
-  dashDistance: 8
-  dashDuration: 0.15
-  projectileLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 2048
   dashClip: {fileID: 0}
   indicatorRef: {fileID: 192944804307636621}
   indicatorRenderer: {fileID: 4811700125883332067}
@@ -948,6 +971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startWithHull: 0
+  _aimTarget: {fileID: 6510081702476418290}
   _gritEvent: {fileID: 11400000, guid: 13e14b718845bef499bf0df448e608af, type: 2}
   _hullEvent: {fileID: 11400000, guid: 4823a310732ff2e47926091df574fe19, type: 2}
   _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
@@ -1047,9 +1071,6 @@ MonoBehaviour:
   range: 7
   beamRadius: 0.5
   selfRecoil: 15
-  hitLayers:
-    serializedVersion: 2
-    m_Bits: 128
   beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
     type: 3}
 --- !u!114 &9117973085963638233

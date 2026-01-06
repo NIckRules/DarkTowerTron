@@ -1,22 +1,16 @@
 using UnityEngine;
 using System.Collections;
 
-namespace DarkTowerTron.Core
+namespace DarkTowerTron.Services
 {
     public class GameTime : MonoBehaviour
     {
-        public static GameTime Instance;
         private bool _isFrozen = false;
-
-        private void Awake()
-        {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
 
         public void HitStop(float duration)
         {
             if (_isFrozen) return;
+            if (duration <= 0) return;
             StartCoroutine(DoHitStop(duration));
         }
 

@@ -15,18 +15,18 @@ MonoBehaviour:
   isEssential: 0
   scoreValue: 100
   focusReward: 30
-  healsGrit: 1
+  healsGrit: 0
   gritRewardAmount: 1
   moveSpeed: 7
   rotationSpeed: 15
   combatRotationSpeed: 3
   acceleration: 20
-  rideHeight: 0.2
+  rideHeight: 1.1
   verticalSmoothTime: 0.5
-  separationRadius: 2
-  separationForce: 5
-  maxHealth: 10
-  maxStagger: 1
+  separationRadius: 5
+  separationForce: 7
+  maxHealth: 3
+  maxStagger: 9
   staggerDecay: 0.5
   hasFrontalShield: 0
   shieldAngle: 0.5

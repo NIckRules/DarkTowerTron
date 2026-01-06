@@ -3,15 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Events
 using DarkTowerTron.Core.Services;
-using DarkTowerTron.AI.FSM; // State Machine System
-using DarkTowerTron.Managers; // VFX & Pool
+using DarkTowerTron.AI.FSM;
 using DG.Tweening;
+
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
     [RequireComponent(typeof(StateMachine))]
-    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget
+    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget, IAimTarget // NEW: IAimTarget
     {
         [Header("Parts")]
         public Transform rotationRig;
@@ -24,9 +26,9 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         public float rotationSpeedCombat = 30f;
 
         [Header("Configuration")]
-        public float radiusOuter = 2.5f; // Local distance for "Outer" position
-        public float radiusInner = 0.8f; // Local distance for "Inner" position
-        public float patternInterval = 2.0f; // Time between patterns
+        public float radiusOuter = 2.5f;
+        public float radiusInner = 0.8f;
+        public float patternInterval = 2.0f;
 
         [Header("Patterns")]
         public List<ArchitectPatternSO> phase1Patterns;
@@ -34,7 +36,22 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         [Header("Debug")]
         public bool autoStartCombat = false;
 
+        [Header("Events (Wiring)")]
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
+        [SerializeField] private IntIntEventChannelSO _waveAnnounceEvent; // For "Wave 666"
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;
+        // Note: Popup/Damage text might still be static or you can inject a channel if you have one.
+        // Assuming GameEvents.OnPopupText is still static for now as per previous sessions.
+
+        [Header("Aiming")]
+        [SerializeField] private float _aimOffset = 0f;
+        [SerializeField] private float _coreRadius = 1.5f;
+
         public bool KeepPlayerGrounded => true;
+
+        // IAimTarget Implementation
+        public Vector3 AimPoint => transform.position + (Vector3.up * _aimOffset);
+        public float TargetRadius => _coreRadius;
 
         // State
         private bool _isCombatActive = false;
@@ -46,53 +63,55 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         // Components
         private StateMachine _fsm;
 
-        // NEW: Idle State reference
+        // State Cache (No more GC allocation)
         public ArchitectState_Idle StateIdle { get; private set; }
+        private List<ArchitectState_Pattern> _patternStates = new List<ArchitectState_Pattern>();
 
         private void Awake()
         {
             _fsm = GetComponent<StateMachine>();
-            StateIdle = new ArchitectState_Idle(); // Initialize it
+            StateIdle = new ArchitectState_Idle();
         }
 
         private void Start()
         {
-            // Use Service Locator for player reference
             if (GameServices.Player != null)
-            {
                 _player = GameServices.Player.transform;
+
+            // Pre-allocate Pattern States
+            foreach (var pattern in phase1Patterns)
+            {
+                _patternStates.Add(new ArchitectState_Pattern(this, pattern));
             }
 
-            // Setup
             SetShield(true);
             _currentRotationSpeed = rotationSpeedIdle;
 
             if (autoStartCombat)
-            {
                 Invoke(nameof(ActivateBoss), 1.0f);
-            }
         }
 
         private void Update()
         {
-            // 1. Constant Rotation
             if (rotationRig)
-            {
                 rotationRig.Rotate(Vector3.up, _currentRotationSpeed * Time.deltaTime);
-            }
 
             if (!_isCombatActive) return;
 
-            // 2. Check Hands (Phase Transition)
+            // Phase Transition Check
             if (!_isVulnerable)
             {
-                int livingHands = 0;
+                bool anyHandAlive = false;
                 foreach (var h in hands)
                 {
-                    if (h != null && h.IsAlive()) livingHands++;
+                    if (h != null && h.IsAlive())
+                    {
+                        anyHandAlive = true;
+                        break;
+                    }
                 }
 
-                if (livingHands == 0)
+                if (!anyHandAlive)
                 {
                     StartCoroutine(EnterVulnerablePhase());
                 }
@@ -108,74 +127,54 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _isCombatActive = true;
             _currentRotationSpeed = rotationSpeedCombat;
 
-            // Start the first pattern
             StartNextPattern();
 
-            // UI / Audio Juice
-            GameEvents.OnWaveAnnounce?.Invoke(666); // Custom ID for Boss
-            GameEvents.OnWaveCombatStarted?.Invoke();
+            // Juice
+            _waveAnnounceEvent?.Raise(666, 0); // Custom ID for Boss
+            _combatStartedEvent?.Raise();
         }
 
         public void StartNextPattern()
         {
-            if (_isVulnerable) return; // Stop patterns if phase 2
-            if (phase1Patterns == null || phase1Patterns.Count == 0) return;
+            if (_isVulnerable) return;
+            if (_patternStates.Count == 0) return;
 
-            // Pick pattern
-            ArchitectPatternSO pattern = phase1Patterns[_currentPatternIndex];
+            // Pick pre-cached state
+            ArchitectState_Pattern nextState = _patternStates[_currentPatternIndex];
 
-            // Increment index loop
-            _currentPatternIndex = (_currentPatternIndex + 1) % phase1Patterns.Count;
+            // Increment loop
+            _currentPatternIndex = (_currentPatternIndex + 1) % _patternStates.Count;
 
-            // Change State (Creates a new state instance for the specific pattern)
-            _fsm.ChangeState(new ArchitectState_Pattern(this, pattern));
+            _fsm.ChangeState(nextState);
         }
 
-        /// <summary>
-        /// Called by the State when it finishes its duration.
-        /// </summary>
         public void OnPatternFinished()
         {
             if (_isVulnerable) return;
-            // Switch to Idle immediately to cleanup the old pattern state
             _fsm.ChangeState(StateIdle);
-
-            // Start the delay timer
             StartCoroutine(WaitAndNextPattern());
         }
 
         private IEnumerator WaitAndNextPattern()
         {
-            // Reset to neutral rotation speed or idle behavior?
-            // _currentRotationSpeed = rotationSpeedCombat; 
-
             yield return new WaitForSeconds(patternInterval);
             StartNextPattern();
         }
 
-        // --- HELPER METHODS FOR STATES ---
+        // --- HELPER METHODS ---
 
-        public void SetRotationSpeed(float speed)
-        {
-            _currentRotationSpeed = speed;
-        }
+        public void SetRotationSpeed(float speed) => _currentRotationSpeed = speed;
 
-        // 1. Move Hands (Inner vs Outer)
         public void MoveHands(bool[] extendConfig)
         {
             for (int i = 0; i < hands.Count; i++)
             {
                 if (hands[i] == null) continue;
-
-                // Check config, default to Inner (false) if array is short
                 bool extend = (extendConfig != null && i < extendConfig.Length) ? extendConfig[i] : false;
-                
-                float targetDist = extend ? radiusOuter : radiusInner;
-                hands[i].MoveToDistance(targetDist);
+                hands[i].MoveToDistance(extend ? radiusOuter : radiusInner);
             }
         }
 
-        // 2. Telegraph Walls (Rotate)
         public void TelegraphWalls(bool[] wallConfig)
         {
             for (int i = 0; i < hands.Count; i++)
@@ -186,7 +185,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        // 3. Activate Walls (Laser On)
         public void ActivateWalls(bool[] wallConfig)
         {
             for (int i = 0; i < hands.Count; i++)
@@ -197,25 +195,21 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        // 4. Reset All (Cleanup)
         public void ResetHands()
         {
             foreach (var h in hands)
             {
                 if (h == null) continue;
-                h.MoveToDistance(radiusInner); // Retract
-                h.SetWall(false);              // Off
-                h.PrepareWall(false);          // Rotate Flat
+                h.MoveToDistance(radiusInner);
+                h.SetWall(false);
+                h.PrepareWall(false);
             }
         }
 
         public Transform GetTarget()
         {
-            if (_player == null)
-            {
-                // Re-acquire if lost via Service Locator
-                if (GameServices.Player != null) _player = GameServices.Player.transform;
-            }
+            if (_player == null && GameServices.Player != null)
+                _player = GameServices.Player.transform;
             return _player;
         }
 
@@ -225,14 +219,10 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         {
             _isVulnerable = true;
             SetShield(false);
+            _fsm.ChangeState(null); // Stop AI
+            _currentRotationSpeed = 60f; // Panic
 
-            // Stop FSM patterns
-            _fsm.ChangeState(null); // Or switch to a VulnerableState if you want complex logic
-
-            _currentRotationSpeed = 60f; // Panic Spin
-
-            GameEvents.OnPopupText?.Invoke(transform.position, "SHIELD DOWN");
-
+            GameEvents.OnPopupText?.Invoke(transform.position, "SHIELD DOWN"); // Legacy Event
             yield return null;
         }
 
@@ -241,7 +231,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             if (shieldVisual) shieldVisual.SetActive(state);
         }
 
-        // --- IDAMAGEABLE (THE CORE) ---
+        // --- IDAMAGEABLE ---
 
         public bool TakeDamage(DamageInfo info)
         {
@@ -253,8 +243,8 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
             coreHealth -= info.damageAmount;
 
-            // Show Damage Numbers
-            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, true); // true = Critical visual
+            // Legacy Events for text
+            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, true);
 
             if (coreHealth <= 0) Kill(true);
             return true;
@@ -265,22 +255,19 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _isCombatActive = false;
             _currentRotationSpeed = 0;
 
-            // Spawn BIG explosion
-            if (Services.VFX != null && Services.VFX.explosionPrefab)
+            if (Global.VFX != null && Global.VFX.explosionPrefab)
             {
-                // Spawn a few explosions for effect
-                Services.Pool?.Spawn(Services.VFX.explosionPrefab, transform.position, Quaternion.identity);
+                Global.Pool?.Spawn(Global.VFX.explosionPrefab, transform.position, Quaternion.identity);
             }
 
-            // Win Game
-            GameEvents.OnGameVictory?.Invoke();
+            _gameVictoryEvent?.Raise(); // Updated
 
             Destroy(gameObject, 0.5f);
         }
 
-        // --- ICOMBATTARGET (EXECUTION) ---
+        // --- ICOMBATTARGET ---
 
-        public bool IsStaggered => false; // Boss Core doesn't stagger via normal means
+        public bool IsStaggered => false;
 
         public void OnExecutionHit()
         {
@@ -291,7 +278,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
             else
             {
-                // Optional: Push player back if they try to teleport to shield
                 GameEvents.OnPopupText?.Invoke(transform.position, "SHIELDED");
             }
         }

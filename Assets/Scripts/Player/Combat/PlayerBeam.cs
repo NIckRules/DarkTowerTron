@@ -1,37 +1,35 @@
 using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Player.Movement;
+using DarkTowerTron.Core; // DamageInfo
 using DG.Tweening;
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
 {
-    // RENAMED: Was PlayerAttack
     public class PlayerBeam : WeaponBase
     {
         [Header("Beam Specifics")]
         public float range = 7f;
         public float beamRadius = 0.5f;
         public float selfRecoil = 15f;
-        public LayerMask hitLayers;
         public GameObject beamVisualPrefab;
 
-        private PlayerMovement _movement;
+        private DarkTowerTron.Player.Movement.PlayerMovement _movement;
 
         protected override void Awake()
         {
             base.Awake();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<DarkTowerTron.Player.Movement.PlayerMovement>();
         }
 
-        // Implement Abstract Method from WeaponBase
         protected override float GetCurrentFireRate()
         {
-            // Read specific Beam stat
             return _stats.BeamRate;
         }
 
         protected override void Fire()
         {
+            // Use Smart Aim (Magnetism)
             Vector3 fireDir = GetAimDirection();
 
             // 1. Visuals
@@ -56,8 +54,7 @@ namespace DarkTowerTron.Player.Combat
             }
 
             // 3. Hit Detection
-            // CHANGE: Beam is instant, so we want to hit Enemies and Walls.
-            // Use a specific mask for Player attacks: Walls (+ Default) + Enemy.
+            // Use Mask from Constants
             int mask = GameConstants.MASK_WALLS | (1 << GameConstants.LAYER_ENEMY);
 
             if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, mask))
@@ -68,20 +65,17 @@ namespace DarkTowerTron.Player.Combat
                 {
                     DamageInfo info = new DamageInfo
                     {
-                        // Read Stats
                         damageAmount = _stats.BeamDamage,
                         staggerAmount = _stats.BeamStagger,
-
                         pushDirection = fireDir,
                         pushForce = 10f,
-                        source = gameObject
-                        ,
-                        // NEW: Explicitly Melee
+                        source = gameObject,
                         damageType = DamageType.Melee
                     };
 
                     target.TakeDamage(info);
-                    GameEvents.OnPlayerHit?.Invoke();
+
+                    // Optional: Call Global.Audio.PlaySound(hitSound) here
                 }
             }
         }

@@ -1,24 +1,27 @@
 using UnityEngine;
-using System.Collections; // Required for IEnumerator
+using UnityEngine.InputSystem; // NEW: For Keyboard
+using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Player.Controller;
 using DarkTowerTron.Player.Stats;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron.Combat; // For DamageReceiver
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
 {
     public class DebugController : MonoBehaviour
     {
         [Header("Workflow")]
-        public bool autoStartGame = false; // Check this to skip Main Menu
+        public bool autoStartGame = false;
 
         [Header("Cheats")]
         public bool godMode = false;
         public bool infiniteFocus = false;
 
-		[Header("Visualization")]
-		public bool showEnemyStats = true; // Toggle this in Inspector
+        [Header("Visualization")]
+        public bool showEnemyStats = true;
 
         [Header("Spawn Keys (NumPad)")]
         public GameObject[] enemiesToSpawn;
@@ -31,11 +34,10 @@ namespace DarkTowerTron.Managers
         private PlayerHealth _health;
         private PlayerLoadout _loadout;
 
-        // Changed void to IEnumerator to allow waiting
         private IEnumerator Start()
         {
-            // Wait one frame so core systems (GameSession, GameServices) can boot
-            yield return null; 
+            // Wait for Bootloader and Scene Init
+            yield return null;
 
             // 1. Auto-Start Logic
             if (autoStartGame)
@@ -43,75 +45,93 @@ namespace DarkTowerTron.Managers
                 var session = FindObjectOfType<GameSession>();
                 if (session)
                 {
-                    Debug.Log("<color=yellow>[DEBUG] Auto-Starting Game...</color>");
+                    GameLogger.Log(LogChannel.System, "[DEBUG] Auto-Starting Game...", gameObject);
                     session.BeginGame();
 
-                    // Force combat state so focus decay and combat systems are active while testing
+                    // Force combat state active
                     GameEvents.OnWaveCombatStarted?.Invoke();
                 }
             }
 
-            // 2. Locate player via GameServices
-            if (GameServices.Player != null)
+            // 2. Locate Player (Robust Find)
+            var player = FindObjectOfType<PlayerController>();
+            if (player != null)
             {
-                _energy = GameServices.Player.GetComponent<PlayerEnergy>();
-                _health = GameServices.Player.GetComponent<PlayerHealth>();
-                _loadout = GameServices.Player.GetComponent<PlayerLoadout>();
+                _energy = player.GetComponent<PlayerEnergy>();
+                _health = player.GetComponent<PlayerHealth>();
+                _loadout = player.GetComponent<PlayerLoadout>();
             }
         }
 
         private void Update()
         {
-            // Sync the static flag for enemy debug gizmos
-            DarkTowerTron.Combat.DamageReceiver.EnableDebugGizmos = showEnemyStats;
+            // Safety check for Input System
+            if (Keyboard.current == null) return;
 
-            // Keyboard Shortcut (e.g. Tab) to toggle
-            if (Input.GetKeyDown(KeyCode.Tab))
+            // Sync debug flag
+            DamageReceiver.EnableDebugGizmos = showEnemyStats;
+
+            // [TAB] Toggle Visuals
+            if (Keyboard.current.tabKey.wasPressedThisFrame)
             {
                 showEnemyStats = !showEnemyStats;
             }
 
-            // 1. Time Control
-            if (Input.GetKeyDown(KeyCode.T))
+            // [T] Time Control
+            if (Keyboard.current.tKey.wasPressedThisFrame)
             {
                 Time.timeScale = (Time.timeScale == 1f) ? 0.1f : 1f;
+                GameLogger.Log(LogChannel.System, $"Time Scale: {Time.timeScale}");
             }
 
-            // 2. Kill All
-            if (Input.GetKeyDown(KeyCode.K))
+            // [K] Kill All Enemies
+            if (Keyboard.current.kKey.wasPressedThisFrame)
             {
                 var enemies = FindObjectsOfType<DarkTowerTron.Enemy.EnemyController>();
                 foreach (var e in enemies) e.Kill(true);
+                GameLogger.Log(LogChannel.Combat, "Nuke Triggered.");
             }
 
-            // 3. Recharge
-            if (Input.GetKeyDown(KeyCode.R) && _energy)
+            // [R] Recharge Stats
+            if (Keyboard.current.rKey.wasPressedThisFrame && _energy)
             {
                 _energy.AddFocus(100f);
                 if (_health) _health.HealGrit(2);
             }
 
-            // 4. Manual Spawning (NumPad 1-4)
-            if (Input.GetKeyDown(KeyCode.Keypad1)) Spawn(0);
-            if (Input.GetKeyDown(KeyCode.Keypad2)) Spawn(1);
-            if (Input.GetKeyDown(KeyCode.Keypad3)) Spawn(2);
-            if (Input.GetKeyDown(KeyCode.Keypad4)) Spawn(3);
+            // [NumPad 1-4] Spawning
+            if (Keyboard.current.numpad1Key.wasPressedThisFrame) Spawn(0);
+            if (Keyboard.current.numpad2Key.wasPressedThisFrame) Spawn(1);
+            if (Keyboard.current.numpad3Key.wasPressedThisFrame) Spawn(2);
+            if (Keyboard.current.numpad4Key.wasPressedThisFrame) Spawn(3);
 
-            // 5. Cheats Application
+            // Cheats Application (Continuous)
             if (infiniteFocus && _energy) _energy.AddFocus(100f);
             if (godMode && _health) _health.HealGrit(2);
 
-            // 6. Perk Toggles
-            if (Input.GetKeyDown(KeyCode.H) && _loadout) _loadout.EquipProjectile(homingPrefab);
-            if (Input.GetKeyDown(KeyCode.J) && _loadout) _loadout.EquipDecoy(explosiveDecoyPrefab);
+            // [H / J] Perk Testing
+            if (Keyboard.current.hKey.wasPressedThisFrame && _loadout)
+            {
+                _loadout.EquipProjectile(homingPrefab);
+                GameLogger.Log(LogChannel.Player, "Equipped Homing Projectile");
+            }
+
+            if (Keyboard.current.jKey.wasPressedThisFrame && _loadout)
+            {
+                _loadout.EquipDecoy(explosiveDecoyPrefab);
+                GameLogger.Log(LogChannel.Player, "Equipped Explosive Decoy");
+            }
         }
 
         private void Spawn(int index)
         {
-            if (index < 0 || index >= enemiesToSpawn.Length) return;
+            if (enemiesToSpawn == null || index < 0 || index >= enemiesToSpawn.Length) return;
+
             Vector3 spawnPos = Vector3.zero + Random.insideUnitSphere * 5f;
-            spawnPos.y = 0;
-            Services.Pool?.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
+            spawnPos.y = 0; // Reset height (Motors will handle hovering)
+
+            if (Global.Pool != null)
+                Global.Pool.Spawn(enemiesToSpawn[index], spawnPos, Quaternion.identity);
         }
     }
 }

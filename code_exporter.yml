@@ -17,6 +17,7 @@ profiles:
       - Assets\Scripts
       #- Assets\Prefabs
       - Assets\Data
+      - Assets\Modules  
 
     # Source files only
     include_extensions:

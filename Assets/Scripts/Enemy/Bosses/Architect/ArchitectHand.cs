@@ -1,50 +1,92 @@
 using UnityEngine;
-using DarkTowerTron.Environment; // Access to Prop_Explosive
 using DarkTowerTron.Combat;
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Enemy.Visuals; // For Visuals
 using DG.Tweening;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
-    // dependency on the new Prop system
-    [RequireComponent(typeof(Prop_Explosive))]
+    [RequireComponent(typeof(DamageReceiver))]
+    [RequireComponent(typeof(EnemyVisuals))]
     public class ArchitectHand : MonoBehaviour
     {
         [Header("Visual Components")]
         public Transform visualRoot;    // The object that slides In/Out
-        public Transform meshPivot;     // The object that rotates 90 degrees (Telegraph)
+        public Transform meshPivot;     // The object that rotates 90 degrees
         public GameObject wallObject;   // The Laser Hazard (Child)
         public Transform firePoint;     // Where bullets spawn
 
-        [Header("Combat")]
+        [Header("Combat Configuration")]
         public GameObject projectilePrefab;
+        public GameObject deathExplosionEffect; // Optional: Explosion VFX on disable
+
+        [Header("Animation")]
         public float slideDuration = 1.0f;
         public float rotateDuration = 0.5f;
 
-        private Prop_Explosive _prop;
+        // Dependencies
+        private DamageReceiver _receiver;
+        private EnemyVisuals _visuals;
         private bool _isDead = false;
 
         private void Awake()
         {
-            _prop = GetComponent<Prop_Explosive>();
+            _receiver = GetComponent<DamageReceiver>();
+            _visuals = GetComponent<EnemyVisuals>();
 
             // Ensure wall is off by default
             if (wallObject) wallObject.SetActive(false);
         }
 
-        private void Update()
+        private void Start()
         {
-            // Check if the Prop took enough damage to "Die"
-            // Note: Prop_Explosive handles the explosion VFX internally via its own Die() method,
-            // but we need to handle the visual shutdown of the hand here.
-            if (!_isDead && _prop.health <= 0)
+            // Initialize DamageReceiver (No Stats SO needed, uses Inspector overrides)
+            _receiver.Initialize(null);
+        }
+
+        private void OnEnable()
+        {
+            _receiver.OnDeathProcessed += HandleDeath;
+            _receiver.OnHitProcessed += HandleHit;
+
+            // Wire up Stagger Visuals
+            if (_receiver.Stagger != null)
             {
-                Die();
+                _receiver.Stagger.OnStaggerBreak += _visuals.StartStaggerEffect;
+                _receiver.Stagger.OnStaggerRecover += _visuals.StopStaggerEffect;
+            }
+        }
+
+        private void OnDisable()
+        {
+            _receiver.OnDeathProcessed -= HandleDeath;
+            _receiver.OnHitProcessed -= HandleHit;
+
+            if (_receiver.Stagger != null)
+            {
+                _receiver.Stagger.OnStaggerBreak -= _visuals.StartStaggerEffect;
+                _receiver.Stagger.OnStaggerRecover -= _visuals.StopStaggerEffect;
             }
         }
 
         public bool IsAlive() => !_isDead;
+
+        // --- HANDLERS ---
+
+        private void HandleHit(Core.DamageInfo info)
+        {
+            if (!_receiver.IsStaggered)
+                _visuals.PlayHitFlash();
+        }
+
+        private void HandleDeath(EnemyStatsSO stats, bool reward)
+        {
+            if (_isDead) return;
+            Die();
+        }
 
         // --- MOVEMENT ---
 
@@ -57,9 +99,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
         // --- COMBAT ACTIONS ---
 
-        /// <summary>
-        /// Telegraphs the wall attack by rotating the hand 90 degrees.
-        /// </summary>
         public void PrepareWall(bool willBeActive)
         {
             if (_isDead || meshPivot == null) return;
@@ -91,8 +130,8 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
                 dir = (targetPos - firePoint.position).normalized; // Tracking aim
             }
 
-            // Spawn from Pool
-            GameObject p = Services.Pool.Spawn(projectilePrefab, firePoint.position, Quaternion.LookRotation(dir));
+            // Spawn from Pool using Global Alias
+            GameObject p = Global.Pool.Spawn(projectilePrefab, firePoint.position, Quaternion.LookRotation(dir));
             p.transform.localScale = Vector3.one * scale;
 
             var proj = p.GetComponent<Projectile>();
@@ -100,8 +139,10 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             {
                 proj.ResetHostility(true);
                 proj.speed = 15f;
-                // Ignore the hand itself to prevent instant self-collision
+
+                // CRITICAL: Set Source so the bullet ignores the HandCollider immediately
                 proj.SetSource(gameObject);
+
                 proj.Initialize(dir);
             }
         }
@@ -113,20 +154,43 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             _isDead = true;
             SetWall(false);
 
-            // Visual Shutdown
+            // 1. VFX
+            if (deathExplosionEffect && Global.Pool != null)
+            {
+                Global.Pool.Spawn(deathExplosionEffect, transform.position, Quaternion.identity);
+            }
+
+            // 2. Visual Shutdown (Shrink)
             if (meshPivot) meshPivot.DOKill();
             visualRoot.DOKill();
             visualRoot.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+
+            // 3. Disable Logic (but keep GameObject active for Revive)
+            // We disable the collider via the DamageReceiver's component or manually?
+            // Usually simpler to just rely on _isDead flag to ignore logic, 
+            // but we should disable collider to stop blocking shots.
+            var col = GetComponent<Collider>();
+            if (col) col.enabled = false;
         }
 
         public void Revive()
         {
             _isDead = false;
-            _prop.OnSpawn(); // Reset Health in the prop component
 
-            // Hard reset visuals
+            // revive modules
+            _receiver.Vitality.Revive();
+            _receiver.Stagger.ResetStagger();
+            _visuals.ResetVisuals();
+
+            // Enable collider
+            var col = GetComponent<Collider>();
+            if (col) col.enabled = true;
+
+            // Visual Pop-in
             gameObject.SetActive(true);
-            visualRoot.localScale = Vector3.one;
+            visualRoot.localScale = Vector3.zero;
+            visualRoot.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+
             if (meshPivot) meshPivot.localRotation = Quaternion.identity;
         }
     }

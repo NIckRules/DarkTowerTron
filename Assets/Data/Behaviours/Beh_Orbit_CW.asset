@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c3958e979e8ba7438bbb58ca6123f36, type: 3}
   m_Name: Beh_Orbit_CW
   m_EditorClassIdentifier: 
-  idealDistance: 7
+  idealDistance: 15
   distanceCorrectionStrength: 0.5
   clockwise: 1

@@ -16,6 +16,9 @@ namespace DarkTowerTron.Player.Stats
         [Header("Configuration")]
         public bool startWithHull = true;
 
+        [Header("Aiming")]
+        [SerializeField] private Transform _aimTarget; // Assign 'CameraTarget' or 'Visuals/Spine'
+
         [Header("Broadcasting")]
         [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
         [SerializeField] private BoolEventChannelSO _hullEvent;        // Replaces OnHullStateChanged
@@ -157,8 +160,14 @@ namespace DarkTowerTron.Player.Stats
         }
 
         // --- IAimTarget ---
-        // Player Chest Height (approx 1.2m)
-        public Vector3 AimPoint => transform.position + (Vector3.up * 1.2f);
+        public Vector3 AimPoint
+        {
+            get
+            {
+                if (_aimTarget == null) return transform.position + Vector3.up * 1.2f;
+                return _aimTarget.position;
+            }
+        }
         public float TargetRadius => 0.5f;
     }
 }

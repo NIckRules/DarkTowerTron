@@ -1,14 +1,14 @@
 using UnityEngine;
 using DarkTowerTron.Combat;
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.Managers;
 using DarkTowerTron.Player.Stats;
+
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
 {
-    // Inherits from WeaponBase instead of MonoBehaviour
-    [RequireComponent(typeof(PlayerLoadout))]
-    public class PlayerGun : WeaponBase 
+    [RequireComponent(typeof(DarkTowerTron.Player.Stats.PlayerLoadout))]
+    public class PlayerGun : WeaponBase
     {
         [Header("Gun Specifics")]
         public float bulletSpeed = 25f;
@@ -23,37 +23,34 @@ namespace DarkTowerTron.Player.Combat
 
         protected override void Fire()
         {
-            // Read from loadout
             GameObject prefabToSpawn = _loadout.currentProjectile;
 
             if (prefabToSpawn && firePoint)
             {
+                // Use Smart Aim
                 Vector3 aimDir = GetAimDirection();
-                GameObject p = Services.Pool.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
-                
-                var proj = p.GetComponent<DarkTowerTron.Combat.Projectile>();
+
+                // Use Global Pool
+                GameObject p = Global.Pool.Spawn(prefabToSpawn, firePoint.position, Quaternion.LookRotation(aimDir));
+
+                var proj = p.GetComponent<Projectile>();
                 if (proj)
                 {
                     proj.speed = bulletSpeed;
-                    proj.isHostile = false; 
-                    
-                    // --- DATA INJECTION ---
-                    // Overwrite the Prefab's damage with our RPG stats
+                    proj.isHostile = false;
+
+                    // Stats Injection
                     proj.damage = _stats.GunDamage;
                     proj.stagger = _stats.GunStagger;
-                    // ---------------------
 
-
-                    Debug.Log($"[GUN DEBUG] Firing Bullet. Damage: {proj.damage} | Stagger: {proj.stagger}");
-
-                    // Prevent immediate self-collision
+                    // CRITICAL: Self-Hit Protection
                     proj.SetSource(gameObject);
+
                     proj.Initialize(aimDir);
                 }
             }
         }
 
-        // 1. Return the rate from Stats
         protected override float GetCurrentFireRate()
         {
             return _stats.GunRate;

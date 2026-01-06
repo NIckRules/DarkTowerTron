@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Managers;
+using DarkTowerTron.Services;
 
 namespace DarkTowerTron.Core.Services
 {
@@ -13,10 +14,12 @@ namespace DarkTowerTron.Core.Services
 
             // 1. Register Core Systems
             Register<AudioManager>();
+            Register<GameTime>();
+            Register<MusicManager>();
+            Register<PaletteManager>();
             Register<PoolManager>();
-            Register<VFXManager>();
             Register<ScoreManager>(); 
-            Register<PaletteManager>(); 
+            Register<VFXManager>();
             
             GameLogger.Log(LogChannel.System, "System Core & Managers Initialized.");
         }

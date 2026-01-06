@@ -1,8 +1,8 @@
 using UnityEngine;
 using DG.Tweening;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Services;      // Where PaletteManager lives
-using DarkTowerTron.Core.Services; // Where ServiceLocator lives
+using DarkTowerTron.Core.Services;
+using DarkTowerTron.Services; // PaletteManager
 using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Enemy.Visuals
@@ -10,15 +10,16 @@ namespace DarkTowerTron.Enemy.Visuals
     public class EnemyVisuals : MonoBehaviour
     {
         [Header("Configuration")]
-        [Tooltip("Leave EMPTY to use the Global Palette. Assign only to force a specific look.")]
+        [Tooltip("Leave EMPTY to use the Global Palette.")]
         [FormerlySerializedAs("palette")]
         public ColorPaletteSO paletteOverride;
-        
+
         [Tooltip("Defines timing and animation curves. Required.")]
-        public EnemyVisualProfileSO profile; 
+        public EnemyVisualProfileSO profile;
 
         [Header("References")]
-        [SerializeField] private Renderer _renderer;
+        [Tooltip("Assign all mesh parts here. If empty, auto-finds in children.")]
+        [SerializeField] private Renderer[] _renderers;
 
         // Internal
         private MaterialPropertyBlock _propBlock;
@@ -26,18 +27,27 @@ namespace DarkTowerTron.Enemy.Visuals
         private int _emissionPropID;
 
         // State
-        private Color _baseColor; 
+        private Color[] _baseColors; // Snapshot of original colors per renderer
         private Color _staggerColor;
         private Color _hitColor;
         private Tween _flashTween;
 
         private void Awake()
         {
-            // Auto-find if not assigned in Inspector
-            if (_renderer == null) _renderer = GetComponentInChildren<Renderer>();
-            
+            // Auto-find if not assigned (Convenience)
+            if (_renderers == null || _renderers.Length == 0)
+                _renderers = GetComponentsInChildren<Renderer>();
+
+            // Validate
+            if (_renderers.Length == 0)
+            {
+                // Warn but don't crash, logic will just loop 0 times
+                Debug.LogWarning($"[EnemyVisuals] No Renderers found on {name}", gameObject);
+            }
+
+            _baseColors = new Color[_renderers.Length];
             _propBlock = new MaterialPropertyBlock();
-            
+
             _colorPropID = Shader.PropertyToID("_BaseColor");
             _emissionPropID = Shader.PropertyToID("_EmissionColor");
         }
@@ -46,35 +56,29 @@ namespace DarkTowerTron.Enemy.Visuals
         {
             if (profile == null)
             {
-                // We use GameLogger if possible, or Debug.LogError
                 Debug.LogError($"[EnemyVisuals] Profile missing on {gameObject.name}. Animations will fail.", gameObject);
                 enabled = false;
                 return;
             }
-            
+
+            // Wait one frame to ensure PaletteReceiver has run (Execution Order usually handles this, but safety first)
             InitializeColors();
         }
 
         public void InitializeColors()
         {
-            // 1. Determine which Palette to use (Priority Hierarchy)
+            // 1. Resolve Palette (Override -> Service -> Instance)
             ColorPaletteSO activePalette = paletteOverride;
 
             if (activePalette == null)
             {
-                // Try Service Locator (Standard Runtime)
                 if (ServiceLocator.TryGet<PaletteManager>(out var manager))
-                {
                     activePalette = manager.activePalette;
-                }
-                // Fallback to Instance (Editor/Test Scenes without Bootloader)
                 else if (PaletteManager.Instance != null)
-                {
                     activePalette = PaletteManager.Instance.activePalette;
-                }
             }
 
-            // 2. Load Colors
+            // 2. Cache Flash Colors
             if (activePalette != null)
             {
                 _staggerColor = activePalette.staggerColor;
@@ -82,27 +86,30 @@ namespace DarkTowerTron.Enemy.Visuals
             }
             else
             {
-                // Absolute Fallback
                 _staggerColor = Color.yellow;
                 _hitColor = Color.white;
             }
 
-            // 3. Determine Base Color (Preserve PaletteReceiver overrides)
-            if (_renderer)
+            // 3. Snapshot Base Colors (The "Memory")
+            // We read what is currently on the mesh (set by PaletteReceiver or Material)
+            for (int i = 0; i < _renderers.Length; i++)
             {
-                _renderer.GetPropertyBlock(_propBlock);
-                
-                // If MPB is empty/clear, assume Material color. Otherwise trust the MPB (from PaletteReceiver).
+                Renderer r = _renderers[i];
+                if (r == null) continue;
+
+                r.GetPropertyBlock(_propBlock);
+
+                // If MPB is empty, fall back to material color
                 if (_propBlock.isEmpty || _propBlock.GetColor(_colorPropID) == Color.clear)
                 {
-                    if (_renderer.sharedMaterial != null && _renderer.sharedMaterial.HasProperty(_colorPropID))
-                        _baseColor = _renderer.sharedMaterial.GetColor(_colorPropID);
+                    if (r.sharedMaterial != null && r.sharedMaterial.HasProperty(_colorPropID))
+                        _baseColors[i] = r.sharedMaterial.GetColor(_colorPropID);
                     else
-                        _baseColor = Color.white;
+                        _baseColors[i] = Color.white;
                 }
                 else
                 {
-                    _baseColor = _propBlock.GetColor(_colorPropID);
+                    _baseColors[i] = _propBlock.GetColor(_colorPropID);
                 }
             }
         }
@@ -114,8 +121,10 @@ namespace DarkTowerTron.Enemy.Visuals
             if (profile == null) return;
             if (_flashTween != null && _flashTween.IsActive()) _flashTween.Kill();
 
-            SetColor(_hitColor);
-            _flashTween = DOVirtual.DelayedCall(profile.hitFlashDuration, () => SetColor(_baseColor));
+            // Flash all parts to pure White
+            SetAllColors(_hitColor);
+
+            _flashTween = DOVirtual.DelayedCall(profile.hitFlashDuration, ResetVisuals);
         }
 
         public void StartStaggerEffect()
@@ -127,18 +136,14 @@ namespace DarkTowerTron.Enemy.Visuals
             _flashTween = DOTween.To(() => lerpVal, x => lerpVal = x, 1f, profile.staggerPulseDuration / 2f)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.Linear)
-                .OnUpdate(() => 
+                .OnUpdate(() =>
                 {
                     Color c = Color.Lerp(_staggerColor, profile.dangerPulseColor, lerpVal);
-                    SetColor(c);
+                    SetAllColors(c);
                 });
         }
 
-        public void StopStaggerEffect()
-        {
-            if (_flashTween != null) _flashTween.Kill();
-            SetColor(_baseColor); 
-        }
+        public void StopStaggerEffect() => ResetVisuals();
 
         public void StartPrimingEffect()
         {
@@ -146,14 +151,13 @@ namespace DarkTowerTron.Enemy.Visuals
             if (_flashTween != null) _flashTween.Kill();
 
             float lerpVal = 0f;
-            // Fast blink (0.1s loops)
             _flashTween = DOTween.To(() => lerpVal, x => lerpVal = x, 1f, 0.1f)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.Linear)
                 .OnUpdate(() =>
                 {
-                    Color c = Color.Lerp(_baseColor, profile.dangerPulseColor, lerpVal);
-                    SetColor(c);
+                    Color c = Color.Lerp(GetBaseColorSafe(0), profile.dangerPulseColor, lerpVal);
+                    SetAllColors(c);
                 });
         }
 
@@ -162,17 +166,38 @@ namespace DarkTowerTron.Enemy.Visuals
         public void ResetVisuals()
         {
             if (_flashTween != null) _flashTween.Kill();
-            SetColor(_baseColor);
+
+            // Restore individual colors
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                ApplyColorToRenderer(_renderers[i], _baseColors[i]);
+            }
         }
 
-        private void SetColor(Color c)
-        {
-            if (_renderer == null) return;
+        // --- HELPERS ---
 
-            _renderer.GetPropertyBlock(_propBlock);
+        private void SetAllColors(Color c)
+        {
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                ApplyColorToRenderer(_renderers[i], c);
+            }
+        }
+
+        private void ApplyColorToRenderer(Renderer r, Color c)
+        {
+            if (r == null) return;
+            r.GetPropertyBlock(_propBlock);
             _propBlock.SetColor(_colorPropID, c);
             _propBlock.SetColor(_emissionPropID, c);
-            _renderer.SetPropertyBlock(_propBlock);
+            r.SetPropertyBlock(_propBlock);
+        }
+
+        private Color GetBaseColorSafe(int index)
+        {
+            if (_baseColors != null && index < _baseColors.Length)
+                return _baseColors[index];
+            return Color.white;
         }
 
         private void OnDestroy()

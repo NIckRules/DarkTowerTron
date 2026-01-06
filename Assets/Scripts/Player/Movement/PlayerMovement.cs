@@ -5,10 +5,14 @@ using DarkTowerTron.Player.Stats;
 
 namespace DarkTowerTron.Player.Movement
 {
-    [RequireComponent(typeof(KinematicMover))]
+    // Intentionally not requiring a specific mover so we can swap implementations.
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerMovement : MonoBehaviour
     {
+        [Header("Mover Selection")]
+        [Tooltip("If true, attempts to use UnityCharacterMover. If false, uses KinematicMover.")]
+        public bool useUnityController = false;
+
         [Header("Wall Repulsion")]
         public float wallBuffer = 0.6f; // Keep this (Collider size dependency)
 
@@ -21,7 +25,7 @@ namespace DarkTowerTron.Player.Movement
         // Expose input for Blitz
         public Vector3 MoveInput => _inputDir;
 
-        private KinematicMover _mover;
+        private IMover _mover;
         private Camera _cam;
         private PlayerStats _stats;
 
@@ -36,14 +40,54 @@ namespace DarkTowerTron.Player.Movement
 
         private void Awake()
         {
-            _mover = GetComponent<KinematicMover>();
             _cam = Camera.main;
             _stats = GetComponent<PlayerStats>();
+
+            InitializeMover();
         }
 
         private void Start()
         {
             LastSafePosition = transform.position;
+        }
+
+        private void InitializeMover()
+        {
+            var kMover = GetComponent<KinematicMover>();
+            var uMover = GetComponent<UnityCharacterMover>();
+
+            // Disable both initially
+            if (kMover) kMover.SetEnabled(false);
+            if (uMover) uMover.SetEnabled(false);
+
+            if (useUnityController)
+            {
+                if (uMover == null) uMover = gameObject.AddComponent<UnityCharacterMover>();
+                _mover = uMover;
+
+                // Disable collision on KinematicMover (CapsuleCollider) to avoid double collision
+                if (kMover && kMover.GetComponent<Collider>())
+                    kMover.GetComponent<Collider>().enabled = false;
+            }
+            else
+            {
+                if (kMover == null) kMover = gameObject.AddComponent<KinematicMover>();
+                _mover = kMover;
+
+                // Re-enable CapsuleCollider
+                if (kMover.GetComponent<Collider>())
+                    kMover.GetComponent<Collider>().enabled = true;
+            }
+
+            _mover?.SetEnabled(true);
+            if (_mover != null) Debug.Log($"[PlayerMovement] Using Mover: {_mover.GetType().Name}");
+        }
+
+        [ContextMenu("Swap Mover")]
+        public void SwapMover()
+        {
+            useUnityController = !useUnityController;
+            InitializeMover();
         }
 
         public void SetMoveInput(Vector3 dir)

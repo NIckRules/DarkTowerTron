@@ -5,7 +5,7 @@ using DarkTowerTron.Core;
 namespace DarkTowerTron.Physics
 {
     [RequireComponent(typeof(CapsuleCollider))]
-    public class KinematicMover : MonoBehaviour
+    public class KinematicMover : MonoBehaviour, IMover
     {
         [Header("Configuration")]
         [SerializeField] private LayerMask _obstacleMask;
@@ -86,6 +86,7 @@ namespace DarkTowerTron.Physics
         }
 
         public void Teleport(Vector3 pos) { transform.position = pos; _velocity = Vector3.zero; }
+        public void SetEnabled(bool state) => enabled = state;
         public void IgnoreCollider(Collider col) => _ignoredColliders.Add(col);
 
         // ================= INTERNAL PHYSICS =================

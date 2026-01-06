@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DarkTowerTron.Managers
+namespace DarkTowerTron.UI
 {
     public class UIManager : MonoBehaviour
     {

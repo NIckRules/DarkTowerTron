@@ -1,8 +1,10 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Events; // NEW: For Popup Text
 using DG.Tweening;
+
+// ALIAS: Resolves Services conflict
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Combat
 {
@@ -11,23 +13,38 @@ namespace DarkTowerTron.Combat
         [Header("Heat Mechanics")]
         public float maxHeat = 10f;
         public float coolDownRate = 2f;
-        public float staggerToHeatMultiplier = 10f; 
-        
+        public float staggerToHeatMultiplier = 10f;
+
         public bool isBroken = false;
-        
+
         [Header("Advanced Mechanics")]
-        public bool reflectProjectiles = false; 
+        public bool reflectProjectiles = false;
 
         [Header("Visuals")]
         public Renderer shieldRenderer;
         public Color coldColor = Color.grey;
-        public Color hotColor = new Color(1f, 0.3f, 0f); 
+        [ColorUsage(true, true)] public Color hotColor = new Color(1f, 0.3f, 0f);
 
-        [Header("Audio")]
+        [Header("Feedback")]
+        [SerializeField] private PopupTextEventChannelSO _popupEvent;
         public AudioClip breakClip;
 
         private float _currentHeat;
         private float _lastHitTime;
+
+        // Optimization: Property Block
+        private MaterialPropertyBlock _propBlock;
+        private int _baseColorID;
+        private int _emissionColorID;
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            _propBlock = new MaterialPropertyBlock();
+            _baseColorID = Shader.PropertyToID("_BaseColor");
+            _emissionColorID = Shader.PropertyToID("_EmissionColor");
+        }
 
         private void OnEnable()
         {
@@ -50,9 +67,8 @@ namespace DarkTowerTron.Combat
 
         public override bool TakeDamage(DamageInfo info)
         {
-            // CHANGED: Use _receiver
             if (_receiver == null) return false;
-            
+
             if (isBroken) return base.TakeDamage(info);
 
             _lastHitTime = Time.time;
@@ -60,14 +76,14 @@ namespace DarkTowerTron.Combat
             if (info.isRedirected)
             {
                 BreakShield();
-                return true; 
+                return true;
             }
 
             if (info.damageType == DamageType.Projectile || info.damageType == DamageType.Generic)
             {
                 float heatAdded = info.damageAmount + (info.staggerAmount * staggerToHeatMultiplier);
                 _currentHeat += heatAdded;
-                
+
                 if (shieldRenderer) shieldRenderer.transform.DOPunchScale(Vector3.one * 0.05f, 0.1f);
                 UpdateVisuals();
 
@@ -77,26 +93,30 @@ namespace DarkTowerTron.Combat
                     if (proj != null)
                     {
                         proj.DeflectByEnemy(transform.forward);
-                        GameEvents.OnPopupText?.Invoke(transform.position, "REFLECT");
-                        return true; 
+
+                        // CRITICAL FIX: Claim ownership so the bullet doesn't hit us again instantly
+                        proj.SetSource(this.gameObject);
+
+                        _popupEvent?.Raise(transform.position, "REFLECT");
+                        return true;
                     }
                 }
 
-                GameEvents.OnPopupText?.Invoke(transform.position, "DEFLECT");
-                return true; 
+                _popupEvent?.Raise(transform.position, "DEFLECT");
+                return true;
             }
-            
+
             else if (info.damageType == DamageType.Melee)
             {
                 if (_currentHeat >= maxHeat)
                 {
                     BreakShield();
-                    return true; 
+                    return true;
                 }
                 else
                 {
-                    GameEvents.OnPopupText?.Invoke(transform.position, "ARMORED");
-                    return false; 
+                    _popupEvent?.Raise(transform.position, "ARMORED");
+                    return false;
                 }
             }
 
@@ -107,13 +127,11 @@ namespace DarkTowerTron.Combat
         {
             isBroken = true;
             if (shieldRenderer) shieldRenderer.enabled = false;
-            
-            GameEvents.OnPopupText?.Invoke(transform.position, "SHATTERED");
-            
-              if (Services.Audio != null && breakClip)
-                  Services.Audio.PlaySound(breakClip, 1.0f);
-                 
-            // TODO: Spawn AOE Explosion Hazard here if you want the "Exploding Shield" perk
+
+            _popupEvent?.Raise(transform.position, "SHATTERED");
+
+            if (Global.Audio != null && breakClip)
+                Global.Audio.PlaySound(breakClip, 1.0f);
         }
 
         private void UpdateVisuals()
@@ -121,8 +139,14 @@ namespace DarkTowerTron.Combat
             if (shieldRenderer)
             {
                 float t = Mathf.Clamp01(_currentHeat / maxHeat);
-                shieldRenderer.material.color = Color.Lerp(coldColor, hotColor, t);
-                shieldRenderer.material.SetColor("_EmissionColor", Color.Lerp(coldColor, hotColor, t) * (1 + t * 2)); 
+                Color c = Color.Lerp(coldColor, hotColor, t);
+                Color e = Color.Lerp(coldColor, hotColor, t) * (1 + t * 2);
+
+                // Use Property Block to avoid creating Material Instances
+                shieldRenderer.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor(_baseColorID, c);
+                _propBlock.SetColor(_emissionColorID, e);
+                shieldRenderer.SetPropertyBlock(_propBlock);
             }
         }
     }
