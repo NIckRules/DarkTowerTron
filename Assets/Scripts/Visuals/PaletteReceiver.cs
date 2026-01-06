@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Services;      // NEW: Where PaletteManager lives
+using DarkTowerTron.Core.Services; // NEW: For ServiceLocator
 
 namespace DarkTowerTron.Visuals
 {
@@ -14,7 +15,7 @@ namespace DarkTowerTron.Visuals
         public ActorType actorType = ActorType.Enemy;
 
         [Header("Override (Optional)")]
-        [Tooltip("Leave empty to use Global Default. Assign 'Elite_Gold' here to override.")]
+        [Tooltip("Leave empty to use Global Default.")]
         public ActorThemeSO themeOverride;
 
         [Header("Renderer Bindings")]
@@ -24,16 +25,19 @@ namespace DarkTowerTron.Visuals
 
         private MaterialPropertyBlock _propBlock;
 
+        // --- LIFECYCLE ---
+
         private void OnEnable()
         {
-            if (PaletteManager.Instance != null)
-                PaletteManager.Instance.OnPaletteChanged += ApplyTheme;
+            if (TryGetManager(out var pm))
+                pm.OnPaletteChanged += ApplyTheme;
         }
 
         private void OnDisable()
         {
-            if (PaletteManager.Instance != null)
-                PaletteManager.Instance.OnPaletteChanged -= ApplyTheme;
+            // Safety check prevents errors on quit
+            if (TryGetManager(out var pm))
+                pm.OnPaletteChanged -= ApplyTheme;
         }
 
         private void Start()
@@ -43,11 +47,13 @@ namespace DarkTowerTron.Visuals
 
         public void ManualRefresh() => ApplyTheme();
 
+        // --- LOGIC ---
+
         private void ApplyTheme()
         {
             if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
 
-            // 1. CASE A: Use Local Override (Elite/Boss)
+            // 1. CASE A: Use Local Override
             if (themeOverride != null)
             {
                 ApplySurfaceToList(primaryRenderers, themeOverride.primary);
@@ -56,10 +62,11 @@ namespace DarkTowerTron.Visuals
                 return;
             }
 
-            // 2. CASE B: Use Global Defaults
-            if (PaletteManager.Instance == null || PaletteManager.Instance.activePalette == null) return;
+            // 2. CASE B: Use Global Service
+            // We use TryGetManager helper to handle both Runtime (Services) and Editor (Instance)
+            if (!TryGetManager(out var pm) || pm.activePalette == null) return;
 
-            var global = PaletteManager.Instance.activePalette;
+            var global = pm.activePalette;
 
             if (actorType == ActorType.Player)
             {
@@ -88,7 +95,8 @@ namespace DarkTowerTron.Visuals
                 else if (HasProp(r, "_Color")) _propBlock.SetColor("_Color", surf.mainColor);
 
                 // Set Emission
-                if (HasProp(r, "_EmissionColor")) _propBlock.SetColor("_EmissionColor", surf.mainColor);
+                if (HasProp(r, "_EmissionColor")) 
+                    _propBlock.SetColor("_EmissionColor", surf.emissionColor);
 
                 // Set Physics
                 if (HasProp(r, "_Smoothness")) _propBlock.SetFloat("_Smoothness", surf.smoothness);
@@ -98,10 +106,31 @@ namespace DarkTowerTron.Visuals
             }
         }
 
+        /// <summary>
+        /// Helper to find the manager safely in both Play Mode and Editor Mode.
+        /// </summary>
+        private bool TryGetManager(out PaletteManager pm)
+        {
+            // 1. Runtime: Use Service Locator (Safe, no singleton dependency)
+            if (ServiceLocator.TryGet(out pm)) return true;
+
+            // 2. Editor Mode: Use the static Instance (Legacy support for ExecuteAlways)
+            if (!Application.isPlaying)
+            {
+                pm = PaletteManager.Instance;
+                return pm != null;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// CRITICAL FIX: Actually checks the material properties.
+        /// </summary>
         private bool HasProp(Renderer r, string name)
         {
-            // Simplified check
-            return true;
+            if (r.sharedMaterial == null) return false;
+            return r.sharedMaterial.HasProperty(name);
         }
     }
 }

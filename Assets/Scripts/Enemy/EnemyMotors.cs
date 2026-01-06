@@ -86,12 +86,32 @@ namespace DarkTowerTron.Enemy
             // 5. VERTICAL LOGIC (Flight vs Gravity)
             if (stats.rideHeight > 0)
             {
-                // FLYING: Calculate vertical velocity to reach height
+                // A. Determine Ground Height
+                float groundY = -999f; // Fallback (Void)
+
+                // Start raycast slightly above current position to catch the floor even if we clipped in slightly
+                Vector3 rayOrigin = transform.position + Vector3.up * 1.0f;
+
+                // Cast down 20 units (Enough for high hoverers)
+                // Use OBSTACLES mask (Ground + Default + Wall) so they hover over bridges/crates too
+                if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f, GameConstants.MASK_PHYSICS_OBSTACLES))
+                {
+                    groundY = hit.point.y;
+                }
+                else
+                {
+                    // No ground found? Maintain current height (don't fall into void)
+                    groundY = transform.position.y - stats.rideHeight;
+                }
+
+                // B. Calculate Target Y
+                float targetY = groundY + stats.rideHeight;
+
+                // C. Smoothly Fly There
                 float currentY = transform.position.y;
-                float targetY = stats.rideHeight;
                 float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime);
 
-                // Convert distance delta back to velocity for the motor
+                // D. Convert to Velocity for the KinematicMover
                 float verticalVel = (newY - currentY) / dt;
                 finalVelocity.y = verticalVel;
             }

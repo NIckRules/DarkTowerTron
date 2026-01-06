@@ -271,6 +271,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4400474212300462037, guid: c10164807589214499042b9f74c8fb91,
+        type: 3}
+      propertyPath: beamVisualPrefab
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7576279871074212748, guid: c10164807589214499042b9f74c8fb91,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -395,6 +400,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1339749708970359162, guid: 0105c73a22cb6624986b706919181f8c,
+        type: 3}
+      propertyPath: gizmoColor.a
+      value: 0.078431375
+      objectReference: {fileID: 0}
+    - target: {fileID: 1339749708970359162, guid: 0105c73a22cb6624986b706919181f8c,
+        type: 3}
+      propertyPath: gizmoColor.b
+      value: 0.05420795
+      objectReference: {fileID: 0}
+    - target: {fileID: 1339749708970359162, guid: 0105c73a22cb6624986b706919181f8c,
+        type: 3}
+      propertyPath: gizmoColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1339749708970359162, guid: 0105c73a22cb6624986b706919181f8c,
+        type: 3}
+      propertyPath: gizmoColor.r
+      value: 0.7075472
+      objectReference: {fileID: 0}
     - target: {fileID: 5282759707020977701, guid: 0105c73a22cb6624986b706919181f8c,
         type: 3}
       propertyPath: m_Name
@@ -485,6 +510,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Env_Module_Gap_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361972962497559876, guid: ff34dd1c1f67a804b93ab97ed7dc0d5a,
+        type: 3}
+      propertyPath: gizmoColor.a
+      value: 0.078431375
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361972962497559876, guid: ff34dd1c1f67a804b93ab97ed7dc0d5a,
+        type: 3}
+      propertyPath: gizmoColor.b
+      value: 0.4198113
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361972962497559876, guid: ff34dd1c1f67a804b93ab97ed7dc0d5a,
+        type: 3}
+      propertyPath: gizmoColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361972962497559876, guid: ff34dd1c1f67a804b93ab97ed7dc0d5a,
+        type: 3}
+      propertyPath: gizmoColor.r
+      value: 0.42660654
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -590,6 +635,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Env_Module_Start
       objectReference: {fileID: 0}
+    - target: {fileID: 7583970319307265651, guid: 55a0822dc243f0b44a0036768bb1c514,
+        type: 3}
+      propertyPath: gizmoColor.a
+      value: 0.078431375
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -603,6 +653,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 140011851}
     m_Modifications:
+    - target: {fileID: 2680855771507871614, guid: 80c30d67cc444744d92faec91b034434,
+        type: 3}
+      propertyPath: gizmoColor.a
+      value: 0.078431375
+      objectReference: {fileID: 0}
+    - target: {fileID: 2680855771507871614, guid: 80c30d67cc444744d92faec91b034434,
+        type: 3}
+      propertyPath: gizmoColor.b
+      value: 0.7756052
+      objectReference: {fileID: 0}
+    - target: {fileID: 2680855771507871614, guid: 80c30d67cc444744d92faec91b034434,
+        type: 3}
+      propertyPath: gizmoColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2680855771507871614, guid: 80c30d67cc444744d92faec91b034434,
+        type: 3}
+      propertyPath: gizmoColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3623436760673529926, guid: 80c30d67cc444744d92faec91b034434,
         type: 3}
       propertyPath: m_Name
@@ -673,18 +743,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 270256704586158284, guid: 63a246fb93fd860468c637a68c49938c,
         type: 3}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 270256704586158284, guid: 63a246fb93fd860468c637a68c49938c,
+        type: 3}
       propertyPath: m_BackGroundColor.b
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 270256704586158284, guid: 63a246fb93fd860468c637a68c49938c,
         type: 3}
       propertyPath: m_BackGroundColor.g
-      value: 0
+      value: 0.9924197
       objectReference: {fileID: 0}
     - target: {fileID: 270256704586158284, guid: 63a246fb93fd860468c637a68c49938c,
         type: 3}
       propertyPath: m_BackGroundColor.r
-      value: 0
+      value: 0.8915094
       objectReference: {fileID: 0}
     - target: {fileID: 646026341928374794, guid: 63a246fb93fd860468c637a68c49938c,
         type: 3}
@@ -790,6 +865,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5029309627717016179, guid: 63a246fb93fd860468c637a68c49938c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5265512118423655630, guid: 63a246fb93fd860468c637a68c49938c,
         type: 3}
@@ -912,6 +992,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 140011851}
     m_Modifications:
+    - target: {fileID: 736372110495938405, guid: 979dc051f3bc6214c995ae4a1f6c9f73,
+        type: 3}
+      propertyPath: gizmoColor.a
+      value: 0.078431375
+      objectReference: {fileID: 0}
+    - target: {fileID: 736372110495938405, guid: 979dc051f3bc6214c995ae4a1f6c9f73,
+        type: 3}
+      propertyPath: gizmoColor.b
+      value: 0.07987377
+      objectReference: {fileID: 0}
+    - target: {fileID: 736372110495938405, guid: 979dc051f3bc6214c995ae4a1f6c9f73,
+        type: 3}
+      propertyPath: gizmoColor.g
+      value: 0.5754717
+      objectReference: {fileID: 0}
+    - target: {fileID: 736372110495938405, guid: 979dc051f3bc6214c995ae4a1f6c9f73,
+        type: 3}
+      propertyPath: gizmoColor.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5854439380519348416, guid: 979dc051f3bc6214c995ae4a1f6c9f73,
         type: 3}
       propertyPath: m_LocalPosition.x

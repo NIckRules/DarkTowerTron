@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 8876131734462160885}
   - component: {fileID: 2506214670472289537}
   - component: {fileID: -6759021638277592065}
+  - component: {fileID: 9085053321305765256}
+  - component: {fileID: 1509101402999038234}
+  - component: {fileID: 1006600384734240483}
   m_Layer: 7
   m_Name: Prop_Anchor_Crystal
   m_TagString: Untagged
@@ -30,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -63,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 963055f58ce378b47ba813ef87c37448, type: 2}
+  - {fileID: 2100000, guid: 06ebf18291359ee45a07edb03f44fad2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -118,12 +121,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20b58dfd70c9bd45937efe72bece5f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 10
-  maxStagger: 1
-  staggerDecay: 1
-  meshRenderer: {fileID: 0}
-  normalColor: {r: 0, g: 1, b: 1, a: 1}
-  staggerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  flashColor: {r: 1, g: 1, b: 1, a: 1}
   respawnTime: 3
-  keepPlayerInAir: 1
+  visualRoot: {fileID: 0}
+  mainCollider: {fileID: 0}
+--- !u!114 &9085053321305765256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6042327649744245293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89939daf16190e4a8534162a9116e93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1509101402999038234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6042327649744245293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358fbf73a02f56a4dbf53de385f17f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1006600384734240483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6042327649744245293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 188435c26dc3ba349a8180861ff88419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useOverrides: 1
+  _overrideHealth: 150
+  _overrideStagger: 3
+  _aimCenterOffset: 0.5
+  _magnetismRadius: 2
+  _keepPlayerGrounded: 0

@@ -10,7 +10,6 @@ namespace DarkTowerTron.Enemy.States.Chaser
     {
         private EnemyAgent_Chaser _agent;
         private float _timer;
-        private Tween _shakeTween;
 
         public ChaserState_Priming(EnemyAgent_Chaser agent)
         {
@@ -24,15 +23,14 @@ namespace DarkTowerTron.Enemy.States.Chaser
 
             _timer = _agent.fuseDuration;
 
-            // VISUAL WARNING: Shake the mesh
-            // (Assumes Art is a child, so we shake the child or local rotation)
-            // A simple scale punch or color flash works too.
-            // Let's do a Color Flash + Scale Shake
-
-            if (_agent.GetController().meshRenderer)
+            // 1. VISUAL WARNING (The Fix)
+            // Use the Visuals component via the Controller
+            if (_agent.GetController() != null && _agent.GetController().Visuals != null)
             {
-                _agent.GetController().meshRenderer.material.DOColor(Color.red, 0.1f).SetLoops(-1, LoopType.Yoyo);
+                _agent.GetController().Visuals.StartPrimingEffect();
             }
+
+            // 2. PHYSICAL WARNING (Shake)
             _agent.transform.DOShakeScale(_agent.fuseDuration, 0.5f, 20, 90);
         }
 
@@ -40,7 +38,7 @@ namespace DarkTowerTron.Enemy.States.Chaser
         {
             _timer -= Time.deltaTime;
 
-            // Lock rotation to target so it looks aggressive
+            // Lock rotation to target
             if (_agent.GetTarget() != null)
             {
                 _agent.GetMotor().FaceTarget(_agent.GetTarget().position);
@@ -48,16 +46,20 @@ namespace DarkTowerTron.Enemy.States.Chaser
 
             if (_timer <= 0)
             {
-                _agent.DeployMine(); // CHANGED: Was Detonate()
+                _agent.DeployMine();
             }
         }
 
         public override void Exit()
         {
-            // Cleanup tweens if we get stunned/killed during priming
+            // Cleanup tweens
             _agent.transform.DOKill();
-            if (_agent.GetController().meshRenderer)
-                _agent.GetController().meshRenderer.material.DOKill();
+            
+            // Reset Color (The Fix)
+            if (_agent.GetController() != null && _agent.GetController().Visuals != null)
+            {
+                _agent.GetController().Visuals.StopPrimingEffect();
+            }
         }
     }
 }

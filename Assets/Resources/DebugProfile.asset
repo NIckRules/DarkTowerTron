@@ -16,7 +16,7 @@ MonoBehaviour:
   logPlayer: 0
   logAI: 0
   logCombat: 0
-  logUI: 1
+  logUI: 0
   logPhysics: 0
   logSystem: 0
-  logVFX: 0
+  logVFX: 1

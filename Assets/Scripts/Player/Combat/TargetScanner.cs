@@ -41,15 +41,20 @@ namespace DarkTowerTron.Player.Combat
 
         public void UpdateScanner(Vector3 aimDirection)
         {
-            // Lift origin slightly to avoid floor clipping
-            Vector3 origin = transform.position + Vector3.up * 1.0f;
-
+            // NEW: Create a tall vertical capsule
+            // From: 5 units below feet (catch things down stairs)
+            // To: 10 units above feet (catch flying drones)
+            Vector3 p1 = transform.position + (Vector3.down * 5f);
+            Vector3 p2 = transform.position + (Vector3.up * 10f);
+            
             int layerMask = 1 << GameConstants.LAYER_ENEMY;
 
+            // Use Stats for width/range
             float range = _stats ? _stats.ScanRange : 25f;
-            float radius = _stats ? _stats.ScanRadius : 2f;
+            float rad = _stats ? _stats.ScanRadius : 2f; // Width of the pole
 
-            if (UnityEngine.Physics.SphereCast(origin, radius, aimDirection, out RaycastHit hit, range, layerMask))
+            // Change SphereCast to CapsuleCast
+            if (UnityEngine.Physics.CapsuleCast(p1, p2, rad, aimDirection, out RaycastHit hit, range, layerMask))
             {
                 // FIX: Look for Interface instead of EnemyController
                 ICombatTarget target = hit.collider.GetComponentInParent<ICombatTarget>();

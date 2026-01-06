@@ -5,6 +5,8 @@ using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
+using Global = DarkTowerTron.Core.Services.Services; 
+
 namespace DarkTowerTron.Enemy
 {
     [RequireComponent(typeof(EnemyMotor))]
@@ -93,7 +95,7 @@ namespace DarkTowerTron.Enemy
             if (prefab == null) return;
 
             // 1. Spawn via Pool
-            GameObject p = Services.Pool.Spawn(prefab, position, rotation);
+            GameObject p = Global.Pool.Spawn(prefab, position, rotation);
 
             // 2. Setup Logic
             Projectile proj = p.GetComponent<Projectile>();

@@ -2,9 +2,8 @@ using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
-using DarkTowerTron.Core.Services;    // For logging
 
-namespace DarkTowerTron.Managers
+namespace DarkTowerTron.Services
 {
     public class ScoreManager : MonoBehaviour
     {

@@ -45,7 +45,9 @@ namespace DarkTowerTron.Player.Combat
 
 
                     Debug.Log($"[GUN DEBUG] Firing Bullet. Damage: {proj.damage} | Stagger: {proj.stagger}");
-                    
+
+                    // Prevent immediate self-collision
+                    proj.SetSource(gameObject);
                     proj.Initialize(aimDir);
                 }
             }

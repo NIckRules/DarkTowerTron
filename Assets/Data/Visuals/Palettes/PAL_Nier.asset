@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
-  m_Name: PAL_Nier
+  m_Name: Pal_Nier
   m_EditorClassIdentifier: 
   playerPrimary:
     mainColor: {r: 0.5952296, g: 0.5955943, b: 0.6037736, a: 0}
@@ -43,11 +43,11 @@ MonoBehaviour:
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
     emissionIntensity: 0
   enemyTertiary:
-    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    mainColor: {r: 0.16660735, g: 0.9056604, b: 0.59294343, a: 1}
     smoothness: 0
-    metallic: 0
-    emissionColor: {r: 0, g: 0, b: 0, a: 0}
-    emissionIntensity: 0
+    metallic: 0.7
+    emissionColor: {r: 0.16470589, g: 0.90588236, b: 0.5921569, a: 1}
+    emissionIntensity: 0.2
   projectileHostile:
     mainColor: {r: 1, g: 0.33965325, b: 0.0990566, a: 0}
     smoothness: 0
@@ -60,6 +60,25 @@ MonoBehaviour:
     metallic: 0
     emissionColor: {r: 0, g: 0, b: 0, a: 0}
     emissionIntensity: 0
+  beamAttack:
+    mainColor: {r: 0.035899233, g: 0.02300641, b: 0.4433962, a: 0}
+    smoothness: 0
+    metallic: 0.3
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 1
+  blitzReady:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  blitzCooldown:
+    mainColor: {r: 0, g: 0, b: 0, a: 0}
+    smoothness: 0
+    metallic: 0
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   staggerColor: {r: 1, g: 0.8, b: 0, a: 1}
   floor:
     mainColor: {r: 0.8666667, g: 0.7882353, b: 0.7882353, a: 0}
@@ -79,4 +98,18 @@ MonoBehaviour:
     metallic: 0
     emissionColor: {r: 1, g: 0.9481132, b: 0.9481132, a: 0}
     emissionIntensity: 0.5
-  skyColor: {r: 0.4009434, g: 1, b: 0.95789695, a: 1}
+  voidZone:
+    mainColor: {r: 0.990566, g: 0.65881985, b: 0.65881985, a: 0.7058824}
+    smoothness: 0.3
+    metallic: 0.2
+    emissionColor: {r: 0, g: 0, b: 0, a: 0}
+    emissionIntensity: 0
+  anchor:
+    mainColor: {r: 0, g: 0.3962264, b: 0.18193561, a: 0}
+    smoothness: 0.2
+    metallic: 0.6
+    emissionColor: {r: 0, g: 0.39607844, b: 0.18039216, a: 0}
+    emissionIntensity: 0
+  skyColor: {r: 0.01668743, g: 0.51363224, b: 0.7075472, a: 1}
+  fogDensity: 0.0068
+  variants: []

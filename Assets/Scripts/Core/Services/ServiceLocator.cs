@@ -12,6 +12,8 @@ namespace DarkTowerTron.Core.Services
     {
         private static readonly Dictionary<Type, object> _services = new();
 
+        public static bool IsInitialized => _services.Count > 0;
+
         /// <summary>
         /// Registers a service instance. Overwrites if type already exists.
         /// </summary>

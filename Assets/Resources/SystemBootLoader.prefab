@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -8401364212584002029}
   - component: {fileID: 3075966719113363501}
   - component: {fileID: 411191631447898274}
+  - component: {fileID: 8599298648147933543}
   m_Layer: 0
   m_Name: SystemBootLoader
   m_TagString: Untagged
@@ -208,3 +209,67 @@ MonoBehaviour:
   gloryKillBonus: 500
   maxMultiplier: 5
   currentMultiplier: 1
+--- !u!114 &8599298648147933543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257296264535243330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f4c1f22d2c2edf429a4df06c4e619d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activePalette: {fileID: 11400000, guid: 253c73382724c81448699d784b933b68, type: 2}
+  activeVariant: 
+  bindings:
+  - surfaceName: PlayerPrimary
+    type: 1
+    collection: {fileID: 11400000, guid: 4a48fecfa6f40d546a691de1b3a319e8, type: 2}
+  - surfaceName: PlayerSecondary
+    type: 2
+    collection: {fileID: 11400000, guid: 42b58d063cd4d28498b6832812f62242, type: 2}
+  - surfaceName: PlayerTertiary
+    type: 3
+    collection: {fileID: 11400000, guid: 316488ef898c4da408965571ac1534e7, type: 2}
+  - surfaceName: EnemyPrimary
+    type: 4
+    collection: {fileID: 11400000, guid: a5ab19fb2b2b2d74497a9c5d67f872d5, type: 2}
+  - surfaceName: EnemySecondary
+    type: 5
+    collection: {fileID: 11400000, guid: 6aeec2b6cfc6b5b45b4f4aea63ea700a, type: 2}
+  - surfaceName: EnemyTertiary
+    type: 6
+    collection: {fileID: 11400000, guid: 395003987dc20114f91713ff6dd2225a, type: 2}
+  - surfaceName: ProjectileHostile
+    type: 7
+    collection: {fileID: 11400000, guid: 50797cad22d679541aeb978a850a9ebb, type: 2}
+  - surfaceName: ProjectileFriendly
+    type: 8
+    collection: {fileID: 11400000, guid: edd3949e88bdbbe47a37dd1187d1ee5e, type: 2}
+  - surfaceName: BeamAttack
+    type: 9
+    collection: {fileID: 11400000, guid: 9e6783eb5a8a1794bb6278716baca0a7, type: 2}
+  - surfaceName: BlitzReady
+    type: 10
+    collection: {fileID: 0}
+  - surfaceName: BlitzCooldown
+    type: 11
+    collection: {fileID: 0}
+  - surfaceName: Floor
+    type: 12
+    collection: {fileID: 11400000, guid: e64a29004f9ed6d4994b85261337aacb, type: 2}
+  - surfaceName: Walls
+    type: 13
+    collection: {fileID: 11400000, guid: 8342502258de9bb48b87f0298e3e2ff2, type: 2}
+  - surfaceName: Hazards
+    type: 15
+    collection: {fileID: 11400000, guid: 8256fedb61135554fa3671d5141d34cb, type: 2}
+  - surfaceName: Hazards
+    type: 16
+    collection: {fileID: 11400000, guid: 4219a6156bade5b41bce67fbe685625c, type: 2}
+  - surfaceName: Hazards
+    type: 14
+    collection: {fileID: 11400000, guid: d6e557455fd9a074cbc5863e7c3da0fd, type: 2}
+  refreshNow: 0

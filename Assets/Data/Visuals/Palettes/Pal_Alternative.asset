@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dda5f9eb5b7e0544b859fff5673912ea, type: 3}
-  m_Name: PAL_Alt
+  m_Name: Pal_Alternative
   m_EditorClassIdentifier: 
   playerPrimary:
     mainColor: {r: 0.4811321, g: 0, b: 0, a: 0}

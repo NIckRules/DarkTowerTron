@@ -18,7 +18,7 @@ MonoBehaviour:
   rotationSpeed: 25
   gravity: 20
   wallRepulsionForce: 100
-  actionHangTime: 0.2
+  actionHangTime: 0.3
   scanRange: 25
   scanRadius: 2
   maxGrit: 3

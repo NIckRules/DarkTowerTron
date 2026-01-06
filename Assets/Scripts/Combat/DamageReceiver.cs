@@ -11,7 +11,7 @@ namespace DarkTowerTron.Combat
 {
     [RequireComponent(typeof(VitalityModule))]
     [RequireComponent(typeof(StaggerModule))]
-    public class DamageReceiver : MonoBehaviour, IDamageable, IPoolable, ICombatTarget
+    public class DamageReceiver : MonoBehaviour, IDamageable, IPoolable, ICombatTarget, IAimTarget
     {
         // --- DEBUG SWITCH ---
         public static bool EnableDebugGizmos = false;
@@ -20,6 +20,13 @@ namespace DarkTowerTron.Combat
         public bool useOverrides = false;
         [SerializeField] private float _overrideHealth = 50f;
         [SerializeField] private int _overrideStagger = 3;
+
+        [Header("Aiming Configuration")]
+        [SerializeField] private float _aimCenterOffset = 1.0f;
+        [SerializeField] private float _magnetismRadius = 0.75f;
+
+        [Header("Execution Settings")]
+        [SerializeField] private bool _keepPlayerGrounded = true; // Default True for Enemies
 
         // Dependencies
         private VitalityModule _vitality;
@@ -143,7 +150,11 @@ namespace DarkTowerTron.Combat
 
         // --- ICombatTarget ---
         public void OnExecutionHit() => Kill(true);
-        public bool KeepPlayerGrounded => true;
+        public bool KeepPlayerGrounded => _keepPlayerGrounded;
+
+        // --- IAimTarget ---
+        public Vector3 AimPoint => transform.position + (Vector3.up * _aimCenterOffset);
+        public float TargetRadius => _magnetismRadius;
 
         // --- DEBUG GIZMOS ---
 #if UNITY_EDITOR

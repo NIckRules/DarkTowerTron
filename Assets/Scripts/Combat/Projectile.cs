@@ -1,8 +1,9 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Managers;
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.Combat.Strategies; // NEW Namespace
+using DarkTowerTron.Combat.Strategies;
+
+// ALIAS: Resolves the conflict between 'Services' (Namespace) and 'Services' (Class)
+using Global = DarkTowerTron.Core.Services.Services; 
 
 namespace DarkTowerTron.Combat
 {
@@ -25,9 +26,9 @@ namespace DarkTowerTron.Combat
         public Material friendlyMaterial; 
         public Material hostileMaterial; 
 
-        private Vector3 _direction; // Kept for reference
+        private Vector3 _direction; 
         private GameObject _source;
-        private IMovementStrategy _movementStrategy; // The Brain
+        private IMovementStrategy _movementStrategy;
         
         private bool _isInitialized = false;
         private bool _isRedirected = false; 
@@ -39,12 +40,11 @@ namespace DarkTowerTron.Combat
         public void OnDespawn() 
         {
             _isInitialized = false;
-            _movementStrategy = null; // Clear strategy
+            _movementStrategy = null; 
         }
 
         public void Initialize(Vector3 dir)
         {
-            // Default Strategy: Linear
             if (_movementStrategy == null) SetStrategy(new LinearMovement());
 
             _direction = dir.normalized;
@@ -57,58 +57,36 @@ namespace DarkTowerTron.Combat
             UpdateVisuals();
         }
 
-        // NEW: Allow external systems to inject logic
-        public void SetStrategy(IMovementStrategy strategy)
-        {
-            _movementStrategy = strategy;
-        }
-
+        public void SetStrategy(IMovementStrategy strategy) => _movementStrategy = strategy;
         public void SetSource(GameObject source) => _source = source;
-
-        public void ResetHostility(bool startHostile) 
-        { 
-            isHostile = startHostile; 
-            UpdateVisuals();
-        }
+        public void ResetHostility(bool startHostile) { isHostile = startHostile; UpdateVisuals(); }
 
         private void Update()
         {
             if (!_isInitialized) return;
-            
             _wasDeflectedThisFrame = false;
             float dt = Time.deltaTime;
 
-            // 1. CAPTURE OLD POS
             Vector3 oldPos = transform.position;
-
-            // 2. EXECUTE STRATEGY
             _movementStrategy.Move(transform, dt);
-
-            // 3. RAYCAST (From Old to New)
+            
             Vector3 newPos = transform.position;
             Vector3 travelVec = newPos - oldPos;
             float moveDistance = travelVec.magnitude;
-            Vector3 travelDir = travelVec.normalized;
 
-            if (moveDistance > 0) // Only cast if we moved
+            if (moveDistance > 0)
             {
-                int layerMask = GameConstants.MASK_PROJECTILE_COLLISION;
+                int mask = GameConstants.MASK_PROJECTILE_COLLISION;
 
-                if (UnityEngine.Physics.Raycast(oldPos, travelDir, out RaycastHit hit, moveDistance, layerMask))
+                if (UnityEngine.Physics.Raycast(oldPos, travelVec.normalized, out RaycastHit hit, moveDistance, mask))
                 {
-                    // Self-Hit Prevention
-                    if (_source != null)
+                    if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform)))
                     {
-                        if (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform))
-                        {
-                            // Ignore
-                            return;
-                        }
+                        return; 
                     }
 
-                    // Impact
                     transform.position = hit.point;
-                    HandleCollision(hit.collider); 
+                    HandleCollision(hit.collider);
                 }
             }
 
@@ -116,7 +94,6 @@ namespace DarkTowerTron.Combat
             if (_lifeTimer <= 0) Despawn();
         }
 
-        // ... (HandleCollision remains same as before) ...
         private void HandleCollision(Collider other)
         {
             if (other.isTrigger && other.GetComponent<ShieldHitbox>() == null) return;
@@ -137,7 +114,7 @@ namespace DarkTowerTron.Combat
                 {
                     damageAmount = this.damage,
                     staggerAmount = this.stagger,
-                    pushDirection = travelDirForDamage(), // Helper below
+                    pushDirection = transform.forward,
                     pushForce = 5f,
                     source = _source,
                     isRedirected = this._isRedirected,
@@ -151,24 +128,14 @@ namespace DarkTowerTron.Combat
             }
         }
 
-        private Vector3 travelDirForDamage()
-        {
-            // Just use forward vector of projectile for push direction
-            return transform.forward;
-        }
-
         private void OnTriggerEnter(Collider other) { }
-
-        // --- REFLECTION LOGIC (Updated Signatures) ---
 
         public void DeflectByEnemy(Vector3 surfaceNormal, IMovementStrategy overrideStrategy = null)
         {
             _wasDeflectedThisFrame = true;
             isHostile = true; 
-            
             _direction = Vector3.Reflect(_direction, surfaceNormal).normalized;
             _source = null; 
-
             ApplyStrategy(overrideStrategy ?? new LinearMovement());
             UpdateVisuals();
         }
@@ -178,13 +145,10 @@ namespace DarkTowerTron.Combat
             _wasDeflectedThisFrame = true;
             isHostile = false; 
             _isRedirected = true;
-            
             _direction = newDirection.normalized;
             _source = newOwner;
-
             speed *= 1.5f;
             _lifeTimer = 3.0f;
-            
             ApplyStrategy(overrideStrategy ?? new LinearMovement());
             UpdateVisuals();
         }
@@ -197,12 +161,15 @@ namespace DarkTowerTron.Combat
 
         private void UpdateVisuals()
         {
-            if (meshRenderer) meshRenderer.material = isHostile ? hostileMaterial : friendlyMaterial;
+            // CRITICAL FIX: Use sharedMaterial to respect the Palette Manager
+            if (meshRenderer) 
+                meshRenderer.sharedMaterial = isHostile ? hostileMaterial : friendlyMaterial;
         }
 
         private void Despawn()
         {
-            if (Services.Pool) Services.Pool.Despawn(gameObject);
+            // USE ALIAS 'Global' to avoid namespace collision
+            if (Global.Pool) Global.Pool.Despawn(gameObject);
             else Destroy(gameObject);
         }
     }

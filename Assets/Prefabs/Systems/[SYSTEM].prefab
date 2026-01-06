@@ -225,7 +225,6 @@ GameObject:
   - component: {fileID: 4583971373037434231}
   - component: {fileID: 1873433104586794551}
   - component: {fileID: 2123055543117970472}
-  - component: {fileID: 4815455943164921751}
   - component: {fileID: 1360794710383633628}
   m_Layer: 0
   m_Name: '[SYSTEM]'
@@ -283,34 +282,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiManager: {fileID: 2783664782137103427}
   activeSpawnID: ST_Start
---- !u!114 &4815455943164921751
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3462713615548775571}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f4c1f22d2c2edf429a4df06c4e619d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activePalette: {fileID: 11400000, guid: 253c73382724c81448699d784b933b68, type: 2}
-  playerPrimaryCols: {fileID: 11400000, guid: 4a48fecfa6f40d546a691de1b3a319e8, type: 2}
-  playerSecondaryCols: {fileID: 11400000, guid: 42b58d063cd4d28498b6832812f62242,
-    type: 2}
-  playerTertiaryCols: {fileID: 11400000, guid: 316488ef898c4da408965571ac1534e7, type: 2}
-  enemyPrimaryCols: {fileID: 11400000, guid: a5ab19fb2b2b2d74497a9c5d67f872d5, type: 2}
-  enemySecondaryCols: {fileID: 11400000, guid: 6aeec2b6cfc6b5b45b4f4aea63ea700a, type: 2}
-  enemyTertiaryCols: {fileID: 11400000, guid: 395003987dc20114f91713ff6dd2225a, type: 2}
-  floorCols: {fileID: 11400000, guid: e64a29004f9ed6d4994b85261337aacb, type: 2}
-  wallCols: {fileID: 11400000, guid: 8342502258de9bb48b87f0298e3e2ff2, type: 2}
-  hazardCols: {fileID: 11400000, guid: d6e557455fd9a074cbc5863e7c3da0fd, type: 2}
-  projectileHostileCols: {fileID: 11400000, guid: 50797cad22d679541aeb978a850a9ebb,
-    type: 2}
-  projectileFriendlyCols: {fileID: 11400000, guid: edd3949e88bdbbe47a37dd1187d1ee5e,
-    type: 2}
-  refreshNow: 0
 --- !u!114 &1360794710383633628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,6 +478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40d19321d9712204293a987e3bb6c75e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
   waves: []
   timeBetweenWaves: 3
 --- !u!1001 &1406556555021720400

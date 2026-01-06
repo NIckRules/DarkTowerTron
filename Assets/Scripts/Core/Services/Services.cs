@@ -1,5 +1,4 @@
-using DarkTowerTron.Core.Services; 
-using DarkTowerTron.Managers; 
+using DarkTowerTron.Services;
 
 namespace DarkTowerTron.Core.Services
 {
@@ -9,5 +8,6 @@ namespace DarkTowerTron.Core.Services
         public static PoolManager Pool => ServiceLocator.Get<PoolManager>();
         public static VFXManager VFX => ServiceLocator.Get<VFXManager>();
         public static ScoreManager Score => ServiceLocator.Get<ScoreManager>();
+        public static PaletteManager Palette => ServiceLocator.Get<PaletteManager>();
     }
 }

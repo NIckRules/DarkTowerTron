@@ -16,6 +16,7 @@ namespace DarkTowerTron.Core.Services
             Register<PoolManager>();
             Register<VFXManager>();
             Register<ScoreManager>(); 
+            Register<PaletteManager>(); 
             
             GameLogger.Log(LogChannel.System, "System Core & Managers Initialized.");
         }

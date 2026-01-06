@@ -3,22 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+using DarkTowerTron.Core.Services;    // For Logger
 
 namespace DarkTowerTron.Managers
 {
     [RequireComponent(typeof(ArenaSpawner))]
     public class WaveDirector : MonoBehaviour
     {
+        [Header("Wiring")]
+        [Tooltip("Listens for enemy deaths to track wave progress.")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+
         [Header("Configuration")]
         public List<WaveDefinitionSO> waves;
         public float timeBetweenWaves = 3.0f;
 
+        // Internal State
         private ArenaSpawner _spawner;
-
         private int _currentWaveIndex = 0;
         private int _essentialEnemiesAlive = 0;
         private int _gruntsAlive = 0;
-
         private bool _isSpawningMain = false;
         private bool _gameStarted = false;
         private Coroutine _gruntRoutine;
@@ -28,8 +33,19 @@ namespace DarkTowerTron.Managers
             _spawner = GetComponent<ArenaSpawner>();
         }
 
-        private void OnEnable() => GameEvents.OnEnemyKilled += OnEnemyKilled;
-        private void OnDisable() => GameEvents.OnEnemyKilled -= OnEnemyKilled;
+        private void OnEnable()
+        {
+            if (_enemyKilledEvent != null) 
+                _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent != null) 
+                _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+        }
+
+        // --- PUBLIC API ---
 
         public void StartGame()
         {
@@ -38,9 +54,11 @@ namespace DarkTowerTron.Managers
             StartCoroutine(StartGameRoutine());
         }
 
+        // --- CORE LOGIC ---
+
         private IEnumerator StartGameRoutine()
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.5f);
             StartCoroutine(RunWave(_currentWaveIndex));
         }
 
@@ -50,29 +68,33 @@ namespace DarkTowerTron.Managers
             if (index >= waves.Count)
             {
                 GameLogger.Log(LogChannel.System, "ROOM CLEARED", gameObject);
-                // Open the doors. Boss script will handle Victory separately.
-                GameEvents.OnRoomCleared?.Invoke();
+                
+                // Triggers doors opening, etc.
+                GameEvents.OnRoomCleared?.Invoke(); 
                 yield break;
             }
 
             WaveDefinitionSO wave = waves[index];
-            GameLogger.Log(LogChannel.System, $"WAVE {index + 1}: {wave.waveName}", gameObject);
+            GameLogger.Log(LogChannel.System, $"STARTING WAVE {index + 1}: {wave.waveName}", gameObject);
 
-            // --- COUNTDOWN ---
+            // --- UI ANNOUNCEMENT (Legacy Static Events) ---
             GameEvents.OnWaveAnnounce?.Invoke(index);
             yield return new WaitForSeconds(1.0f);
-            for (int c = 3; c > 0; c--)
-            {
-                GameEvents.OnCountdownChange?.Invoke(c.ToString());
-                yield return new WaitForSeconds(1.0f);
-            }
+            
+            GameEvents.OnCountdownChange?.Invoke("3");
+            yield return new WaitForSeconds(1.0f);
+            GameEvents.OnCountdownChange?.Invoke("2");
+            yield return new WaitForSeconds(1.0f);
+            GameEvents.OnCountdownChange?.Invoke("1");
+            yield return new WaitForSeconds(1.0f);
+            
             GameEvents.OnCountdownChange?.Invoke("ENGAGE");
             GameEvents.OnWaveCombatStarted?.Invoke();
             yield return new WaitForSeconds(0.5f);
             GameEvents.OnCountdownChange?.Invoke("");
             // -----------------
 
-            // Reset
+            // Reset Counters
             _isSpawningMain = true;
             _essentialEnemiesAlive = 0;
             _gruntsAlive = 0;
@@ -92,6 +114,9 @@ namespace DarkTowerTron.Managers
             }
 
             _isSpawningMain = false;
+            
+            // Check victory in case everything died while we were still spawning
+            CheckVictory();
         }
 
         private IEnumerator GruntLogic(WaveDefinitionSO wave)
@@ -99,7 +124,7 @@ namespace DarkTowerTron.Managers
             if (wave.maxGrunts <= 0 || wave.gruntPrefabs == null || wave.gruntPrefabs.Length == 0)
                 yield break;
 
-            // Anchor Logic: Keep spawning ONLY while VIPs are alive
+            // Anchor Logic: Keep spawning ONLY while VIPs are alive (or main force is still spawning)
             while (_essentialEnemiesAlive > 0 || _isSpawningMain)
             {
                 if (_gruntsAlive < wave.maxGrunts)
@@ -111,24 +136,16 @@ namespace DarkTowerTron.Managers
             }
         }
 
-        // Updated Spawn Method
         private void SpawnEnemy(GameObject prefab, int forcedIndex)
         {
-            if (_spawner == null) return;
-            
-            if (prefab == null)
-            {
-                GameLogger.LogError(LogChannel.System, $"WaveDirector: Attempted to spawn NULL prefab.", gameObject);
-                return;
-            }
+            if (_spawner == null || prefab == null) return;
 
-            // CRITICAL FIX-002: Get the actual spawned instance
+            // Spawn via Pool
             GameObject instance = _spawner.SpawnEnemy(prefab, forcedIndex);
-
             if (instance == null) return;
 
-            // Check the INSTANCE stats, not the PREFAB stats
-            var motor = instance.GetComponentInChildren<DarkTowerTron.Enemy.EnemyMotor>();
+            // Determine if Essential based on the Instance's Stats
+            var motor = instance.GetComponent<DarkTowerTron.Enemy.EnemyMotor>();
             bool countAsEssential = false;
 
             if (motor != null && motor.stats != null)
@@ -137,7 +154,7 @@ namespace DarkTowerTron.Managers
             }
             else
             {
-                GameLogger.LogWarning(LogChannel.System, $"Enemy {instance.name} missing Stats! Defaulting to Essential.", instance);
+                // Fallback for safety
                 countAsEssential = true;
             }
 
@@ -145,15 +162,19 @@ namespace DarkTowerTron.Managers
             else _gruntsAlive++;
         }
 
+        // --- EVENT HANDLERS ---
+
         private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!_gameStarted) return;
 
+            // Logic: Identify who died based on the Stats passed by the event
             if (stats != null && stats.isEssential)
             {
                 _essentialEnemiesAlive--;
+                GameLogger.Log(LogChannel.System, $"VIP Killed. Remaining: {_essentialEnemiesAlive}", gameObject);
 
-                // ANCHOR: If VIPs are dead, cut the reinforcement line immediately
+                // Cut reinforcements immediately if VIPs are dead
                 if (_essentialEnemiesAlive <= 0)
                 {
                     if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
@@ -165,7 +186,10 @@ namespace DarkTowerTron.Managers
                 _gruntsAlive--;
             }
 
-            // Check victory on EVERY death (Grunt or VIP)
+            // Safety clamp
+            if (_essentialEnemiesAlive < 0) _essentialEnemiesAlive = 0;
+            if (_gruntsAlive < 0) _gruntsAlive = 0;
+
             CheckVictory();
         }
 
@@ -178,7 +202,8 @@ namespace DarkTowerTron.Managers
 
                 if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
 
-                GameEvents.OnWaveCleared?.Invoke();
+                GameEvents.OnWaveCleared?.Invoke(); // UI/FX Feedback
+                
                 _currentWaveIndex++;
                 StartCoroutine(NextWaveRoutine());
             }

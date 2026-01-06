@@ -1,7 +1,8 @@
 using UnityEngine;
 using TMPro;
 using DarkTowerTron.Managers;
-using DarkTowerTron.Core.Services;
+// ALIAS: Prevents conflict if you later add 'using DarkTowerTron.Services;' for Audio
+using Global = DarkTowerTron.Core.Services.Services; 
 
 namespace DarkTowerTron.UI
 {
@@ -17,41 +18,61 @@ namespace DarkTowerTron.UI
         public int rankA_Threshold = 25000;
         public int rankB_Threshold = 10000;
 
-        // Called automatically when the GameObject is enabled (SetActive true)
         private void OnEnable()
         {
-            if (Services.Score == null) return;
+            // Note: Global.Score throws an error if missing (Hard Dependency), 
+            // so we don't strictly need a null check here unless using TryGet.
+            // We assume the Bootloader has run.
 
             // 1. Stop the Timer
-            Services.Score.StopTracking();
+            Global.Score.StopTracking();
 
             // 2. Get Stats
-            int finalScore = Services.Score.TotalScore;
-            float finalTime = Services.Score.GameTime;
+            int finalScore = Global.Score.TotalScore;
+            float finalTime = Global.Score.GameTime;
 
             // 3. Format Text
             if (scoreText) scoreText.text = finalScore.ToString("N0");
 
             if (timeText)
             {
-                string minutes = Mathf.Floor(finalTime / 60).ToString("00");
-                string seconds = (finalTime % 60).ToString("00");
-                timeText.text = $"{minutes}:{seconds}";
+                // Use FloorToInt for cleaner casting
+                int minutes = Mathf.FloorToInt(finalTime / 60f);
+                int seconds = Mathf.FloorToInt(finalTime % 60f);
+                timeText.text = $"{minutes:00}:{seconds:00}";
             }
 
             // 4. Calculate Rank
             if (rankText)
             {
-                string rank = "C";
-                Color rankColor = Color.grey;
-
-                if (finalScore >= rankS_Threshold) { rank = "S"; rankColor = Color.cyan; }
-                else if (finalScore >= rankA_Threshold) { rank = "A"; rankColor = Color.green; }
-                else if (finalScore >= rankB_Threshold) { rank = "B"; rankColor = Color.yellow; }
-
-                rankText.text = rank;
-                rankText.color = rankColor;
+                CalculateRank(finalScore);
             }
+        }
+
+        private void CalculateRank(int score)
+        {
+            string rank = "C";
+            Color rankColor = Color.grey; 
+            // Note: In the future, these colors could come from a UIThemeSO or Palette
+
+            if (score >= rankS_Threshold) 
+            { 
+                rank = "S"; 
+                rankColor = Color.cyan; 
+            }
+            else if (score >= rankA_Threshold) 
+            { 
+                rank = "A"; 
+                rankColor = Color.green; 
+            }
+            else if (score >= rankB_Threshold) 
+            { 
+                rank = "B"; 
+                rankColor = Color.yellow; 
+            }
+
+            rankText.text = rank;
+            rankText.color = rankColor;
         }
     }
 }

@@ -1,7 +1,6 @@
 using UnityEngine;
-using DarkTowerTron.Managers; // For PoolManager
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron.Core;          // For GameConstants, GameLogger
+using DarkTowerTron.Core.Services; // For Services
 
 namespace DarkTowerTron.Managers
 {
@@ -12,7 +11,7 @@ namespace DarkTowerTron.Managers
 
         [Header("Debug")]
         public bool showDebugRays = true;
-        public float debugLineDuration = 20f; // Long time to analyze in Scene view
+        public float debugLineDuration = 20f; 
 
         public GameObject SpawnEnemy(GameObject prefab, int forcedIndex = -1)
         {
@@ -29,49 +28,49 @@ namespace DarkTowerTron.Managers
 
             // 3. Find Floor
             Vector3 spawnPos;
-            int mask = LayerMask.GetMask("Ground", "Default", "Wall");
+            
+            // HYGIENE FIX: Use the Constant Mask (Ground + Wall + Default)
+            int mask = GameConstants.MASK_PHYSICS_OBSTACLES; 
+            
             Vector3 rayOrigin = attemptPos + Vector3.up * 50f;
 
             if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 100f, mask))
             {
                 spawnPos = hit.point;
-
-                // Call dedicated Debugger
                 if (showDebugRays) VisualizeSpawn(rayOrigin, hit, true);
             }
             else
             {
                 // Fallback (Air Drop)
                 spawnPos = attemptPos + Vector3.up * 2.0f;
-
-                // Call dedicated Debugger
                 if (showDebugRays) VisualizeSpawn(rayOrigin, new RaycastHit(), false);
             }
 
+            // SERVICE LOCATOR: Correct usage
             return Services.Pool.Spawn(prefab, spawnPos, Quaternion.LookRotation(sp.forward));
         }
 
-        // --- NEW DEBUG METHOD ---
         private void VisualizeSpawn(Vector3 origin, RaycastHit hit, bool success)
         {
             if (success)
             {
-                // Draw Green Line to exact hit point
                 Debug.DrawLine(origin, hit.point, Color.green, debugLineDuration);
-
-                // Draw a small Cross at the hit point so you can see exactly where it landed
                 Debug.DrawRay(hit.point, Vector3.up * 0.5f, Color.green, debugLineDuration);
                 Debug.DrawRay(hit.point, Vector3.right * 0.5f, Color.green, debugLineDuration);
 
-                // Log details
                 string layerName = LayerMask.LayerToName(hit.collider.gameObject.layer);
-                GameLogger.Log(LogChannel.System, $"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>", hit.collider.gameObject);
+                
+                GameLogger.Log(LogChannel.System, 
+                    $"<color=green>[SPAWN HIT]</color> Object: <b>{hit.collider.name}</b> | Layer: <b>{layerName}</b> | Height Y: <b>{hit.point.y:F2}</b>", 
+                    hit.collider.gameObject);
             }
             else
             {
-                // Draw Red Line all the way down
                 Debug.DrawRay(origin, Vector3.down * 100f, Color.red, debugLineDuration);
-                GameLogger.LogError(LogChannel.System, $"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.", gameObject);
+                
+                GameLogger.LogError(LogChannel.System, 
+                    $"<color=red>[SPAWN MISS]</color> Raycast from {origin} hit NOTHING! Enemy air-dropped.", 
+                    gameObject);
             }
         }
     }

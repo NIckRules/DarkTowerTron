@@ -11,7 +11,7 @@ namespace DarkTowerTron.Player.Stats
     [RequireComponent(typeof(PlayerMovement))]
     [RequireComponent(typeof(PlayerDodge))]
     [RequireComponent(typeof(PlayerStats))]
-    public class PlayerHealth : MonoBehaviour, IDamageable
+    public class PlayerHealth : MonoBehaviour, IDamageable, IAimTarget
     {
         [Header("Configuration")]
         public bool startWithHull = true;
@@ -127,8 +127,22 @@ namespace DarkTowerTron.Player.Stats
         private void OnEnemyKilled(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
             if (!rewardPlayer) return;
-            if (stats != null && stats.healsGrit) HealGrit(stats.gritRewardAmount);
-            else HealGrit(1);
+
+            // Case A: Stats exist (Standard Enemy)
+            if (stats != null)
+            {
+                if (stats.healsGrit)
+                {
+                    HealGrit(stats.gritRewardAmount);
+                }
+                // If !healsGrit, do nothing. Correct.
+            }
+            // Case B: No Stats (Debug Enemy / Test Dummy)
+            else
+            {
+                // Fallback: Default behavior for untyped enemies
+                HealGrit(1);
+            }
         }
 
         public void ForceUpdateUI() => UpdateUI();
@@ -141,5 +155,10 @@ namespace DarkTowerTron.Player.Stats
             _gritEvent?.Raise(_currentGrit, max);
             _hullEvent?.Raise(_hasHull);
         }
+
+        // --- IAimTarget ---
+        // Player Chest Height (approx 1.2m)
+        public Vector3 AimPoint => transform.position + (Vector3.up * 1.2f);
+        public float TargetRadius => 0.5f;
     }
 }

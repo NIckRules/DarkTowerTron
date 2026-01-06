@@ -17,7 +17,7 @@ MonoBehaviour:
   focusReward: 30
   healsGrit: 0
   gritRewardAmount: 1
-  moveSpeed: 9
+  moveSpeed: 2
   rotationSpeed: 15
   combatRotationSpeed: 3
   acceleration: 20
@@ -25,6 +25,7 @@ MonoBehaviour:
   verticalSmoothTime: 0.5
   separationRadius: 1.5
   separationForce: 8
+  maxHealth: 10
   maxStagger: 5
   staggerDecay: 0.5
   hasFrontalShield: 0

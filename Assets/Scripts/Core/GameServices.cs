@@ -11,7 +11,7 @@ namespace DarkTowerTron.Core
 
         [Header("System Services")]
         [SerializeField] private WaveDirector _waveDirector;
-        [SerializeField] private ScoreManager _scoreManager;
+        //[SerializeField] private ScoreManager _scoreManager;
         //[SerializeField] private PoolManager _poolManager;
         //[SerializeField] private VFXManager _vfxManager;
         //[SerializeField] private AudioManager _audioManager;
@@ -22,7 +22,7 @@ namespace DarkTowerTron.Core
 
         // Public Accessors
         public static WaveDirector WaveDirector => Instance != null ? Instance._waveDirector : null;
-        public static ScoreManager Score => Instance != null ? Instance._scoreManager : null;
+        //public static ScoreManager Score => Instance != null ? Instance._scoreManager : null;
         //public static PoolManager Pool => Instance != null ? Instance._poolManager : null;
         //public static VFXManager VFX => Instance != null ? Instance._vfxManager : null;
         //public static AudioManager Audio => Instance != null ? Instance._audioManager : null;

@@ -1,75 +1,118 @@
 using UnityEngine;
 using System.Collections;
-using DarkTowerTron.Core;
+using DarkTowerTron.Combat; // For DamageReceiver
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Enemy.Visuals; // For EnemyVisuals
 using DG.Tweening;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace DarkTowerTron.Environment
+namespace DarkTowerTron.Environment.Props
 {
-    public class Prop_Anchor : CombatProp
+    [MovedFrom(true, "DarkTowerTron.Environment", "Assembly-CSharp", "Prop_Anchor")]
+    [RequireComponent(typeof(DamageReceiver))]
+    [RequireComponent(typeof(EnemyVisuals))]
+    public class Prop_Anchor : MonoBehaviour
     {
         [Header("Anchor Settings")]
-        public float respawnTime = 3.0f;
-        public bool keepPlayerInAir = true; // True for traversal
+        public float respawnTime = 5.0f;
+        public GameObject visualRoot; // Assign the mesh object
+        public Collider mainCollider;
 
-        private Collider _col;
+        private DamageReceiver _receiver;
+        private EnemyVisuals _visuals;
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
-            _col = GetComponent<Collider>();
+            _receiver = GetComponent<DamageReceiver>();
+            _visuals = GetComponent<EnemyVisuals>();
+
+            if (visualRoot == null && transform.childCount > 0) visualRoot = transform.GetChild(0).gameObject;
+            if (mainCollider == null) mainCollider = GetComponent<Collider>();
         }
 
-        // Override: Anchors don't die from damage
-        public override bool TakeDamage(DamageInfo info)
+        private void Start()
         {
-            // Only take stagger, ignore health damage
-            if (!IsStaggered)
+            // Trigger the DamageReceiver to read the Inspector Overrides
+            // We pass 'null' for stats because we are using overrides
+            if (_receiver != null) _receiver.Initialize(null);
+        }
+
+        private void OnEnable()
+        {
+            if (_receiver != null)
             {
-                // We barely invoke base just for the Flash/Stagger logic
-                // We hack the info to deal 0 health damage
-                info.damageAmount = 0;
-                base.TakeDamage(info);
+                _receiver.OnDeathProcessed += HandleDeath;
+                _receiver.OnHitProcessed += HandleHit;
+
+                // Wire up Stagger Visuals
+                if (_receiver.Stagger != null && _visuals != null)
+                {
+                    _receiver.Stagger.OnStaggerBreak += _visuals.StartStaggerEffect;
+                    _receiver.Stagger.OnStaggerRecover += _visuals.StopStaggerEffect;
+                }
             }
-            return true;
         }
 
-        protected override void Die() 
+        private void OnDisable()
         {
-            // Impossible state, but handle gracefully
-            StartCoroutine(RespawnRoutine());
+            if (_receiver != null)
+            {
+                _receiver.OnDeathProcessed -= HandleDeath;
+                _receiver.OnHitProcessed -= HandleHit;
+
+                if (_receiver.Stagger != null && _visuals != null)
+                {
+                    _receiver.Stagger.OnStaggerBreak -= _visuals.StartStaggerEffect;
+                    _receiver.Stagger.OnStaggerRecover -= _visuals.StopStaggerEffect;
+                }
+            }
         }
 
-        public override void OnExecutionHit()
+        private void HandleHit(DarkTowerTron.Core.DamageInfo info)
         {
-            // When player teleports here:
-            // 1. Visual Bounce
-            transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
-            
-            // 2. Hide (Respawn)
+            // Trigger the Flash via the Visuals component
+            if (_receiver != null && _visuals != null && !_receiver.IsStaggered)
+            {
+                _visuals.PlayHitFlash();
+            }
+        }
+
+        private void HandleDeath(EnemyStatsSO stats, bool rewardPlayer)
+        {
+            // The PlayerExecution just triggered Kill().
+            // Instead of destroying the object, we "Disable" it temporarily.
             StartCoroutine(RespawnRoutine());
         }
 
         private IEnumerator RespawnRoutine()
         {
-            // Hide
-            if (meshRenderer) meshRenderer.enabled = false;
-            if (_col) _col.enabled = false;
-            
-            // Reset internal state
-            OnSpawn(); 
+            // 1. Hide
+            if (visualRoot) visualRoot.SetActive(false);
+            if (mainCollider) mainCollider.enabled = false;
 
+            // 2. Wait
             yield return new WaitForSeconds(respawnTime);
 
-            // Show
-            if (meshRenderer) meshRenderer.enabled = true;
-            if (_col) _col.enabled = true;
-            
-            // Juice
-            transform.localScale = Vector3.zero;
-            transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
-        }
+            // 3. Reset Health
+            // We need to revive the Vitality/Stagger modules manually
+            if (_receiver != null)
+            {
+                if (_receiver.Vitality != null) _receiver.Vitality.Revive();
+                if (_receiver.Stagger != null) _receiver.Stagger.ResetStagger();
+            }
 
-        // ICombatTarget Override
-        public override bool KeepPlayerGrounded => !keepPlayerInAir;
+            if (_visuals != null) _visuals.ResetVisuals();
+
+            // 4. Show (with Pop-in animation)
+            if (visualRoot)
+            {
+                visualRoot.SetActive(true);
+                visualRoot.transform.DOKill();
+                visualRoot.transform.localScale = Vector3.zero;
+                visualRoot.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+            }
+
+            if (mainCollider) mainCollider.enabled = true;
+        }
     }
 }
