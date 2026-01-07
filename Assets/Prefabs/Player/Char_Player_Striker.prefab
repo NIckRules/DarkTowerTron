@@ -1056,7 +1056,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
   isAutomatic: 1
-  fireSound: {fileID: 0}
+  fireFeedback: {fileID: 0}
   inputBufferTime: 0.2
   bulletSpeed: 25
 --- !u!114 &4400474212300462037
@@ -1073,7 +1073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
   isAutomatic: 1
-  fireSound: {fileID: 0}
+  fireFeedback: {fileID: 0}
   inputBufferTime: 0.2
   range: 7
   beamRadius: 0.5

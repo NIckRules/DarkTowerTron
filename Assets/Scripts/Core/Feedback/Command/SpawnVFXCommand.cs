@@ -1,5 +1,6 @@
 using UnityEngine;
-using DarkTowerTron.Core.Services;
+
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {
@@ -14,15 +15,14 @@ namespace DarkTowerTron.Core.Feedback.Commands
 
         public override void Execute(GameObject owner, Vector3 position)
         {
-            if (prefab == null || Services.Pool == null) return;
+            if (prefab == null || Global.Pool == null) return;
 
             // Calculate rotation
             Quaternion rot = Quaternion.identity;
             if (owner != null) rot = owner.transform.rotation;
 
             // Spawn
-            GameObject instance = Services.Pool.Spawn(prefab, position + (rot * offset), rot);
-
+            GameObject instance = Global.Pool.Spawn(prefab, position + (rot * offset), rot);
             // Logic
             if (attachToParent && owner != null)
             {

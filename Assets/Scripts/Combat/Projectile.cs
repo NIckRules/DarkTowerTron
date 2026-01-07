@@ -1,5 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Combat.Strategies;
 
 // ALIAS: Resolves the conflict between 'Services' (Namespace) and 'Services' (Class)
@@ -21,6 +22,10 @@ namespace DarkTowerTron.Combat
         public int stagger = 1;
         public DamageType damageType = DamageType.Projectile;
 
+        [Header("Juice")]
+        public FeedbackConfigurationSO spawnFeedback;
+        public FeedbackConfigurationSO impactFeedback;
+
         [Header("Visuals")]
         public Renderer meshRenderer; 
         public Material friendlyMaterial; 
@@ -35,7 +40,10 @@ namespace DarkTowerTron.Combat
         private float _lifeTimer;
         private bool _wasDeflectedThisFrame = false;
 
-        public void OnSpawn() { }
+        public void OnSpawn()
+        {
+            if (spawnFeedback != null) spawnFeedback.Play(gameObject, transform.position);
+        }
 
         public void OnDespawn() 
         {
@@ -100,6 +108,7 @@ namespace DarkTowerTron.Combat
 
             if (other.gameObject.layer == GameConstants.LAYER_WALL || other.gameObject.layer == GameConstants.LAYER_DEFAULT)
             {
+                if (impactFeedback != null) impactFeedback.Play(null, transform.position);
                 Despawn();
                 return;
             }
@@ -123,6 +132,7 @@ namespace DarkTowerTron.Combat
 
                 if (target.TakeDamage(info))
                 {
+                    if (impactFeedback != null) impactFeedback.Play(null, transform.position);
                     if (!_wasDeflectedThisFrame) Despawn();
                 }
             }

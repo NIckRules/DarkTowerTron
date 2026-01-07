@@ -1,6 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.Core.Data; // For SoundDef
-using DarkTowerTron.Core.Services;
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {
@@ -12,11 +12,11 @@ namespace DarkTowerTron.Core.Feedback.Commands
 
         public override void Execute(GameObject owner, Vector3 position)
         {
-            if (sound != null && Services.Audio != null)
+            if (sound != null && Global.Audio != null)
             {
                 // Note: Your AudioManager.PlaySound currently ignores position (2D).
                 // If you add 3D sound support later, pass 'position' here.
-                Services.Audio.PlaySound(sound);
+                Global.Audio.PlaySound(sound);
             }
         }
     }

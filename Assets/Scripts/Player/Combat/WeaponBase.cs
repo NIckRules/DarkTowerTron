@@ -1,11 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Player.Stats;
-
-// ALIAS: Safety against namespace collisions
-using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
 {
@@ -18,10 +14,11 @@ namespace DarkTowerTron.Player.Combat
         [Header("Behavior")]
         public bool isAutomatic = true;
 
-        [Header("Audio")]
-        public SoundDef fireSound;
+        [Header("Game Feel")]
+        [Tooltip("Audio, Shake, Flash, etc. happens here.")]
+        public FeedbackConfigurationSO fireFeedback;
 
-        [Header("Feel")]
+        [Header("Input")]
         public float inputBufferTime = 0.2f;
 
         protected PlayerStats _stats;
@@ -62,7 +59,7 @@ namespace DarkTowerTron.Player.Combat
                 if (!isAutomatic && _hasFiredThisPress) return;
 
                 Fire();
-                PlayFireSound();
+                PlayFireFeedback();
 
                 _timer = GetCurrentFireRate();
                 _bufferTimer = 0;
@@ -73,11 +70,12 @@ namespace DarkTowerTron.Player.Combat
         protected abstract float GetCurrentFireRate();
         protected abstract void Fire();
 
-        protected void PlayFireSound()
+        protected void PlayFireFeedback()
         {
-            // CHANGE: Services -> Global
-            if (fireSound && Global.Audio != null)
-                Global.Audio.PlaySound(fireSound);
+            if (fireFeedback == null) return;
+
+            Vector3 playPos = firePoint != null ? firePoint.position : transform.position;
+            fireFeedback.Play(gameObject, playPos);
         }
 
         protected Vector3 GetAimDirection()

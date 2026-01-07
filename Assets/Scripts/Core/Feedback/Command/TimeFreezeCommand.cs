@@ -1,5 +1,6 @@
 using UnityEngine;
-using DarkTowerTron.Core.Services;
+
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {
@@ -10,9 +11,9 @@ namespace DarkTowerTron.Core.Feedback.Commands
 
         public override void Execute(GameObject owner, Vector3 position)
         {
-            if (Services.Time != null)
+            if (Global.Time != null)
             {
-                Services.Time.HitStop(duration);
+                Global.Time.HitStop(duration);
             }
         }
     }
