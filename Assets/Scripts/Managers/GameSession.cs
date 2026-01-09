@@ -1,9 +1,10 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Stats;
 using DarkTowerTron.UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DarkTowerTron.Managers
 {

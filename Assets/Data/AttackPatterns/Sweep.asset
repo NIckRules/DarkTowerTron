@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e0fd8f44142d2469388ca2d00fa279, type: 3}
   m_Name: Sweep
   m_EditorClassIdentifier: 
+  firePointID: FirePoint_Primary
   aimMode: 0
   scaleMultiplier: 1
   speed: 15
@@ -21,3 +22,4 @@ MonoBehaviour:
   spinSpeed: 0
   startDelay: 0.5
   delayBetweenShots: 0.1
+  cooldownAfterBurst: 1

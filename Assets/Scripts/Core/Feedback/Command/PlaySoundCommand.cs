@@ -1,5 +1,5 @@
+using DarkTowerTron.Core.Data;
 using UnityEngine;
-using DarkTowerTron.Core.Data; // For SoundDef
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Core.Feedback.Commands

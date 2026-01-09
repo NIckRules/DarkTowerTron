@@ -1,8 +1,8 @@
-using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Managers;
-
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -28,6 +28,13 @@ namespace DarkTowerTron.Combat
 
         [Header("Execution Settings")]
         [SerializeField] private bool _keepPlayerGrounded = true; // Default True for Enemies
+
+        [Header("Juice")]
+        [Tooltip("Played when taking damage (Health or Shield).")]
+        [SerializeField] private FeedbackConfigurationSO _hitFeedback;
+
+        [Tooltip("Played when Health reaches zero.")]
+        [SerializeField] private FeedbackConfigurationSO _deathFeedback;
 
         // Dependencies
         private VitalityModule _vitality;
@@ -127,6 +134,8 @@ namespace DarkTowerTron.Combat
                 _vitality.TakeDamage(info.damageAmount);
             }
 
+            if (_hitFeedback != null) _hitFeedback.Play(gameObject, transform.position);
+
             OnHitProcessed?.Invoke(info);
             return true;
         }
@@ -134,6 +143,8 @@ namespace DarkTowerTron.Combat
         public void Kill(bool rewardPlayer)
         {
             if (IsDead) return;
+
+            if (_deathFeedback != null) _deathFeedback.Play(gameObject, transform.position);
             
             // Fire event immediately
             OnDeathProcessed?.Invoke(_stats, rewardPlayer);

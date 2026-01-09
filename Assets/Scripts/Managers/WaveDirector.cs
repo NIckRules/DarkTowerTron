@@ -1,10 +1,9 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
-using DarkTowerTron.Core.Services;    // For Logger
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using UnityEngine;
 
 namespace DarkTowerTron.Managers
 {

@@ -1,9 +1,7 @@
-using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Events; // NEW: For Popup Text
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
-
-// ALIAS: Resolves Services conflict
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Combat
@@ -39,7 +37,7 @@ namespace DarkTowerTron.Combat
 
         protected override void Awake()
         {
-            base.Awake();
+            base.Awake(); // Sets up _damageableParent
 
             _propBlock = new MaterialPropertyBlock();
             _baseColorID = Shader.PropertyToID("_BaseColor");
@@ -67,7 +65,8 @@ namespace DarkTowerTron.Combat
 
         public override bool TakeDamage(DamageInfo info)
         {
-            if (_receiver == null) return false;
+            // FIX: Use the Interface reference from BaseHitbox
+            if (_damageableParent == null) return false;
 
             if (isBroken) return base.TakeDamage(info);
 

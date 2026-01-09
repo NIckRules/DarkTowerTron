@@ -35,7 +35,9 @@ namespace DarkTowerTron.Physics
 
         // Cache
         private RaycastHit[] _hitBuffer = new RaycastHit[8];
-        private HashSet<Collider> _ignoredColliders = new HashSet<Collider>();
+        // OPTIMIZATION: HashSet lookup is O(1) - incredibly fast
+        private readonly HashSet<Collider> _myColliders = new HashSet<Collider>();
+        private readonly HashSet<Collider> _ignoredExternalColliders = new HashSet<Collider>();
 
         // Properties
         public Vector3 Velocity => _velocity;
@@ -45,6 +47,22 @@ namespace DarkTowerTron.Physics
         private void Awake()
         {
             _capsule = GetComponent<CapsuleCollider>();
+
+            // 1. Auto-Register Self
+            // Find ALL colliders in children (Hitboxes, sensors, shield)
+            var childCols = GetComponentsInChildren<Collider>(true); // true = include inactive
+            foreach (var c in childCols)
+            {
+                _myColliders.Add(c);
+
+                // Also ignore physical collision between the capsule and children
+                // (Redundant if using Layers, but good for safety)
+                if (c != _capsule)
+                {
+                    UnityEngine.Physics.IgnoreCollision(_capsule, c, true);
+                }
+            }
+
             if (Camera.main) _camTransform = Camera.main.transform;
             if (_obstacleMask == 0) _obstacleMask = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
@@ -87,7 +105,15 @@ namespace DarkTowerTron.Physics
 
         public void Teleport(Vector3 pos) { transform.position = pos; _velocity = Vector3.zero; }
         public void SetEnabled(bool state) => enabled = state;
-        public void IgnoreCollider(Collider col) => _ignoredColliders.Add(col);
+
+        // Helper for other scripts to check "Is this me?"
+        public bool IsMyCollider(Collider c) => c != null && _myColliders.Contains(c);
+
+        public void IgnoreCollider(Collider col)
+        {
+            if (col == null) return;
+            _ignoredExternalColliders.Add(col);
+        }
 
         // ================= INTERNAL PHYSICS =================
 
@@ -129,11 +155,26 @@ namespace DarkTowerTron.Physics
                     // Double safety check (redundant with QueryTriggerInteraction.Ignore, but good to keep)
                     if (_hitBuffer[j].collider.isTrigger) continue;
 
-                    if (_hitBuffer[j].distance <= 0 || _ignoredColliders.Contains(_hitBuffer[j].collider) || _hitBuffer[j].transform == transform) continue;
-                    if (_hitBuffer[j].distance < closestDist)
+                    RaycastHit hit = _hitBuffer[j];
+                    Collider col = hit.collider;
+
+                    // FAST CHECK:
+                    // 1. Is it me? (O(1))
+                    // 2. Is it explicitly ignored? (O(1))
+                    // 3. Is it a trigger?
+                    if (_myColliders.Contains(col) ||
+                        _ignoredExternalColliders.Contains(col) ||
+                        col.isTrigger)
                     {
-                        closestDist = _hitBuffer[j].distance;
-                        closest = _hitBuffer[j];
+                        continue;
+                    }
+
+                    if (hit.distance <= 0) continue;
+
+                    if (hit.distance < closestDist)
+                    {
+                        closestDist = hit.distance;
+                        closest = hit;
                         hitFound = true;
                     }
                 }
@@ -254,7 +295,7 @@ namespace DarkTowerTron.Physics
             {
                 var col = buffer[i];
                 // Ignore self AND ignored colliders
-                if (col == _capsule || _ignoredColliders.Contains(col)) continue;
+                if (_myColliders.Contains(col) || _ignoredExternalColliders.Contains(col)) continue;
                 
                 // CRITICAL FIX: Do not push out of Triggers!
                 if (col.isTrigger) continue;

@@ -1,8 +1,8 @@
+using System;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Input; // Namespace for Buffer
 
 namespace DarkTowerTron.Player.Controller
 {
@@ -42,7 +42,7 @@ namespace DarkTowerTron.Player.Controller
             // 1. Dependency Validation
             if (!AreInputsBound())
             {
-                GameLogger.LogError(DarkTowerTron.Core.LogChannel.Player,
+                GameLogger.LogError(LogChannel.Player,
                     "CRITICAL: Missing Input Action References! Disabling InputHandler to prevent crash.", gameObject);
 
                 enabled = false; // Stop Update() from running

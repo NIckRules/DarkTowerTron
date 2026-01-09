@@ -1,7 +1,8 @@
-using UnityEngine;
-using DarkTowerTron.Core; // DamageInfo
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Player.Stats;
 using DG.Tweening;
-// ALIAS
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
@@ -14,12 +15,12 @@ namespace DarkTowerTron.Player.Combat
         public float selfRecoil = 15f;
         public GameObject beamVisualPrefab;
 
-        private DarkTowerTron.Player.Movement.PlayerMovement _movement;
+        private DarkTowerTron.Player.Movement.PlayerMotor _movement;
 
         protected override void Awake()
         {
             base.Awake();
-            _movement = GetComponent<DarkTowerTron.Player.Movement.PlayerMovement>();
+            _movement = GetComponent<DarkTowerTron.Player.Movement.PlayerMotor>();
         }
 
         protected override float GetCurrentFireRate()

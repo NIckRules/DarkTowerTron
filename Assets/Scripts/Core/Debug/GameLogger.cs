@@ -1,8 +1,8 @@
-using UnityEngine;
-using System.Diagnostics; // Required for Conditional attribute
+using System.Diagnostics;
 using DarkTowerTron.Core.Data;
+using UnityEngine;
 
-namespace DarkTowerTron.Core
+namespace DarkTowerTron.Core.Debug
 {
     public static class GameLogger
     {

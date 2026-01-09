@@ -1,10 +1,10 @@
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Feedback;
+using System.Collections.Generic;
 using DarkTowerTron.Combat.Strategies;
-
-// ALIAS: Resolves the conflict between 'Services' (Namespace) and 'Services' (Class)
-using Global = DarkTowerTron.Core.Services.Services; 
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Feedback;
+using UnityEngine;
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Combat
 {
@@ -39,20 +39,61 @@ namespace DarkTowerTron.Combat
         private bool _isRedirected = false; 
         private float _lifeTimer;
         private bool _wasDeflectedThisFrame = false;
+        private List<Collider> _ignoredColliders = new List<Collider>();
 
         public void OnSpawn()
         {
+            // LOG 1: Check initial state coming out of pool
+            GameLogger.Log(LogChannel.Combat, $"[PROJ] OnSpawn - Pos: {transform.position} | Active: {gameObject.activeSelf}", gameObject);
+
+            // 1. SAFE PHYSICS RESET
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                // Only reset velocity if the body is NOT Kinematic
+                // (Kinematic bodies are moved by transform, so velocity doesn't apply)
+                if (!rb.isKinematic)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    rb.Sleep();
+                }
+                else
+                {
+                    // Verify if we are kinematic
+                    GameLogger.Log(LogChannel.Combat, "[PROJ] Body is Kinematic. Skipping velocity reset.", gameObject);
+                }
+            }
+
+            // 2. RESET TRAILS
+            var trail = GetComponent<TrailRenderer>();
+            if (trail != null)
+            {
+                trail.emitting = false;
+                trail.Clear();
+                GameLogger.Log(LogChannel.Combat, "[PROJ] Trail Cleared.", gameObject);
+            }
+
+            // 3. Play spawn feedback
             if (spawnFeedback != null) spawnFeedback.Play(gameObject, transform.position);
         }
 
         public void OnDespawn() 
         {
+            // 1. Clean up Physics (CRITICAL for Pooling)
+            ResetIgnoredColliders();
+
+            // 2. Reset Logic
             _isInitialized = false;
             _movementStrategy = null; 
+            _source = null;
+            isHostile = true; // Reset default hostility
         }
 
         public void Initialize(Vector3 dir)
         {
+            // LOG 2: Check state right before moving
+            GameLogger.Log(LogChannel.Combat, $"[PROJ] Initialize - Dir: {dir} | StartPos: {transform.position}", gameObject);
+
             if (_movementStrategy == null) SetStrategy(new LinearMovement());
 
             _direction = dir.normalized;
@@ -63,11 +104,62 @@ namespace DarkTowerTron.Combat
             _isRedirected = false;
             
             UpdateVisuals();
+
+            // 4. RE-ENABLE TRAIL (The second half of the fix)
+            var trail = GetComponent<TrailRenderer>();
+            if (trail != null)
+            {
+                trail.Clear();
+                trail.emitting = true;
+                GameLogger.Log(LogChannel.Combat, "[PROJ] Trail Restarted.", gameObject);
+            }
         }
 
         public void SetStrategy(IMovementStrategy strategy) => _movementStrategy = strategy;
-        public void SetSource(GameObject source) => _source = source;
+        
+        public void SetSource(GameObject source)
+        {
+            _source = source;
+            
+            // 1. Reset previous ignores (Safety if reused without Despawn)
+            ResetIgnoredColliders();
+
+            if (_source != null)
+            {
+                Collider myCol = GetComponent<Collider>();
+                Collider[] sourceCols = _source.GetComponentsInChildren<Collider>();
+
+                foreach (Collider c in sourceCols)
+                {
+                    // CRITICAL: Don't ignore triggers (like detection zones), only physical blockers
+                    if (!c.isTrigger) 
+                    {
+                        UnityEngine.Physics.IgnoreCollision(myCol, c, true);
+                        _ignoredColliders.Add(c); // Remember this so we can undo it
+                    }
+                }
+            }
+        }
+        
         public void ResetHostility(bool startHostile) { isHostile = startHostile; UpdateVisuals(); }
+
+        private void ResetIgnoredColliders()
+        {
+            Collider myCol = GetComponent<Collider>();
+            
+            // If our collider was destroyed or missing, we can't un-ignore
+            if (myCol == null) return;
+
+            // Loop backwards or forwards, doesn't matter here
+            foreach (Collider c in _ignoredColliders)
+            {
+                if (c != null)
+                {
+                    UnityEngine.Physics.IgnoreCollision(myCol, c, false);
+                }
+            }
+            _ignoredColliders.Clear();
+        }
 
         private void Update()
         {
@@ -86,7 +178,8 @@ namespace DarkTowerTron.Combat
             {
                 int mask = GameConstants.MASK_PROJECTILE_COLLISION;
 
-                if (UnityEngine.Physics.Raycast(oldPos, travelVec.normalized, out RaycastHit hit, moveDistance, mask))
+                // Ensure the Raycast detects Trigger hitboxes (e.g. Player/Enemy hitbox colliders)
+                if (UnityEngine.Physics.Raycast(oldPos, travelVec.normalized, out RaycastHit hit, moveDistance, mask, QueryTriggerInteraction.Collide))
                 {
                     if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform)))
                     {
@@ -104,7 +197,10 @@ namespace DarkTowerTron.Combat
 
         private void HandleCollision(Collider other)
         {
-            if (other.isTrigger && other.GetComponent<ShieldHitbox>() == null) return;
+            // If this is a trigger and NOT a hitbox/health component, ignore it (it's likely a zone)
+            IDamageable target = other.GetComponent<IDamageable>();
+            if (target == null) target = other.GetComponentInParent<IDamageable>();
+            if (other.isTrigger && target == null) return;
 
             if (other.gameObject.layer == GameConstants.LAYER_WALL || other.gameObject.layer == GameConstants.LAYER_DEFAULT)
             {
@@ -113,7 +209,6 @@ namespace DarkTowerTron.Combat
                 return;
             }
 
-            IDamageable target = other.GetComponentInParent<IDamageable>();
             if (target != null)
             {
                 if (isHostile && other.CompareTag(GameConstants.TAG_ENEMY)) return;
@@ -125,7 +220,7 @@ namespace DarkTowerTron.Combat
                     staggerAmount = this.stagger,
                     pushDirection = transform.forward,
                     pushForce = 5f,
-                    source = _source,
+                    source = gameObject,
                     isRedirected = this._isRedirected,
                     damageType = this.damageType
                 };
@@ -178,6 +273,8 @@ namespace DarkTowerTron.Combat
 
         private void Despawn()
         {
+            GameLogger.Log(LogChannel.Combat, $"[PROJ] Despawn at {transform.position}", gameObject);
+
             // USE ALIAS 'Global' to avoid namespace collision
             if (Global.Pool) Global.Pool.Despawn(gameObject);
             else Destroy(gameObject);

@@ -3,17 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Events
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
 
+// ALIAS
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
-    [RequireComponent(typeof(StateMachine))]
-    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget, IAimTarget // NEW: IAimTarget
+    // REMOVED: [RequireComponent(typeof(StateMachine))] <-- Old FSM deleted
+    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget, IAimTarget
     {
         [Header("Parts")]
         public Transform rotationRig;
@@ -28,20 +27,15 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         [Header("Configuration")]
         public float radiusOuter = 2.5f;
         public float radiusInner = 0.8f;
-        public float patternInterval = 2.0f;
 
+        // We keep the data, but we aren't using it automatically right now
         [Header("Patterns")]
         public List<ArchitectPatternSO> phase1Patterns;
 
-        [Header("Debug")]
-        public bool autoStartCombat = false;
-
-        [Header("Events (Wiring)")]
+        [Header("Event Wiring")]
         [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
-        [SerializeField] private IntIntEventChannelSO _waveAnnounceEvent; // For "Wave 666"
+        [SerializeField] private IntEventChannelSO _waveAnnounceEvent; // Updated type
         [SerializeField] private VoidEventChannelSO _combatStartedEvent;
-
-        // Replacements for legacy static UI calls
         [SerializeField] private PopupTextEventChannelSO _popupEvent;
         [SerializeField] private DamageTextEventChannelSO _damageTextEvent;
 
@@ -49,48 +43,27 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         [SerializeField] private float _aimOffset = 0f;
         [SerializeField] private float _coreRadius = 1.5f;
 
+        // Interfaces
         public bool KeepPlayerGrounded => true;
-
-        // IAimTarget Implementation
         public Vector3 AimPoint => transform.position + (Vector3.up * _aimOffset);
         public float TargetRadius => _coreRadius;
+        public bool IsStaggered => false;
 
-        // State
-        private bool _isCombatActive = false;
+        // Internal State
         private bool _isVulnerable = false;
-        private Transform _player;
         private float _currentRotationSpeed;
-        private int _currentPatternIndex = 0;
+        private Transform _player;
 
-        // Components
-        private StateMachine _fsm;
-
-        // State Cache (No more GC allocation)
-        public ArchitectState_Idle StateIdle { get; private set; }
-        private List<ArchitectState_Pattern> _patternStates = new List<ArchitectState_Pattern>();
-
-        private void Awake()
-        {
-            _fsm = GetComponent<StateMachine>();
-            StateIdle = new ArchitectState_Idle();
-        }
+        // REMOVED: StateMachine _fsm;
+        // REMOVED: ArchitectState_Idle, ArchitectState_Pattern variables
 
         private void Start()
         {
-            if (GameServices.Player != null)
-                _player = GameServices.Player.transform;
-
-            // Pre-allocate Pattern States
-            foreach (var pattern in phase1Patterns)
-            {
-                _patternStates.Add(new ArchitectState_Pattern(this, pattern));
-            }
+            if (DarkTowerTron.Core.GameServices.Player != null)
+                _player = DarkTowerTron.Core.GameServices.Player.transform;
 
             SetShield(true);
             _currentRotationSpeed = rotationSpeedIdle;
-
-            if (autoStartCombat)
-                Invoke(nameof(ActivateBoss), 1.0f);
         }
 
         private void Update()
@@ -98,9 +71,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             if (rotationRig)
                 rotationRig.Rotate(Vector3.up, _currentRotationSpeed * Time.deltaTime);
 
-            if (!_isCombatActive) return;
-
-            // Phase Transition Check
+            // Phase Logic (Simplified for now)
             if (!_isVulnerable)
             {
                 bool anyHandAlive = false;
@@ -120,52 +91,87 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        // --- COMBAT FLOW ---
+        // --- PUBLIC API (The "Body" Commands) ---
+        // These will be called by the Pluggable AI Action later
+
+        public void SetRotationSpeed(float speed) => _currentRotationSpeed = speed;
 
         public void ActivateBoss()
         {
-            if (_isCombatActive) return;
-
-            _isCombatActive = true;
             _currentRotationSpeed = rotationSpeedCombat;
-
-            StartNextPattern();
-
-            // Juice
-            _waveAnnounceEvent?.Raise(666, 0); // Custom ID for Boss
+            _waveAnnounceEvent?.Raise(666);
             _combatStartedEvent?.Raise();
+
+            // Temporary: Just run the first pattern manually to prove it works
+            // In future, the Pluggable AI will call RunPattern()
+            if (phase1Patterns.Count > 0) StartCoroutine(RunPatternSequence(phase1Patterns[0]));
         }
 
-        public void StartNextPattern()
+        // Adapted from the old State logic into a standalone Coroutine
+        public IEnumerator RunPatternSequence(ArchitectPatternSO pattern)
         {
-            if (_isVulnerable) return;
-            if (_patternStates.Count == 0) return;
+            if (_isVulnerable) yield break;
 
-            // Pick pre-cached state
-            ArchitectState_Pattern nextState = _patternStates[_currentPatternIndex];
+            SetRotationSpeed(pattern.rotationSpeed);
 
-            // Increment loop
-            _currentPatternIndex = (_currentPatternIndex + 1) % _patternStates.Count;
+            // 1. Setup
+            MoveHands(pattern.extendHands);
+            TelegraphWalls(pattern.activateWalls);
 
-            _fsm.ChangeState(nextState);
-        }
+            yield return new WaitForSeconds(pattern.startDelay);
 
-        public void OnPatternFinished()
-        {
-            if (_isVulnerable) return;
-            _fsm.ChangeState(StateIdle);
-            StartCoroutine(WaitAndNextPattern());
-        }
+            // 2. Active
+            ActivateWalls(pattern.activateWalls);
 
-        private IEnumerator WaitAndNextPattern()
-        {
-            yield return new WaitForSeconds(patternInterval);
-            StartNextPattern();
+            float timer = 0f;
+            float duration = pattern.activeDuration - pattern.startDelay;
+            float shotCooldown = 0f;
+            bool hasGun = pattern.shootingPattern != null;
+
+            while (timer < duration)
+            {
+                if (_isVulnerable) break;
+
+                float dt = Time.deltaTime;
+                timer += dt;
+
+                if (hasGun)
+                {
+                    shotCooldown -= dt;
+                    if (shotCooldown <= 0)
+                    {
+                        FireProjectiles(pattern);
+                        shotCooldown = pattern.shootingPattern.delayBetweenShots;
+                    }
+                }
+                yield return null;
+            }
+
+            // 3. Cleanup
+            ResetHands();
         }
 
         // --- HELPER METHODS ---
 
-        public void SetRotationSpeed(float speed) => _currentRotationSpeed = speed;
+        private void FireProjectiles(ArchitectPatternSO pattern)
+        {
+            if (pattern.shootingPattern == null) return;
+            bool useForward = pattern.shootingPattern.aimMode == AimType.ForwardRadial;
+            float scale = pattern.shootingPattern.scaleMultiplier;
+
+            for (int i = 0; i < hands.Count; i++)
+            {
+                var hand = hands[i];
+                if (hand == null || !hand.IsAlive()) continue;
+
+                // Check Config Array safety
+                if (pattern.activeGuns != null && i < pattern.activeGuns.Length && pattern.activeGuns[i])
+                {
+                    Vector3 targetPos = (_player != null) ? _player.position : Vector3.zero;
+                    hand.Shoot(targetPos, useForward, scale);
+                }
+            }
+        }
 
         public void MoveHands(bool[] extendConfig)
         {
@@ -208,22 +214,13 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        public Transform GetTarget()
-        {
-            if (_player == null && GameServices.Player != null)
-                _player = GameServices.Player.transform;
-            return _player;
-        }
-
         // --- PHASE LOGIC ---
 
         private IEnumerator EnterVulnerablePhase()
         {
             _isVulnerable = true;
             SetShield(false);
-            _fsm.ChangeState(null); // Stop AI
-            _currentRotationSpeed = 60f; // Panic
-
+            _currentRotationSpeed = 60f;
             _popupEvent?.Raise(transform.position, "SHIELD DOWN");
             yield return null;
         }
@@ -244,7 +241,6 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
 
             coreHealth -= info.damageAmount;
-
             _damageTextEvent?.Raise(transform.position, info.damageAmount, true, false);
 
             if (coreHealth <= 0) Kill(true);
@@ -253,29 +249,18 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
         public void Kill(bool instant)
         {
-            _isCombatActive = false;
-            _currentRotationSpeed = 0;
-
+            _gameVictoryEvent?.Raise();
             if (Global.VFX != null && Global.VFX.explosionPrefab)
-            {
                 Global.Pool?.Spawn(Global.VFX.explosionPrefab, transform.position, Quaternion.identity);
-            }
-
-            _gameVictoryEvent?.Raise(); // Updated
 
             Destroy(gameObject, 0.5f);
         }
-
-        // --- ICOMBATTARGET ---
-
-        public bool IsStaggered => false;
 
         public void OnExecutionHit()
         {
             if (_isVulnerable)
             {
-                DamageInfo info = new DamageInfo { damageAmount = 50f };
-                TakeDamage(info);
+                TakeDamage(new DamageInfo { damageAmount = 50f });
             }
             else
             {

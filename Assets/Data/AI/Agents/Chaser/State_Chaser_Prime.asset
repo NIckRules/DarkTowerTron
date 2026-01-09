@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Chaser_Prime
+  m_EditorClassIdentifier: 
+  onEnterActions:
+  - {fileID: 11400000, guid: 6170974fdce893b46b9ed1536d3ea9ae, type: 2}
+  actions:
+  - {fileID: 11400000, guid: d131394403aa6e24db73676416e45e91, type: 2}
+  transitions:
+  - decision: {fileID: 11400000, guid: 33cf2d553cae320428b90dfc7c42e2ed, type: 2}
+    trueState: {fileID: 11400000, guid: f890b1b0aa61d7148a8e23c87ebff24e, type: 2}
+    falseState: {fileID: 11400000, guid: d996aa5731d315f4297290ff5661f6b6, type: 2}

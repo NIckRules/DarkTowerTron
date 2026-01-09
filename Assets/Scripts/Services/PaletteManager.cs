@@ -1,9 +1,9 @@
-using UnityEngine;
-using System; // <--- REQUIRED for Action
+using System;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Services;
-using DarkTowerTron.Core;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Services
@@ -78,7 +78,7 @@ namespace DarkTowerTron.Services
             foreach (var binding in bindings)
             {
 
-                GameLogger.Log(DarkTowerTron.Core.LogChannel.VFX, $"Applying Surface: {binding.type} to Collection: {binding.collection?.name}", gameObject);
+                GameLogger.Log(LogChannel.VFX, $"Applying Surface: {binding.type} to Collection: {binding.collection?.name}", gameObject);
 
                 if (binding.collection == null) continue;
 
@@ -104,7 +104,7 @@ namespace DarkTowerTron.Services
             // 4. Notify Listeners (PaletteReceiver)
             OnPaletteChanged?.Invoke(); // <--- RESTORED
 
-            GameLogger.Log(DarkTowerTron.Core.LogChannel.VFX, $"Palette Applied: {activePalette.name} [{activeVariant}]", gameObject);
+            GameLogger.Log(LogChannel.VFX, $"Palette Applied: {activePalette.name} [{activeVariant}]", gameObject);
         }
 
         private void ApplyToCollection(MaterialCollectionSO col, SurfaceDefinition def)

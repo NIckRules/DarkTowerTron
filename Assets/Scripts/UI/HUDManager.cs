@@ -1,12 +1,10 @@
+using System.Collections.Generic;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Services;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using TMPro;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services; // Needed for ServiceLocator types
-
-// ALIAS: Prevents conflict if you later import DarkTowerTron.Services
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.UI

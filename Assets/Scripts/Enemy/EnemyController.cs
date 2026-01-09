@@ -63,6 +63,8 @@ namespace DarkTowerTron.Enemy
         public void OnSpawn()
         {
             if (_motor != null) _stats = _motor.stats;
+            
+            // Reset Modules
             _receiver.Initialize(_stats);
             _visuals.ResetVisuals();
         }
@@ -70,6 +72,8 @@ namespace DarkTowerTron.Enemy
         public void OnDespawn()
         {
             _visuals.ResetVisuals();
+            // Note: Shooting coroutines in PatternExecutor are automatically killed 
+            // when the GameObject is disabled/despawned.
         }
 
         private void OnEnable()
@@ -143,10 +147,10 @@ namespace DarkTowerTron.Enemy
 
         private void HandleDeath(EnemyStatsSO stats, bool reward)
         {
-            // Notify Game Logic
+            // Notify Game Logic (Wave Director / Score)
             _enemyKilledEvent?.Raise(transform.position, stats, reward);
 
-            // Despawn via Service Locator
+            // Despawn
             if (Global.Pool != null) Global.Pool.Despawn(gameObject);
             else Destroy(gameObject);
         }

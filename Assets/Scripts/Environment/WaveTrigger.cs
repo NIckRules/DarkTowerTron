@@ -1,8 +1,9 @@
-using UnityEngine;
 using System.Collections.Generic;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core; // <--- THIS WAS MISSING
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Managers;
+using UnityEngine;
 
 namespace DarkTowerTron.Environment
 {

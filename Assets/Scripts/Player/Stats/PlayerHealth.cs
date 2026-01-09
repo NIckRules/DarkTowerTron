@@ -1,14 +1,14 @@
-using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
-using DarkTowerTron.Core.Services;    // For GameLogger
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Player.Movement;
-using DarkTowerTron.Player.Stats;
+using UnityEngine;
 
 namespace DarkTowerTron.Player.Stats
 {
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerDodge))]
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerHealth : MonoBehaviour, IDamageable, IAimTarget
@@ -18,6 +18,10 @@ namespace DarkTowerTron.Player.Stats
 
         [Header("Aiming")]
         [SerializeField] private Transform _aimTarget; // Assign 'CameraTarget' or 'Visuals/Spine'
+
+        [Header("Juice")]
+        [SerializeField] private FeedbackConfigurationSO _damageFeedback;
+        [SerializeField] private FeedbackConfigurationSO _deathFeedback;
 
         [Header("Broadcasting")]
         [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
@@ -32,13 +36,13 @@ namespace DarkTowerTron.Player.Stats
         private bool _hasHull;
         private bool _isDead;
         
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerDodge _dodge;
         private PlayerStats _stats;
 
         private void Awake()
         {
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _dodge = GetComponent<PlayerDodge>();
             _stats = GetComponent<PlayerStats>();
         }
@@ -67,6 +71,8 @@ namespace DarkTowerTron.Player.Stats
 
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
+            GameLogger.Log(LogChannel.Player, $"[PlayerHealth] Taking {dmg} Damage. Grit: {_currentGrit} -> {_currentGrit - dmg}", gameObject);
+
             if (_currentGrit > 0)
             {
                 _currentGrit -= dmg;
@@ -74,11 +80,13 @@ namespace DarkTowerTron.Player.Stats
 
                 // NEW: Raise Void Event for FX/Camera Shake
                 _playerHitEvent?.Raise();
+                _damageFeedback?.Play(gameObject, transform.position);
             }
             else if (_hasHull)
             {
                 _hasHull = false;
                 _playerHitEvent?.Raise();
+                _damageFeedback?.Play(gameObject, transform.position);
             }
             else
             {
@@ -87,6 +95,8 @@ namespace DarkTowerTron.Player.Stats
 
             if (!_isDead && _movement) 
                 _movement.ApplyKnockback(info.pushDirection * info.pushForce);
+
+            GameLogger.Log(LogChannel.Player, $"[PlayerHealth] Post-Damage State. Grit: {_currentGrit}, HasHull: {_hasHull}", gameObject);
 
             UpdateUI();
             return true;
@@ -111,6 +121,9 @@ namespace DarkTowerTron.Player.Stats
         public void Kill(bool instant)
         {
             if (_isDead) return;
+            
+            _deathFeedback?.Play(gameObject, transform.position);
+            
             _isDead = true;
             _currentGrit = 0;
             _hasHull = false;

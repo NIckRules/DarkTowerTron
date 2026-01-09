@@ -1,6 +1,6 @@
-using UnityEngine;
-using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
 
 namespace DarkTowerTron.Player.Stats
 {

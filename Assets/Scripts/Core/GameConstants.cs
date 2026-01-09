@@ -26,6 +26,7 @@ namespace DarkTowerTron.Core
         public static readonly int LAYER_PLAYER = LayerMask.NameToLayer("Player");
         public static readonly int LAYER_ENEMY = LayerMask.NameToLayer("Enemy");
         public static readonly int LAYER_PROJECTILE = LayerMask.NameToLayer("Projectile");
+        public static readonly int LAYER_HITBOX = LayerMask.NameToLayer("Hitbox");
         public static readonly int LAYER_WALL = LayerMask.NameToLayer("Wall");
         public static readonly int LAYER_GROUND = LayerMask.NameToLayer("Ground");
 
@@ -33,15 +34,14 @@ namespace DarkTowerTron.Core
         // 🎭 MASKS (Bitmasks - for Physics.Raycast / OverlapSphere)
         // ========================================================================
         
-        // Used by Player Movement / KinematicMover
-        // What stops a character from walking? (Walls + Floor + Default objects)
+        // 1. Movement: Can I walk here?
+        // EXCLUDES 'Hitbox' and 'Enemy'. Enemies should not treat other enemies as static walls.
+        // They should overlap and let 'EnemyMotor' separation handle the spacing.
         public static readonly int MASK_PHYSICS_OBSTACLES = LayerMask.GetMask("Default", "Wall", "Ground");
 
-        // Used by Projectiles / Shooting
-        // What stops a bullet? (Walls + Default + Players + Enemies)
-        // Note: Ground is usually excluded if bullets fly high, included if they can hit floor.
-        // Let's stick to the mask we defined in Session 4.
-        public static readonly int MASK_PROJECTILE_COLLISION = LayerMask.GetMask("Default", "Wall", "Player", "Enemy");
+        // 2. Projectiles: What do I hit?
+        // INCLUDES 'Hitbox' (Shoot the arm) and 'Enemy' (Shoot the capsule)
+        public static readonly int MASK_PROJECTILE_COLLISION = LayerMask.GetMask("Default", "Wall", "Player", "Enemy", "Hitbox");
 
         // Used by Wall Detection (Pushback)
         public static readonly int MASK_WALLS = LayerMask.GetMask("Default", "Wall");
@@ -49,7 +49,8 @@ namespace DarkTowerTron.Core
         // Used by "Safe Ground" checks (Falling into void)
         public static readonly int MASK_GROUND_ONLY = LayerMask.GetMask("Ground");
         
-        // Used by Enemy AI (Line of Sight)
+        // 3. Sight/AI: What blocks vision?
+        // Usually just Walls and Ground. We don't want an enemy to block another enemy's view of the player.
         public static readonly int MASK_SIGHT_BLOCKING = LayerMask.GetMask("Default", "Wall", "Ground");
     }
 }

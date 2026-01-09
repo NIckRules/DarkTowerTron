@@ -7,7 +7,7 @@ using DarkTowerTron.Player.Stats;
 namespace DarkTowerTron.Player.Controller
 {
     [RequireComponent(typeof(PlayerInputHandler))]
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerDodge))]
     [RequireComponent(typeof(PlayerExecution))]
     [RequireComponent(typeof(PlayerWeaponController))]
@@ -15,7 +15,7 @@ namespace DarkTowerTron.Player.Controller
     {
         // --- Dependencies ---
         private PlayerInputHandler _input;
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerDodge _dodge;
         private PlayerExecution _execution;
         private PlayerWeaponController _weapons;
@@ -25,7 +25,7 @@ namespace DarkTowerTron.Player.Controller
         {
             // 1. Get Components
             _input = GetComponent<PlayerInputHandler>();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _dodge = GetComponent<PlayerDodge>();
             _execution = GetComponent<PlayerExecution>();
             _weapons = GetComponent<PlayerWeaponController>();

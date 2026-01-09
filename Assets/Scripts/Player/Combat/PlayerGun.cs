@@ -1,8 +1,6 @@
-using UnityEngine;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
-
-// ALIAS
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat

@@ -1,9 +1,10 @@
-using UnityEngine;
-using DG.Tweening;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Services;
-using DarkTowerTron.Services; // PaletteManager
+using DarkTowerTron.Services;
+using DG.Tweening;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Enemy.Visuals

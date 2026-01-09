@@ -1,29 +1,35 @@
-using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement; // Needed for cleanup
-using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DarkTowerTron.Core.Services
 {
     public class PoolManager : MonoBehaviour
     {
-        // REMOVED: public static PoolManager Instance;
-
+        // Dictionary mapping Prefab InstanceID -> Queue of inactive objects
         private Dictionary<int, Queue<GameObject>> _poolDictionary = new Dictionary<int, Queue<GameObject>>();
+
+        // Dictionary mapping Spawned Object InstanceID -> Prefab InstanceID (to know where to return it)
         private Dictionary<int, int> _spawnedObjectsParentId = new Dictionary<int, int>();
+
+        private Transform _poolRoot;
 
         private void Awake()
         {
-            // REMOVED: Singleton check
+            // Create a clean container so the Hierarchy doesn't get messy
+            GameObject rootObj = new GameObject("Pool_Container");
+            _poolRoot = rootObj.transform;
+            DontDestroyOnLoad(rootObj);
         }
 
         private void OnEnable() => SceneManager.activeSceneChanged += OnSceneChanged;
         private void OnDisable() => SceneManager.activeSceneChanged -= OnSceneChanged;
 
-        // CRITICAL FIX: When scene changes, all GameObjects in the scene are destroyed.
-        // We must clear our references, or we hold onto "Missing" objects.
         private void OnSceneChanged(Scene current, Scene next)
         {
+            // Clear tracking lists, but logic dictates we should also clear the physical container
+            // if we want a fresh start per scene (usually safer for references).
             ClearPools();
         }
 
@@ -31,14 +37,39 @@ namespace DarkTowerTron.Core.Services
         {
             _poolDictionary.Clear();
             _spawnedObjectsParentId.Clear();
-            
-            // Destroy any children still hanging under this transform (if any were reparented)
-            foreach (Transform child in transform)
+
+            // Nuke the physical objects
+            foreach (Transform child in _poolRoot)
             {
                 Destroy(child.gameObject);
             }
-            
-            GameLogger.Log(LogChannel.System, "PoolManager cleaned up for new scene.", gameObject);
+
+            GameLogger.Log(LogChannel.System, "Pool memory flushed.", gameObject);
+        }
+
+        /// <summary>
+        /// Call this during Loading Screens to prevent stutter during gameplay.
+        /// </summary>
+        public void Prewarm(GameObject prefab, int count)
+        {
+            if (prefab == null) return;
+
+            int poolKey = prefab.GetInstanceID();
+
+            // Initialize the queue if missing
+            if (!_poolDictionary.ContainsKey(poolKey))
+            {
+                _poolDictionary.Add(poolKey, new Queue<GameObject>());
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                GameObject obj = CreateNewInstance(prefab, poolKey);
+                // Immediately disable and enqueue
+                obj.SetActive(false);
+                obj.transform.SetParent(_poolRoot);
+                _poolDictionary[poolKey].Enqueue(obj);
+            }
         }
 
         public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
@@ -47,83 +78,91 @@ namespace DarkTowerTron.Core.Services
 
             int poolKey = prefab.GetInstanceID();
 
+            // 1. Ensure Queue Exists
             if (!_poolDictionary.ContainsKey(poolKey))
             {
                 _poolDictionary.Add(poolKey, new Queue<GameObject>());
             }
 
-            GameObject objectToSpawn;
+            GameObject objToSpawn = null;
 
-            // Simple validation: Ensure queue item isn't null (destroyed externally)
+            // 2. Try Dequeue (Find inactive)
             if (_poolDictionary[poolKey].Count > 0)
             {
-                objectToSpawn = _poolDictionary[poolKey].Dequeue();
-                
-                // Safety check: Was it destroyed?
-                while (objectToSpawn == null && _poolDictionary[poolKey].Count > 0)
-                {
-                    objectToSpawn = _poolDictionary[poolKey].Dequeue();
-                }
+                objToSpawn = _poolDictionary[poolKey].Dequeue();
 
-                if (objectToSpawn == null)
+                // Validation: Was it destroyed externally?
+                while (objToSpawn == null && _poolDictionary[poolKey].Count > 0)
                 {
-                    objectToSpawn = Instantiate(prefab, position, rotation);
-                }
-                else
-                {
-                    objectToSpawn.transform.position = position;
-                    objectToSpawn.transform.rotation = rotation;
-                    objectToSpawn.SetActive(true);
+                    objToSpawn = _poolDictionary[poolKey].Dequeue();
                 }
             }
-            else
+
+            // 3. If missing or null, Create New
+            if (objToSpawn == null)
             {
-                objectToSpawn = Instantiate(prefab, position, rotation);
+                objToSpawn = CreateNewInstance(prefab, poolKey);
             }
 
-            // Interface Logic
-            var poolables = objectToSpawn.GetComponentsInChildren<IPoolable>();
+            // 4. Setup
+            objToSpawn.transform.SetPositionAndRotation(position, rotation);
+            objToSpawn.SetActive(true);
+
+            // NOTE: We don't unparent from _poolRoot. 
+            // Keeping them organized under one parent is cleaner for the Hierarchy view,
+            // though slightly (negligibly) more expensive for Transform updates.
+            // For a solo dev, clean Hierarchy > Micro-optimization.
+
+            // 5. Interface Call
+            var poolables = objToSpawn.GetComponentsInChildren<IPoolable>();
             foreach (var p in poolables) p.OnSpawn();
 
-            // Track ID
-            int instanceKey = objectToSpawn.GetInstanceID();
-            if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
-            {
-                _spawnedObjectsParentId.Add(instanceKey, poolKey);
-            }
-
-            return objectToSpawn;
+            return objToSpawn;
         }
 
         public void Despawn(GameObject obj)
         {
             if (obj == null) return;
+            if (!obj.scene.isLoaded) { Destroy(obj); return; }
 
             int instanceKey = obj.GetInstanceID();
 
-            if (_spawnedObjectsParentId.ContainsKey(instanceKey))
+            if (_spawnedObjectsParentId.TryGetValue(instanceKey, out int poolKey))
             {
+                // Interface Call
                 var poolables = obj.GetComponentsInChildren<IPoolable>();
                 foreach (var p in poolables) p.OnDespawn();
 
-                int poolKey = _spawnedObjectsParentId[instanceKey];
-                
-                // PREVENT LEAK: Remove from tracking
-                _spawnedObjectsParentId.Remove(instanceKey);
-
                 obj.SetActive(false);
-                obj.transform.SetParent(transform); // Store under manager
+
+                // Reparent to root to keep scene tidy
+                if (obj.transform.parent != _poolRoot)
+                    obj.transform.SetParent(_poolRoot);
 
                 // Add back to queue
-                if (!_poolDictionary.ContainsKey(poolKey)) 
+                if (!_poolDictionary.ContainsKey(poolKey))
                     _poolDictionary[poolKey] = new Queue<GameObject>();
-                    
+
                 _poolDictionary[poolKey].Enqueue(obj);
             }
             else
             {
+                // Wasn't pooled? Just destroy.
                 Destroy(obj);
             }
+        }
+
+        // Helper to keep logic DRY
+        private GameObject CreateNewInstance(GameObject prefab, int poolKey)
+        {
+            GameObject obj = Instantiate(prefab, _poolRoot); // Spawn directly in root
+            int instanceKey = obj.GetInstanceID();
+
+            if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
+            {
+                _spawnedObjectsParentId.Add(instanceKey, poolKey);
+            }
+            return obj;
         }
     }
 }

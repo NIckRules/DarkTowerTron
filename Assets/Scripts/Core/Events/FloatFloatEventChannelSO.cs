@@ -1,6 +1,6 @@
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
-using DarkTowerTron.Core;
 
 namespace DarkTowerTron.Core.Events
 {

@@ -1,10 +1,8 @@
-using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player.Stats;
 using DarkTowerTron.Player.Movement;
-
-// ALIAS: Resolves Services conflict
+using DarkTowerTron.Player.Stats;
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
@@ -12,7 +10,7 @@ namespace DarkTowerTron.Player.Combat
     [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerHealth))]
     [RequireComponent(typeof(TargetScanner))]
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerExecution : MonoBehaviour
     {
@@ -20,10 +18,14 @@ namespace DarkTowerTron.Player.Combat
         public float killRewardFocus = 50f;
         public AudioClip executeClip;
 
+        [Header("Positioning")]
+        [Tooltip("How high above the ground to teleport to prevent clipping. 0.1 is usually enough.")]
+        public float verticalBuffer = 0.2f;
+
         private PlayerEnergy _energy;
         private PlayerHealth _health;
         private TargetScanner _scanner;
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerStats _stats;
         private bool _isBusy;
 
@@ -32,7 +34,7 @@ namespace DarkTowerTron.Player.Combat
             _energy = GetComponent<PlayerEnergy>();
             _health = GetComponent<PlayerHealth>();
             _scanner = GetComponent<TargetScanner>();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _stats = GetComponent<PlayerStats>();
         }
 
@@ -52,36 +54,47 @@ namespace DarkTowerTron.Player.Combat
         {
             _isBusy = true;
 
-            // 1. Calculate Position
+            // 1. Calculate Base Position (Horizontal only first)
             Vector3 targetPos = target.transform.position;
-            Vector3 attackPos = targetPos - (transform.forward * 1.0f);
+            
+            // Back up slightly from the target so we don't clip inside them
+            Vector3 attackPos = targetPos - (transform.forward * 1.5f);
 
-            // 2. Y-Axis Logic (Verticality Support)
+            // 2. Y-Axis Logic (Safe Ground Snap)
             if (target.KeepPlayerGrounded)
             {
-                // HYGIENE: Use Constant Mask
-                if (UnityEngine.Physics.Raycast(targetPos + Vector3.up, Vector3.down, out RaycastHit hit, 10f, GameConstants.MASK_GROUND_ONLY))
+                // FIX: Cast from High Up (Enemy Head + 2m) downwards
+                // This ensures we don't start the raycast inside the floor if the enemy is short
+                Vector3 rayOrigin = targetPos;
+                rayOrigin.y += 2.0f;
+
+                int groundMask = DarkTowerTron.Core.GameConstants.MASK_GROUND_ONLY;
+
+                if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 10f, groundMask))
                 {
-                    attackPos.y = hit.point.y;
+                    // Add a small buffer so we don't clip into the floor after teleport.
+                    attackPos.y = hit.point.y + verticalBuffer;
                 }
                 else
                 {
-                    attackPos.y = targetPos.y; // Fallback
+                    // Fallback: Use Player's current height if we can't find ground
+                    // This prevents teleporting into the void if the enemy is flying over a pit
+                    attackPos.y = transform.position.y + verticalBuffer;
                 }
             }
             else
             {
-                // Go to exact height (e.g. Floating Anchor)
+                // Air execution (maintain enemy height)
                 attackPos.y = targetPos.y;
             }
 
-            transform.position = attackPos;
-
-            // 3. Suspend Gravity (The "Matrix" Pause)
+            // 3. SAFE TELEPORT (Fixes the "Falling through ground" bug)
             if (_movement)
             {
-                _movement.ResetVelocity();
-                _movement.SuspendGravity(_stats.ActionHangTime);
+                _movement.Teleport(attackPos);
+                
+                // Suspend gravity so we hang in the air during the animation
+                _movement.SuspendGravity(_stats.ActionHangTime + 0.5f);
             }
 
             // 4. Trigger Target Reaction (Die or Reset)

@@ -12,7 +12,7 @@ namespace DarkTowerTron.Player.Movement
 {
     [RequireComponent(typeof(KinematicMover))]
     [RequireComponent(typeof(PlayerEnergy))]
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerLoadout))]
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerDodge : MonoBehaviour
@@ -40,7 +40,7 @@ namespace DarkTowerTron.Player.Movement
         // Dependencies
         private KinematicMover _mover;
         private PlayerEnergy _energy;
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerLoadout _loadout;
         private PlayerStats _stats;
 
@@ -48,7 +48,7 @@ namespace DarkTowerTron.Player.Movement
         {
             _mover = GetComponent<KinematicMover>();
             _energy = GetComponent<PlayerEnergy>();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _loadout = GetComponent<PlayerLoadout>();
             _stats = GetComponent<PlayerStats>();
         }

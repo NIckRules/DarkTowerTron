@@ -1,7 +1,7 @@
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data; // For EnemyStatsSO
 
 namespace DarkTowerTron.Core.Events
 {

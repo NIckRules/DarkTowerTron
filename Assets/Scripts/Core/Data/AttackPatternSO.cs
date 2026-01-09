@@ -12,6 +12,10 @@ namespace DarkTowerTron.Core.Data
     [CreateAssetMenu(menuName = "DarkTowerTron/Combat/Attack Pattern")]
     public class AttackPatternSO : ScriptableObject
     {
+        [Header("Anatomy")]
+        [Tooltip("Must match an ID in the Enemy's FirePointRegistry (e.g. 'Muzzle', 'Eye').")]
+        public string firePointID = "Default";
+
         [Header("Aiming & Visuals")]
         public AimType aimMode = AimType.TargetPlayer;
         public float scaleMultiplier = 1.0f; // Boss bullets are huge
@@ -26,5 +30,8 @@ namespace DarkTowerTron.Core.Data
         [Header("Timing")]
         public float startDelay = 0.5f;      // Windup time
         public float delayBetweenShots = 0.1f; // Time between individual bullets in a burst/stream
+
+        [Header("Cooldown")]
+        public float cooldownAfterBurst = 1.0f; // Enforce pacing
     }
 }

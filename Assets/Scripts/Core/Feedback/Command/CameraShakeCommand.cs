@@ -1,5 +1,5 @@
+using DarkTowerTron.Visuals;
 using UnityEngine;
-using DarkTowerTron.Visuals; // Where CameraShaker lives
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {

@@ -1,12 +1,13 @@
-using UnityEngine;
-using DarkTowerTron.Physics;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Physics;
+using UnityEngine;
 
 namespace DarkTowerTron.Enemy
 {
-    // Do not require a specific mover so we can swap implementations.
-    public class EnemyMotor : MonoBehaviour, IPoolable
+    // We implement IMover so the PluggableAIController can talk to us directly.
+    public class EnemyMotor : MonoBehaviour, IPoolable, IMover
     {
         [Header("Data Profile")]
         public EnemyStatsSO stats;
@@ -14,136 +15,161 @@ namespace DarkTowerTron.Enemy
         [Header("Layers")]
         public LayerMask allyLayer;
 
-        private IMover _mover;
+        // The underlying Physics Engine (KinematicMover or UnityCharacterMover)
+        private IMover _physicsMover;
+
+        // Internal State
         private Vector3 _currentVelocity;
         private Vector3 _knockbackForce;
-        private float _currentVerticalSpeed;
-        private Collider[] _neighbors = new Collider[10];
+        private float _currentVerticalSpeed; // For smooth hovering
+        private Collider[] _neighbors = new Collider[10]; // For separation
+
+        // --- IMover Interface Properties (Pass-Through) ---
+        public Vector3 Velocity => _physicsMover != null ? _physicsMover.Velocity : Vector3.zero;
+        public bool IsGrounded => _physicsMover != null && _physicsMover.IsGrounded;
 
         private void Awake()
         {
-            // Auto-detect any IMover implementation (KinematicMover, UnityCharacterMover, etc.)
-            _mover = GetComponent<IMover>();
-
-            if (_mover == null)
+            // 1. Find the REAL physics mover attached to this object.
+            // Since EnemyMotor acts as a wrapper, we need to find the "Other" IMover.
+            var allMovers = GetComponents<IMover>();
+            foreach (var m in allMovers)
             {
-                // Safe default
-                _mover = gameObject.AddComponent<KinematicMover>();
+                // Cast to interface to compare references
+                if (m != (IMover)this)
+                {
+
+                    GameLogger.Log(LogChannel.AI, "[EnemyMotor] Found Physics Mover: " + m.GetType().Name, this.gameObject);
+
+                    _physicsMover = m;
+                    break;
+                }
             }
+
+            // 2. Fallback Safety: If no physics mover exists, add the default KinematicMover.
+            if (_physicsMover == null)
+            {
+                _physicsMover = gameObject.AddComponent<KinematicMover>();
+            }
+
             if (allyLayer == 0) allyLayer = 1 << GameConstants.LAYER_ENEMY;
         }
 
-        private void OnEnable()
-        {
-            _currentVelocity = Vector3.zero;
-            _knockbackForce = Vector3.zero;
-            _currentVerticalSpeed = 0f;
+        // --- IPoolable Implementation ---
 
-            // REMOVED: The code that snapped transform.position.y = 0
-            // logic: We trust the Spawner to put us where we need to be.
-            // If rideHeight > 0, the Update loop will naturally float us up/down to that height.
-            OnSpawn();
-        }
-
-        // --- IPoolable ---
         public void OnSpawn()
         {
-            // Reset Physics State
             _currentVelocity = Vector3.zero;
             _knockbackForce = Vector3.zero;
             _currentVerticalSpeed = 0f;
 
-            // Reset Position logic
-            // (Removed y=0 snap. Spawner is responsible for initial Y. If rideHeight > 0, Update loop will float us.)
+            // Forward the spawn event to the physics engine if it supports it
+            if (_physicsMover is IPoolable p) p.OnSpawn();
         }
 
         public void OnDespawn()
         {
-            // Stop moving immediately so we don't drift while in the pool
             _currentVelocity = Vector3.zero;
+            if (_physicsMover is IPoolable p) p.OnDespawn();
         }
 
-        public void Move(Vector3 desiredDirection)
+        // --- IMover Implementation (The Logic) ---
+
+        public void Teleport(Vector3 pos) => _physicsMover?.Teleport(pos);
+
+        public void SetEnabled(bool state)
         {
-            if (stats == null) return;
+            this.enabled = state;
+            // Optionally enable/disable the physics mover too, 
+            // though usually we want physics to run even if AI logic is paused.
+        }
+
+        /// <summary>
+        /// Receives a Direction (usually Magnitude 1) from the AI.
+        /// Applies Speed, Acceleration, Hovering, and Separation.
+        /// </summary>
+        public void Move(Vector3 inputVector)
+        {
+
+            GameLogger.Log(LogChannel.AI, "[EnemyMotor] Move Called with Input: " + inputVector.ToString("F2"), this.gameObject);
+
+            if (stats == null || _physicsMover == null) return;
 
             float dt = Time.deltaTime;
             if (dt < 1e-5f) return;
-            Vector3 targetVel = desiredDirection * stats.moveSpeed;
 
-            // 1. Separation
+            GameLogger.Log(LogChannel.AI, "[EnemyMotor] Move Input: " + inputVector.ToString("F2"), this.gameObject);
+
+            // 1. Apply Speed Stats
+            // The AI sends a direction. We make it a Velocity based on stats.
+            Vector3 targetVel = inputVector.normalized * stats.moveSpeed;
+
+            // 2. Separation Logic (Don't stack on top of other enemies)
             if (stats.moveSpeed > 0.1f)
             {
-                Vector3 separationPush = CalculateSeparation();
-                targetVel += separationPush;
+                targetVel += CalculateSeparation();
             }
 
-            // 2. Inertia
+            // 3. Inertia (Acceleration)
             _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, stats.acceleration * dt);
 
-            // 3. Knockback
+            // 4. Knockback Decay
             if (_knockbackForce.magnitude > 0.1f)
             {
                 _knockbackForce = Vector3.Lerp(_knockbackForce, Vector3.zero, 5f * dt);
             }
 
-            // 4. COMBINE
             Vector3 finalVelocity = _currentVelocity + _knockbackForce;
 
-            // 5. VERTICAL LOGIC (Flight vs Gravity)
+            // 5. Vertical Logic (Hover vs Gravity)
             if (stats.rideHeight > 0)
             {
-                // A. Determine Ground Height
-                float groundY = -999f; // Fallback (Void)
-
-                // Start raycast slightly above current position to catch the floor even if we clipped in slightly
+                // --- HOVER LOGIC ---
+                float groundY = -999f;
                 Vector3 rayOrigin = transform.position + Vector3.up * 1.0f;
 
-                // Cast down 20 units (Enough for high hoverers)
-                // Use OBSTACLES mask (Ground + Default + Wall) so they hover over bridges/crates too
+                // Cast down to find floor/obstacles
                 if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f, GameConstants.MASK_PHYSICS_OBSTACLES))
                 {
                     groundY = hit.point.y;
                 }
                 else
                 {
-                    // No ground found? Maintain current height (don't fall into void)
+                    // No ground? Maintain current relative height
                     groundY = transform.position.y - stats.rideHeight;
                 }
 
-                // B. Calculate Target Y
                 float targetY = groundY + stats.rideHeight;
-
-                // C. Smoothly Fly There
                 float currentY = transform.position.y;
+
+                // Smoothly interpolate height
                 float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime);
 
-                // D. Convert to Velocity for the KinematicMover
-                float verticalVel = (newY - currentY) / dt;
-                finalVelocity.y = verticalVel;
+                // Convert position change back to velocity for the Mover
+                finalVelocity.y = (newY - currentY) / dt;
             }
             else
             {
-                // WALKING: Apply Gravity if not grounded
-                if (!_mover.IsGrounded)
+                // --- GRAVITY LOGIC ---
+                if (!_physicsMover.IsGrounded)
                 {
-                    finalVelocity.y -= 20f; // Standard gravity
+                    finalVelocity.y -= 20f; // Standard Gravity
                 }
                 else
                 {
-                    finalVelocity.y = -2f; // Stick
+                    finalVelocity.y = -2f; // Stick to ground
                 }
             }
 
-            // 6. EXECUTE
-            _mover.Move(finalVelocity);
+            // 6. Final Execution
+            _physicsMover.Move(finalVelocity);
         }
+
+        // --- Helper Methods ---
 
         private Vector3 CalculateSeparation()
         {
             Vector3 pushVector = Vector3.zero;
-
-            // Use stats.separationRadius
             int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, stats.separationRadius, _neighbors, allyLayer);
 
             for (int i = 0; i < count; i++)
@@ -154,46 +180,47 @@ namespace DarkTowerTron.Enemy
                 Vector3 direction = transform.position - neighbor.transform.position;
                 float dist = direction.magnitude;
 
+                // Prevent division by zero
                 if (dist < 0.01f) direction = Random.insideUnitSphere;
 
+                // Stronger push the closer they are
                 pushVector += direction.normalized / (dist + 0.1f);
             }
 
-            // Use stats.separationForce
             return pushVector * stats.separationForce;
-        }
-
-        // Standard Face Target (Uses Navigation Speed)
-        public void FaceTarget(Vector3 targetPosition)
-        {
-            if (stats == null) return;
-            RotateTowards(targetPosition, stats.rotationSpeed);
-        }
-
-        // Combat Face Target (Uses Slower Combat Speed)
-        public void FaceCombatTarget(Vector3 targetPosition)
-        {
-            if (stats == null) return;
-            RotateTowards(targetPosition, stats.combatRotationSpeed);
-        }
-
-        // Helper to avoid duplicate code
-        private void RotateTowards(Vector3 targetPosition, float speed)
-        {
-            Vector3 dir = targetPosition - transform.position;
-            dir.y = 0; 
-            
-            if (dir != Vector3.zero)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(dir);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, speed * Time.deltaTime);
-            }
         }
 
         public void ApplyKnockback(Vector3 force)
         {
             force.y = 0;
             _knockbackForce += force;
+        }
+
+        public void FaceTarget(Vector3 targetPos)
+        {
+            // Ignore Y axis for rotation
+            Vector3 dir = targetPos - transform.position;
+            dir.y = 0;
+
+            if (dir.sqrMagnitude > 0.01f)
+            {
+                Quaternion rot = Quaternion.LookRotation(dir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, stats.rotationSpeed * Time.deltaTime);
+            }
+        }
+
+        public void FaceCombatTarget(Vector3 targetPos)
+        {
+            // Ignore Y axis
+            Vector3 dir = targetPos - transform.position;
+            dir.y = 0;
+
+            if (dir.sqrMagnitude > 0.01f)
+            {
+                Quaternion rot = Quaternion.LookRotation(dir);
+                // Use COMBAT rotation speed (slower/smoother) instead of navigation speed
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, stats.combatRotationSpeed * Time.deltaTime);
+            }
         }
     }
 }

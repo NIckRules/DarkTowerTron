@@ -19,7 +19,7 @@ MonoBehaviour:
     count: 3
     rate: 0.5
     spawnPointIndex: -1
-  - enemyPrefab: {fileID: 3473038045254472648, guid: 1513d0ac6f440b04981069a6ebcff7b7,
+  - enemyPrefab: {fileID: 3473038045254472648, guid: fc07c4c7cd445f94580bcaad84f8c003,
       type: 3}
     count: 3
     rate: 0.5
