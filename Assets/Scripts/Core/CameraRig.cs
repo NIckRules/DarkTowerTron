@@ -23,8 +23,9 @@ namespace DarkTowerTron.Core
 
         private Vector3 _currentVelocity;
 
-        private void Start()
+        private void Awake()
         {
+            GameServices.RegisterCamera(this);
             ResetToDefault();
         }
 

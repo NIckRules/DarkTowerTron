@@ -3,6 +3,7 @@ using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Managers;
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -202,7 +203,7 @@ namespace DarkTowerTron.Combat
             if (IsStaggered) label += "\n<color=yellow>[STAGGERED]</color>";
 
             Vector3 labelPos = transform.position + Vector3.up * 5f;
-            UnityEditor.Handles.Label(labelPos, label, style);
+            Handles.Label(labelPos, label, style);
         }
 #endif
     }

@@ -3,9 +3,7 @@ using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Enemy.Visuals; // For Visuals
 using DG.Tweening;
-
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {

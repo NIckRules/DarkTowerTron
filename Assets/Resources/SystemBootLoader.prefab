@@ -19,6 +19,9 @@ GameObject:
   - component: {fileID: 78568643233073422}
   - component: {fileID: 8744451723609990132}
   - component: {fileID: 3163029198683243387}
+  - component: {fileID: 7861188935372531404}
+  - component: {fileID: 551666531057338588}
+  - component: {fileID: 7881335312331896476}
   m_Layer: 0
   m_Name: SystemBootLoader
   m_TagString: Untagged
@@ -329,3 +332,52 @@ MonoBehaviour:
   - CRUNCH!
   - ERROR
   - VOID
+--- !u!114 &7861188935372531404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257296264535243330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9b79a6d2a7f7547967e29ad33e3d28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentSlotIndex: 0
+--- !u!114 &551666531057338588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257296264535243330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41b539b3c236c2b40adfaa83ee2ea200, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _persistence: {fileID: 0}
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+  _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
+  _damageEvent: {fileID: 11400000, guid: 62100c1f9efa3034d86dce2d21dbf5f9, type: 2}
+--- !u!114 &7881335312331896476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257296264535243330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 878c8ffaeea5f1b4ba13e50b4d481a4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  library: {fileID: 11400000, guid: d08b90e142b6b144f93015012da217d1, type: 2}
+  _narrativeOutput: {fileID: 0}
+  _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
+  _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
+  _waveCombatStartedEvent: {fileID: 11400000, guid: 82d8dc1f496caeb438899a555ff9688d,
+    type: 2}
+  _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
+  spamCooldown: 3

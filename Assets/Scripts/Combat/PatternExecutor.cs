@@ -2,8 +2,7 @@ using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Combat
 {

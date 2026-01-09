@@ -3,9 +3,7 @@ using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Enemy.Visuals;
-
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Environment.Props
 {

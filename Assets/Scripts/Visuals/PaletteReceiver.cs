@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Services;      // NEW: Where PaletteManager lives
+using DarkTowerTron.Systems;
 using DarkTowerTron.Core.Services; // NEW: For ServiceLocator
 
 namespace DarkTowerTron.Visuals

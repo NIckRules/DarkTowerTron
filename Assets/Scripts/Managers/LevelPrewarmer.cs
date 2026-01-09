@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using DarkTowerTron.Core.Services;
-// Alias
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Managers
 {

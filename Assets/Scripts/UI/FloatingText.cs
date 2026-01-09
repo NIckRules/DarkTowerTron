@@ -1,8 +1,7 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.UI
 {

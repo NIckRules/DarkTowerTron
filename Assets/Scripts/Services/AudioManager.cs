@@ -2,7 +2,7 @@ using UnityEngine;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core; // For GameLogger
 
-namespace DarkTowerTron.Core.Services
+namespace DarkTowerTron.Systems
 {
     [RequireComponent(typeof(AudioSource))]
     public class AudioManager : MonoBehaviour

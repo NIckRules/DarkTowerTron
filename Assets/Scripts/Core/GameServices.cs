@@ -21,6 +21,8 @@ namespace DarkTowerTron.Core
 
         // Dynamic Services (Set at runtime)
         public static PlayerController Player { get; private set; }
+        public static CameraRig CameraRig { get; private set; }
+        public static GameSession Session { get; private set; }
 
         // Public Accessors
         public static WaveDirector WaveDirector => Instance != null ? Instance._waveDirector : null;
@@ -44,6 +46,18 @@ namespace DarkTowerTron.Core
         {
             Player = player;
             GameLogger.Log(LogChannel.System, "[GameServices] Player Registered.", player != null ? player.gameObject : null);
+        }
+
+        public static void RegisterCamera(CameraRig rig)
+        {
+            CameraRig = rig;
+            GameLogger.Log(LogChannel.System, "[GameServices] CameraRig Registered.", rig != null ? rig.gameObject : null);
+        }
+
+        public static void RegisterSession(GameSession session)
+        {
+            Session = session;
+            GameLogger.Log(LogChannel.System, "[GameServices] GameSession Registered.", session != null ? session.gameObject : null);
         }
 
         private void OnDestroy()

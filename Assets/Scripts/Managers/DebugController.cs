@@ -1,12 +1,13 @@
 using System.Collections;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Controller;
 using DarkTowerTron.Player.Stats;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Managers
 {
@@ -44,11 +45,11 @@ namespace DarkTowerTron.Managers
             // 1. Auto-Start Logic
             if (autoStartGame)
             {
-                var session = FindObjectOfType<GameSession>();
-                if (session)
+                // FIX: Use Service
+                if (GameServices.Session != null)
                 {
                     GameLogger.Log(LogChannel.System, "[DEBUG] Auto-Starting Game...", gameObject);
-                    session.BeginGame();
+                    GameServices.Session.BeginGame();
 
                     // Force combat state active
                     _combatStartedEvent?.Raise();
@@ -56,12 +57,13 @@ namespace DarkTowerTron.Managers
             }
 
             // 2. Locate Player (Robust Find)
-            var player = FindObjectOfType<PlayerController>();
-            if (player != null)
+            // (Already cached in Services)
+            if (GameServices.Player != null)
             {
-                _energy = player.GetComponent<PlayerEnergy>();
-                _health = player.GetComponent<PlayerHealth>();
-                _loadout = player.GetComponent<PlayerLoadout>();
+                var p = GameServices.Player;
+                _energy = p.GetComponent<PlayerEnergy>();
+                _health = p.GetComponent<PlayerHealth>();
+                _loadout = p.GetComponent<PlayerLoadout>();
             }
         }
 

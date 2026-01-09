@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Debug;
-using DarkTowerTron.Core.Services;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     [ExecuteAlways]
     public class PaletteManager : MonoBehaviour

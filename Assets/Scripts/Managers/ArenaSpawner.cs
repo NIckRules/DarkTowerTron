@@ -1,7 +1,6 @@
 using DarkTowerTron.Core.Debug;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
 {

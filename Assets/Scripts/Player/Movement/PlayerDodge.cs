@@ -4,9 +4,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
-
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Movement
 {

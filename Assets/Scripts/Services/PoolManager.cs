@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace DarkTowerTron.Core.Services
+namespace DarkTowerTron.Systems
 {
     public class PoolManager : MonoBehaviour
     {

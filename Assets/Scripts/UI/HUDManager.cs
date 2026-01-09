@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.UI
 {

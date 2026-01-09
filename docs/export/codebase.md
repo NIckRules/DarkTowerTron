@@ -1,19 +1,36 @@
 # 📦 Codebase Export
 - **Profile:** `unity`
-- **Generated:** 2026-01-06 14:44
-- **Files:** 199
-- **Total LOC:** 11650
-- **Estimated tokens:** 92486
+- **Generated:** 2026-01-09 08:23
+- **Files:** 230
+- **Total LOC:** 12399
+- **Estimated tokens:** 99870
 
 ## 📁 Project Tree
 ```
 Assets
   Data
+    AI
+      Agents
+        Chaser
+          State_Chaser_Detonate.asset
+          State_Chaser_Melee.asset
+          State_Chaser_Prime.asset
+          State_Chaser_Pursue.asset
+        Guardian
+          State_Guardian_Attack.asset
+          State_Guardian_Patrol.asset
+        Sentinel
+          State_Sentinel_Engage.asset
+      AttackPattern
+        Attack_Guardian_Basic.asset
+        Attack_Sentinel_Basic.asset
     AttackPatterns
       Bosses
         Architect
           ARC_Straight.asset
+      Guardian_Attack_Basic.asset
       Nova.asset
+      Sentinel_Attack_Pulsar.asset
       Shotgun.asset
       Sweep.asset
     Audio
@@ -21,34 +38,50 @@ Assets
       SFX_Player_Beam.asset
       SFX_Player_Dash.asset
       SFX_Player_Shoot.asset
-    Behaviours
-      Beh_Avoidance.asset
-      Beh_Flee.asset
-      Beh_Orbit_CCW.asset
-      Beh_Orbit_CW.asset
-      Beh_Seek.asset
-      Beh_VoidAvoidance.asset
     Bosses
       Architect
         ARC_PAT_ClockRotation.asset
         ARC_PAT_HorizontalWall.asset
         ARC_PAT_StraightProjectiles.asset
     Enemies
-      Attack_Sentinel.asset
+      Chaser
+        Stats_Chaser.asset
       Enemy_Visual_Default.asset
-      Stats_Chaser.asset
-      Stats_Guardian.asset
-      Stats_Sentinel.asset
+      Guardian
+        Attack_Guardian.asset
+        Stats_Guardian.asset
+      Sentinel
+        Stats_Sentinel_Attack.asset
+        Stats_Sentinel_Health.asset
       Stats_Sniper.asset
     Events
+      Combat
+        Event_EnemyKilled.asset
+        Event_PlayerHit.asset
       Event_Damage.asset
-      Event_EnemyKilled.asset
+      Event_Decoy_Expired.asset
       Event_Focus.asset
       Event_Grit.asset
       Event_Hull.asset
-      Event_PlayerHit.asset
-      Event_Popup.asset
       Event_Score.asset
+      Event_Wave_Cleared.asset
+      Event_Wave_Started.asset
+      System
+        Event_Game_Victory.asset
+        Event_Player_Died.asset
+        Event_Room_Cleared.asset
+      UI
+        Event_Countdown.asset
+        Event_Popup.asset
+        Event_Wave_Announce.asset
+      Visuals
+        Event_Decoy_Spawned.asset
+        Event_Enemy_Spawned.asset
+    Feedback
+      Commands
+        Enemy_Explosion.asset
+      Events
+        Enemy_Die.asset
     Player
       Stats_Player_Default.asset
     Visuals
@@ -97,15 +130,36 @@ Assets
       Detectors
         ObstacleDetector.cs
         TargetDetector.cs
-      FSM
-        State.cs
-        StateMachine.cs
+      Paths
+        AutoAssignPatrolPath.cs
+        PatrolPath.cs
+        Waypoint.cs
+      Pluggable
+        Actions
+          Action_ContextSteering.cs
+          Action_FirePattern.cs
+          Action_Patrol.cs
+          Action_SelfDestruct.cs
+          Action_Visual_Prime.cs
+        Core
+          AIAction.cs
+          AIBlackboard.cs
+          AIDecision.cs
+          AIState.cs
+          PluggableAIController.cs
+        Decisions
+          Decision_InRange.cs
+          Decision_LineOfSight.cs
+          Decision_TimeElapsed.cs
       Utils
+        AIDebugger.cs
         AIDirections.cs
   Scripts
     Combat
       BaseHitbox.cs
+      ContactDamager.cs
       DamageReceiver.cs
+      FirePointRegistry.cs
       HazardZone.cs
       HitBox
         ShieldHitbox.cs
@@ -113,6 +167,7 @@ Assets
       Modules
         StaggerModule.cs
         VitalityModule.cs
+      PatternExecutor.cs
       Projectile.cs
       Strategies
         HomingMovement.cs
@@ -139,16 +194,28 @@ Assets
         WaveDefinitionSO.cs
       Debug
         GameLogger.cs
+        LogChannel.cs
       Events
         BoolEventChannelSO.cs
         DamageTextEventChannelSO.cs
         EnemyKilledEventChannelSO.cs
         FloatFloatEventChannelSO.cs
+        IntEventChannelSO.cs
         IntIntEventChannelSO.cs
+        StringEventChannelSO.cs
+        TransformEventChannelSO.cs
+        Vector3EventChannelSO.cs
         VoidEventChannelSO.cs
         VoidEventListener.cs
+      Feedback
+        Command
+          CameraShakeCommand.cs
+          PlaySoundCommand.cs
+          SpawnVFXCommand.cs
+          TimeFreezeCommand.cs
+        FeedbackCommand.cs
+        FeedbackConfigurationSO.cs
       GameConstants.cs
-      GameEvents.cs
       GameServices.cs
       GameTime.cs
       Input
@@ -158,10 +225,10 @@ Assets
         ICombatTarget.cs
         IDamageable.cs
         IMovementStrategy.cs
+        IMover.cs
         IPoolable.cs
         IReflectable.cs
         IWeapon.cs
-      LogChannel.cs
       Services
         BootLoader.cs
         GameBootstrap.cs
@@ -171,16 +238,12 @@ Assets
       Structs
         DamageInfo.cs
       Utils
+        LayerAutomator.cs
         Rotator.cs
       VoidKiller.cs
     Editor
       SmartDuplicator.cs
     Enemy
-      Agents
-        EnemyAgent_Chaser.cs
-        EnemyAgent_Guardian.cs
-        EnemyAgent_Sentinel.cs
-        EnemyAgent_Sniper.cs
       Bosses
         Architect
           ArchitectController.cs
@@ -188,26 +251,6 @@ Assets
       EnemyBaseAI.cs
       EnemyController.cs
       EnemyMotors.cs
-      PatrolPath.cs
-      States
-        Bosses
-          Architect
-            ArchitectState_Idle.cs
-            ArchitectState_Pattern.cs
-        Chaser
-          ChaserState_Chase.cs
-          ChaserState_Primer.cs
-        Guardian
-          GuardianState_Attack.cs
-          GuardianState_Move.cs
-        Sentinel
-          SentinelState_Combat.cs
-          SentinelState_Hunt.cs
-        Sniper
-          SniperState_Aiming.cs
-          SniperState_Firing.cs
-          SniperState_Positioning.cs
-          SniperState_Teleport.cs
       Visuals
         EnemyVisuals.cs
     Environment
@@ -224,12 +267,13 @@ Assets
     Managers
       ArenaSpawner.cs
       DebugController.cs
-      FeedbackDirector.cs
       GameSession.cs
       LevelBuilder.cs
+      LevelPrewarmer.cs
       WaveDirector.cs
     Physics
       KinematicMover.cs
+      UnityCharacterMover.cs
     Player
       Combat
         PlayerBeam.cs
@@ -244,7 +288,7 @@ Assets
       Movement
         AfterImage.cs
         PlayerDodge.cs
-        PlayerMovement.cs
+        PlayerMotor.cs
       Stats
         PlayerEnergy.cs
         PlayerHealth.cs
@@ -269,6 +313,251 @@ Assets
     Visuals
       CameraShaker.cs
       PaletteReceiver.cs
+```
+
+## 📄 `Assets\Data\AI\Agents\Chaser\State_Chaser_Detonate.asset`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 07:08
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Chaser_Detonate
+  m_EditorClassIdentifier: 
+  onEnterActions:
+  - {fileID: 11400000, guid: b0e0ecc103e94e34fbe35707854f8e37, type: 2}
+  actions:
+  - {fileID: 11400000, guid: b0e0ecc103e94e34fbe35707854f8e37, type: 2}
+  transitions: []
+```
+
+## 📄 `Assets\Data\AI\Agents\Chaser\State_Chaser_Melee.asset`
+- Lines: 19
+- Size: 0.5 KB
+- Modified: 2026-01-09 00:05
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Chaser_Melee
+  m_EditorClassIdentifier: 
+  onEnterActions: []
+  actions:
+  - {fileID: 11400000, guid: d131394403aa6e24db73676416e45e91, type: 2}
+  transitions: []
+```
+
+## 📄 `Assets\Data\AI\Agents\Chaser\State_Chaser_Prime.asset`
+- Lines: 23
+- Size: 0.8 KB
+- Modified: 2026-01-08 07:08
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Chaser_Prime
+  m_EditorClassIdentifier: 
+  onEnterActions:
+  - {fileID: 11400000, guid: 6170974fdce893b46b9ed1536d3ea9ae, type: 2}
+  actions:
+  - {fileID: 11400000, guid: d131394403aa6e24db73676416e45e91, type: 2}
+  transitions:
+  - decision: {fileID: 11400000, guid: 33cf2d553cae320428b90dfc7c42e2ed, type: 2}
+    trueState: {fileID: 11400000, guid: f890b1b0aa61d7148a8e23c87ebff24e, type: 2}
+    falseState: {fileID: 11400000, guid: d996aa5731d315f4297290ff5661f6b6, type: 2}
+```
+
+## 📄 `Assets\Data\AI\Agents\Chaser\State_Chaser_Pursue.asset`
+- Lines: 22
+- Size: 0.8 KB
+- Modified: 2026-01-08 07:28
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Chaser_Pursue
+  m_EditorClassIdentifier: 
+  onEnterActions: []
+  actions:
+  - {fileID: 11400000, guid: d131394403aa6e24db73676416e45e91, type: 2}
+  transitions:
+  - decision: {fileID: 11400000, guid: 61e7edb3077eaa84284210fbcf2c3d0f, type: 2}
+    trueState: {fileID: 11400000, guid: 9524212464a4f14439a6a4d8b6a3b55c, type: 2}
+    falseState: {fileID: 11400000, guid: d996aa5731d315f4297290ff5661f6b6, type: 2}
+```
+
+## 📄 `Assets\Data\AI\Agents\Guardian\State_Guardian_Attack.asset`
+- Lines: 22
+- Size: 0.7 KB
+- Modified: 2026-01-08 18:27
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Guardian_Attack
+  m_EditorClassIdentifier: 
+  onEnterActions: []
+  actions:
+  - {fileID: 11400000, guid: 9623c5a22d656874ea447fa7f31857c2, type: 2}
+  transitions:
+  - decision: {fileID: 11400000, guid: e9ef885431e6ee64cad1a462cf223266, type: 2}
+    trueState: {fileID: 11400000}
+    falseState: {fileID: 11400000, guid: 88b63b7e3004c5e46bf1b70e838965dc, type: 2}
+```
+
+## 📄 `Assets\Data\AI\Agents\Guardian\State_Guardian_Patrol.asset`
+- Lines: 22
+- Size: 0.7 KB
+- Modified: 2026-01-08 14:32
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Guardian_Patrol
+  m_EditorClassIdentifier: 
+  onEnterActions: []
+  actions:
+  - {fileID: 11400000, guid: a4deedcacb40c5d4daa644286f11362a, type: 2}
+  transitions:
+  - decision: {fileID: 11400000, guid: e9ef885431e6ee64cad1a462cf223266, type: 2}
+    trueState: {fileID: 11400000, guid: ae4b0efbfe3612b44bcd26f8fb8844e5, type: 2}
+    falseState: {fileID: 11400000}
+```
+
+## 📄 `Assets\Data\AI\Agents\Sentinel\State_Sentinel_Engage.asset`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-09 07:36
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6178fbad902a7554db41283da1e14295, type: 3}
+  m_Name: State_Sentinel_Engage
+  m_EditorClassIdentifier: 
+  onEnterActions: []
+  actions:
+  - {fileID: 11400000, guid: d377730163350c64caa4770d49dd750a, type: 2}
+  - {fileID: 11400000, guid: 76756452026f9b846bc0fde5294e8141, type: 2}
+  transitions: []
+```
+
+## 📄 `Assets\Data\AI\AttackPattern\Attack_Guardian_Basic.asset`
+- Lines: 17
+- Size: 0.6 KB
+- Modified: 2026-01-08 23:59
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3a54a2f904891841a6788c97bb0b82f, type: 3}
+  m_Name: Attack_Guardian_Basic
+  m_EditorClassIdentifier: 
+  pattern: {fileID: 11400000, guid: 7f702b6a0de7c33498936259a779dbc6, type: 2}
+  attackStats: {fileID: 11400000, guid: 37ef7c7bef119b241b5c8ca136720b75, type: 2}
+```
+
+## 📄 `Assets\Data\AI\AttackPattern\Attack_Sentinel_Basic.asset`
+- Lines: 17
+- Size: 0.6 KB
+- Modified: 2026-01-09 07:19
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3a54a2f904891841a6788c97bb0b82f, type: 3}
+  m_Name: Attack_Sentinel_Basic
+  m_EditorClassIdentifier: 
+  pattern: {fileID: 11400000, guid: 7f702b6a0de7c33498936259a779dbc6, type: 2}
+  attackStats: {fileID: 11400000, guid: 37ef7c7bef119b241b5c8ca136720b75, type: 2}
 ```
 
 ## 📄 `Assets\Data\AttackPatterns\Bosses\Architect\ARC_Straight.asset`
@@ -302,6 +591,39 @@ MonoBehaviour:
   delayBetweenShots: 0.2
 ```
 
+## 📄 `Assets\Data\AttackPatterns\Guardian_Attack_Basic.asset`
+- Lines: 26
+- Size: 0.6 KB
+- Modified: 2026-01-09 07:32
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e0fd8f44142d2469388ca2d00fa279, type: 3}
+  m_Name: Guardian_Attack_Basic
+  m_EditorClassIdentifier: 
+  firePointID: FirePoint_Primary
+  aimMode: 0
+  scaleMultiplier: 1
+  speed: 15
+  projectileCount: 3
+  spreadAngle: 0
+  spinDuringFire: 0
+  spinSpeed: 0
+  startDelay: 0.5
+  delayBetweenShots: 0.2
+  cooldownAfterBurst: 3
+```
+
 ## 📄 `Assets\Data\AttackPatterns\Nova.asset`
 - Lines: 22
 - Size: 0.5 KB
@@ -329,6 +651,39 @@ MonoBehaviour:
   delayBetweenShots: 0
   startDelay: 0.5
   speed: 15
+```
+
+## 📄 `Assets\Data\AttackPatterns\Sentinel_Attack_Pulsar.asset`
+- Lines: 26
+- Size: 0.6 KB
+- Modified: 2026-01-09 07:36
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e0fd8f44142d2469388ca2d00fa279, type: 3}
+  m_Name: Sentinel_Attack_Pulsar
+  m_EditorClassIdentifier: 
+  firePointID: FirePoint_Primary
+  aimMode: 0
+  scaleMultiplier: 1
+  speed: 15
+  projectileCount: 1
+  spreadAngle: 0
+  spinDuringFire: 0
+  spinSpeed: 0
+  startDelay: 0.5
+  delayBetweenShots: 0
+  cooldownAfterBurst: 1.5
 ```
 
 ## 📄 `Assets\Data\AttackPatterns\Shotgun.asset`
@@ -361,9 +716,9 @@ MonoBehaviour:
 ```
 
 ## 📄 `Assets\Data\AttackPatterns\Sweep.asset`
-- Lines: 24
+- Lines: 26
 - Size: 0.6 KB
-- Modified: 2025-12-30 09:50
+- Modified: 2026-01-08 18:27
 
 ```asset
 %YAML 1.1
@@ -380,6 +735,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e0fd8f44142d2469388ca2d00fa279, type: 3}
   m_Name: Sweep
   m_EditorClassIdentifier: 
+  firePointID: FirePoint_Primary
   aimMode: 0
   scaleMultiplier: 1
   speed: 15
@@ -389,6 +745,7 @@ MonoBehaviour:
   spinSpeed: 0
   startDelay: 0.5
   delayBetweenShots: 0.1
+  cooldownAfterBurst: 1
 ```
 
 ## 📄 `Assets\Data\Audio\SFX_Enemy_Explode.asset`
@@ -500,149 +857,6 @@ MonoBehaviour:
   randomPitchRange: 0.1
 ```
 
-## 📄 `Assets\Data\Behaviours\Beh_Avoidance.asset`
-- Lines: 17
-- Size: 0.4 KB
-- Modified: 2025-12-30 09:50
-
-```asset
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae8d177c719a3c842acb623e4f890876, type: 3}
-  m_Name: Beh_Avoidance
-  m_EditorClassIdentifier: 
-  avoidanceRadius: 2
-  dangerWeight: 1
-```
-
-## 📄 `Assets\Data\Behaviours\Beh_Flee.asset`
-- Lines: 16
-- Size: 0.4 KB
-- Modified: 2025-12-30 09:50
-
-```asset
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35163712aebec7645b7646b7794f86df, type: 3}
-  m_Name: Beh_Flee
-  m_EditorClassIdentifier: 
-  fleeDistance: 10
-```
-
-## 📄 `Assets\Data\Behaviours\Beh_Orbit_CCW.asset`
-- Lines: 18
-- Size: 0.5 KB
-- Modified: 2026-01-06 12:18
-
-```asset
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c3958e979e8ba7438bbb58ca6123f36, type: 3}
-  m_Name: Beh_Orbit_CCW
-  m_EditorClassIdentifier: 
-  idealDistance: 15
-  distanceCorrectionStrength: 0.5
-  clockwise: 0
-```
-
-## 📄 `Assets\Data\Behaviours\Beh_Orbit_CW.asset`
-- Lines: 18
-- Size: 0.5 KB
-- Modified: 2026-01-06 12:18
-
-```asset
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c3958e979e8ba7438bbb58ca6123f36, type: 3}
-  m_Name: Beh_Orbit_CW
-  m_EditorClassIdentifier: 
-  idealDistance: 15
-  distanceCorrectionStrength: 0.5
-  clockwise: 1
-```
-
-## 📄 `Assets\Data\Behaviours\Beh_Seek.asset`
-- Lines: 15
-- Size: 0.4 KB
-- Modified: 2025-12-30 09:50
-
-```asset
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75094ea619450b6408bcf452dd613775, type: 3}
-  m_Name: Beh_Seek
-  m_EditorClassIdentifier:
-```
-
-## 📄 `Assets\Data\Behaviours\Beh_VoidAvoidance.asset`
-- Lines: 17
-- Size: 0.4 KB
-- Modified: 2026-01-06 12:30
-
-```asset
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69d39b00eb79d3641a66b060ff2cd08b, type: 3}
-  m_Name: Beh_VoidAvoidance
-  m_EditorClassIdentifier: 
-  lookAheadDistance: 2
-  voidDangerWeight: 1
-```
-
 ## 📄 `Assets\Data\Bosses\Architect\ARC_PAT_ClockRotation.asset`
 - Lines: 22
 - Size: 0.6 KB
@@ -730,10 +944,10 @@ MonoBehaviour:
   shootingPattern: {fileID: 11400000, guid: de571586b8c5c9645ada6df14bda94ef, type: 2}
 ```
 
-## 📄 `Assets\Data\Enemies\Attack_Sentinel.asset`
-- Lines: 22
-- Size: 0.6 KB
-- Modified: 2026-01-06 12:18
+## 📄 `Assets\Data\Enemies\Chaser\Stats_Chaser.asset`
+- Lines: 33
+- Size: 0.7 KB
+- Modified: 2026-01-08 07:08
 
 ```asset
 %YAML 1.1
@@ -747,16 +961,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b269f952b696774fb25e5db3b40ed34, type: 3}
-  m_Name: Attack_Sentinel
+  m_Script: {fileID: 11500000, guid: 65f63d17ef75d5f45b55d0652fde43f2, type: 3}
+  m_Name: Stats_Chaser
   m_EditorClassIdentifier: 
-  damage: 1
-  stagger: 0
-  projectilePrefab: {fileID: 4044515353307923508, guid: 0dadc435e51ea8e4b88f2067814f308d,
-    type: 3}
-  projectileSpeed: 25
-  lifetime: 5
-  spreadAngle: 0
+  isEssential: 0
+  scoreValue: 100
+  focusReward: 30
+  healsGrit: 0
+  gritRewardAmount: 1
+  moveSpeed: 9
+  rotationSpeed: 15
+  combatRotationSpeed: 3
+  acceleration: 20
+  rideHeight: 1.4
+  verticalSmoothTime: 0.5
+  separationRadius: 1.5
+  separationForce: 8
+  maxHealth: 10
+  maxStagger: 5
+  staggerDecay: 0.5
+  hasFrontalShield: 0
+  shieldAngle: 0.5
 ```
 
 ## 📄 `Assets\Data\Enemies\Enemy_Visual_Default.asset`
@@ -784,10 +1009,10 @@ MonoBehaviour:
   dangerPulseColor: {r: 1, g: 0, b: 0, a: 1}
 ```
 
-## 📄 `Assets\Data\Enemies\Stats_Chaser.asset`
-- Lines: 33
-- Size: 0.7 KB
-- Modified: 2026-01-06 12:21
+## 📄 `Assets\Data\Enemies\Guardian\Attack_Guardian.asset`
+- Lines: 22
+- Size: 0.6 KB
+- Modified: 2026-01-08 23:59
 
 ```asset
 %YAML 1.1
@@ -801,33 +1026,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65f63d17ef75d5f45b55d0652fde43f2, type: 3}
-  m_Name: Stats_Chaser
+  m_Script: {fileID: 11500000, guid: 6b269f952b696774fb25e5db3b40ed34, type: 3}
+  m_Name: Attack_Guardian
   m_EditorClassIdentifier: 
-  isEssential: 0
-  scoreValue: 100
-  focusReward: 30
-  healsGrit: 0
-  gritRewardAmount: 1
-  moveSpeed: 5
-  rotationSpeed: 15
-  combatRotationSpeed: 3
-  acceleration: 20
-  rideHeight: 1.1
-  verticalSmoothTime: 0.5
-  separationRadius: 1.5
-  separationForce: 8
-  maxHealth: 10
-  maxStagger: 5
-  staggerDecay: 0.5
-  hasFrontalShield: 0
-  shieldAngle: 0.5
+  damage: 1
+  stagger: 0
+  projectilePrefab: {fileID: 4816501585111597516, guid: 2f354b46747ecbc4a9c42c9ce1a719e0,
+    type: 3}
+  projectileSpeed: 15
+  lifetime: 7
+  spreadAngle: 0
 ```
 
-## 📄 `Assets\Data\Enemies\Stats_Guardian.asset`
+## 📄 `Assets\Data\Enemies\Guardian\Stats_Guardian.asset`
 - Lines: 33
-- Size: 0.8 KB
-- Modified: 2026-01-06 09:15
+- Size: 0.7 KB
+- Modified: 2026-01-08 08:10
 
 ```asset
 %YAML 1.1
@@ -853,7 +1067,7 @@ MonoBehaviour:
   rotationSpeed: 25
   combatRotationSpeed: 3
   acceleration: 60
-  rideHeight: 1
+  rideHeight: 1.3
   verticalSmoothTime: 0.5
   separationRadius: 1.5
   separationForce: 8
@@ -864,10 +1078,39 @@ MonoBehaviour:
   shieldAngle: 0.5
 ```
 
-## 📄 `Assets\Data\Enemies\Stats_Sentinel.asset`
+## 📄 `Assets\Data\Enemies\Sentinel\Stats_Sentinel_Attack.asset`
+- Lines: 22
+- Size: 0.6 KB
+- Modified: 2026-01-09 07:31
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b269f952b696774fb25e5db3b40ed34, type: 3}
+  m_Name: Stats_Sentinel_Attack
+  m_EditorClassIdentifier: 
+  damage: 1
+  stagger: 0
+  projectilePrefab: {fileID: 4816501585111597516, guid: 2f354b46747ecbc4a9c42c9ce1a719e0,
+    type: 3}
+  projectileSpeed: 25
+  lifetime: 5
+  spreadAngle: 0
+```
+
+## 📄 `Assets\Data\Enemies\Sentinel\Stats_Sentinel_Health.asset`
 - Lines: 33
 - Size: 0.7 KB
-- Modified: 2026-01-06 12:18
+- Modified: 2026-01-09 07:31
 
 ```asset
 %YAML 1.1
@@ -882,7 +1125,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65f63d17ef75d5f45b55d0652fde43f2, type: 3}
-  m_Name: Stats_Sentinel
+  m_Name: Stats_Sentinel_Health
   m_EditorClassIdentifier: 
   isEssential: 0
   scoreValue: 100
@@ -942,6 +1185,50 @@ MonoBehaviour:
   shieldAngle: 0.5
 ```
 
+## 📄 `Assets\Data\Events\Combat\Event_EnemyKilled.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55f9f970bd6bb4641a051f7ba14addb7, type: 3}
+  m_Name: Event_EnemyKilled
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Combat\Event_PlayerHit.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 09:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_PlayerHit
+  m_EditorClassIdentifier:
+```
+
 ## 📄 `Assets\Data\Events\Event_Damage.asset`
 - Lines: 15
 - Size: 0.4 KB
@@ -964,10 +1251,10 @@ MonoBehaviour:
   m_EditorClassIdentifier:
 ```
 
-## 📄 `Assets\Data\Events\Event_EnemyKilled.asset`
+## 📄 `Assets\Data\Events\Event_Decoy_Expired.asset`
 - Lines: 15
 - Size: 0.4 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-06 15:36
 
 ```asset
 %YAML 1.1
@@ -981,8 +1268,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55f9f970bd6bb4641a051f7ba14addb7, type: 3}
-  m_Name: Event_EnemyKilled
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_Decoy_Expired
   m_EditorClassIdentifier:
 ```
 
@@ -1052,7 +1339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
 ```
 
-## 📄 `Assets\Data\Events\Event_PlayerHit.asset`
+## 📄 `Assets\Data\Events\Event_Score.asset`
 - Lines: 15
 - Size: 0.4 KB
 - Modified: 2026-01-06 09:15
@@ -1069,12 +1356,144 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
-  m_Name: Event_PlayerHit
+  m_Script: {fileID: 11500000, guid: df1a6f2a16adf0b469b3d2d772e13959, type: 3}
+  m_Name: Event_Score
   m_EditorClassIdentifier:
 ```
 
-## 📄 `Assets\Data\Events\Event_Popup.asset`
+## 📄 `Assets\Data\Events\Event_Wave_Cleared.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:16
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_Wave_Cleared
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Event_Wave_Started.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:15
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_Wave_Started
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\System\Event_Game_Victory.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:16
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_Game_Victory
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\System\Event_Player_Died.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:16
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_Player_Died
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\System\Event_Room_Cleared.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:16
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970f6552445842c4f9344b5cfaa80755, type: 3}
+  m_Name: Event_Room_Cleared
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\UI\Event_Countdown.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:12
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6650363b51a67f4cae6616f6c77447e, type: 3}
+  m_Name: Event_Countdown
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\UI\Event_Popup.asset`
 - Lines: 15
 - Size: 0.4 KB
 - Modified: 2026-01-06 10:58
@@ -1096,10 +1515,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp:DarkTowerTron.Core.Events:PopupTextEventChannelSO
 ```
 
-## 📄 `Assets\Data\Events\Event_Score.asset`
+## 📄 `Assets\Data\Events\UI\Event_Wave_Announce.asset`
 - Lines: 15
 - Size: 0.4 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-06 15:12
 
 ```asset
 %YAML 1.1
@@ -1113,9 +1532,102 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df1a6f2a16adf0b469b3d2d772e13959, type: 3}
-  m_Name: Event_Score
+  m_Script: {fileID: 11500000, guid: 99c73a4b747983b429da5e92e0ce6971, type: 3}
+  m_Name: Event_Wave_Announce
   m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Visuals\Event_Decoy_Spawned.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:36
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53db0f89a59b246438e566bcc32d98fe, type: 3}
+  m_Name: Event_Decoy_Spawned
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Events\Visuals\Event_Enemy_Spawned.asset`
+- Lines: 15
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:35
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0877295e77ae1894f812a17eb73a1f4a, type: 3}
+  m_Name: Event_Enemy_Spawned
+  m_EditorClassIdentifier:
+```
+
+## 📄 `Assets\Data\Feedback\Commands\Enemy_Explosion.asset`
+- Lines: 18
+- Size: 0.5 KB
+- Modified: 2026-01-07 07:36
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9938b19f9c11d32408de7e5a0836cadc, type: 3}
+  m_Name: Enemy_Explosion
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 648059833510886341, guid: 68f25ab6f4dbf344187bc8a7231afda4, type: 3}
+  attachToParent: 1
+  offset: {x: 0, y: 0, z: 0}
+```
+
+## 📄 `Assets\Data\Feedback\Events\Enemy_Die.asset`
+- Lines: 17
+- Size: 0.5 KB
+- Modified: 2026-01-07 07:36
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14d97b7dd6b915f47a904b3d56571d78, type: 3}
+  m_Name: Enemy_Die
+  m_EditorClassIdentifier: 
+  commands:
+  - {fileID: 11400000, guid: 2f5828803fa1ee747a9b1585bc26739a, type: 2}
 ```
 
 ## 📄 `Assets\Data\Player\Stats_Player_Default.asset`
@@ -1990,7 +2502,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Waves\WA_1_3Mis.asset`
 - Lines: 25
 - Size: 0.6 KB
-- Modified: 2025-12-30 09:50
+- Modified: 2026-01-09 07:48
 
 ```asset
 %YAML 1.1
@@ -2009,7 +2521,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waveName: Wave 1
   entries:
-  - enemyPrefab: {fileID: 3473038045254472648, guid: 1513d0ac6f440b04981069a6ebcff7b7,
+  - enemyPrefab: {fileID: 3473038045254472648, guid: fc07c4c7cd445f94580bcaad84f8c003,
       type: 3}
     count: 3
     rate: 0.5
@@ -2054,7 +2566,7 @@ MonoBehaviour:
 ## 📄 `Assets\Data\Waves\WA_1_3Sen_3Chm.asset`
 - Lines: 30
 - Size: 0.8 KB
-- Modified: 2025-12-30 09:50
+- Modified: 2026-01-09 07:48
 
 ```asset
 %YAML 1.1
@@ -2078,7 +2590,7 @@ MonoBehaviour:
     count: 3
     rate: 0.5
     spawnPointIndex: -1
-  - enemyPrefab: {fileID: 3473038045254472648, guid: 1513d0ac6f440b04981069a6ebcff7b7,
+  - enemyPrefab: {fileID: 3473038045254472648, guid: fc07c4c7cd445f94580bcaad84f8c003,
       type: 3}
     count: 3
     rate: 0.5
@@ -2662,70 +3174,906 @@ namespace DarkTowerTron.AI.Detectors
 }
 ```
 
-## 📄 `Assets\Modules\AI\FSM\State.cs`
-- Lines: 17
-- Size: 0.5 KB
-- Modified: 2025-12-30 09:50
+## 📄 `Assets\Modules\AI\Paths\AutoAssignPatrolPath.cs`
+- Lines: 77
+- Size: 2.5 KB
+- Modified: 2026-01-08 13:37
 
 ```csharp
-namespace DarkTowerTron.AI.FSM
-{
-    public abstract class State
-    {
-        protected StateMachine _stateMachine;
+using UnityEngine;
+using System.Collections;
+using DarkTowerTron.AI.Pluggable.Core; // Needed for Controller
 
-        public void Initialize(StateMachine stateMachine)
+namespace DarkTowerTron.AI.Paths
+{
+    [RequireComponent(typeof(PluggableAIController))]
+    public class AutoAssignPatrolPath : MonoBehaviour
+    {
+        public bool autoFindNearest = true;
+        public PatrolPath explicitPath;
+
+        private void Start()
         {
-            _stateMachine = stateMachine;
+            if (gameObject.scene.name == null) return;
+            var controller = GetComponent<PluggableAIController>();
+
+            if (explicitPath != null)
+            {
+                SetPath(controller, explicitPath);
+            }
+            else if (autoFindNearest)
+            {
+                StartCoroutine(FindAndAssignPathRoutine(controller));
+            }
         }
 
-        public virtual void Enter() { }
-        public virtual void LogicUpdate() { } // Run every Update
-        public virtual void PhysicsUpdate() { } // Run every FixedUpdate
-        public virtual void Exit() { }
+        private IEnumerator FindAndAssignPathRoutine(PluggableAIController controller)
+        {
+            yield return null;
+            PatrolPath nearest = FindNearestPath();
+            if (nearest != null) SetPath(controller, nearest);
+        }
+
+        private void SetPath(PluggableAIController controller, PatrolPath path)
+        {
+            if (controller.blackboard != null)
+            {
+                controller.blackboard.patrolPath = path;
+                controller.blackboard.currentWaypointIndex = GetClosestWaypointIndex(path);
+            }
+        }
+
+        private PatrolPath FindNearestPath()
+        {
+            var allPaths = FindObjectsOfType<PatrolPath>();
+            if (allPaths.Length == 0) return null;
+
+            PatrolPath best = null;
+            float closestDist = float.MaxValue;
+
+            foreach (var path in allPaths)
+            {
+                if (path.waypoints.Count > 0 && path.waypoints[0] != null)
+                {
+                    float d = Vector3.Distance(transform.position, path.waypoints[0].transform.position);
+                    if (d < closestDist) { closestDist = d; best = path; }
+                }
+            }
+            return best;
+        }
+
+        private int GetClosestWaypointIndex(PatrolPath path)
+        {
+            int bestIndex = 0;
+            float closestDist = float.MaxValue;
+
+            for (int i = 0; i < path.waypoints.Count; i++)
+            {
+                if (path.waypoints[i] == null) continue;
+                float d = Vector3.Distance(transform.position, path.waypoints[i].transform.position);
+                if (d < closestDist) { closestDist = d; bestIndex = i; }
+            }
+            return bestIndex;
+        }
     }
 }
 ```
 
-## 📄 `Assets\Modules\AI\FSM\StateMachine.cs`
-- Lines: 36
+## 📄 `Assets\Modules\AI\Paths\PatrolPath.cs`
+- Lines: 28
 - Size: 0.9 KB
-- Modified: 2025-12-30 09:50
+- Modified: 2026-01-08 13:37
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace DarkTowerTron.AI.Paths
+{
+    public class PatrolPath : MonoBehaviour
+    {
+        public List<Waypoint> waypoints;
+        public bool loop = true;
+
+        private void OnDrawGizmos()
+        {
+            if (waypoints == null || waypoints.Count < 2) return;
+
+            Gizmos.color = Color.cyan;
+            for (int i = 0; i < waypoints.Count - 1; i++)
+            {
+                if (waypoints[i] && waypoints[i + 1])
+                    Gizmos.DrawLine(waypoints[i].transform.position, waypoints[i + 1].transform.position);
+            }
+
+            if (loop && waypoints[0] && waypoints[waypoints.Count - 1])
+            {
+                Gizmos.DrawLine(waypoints[waypoints.Count - 1].transform.position, waypoints[0].transform.position);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Paths\Waypoint.cs`
+- Lines: 23
+- Size: 0.7 KB
+- Modified: 2026-01-08 13:36
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core; // Needed for AIState reference
+
+namespace DarkTowerTron.AI.Paths
+{
+    public class Waypoint : MonoBehaviour
+    {
+        [Tooltip("How long the AI should wait here before moving on.")]
+        public float waitTime = 0f;
+
+        [Tooltip("Optional: A specific State to inject into the AI when it arrives.")]
+        public AIState overrideState;
+
+        [Tooltip("How long to stay in the override state before resuming patrol.")]
+        public float overrideDuration = 5f;
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, 0.5f);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Actions\Action_ContextSteering.cs`
+- Lines: 41
+- Size: 1.7 KB
+- Modified: 2026-01-07 19:33
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DarkTowerTron.AI.Core; // For SteeringBehavior list
+using System.Collections.Generic;
+
+namespace DarkTowerTron.AI.Pluggable.Actions
+{
+    [CreateAssetMenu(menuName = "AI/Actions/Move via Context Steering")]
+    public class Action_ContextSteering : AIAction
+    {
+        [Header("Movement Profile")]
+        public float speedMultiplier = 1.0f;
+
+        [Header("Behaviors to Apply")]
+        // We configure the specific steering behaviors HERE in the asset
+        public List<SteeringBehavior> behaviors;
+
+        public override void Act(PluggableAIController controller)
+        {
+            // 1. Inject Behaviors into the Solver
+            // Optimization Note: Doing this every frame is wasteful if the list doesn't change.
+            // A better way is to do this in "OnEnter State", but for simplicity/robustness:
+            controller.blackboard.ContextSolver.behaviors = behaviors;
+
+            // 2. Get Direction
+            Vector3 dir = controller.blackboard.ContextSolver.GetDirectionToMove();
+
+            // 3. Move via IMover interface
+            // (Assuming EnemyStats logic is handled inside the IMover or passed here. 
+            // For now, let's assume the controller's Motor handles the base speed from StatsSO)
+            controller.blackboard.Mover.Move(dir * speedMultiplier);
+
+            // 4. Face Movement
+            if (dir.sqrMagnitude > 0.01f)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(dir);
+                controller.transform.rotation = Quaternion.Slerp(controller.transform.rotation, targetRot, 10f * Time.deltaTime);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Actions\Action_FirePattern.cs`
+- Lines: 35
+- Size: 1.1 KB
+- Modified: 2026-01-08 23:36
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DarkTowerTron.Core.Data; // For EnemyAttackSO & AttackPatternSO
+using DarkTowerTron.Enemy;
+
+namespace DarkTowerTron.AI.Pluggable.Actions
+{
+    [CreateAssetMenu(menuName = "AI/Actions/Combat/Fire Pattern")]
+    public class Action_FirePattern : AIAction
+    {
+        [Header("The Shape")]
+        public AttackPatternSO pattern;
+
+        [Header("The Payload")]
+        public EnemyAttackSO attackStats; // <--- REPLACES 'projectilePrefab'
+
+        public override void Act(PluggableAIController controller)
+        {
+            if (controller.blackboard.Target == null) return;
+
+            // 1. Face the Target
+            if (controller.blackboard.Mover is EnemyMotor motor)
+            {
+                motor.FaceCombatTarget(controller.blackboard.Target.position);
+            }
+
+            // 2. Fire
+            if (controller.blackboard.Weapon != null)
+            {
+                // Pass BOTH config objects to the weapon
+                controller.blackboard.Weapon.Fire(pattern, attackStats, controller.blackboard.Target);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Actions\Action_Patrol.cs`
+- Lines: 69
+- Size: 2.6 KB
+- Modified: 2026-01-08 13:51
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DarkTowerTron.AI.Paths;
+
+namespace DarkTowerTron.AI.Pluggable.Actions
+{
+    [CreateAssetMenu(menuName = "AI/Actions/Move/Patrol")]
+    public class Action_Patrol : AIAction
+    {
+        public float waypointTolerance = 1.0f;
+        public float speedMultiplier = 0.5f;
+
+        public override void Act(PluggableAIController controller)
+        {
+            var bb = controller.blackboard;
+            if (bb.patrolPath == null || bb.patrolPath.waypoints.Count == 0) return;
+
+            Waypoint currentWaypoint = bb.patrolPath.waypoints[bb.currentWaypointIndex];
+            if (currentWaypoint == null) return;
+
+            Transform targetPoint = currentWaypoint.transform;
+
+            // 1. Calculate Flat Distance
+            Vector3 flatPos = controller.transform.position; flatPos.y = 0;
+            Vector3 flatTarget = targetPoint.position; flatTarget.y = 0;
+            float distance = Vector3.Distance(flatPos, flatTarget);
+
+            // 2. Check Arrival
+            if (distance <= waypointTolerance)
+            {
+                // We Arrived.
+
+                // Optional: Snap position to avoid "Orbiting" if we stop here? 
+                // No, just switch target immediately so we don't stop moving.
+
+                bb.currentWaypointIndex = (bb.currentWaypointIndex + 1) % bb.patrolPath.waypoints.Count;
+
+                // CRITICAL FIX: Don't stop. 
+                // Immediately get the NEXT waypoint and start moving towards IT in this same frame.
+                // This prevents the 1-frame freeze.
+
+                var nextWaypoint = bb.patrolPath.waypoints[bb.currentWaypointIndex];
+                if (nextWaypoint != null)
+                {
+                    MoveTowards(controller, nextWaypoint.transform.position);
+                }
+            }
+            else
+            {
+                // 3. Keep Moving
+                MoveTowards(controller, targetPoint.position);
+            }
+        }
+
+        private void MoveTowards(PluggableAIController controller, Vector3 targetPos)
+        {
+            Vector3 dir = (targetPos - controller.transform.position).normalized;
+            controller.blackboard.Mover.Move(dir * speedMultiplier);
+
+            // Store in blackboard for Debugger visualization
+            controller.blackboard.MoveDirection = dir;
+
+            if (controller.blackboard.Mover is DarkTowerTron.Enemy.EnemyMotor motor)
+            {
+                motor.FaceTarget(targetPos);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Actions\Action_SelfDestruct.cs`
+- Lines: 51
+- Size: 1.9 KB
+- Modified: 2026-01-07 19:45
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DarkTowerTron.Core; // For DamageInfo/GameConstants
+using DarkTowerTron.Core.Feedback; // For Juice
+
+namespace DarkTowerTron.AI.Pluggable.Actions
+{
+    [CreateAssetMenu(menuName = "AI/Actions/Combat/Self Destruct")]
+    public class Action_SelfDestruct : AIAction
+    {
+        [Header("Explosion Stats")]
+        public float radius = 2.0f;
+        public float damage = 10f;
+        public float knockback = 20f;
+
+        [Header("Juice")]
+        public FeedbackConfigurationSO explosionFeedback;
+
+        public override void Act(PluggableAIController controller)
+        {
+            // 1. Play Feedback (Sound/VFX)
+            if (explosionFeedback)
+                explosionFeedback.Play(null, controller.transform.position);
+
+            // 2. Find Targets
+            // We use OverlapSphere to hit player OR other enemies (if friendly fire)
+            int mask = LayerMask.GetMask("Player"); // Or use GameConstants
+            Collider[] hits = UnityEngine.Physics.OverlapSphere(controller.transform.position, radius, mask);
+
+            foreach (var hit in hits)
+            {
+                IDamageable target = hit.GetComponentInParent<IDamageable>();
+                if (target != null)
+                {
+                    DamageInfo info = new DamageInfo
+                    {
+                        damageAmount = damage,
+                        pushDirection = (hit.transform.position - controller.transform.position).normalized,
+                        pushForce = knockback,
+                        source = controller.gameObject,
+                        damageType = DamageType.Explosion
+                    };
+                    target.TakeDamage(info);
+                }
+            }
+
+            // 3. Die (No Reward, because it exploded itself)
+            controller.blackboard.Controller.SelfDestruct();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Actions\Action_Visual_Prime.cs`
+- Lines: 25
+- Size: 0.8 KB
+- Modified: 2026-01-08 06:42
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DG.Tweening; // For the shake
+
+namespace DarkTowerTron.AI.Pluggable.Actions
+{
+    [CreateAssetMenu(menuName = "AI/Actions/Visuals/Prime Effect")]
+    public class Action_Visual_Prime : AIAction
+    {
+        public float shakeDuration = 0.5f;
+        public float shakeStrength = 0.5f;
+
+        public override void Act(PluggableAIController controller)
+        {
+            // 1. Visual Color Flash (Using the System we built in Phase 2)
+            if (controller.blackboard.Controller.Visuals != null)
+            {
+                controller.blackboard.Controller.Visuals.StartPrimingEffect();
+            }
+
+            // 2. Physical Shake
+            controller.transform.DOShakeScale(shakeDuration, shakeStrength, 20, 90);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Core\AIAction.cs`
+- Lines: 9
+- Size: 0.2 KB
+- Modified: 2026-01-07 19:32
 
 ```csharp
 using UnityEngine;
 
-namespace DarkTowerTron.AI.FSM
+namespace DarkTowerTron.AI.Pluggable.Core
 {
-    public class StateMachine : MonoBehaviour
+    public abstract class AIAction : ScriptableObject
     {
-        public State CurrentState { get; private set; }
+        public abstract void Act(PluggableAIController controller);
+    }
+}
+```
 
-        public void Initialize(State startingState)
+## 📄 `Assets\Modules\AI\Pluggable\Core\AIBlackboard.cs`
+- Lines: 33
+- Size: 1.0 KB
+- Modified: 2026-01-08 16:50
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Physics; // For IMover
+using DarkTowerTron.Combat;  // For PatternExecutor
+using DarkTowerTron.AI.Core; // For ContextSolver
+using DarkTowerTron.AI.Paths;
+using DarkTowerTron.Enemy;
+
+namespace DarkTowerTron.AI.Pluggable.Core
+{
+    [System.Serializable]
+    public class AIBlackboard
+    {
+        [Header("Runtime Data")]
+        public Transform Target;
+        public Vector3 MoveDirection;
+        public float StateTimeElapsed; // Resets on state change
+
+        public PatternExecutor Weapon;
+
+        [Header("Context Data")]
+        public PatrolPath patrolPath; // Assign this in the Controller Inspector!
+        public int currentWaypointIndex;
+
+        // Component Cache (Filled in Awake)
+        public IMover Mover;
+        public ContextSolver ContextSolver;
+        public DamageReceiver Health;
+        public EnemyController Controller; // Now this works
+
+        // Generic Parameters
+        public Vector3 PatrolDestination;
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Core\AIDecision.cs`
+- Lines: 9
+- Size: 0.2 KB
+- Modified: 2026-01-07 19:32
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.AI.Pluggable.Core
+{
+    public abstract class AIDecision : ScriptableObject
+    {
+        public abstract bool Decide(PluggableAIController controller);
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Core\AIState.cs`
+- Lines: 76
+- Size: 2.3 KB
+- Modified: 2026-01-08 06:41
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace DarkTowerTron.AI.Pluggable.Core
+{
+    [CreateAssetMenu(menuName = "AI/Pluggable/State")]
+    public class AIState : ScriptableObject
+    {
+        [Header("Run Once (On Enter)")]
+        public List<AIAction> onEnterActions;
+
+        [Header("Run Every Frame")]
+        public List<AIAction> actions;
+        public List<Transition> transitions;
+
+        public void EnterState(PluggableAIController controller)
         {
-            CurrentState = startingState;
-            CurrentState.Initialize(this);
-            CurrentState.Enter();
+            if (onEnterActions == null || onEnterActions.Count == 0) return;
+
+            for (int i = 0; i < onEnterActions.Count; i++)
+            {
+                var action = onEnterActions[i];
+                if (action == null) continue;
+                action.Act(controller);
+            }
         }
 
-        public void ChangeState(State newState)
+        public void UpdateState(PluggableAIController controller)
         {
-            if (CurrentState != null)
-                CurrentState.Exit();
+            DoActions(controller);
+            CheckTransitions(controller);
+        }
 
-            CurrentState = newState;
-            CurrentState.Initialize(this);
-            CurrentState.Enter();
+        private void DoActions(PluggableAIController controller)
+        {
+            if (actions == null || actions.Count == 0) return;
+
+            for (int i = 0; i < actions.Count; i++)
+            {
+                var action = actions[i];
+                if (action == null) continue;
+                action.Act(controller);
+            }
+        }
+
+        private void CheckTransitions(PluggableAIController controller)
+        {
+            if (transitions == null || transitions.Count == 0) return;
+
+            for (int i = 0; i < transitions.Count; i++)
+            {
+                var transition = transitions[i];
+                if (transition.decision == null) continue;
+
+                bool decisionSucceeded = transition.decision.Decide(controller);
+
+                if (decisionSucceeded)
+                {
+                    controller.TransitionToState(transition.trueState);
+                }
+                else
+                {
+                    controller.TransitionToState(transition.falseState);
+                }
+            }
+        }
+    }
+
+    [System.Serializable]
+    public struct Transition
+    {
+        public AIDecision decision;
+        public AIState trueState;
+        public AIState falseState; // Usually "RemainState"
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Core\PluggableAIController.cs`
+- Lines: 140
+- Size: 5.0 KB
+- Modified: 2026-01-08 16:51
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Physics;
+using DarkTowerTron.Combat;
+using DarkTowerTron.AI.Core;
+using DarkTowerTron.AI.Paths;
+using DarkTowerTron.Enemy; // For EnemyController
+
+namespace DarkTowerTron.AI.Pluggable.Core
+{
+    [RequireComponent(typeof(IMover))]
+    [RequireComponent(typeof(ContextSolver))]
+    [RequireComponent(typeof(EnemyController))]
+    public class PluggableAIController : MonoBehaviour
+    {
+        [Header("Configuration")]
+        public AIState currentState;
+        public AIState remainState; // Special "Do Nothing" state marker
+
+        [Header("Setup")]
+        [Tooltip("Optional. If empty, auto-searches for a PatternExecutor on self/children.")]
+        public PatternExecutor specificWeapon;
+
+        [Header("Debug")]
+        public bool aiActive = true;
+        public AIBlackboard blackboard; // Exposed for Inspector debugging
+
+        private void Awake()
+        {
+            blackboard ??= new AIBlackboard();
+
+            // The AI needs a mover. EnemyMotor is the preferred component for full AI behavior.
+            // A fallback to other movers might result in simplified or incorrect behavior.
+            var motor = GetComponent<EnemyMotor>();
+            if (motor != null)
+            {
+                blackboard.Mover = motor;
+            }
+            else
+            {
+                // Fallback to any IMover, which is guaranteed by [RequireComponent]
+                var mover = GetComponent<IMover>();
+                blackboard.Mover = mover;
+                Debug.LogWarning($"[AI Setup] {name} is using a fallback mover '{mover.GetType().Name}'. " +
+                                 "This may cause unintended behavior. Consider adding an 'EnemyMotor' component for full AI capabilities.", gameObject);
+            }
+
+            blackboard.ContextSolver = GetComponent<ContextSolver>();
+            blackboard.Health = GetComponent<DamageReceiver>();
+            blackboard.Controller = GetComponent<EnemyController>();
+
+            // --- WEAPON SETUP ---
+            if (specificWeapon != null)
+            {
+                blackboard.Weapon = specificWeapon;
+            }
+            else
+            {
+                blackboard.Weapon = GetComponent<PatternExecutor>();
+                if (blackboard.Weapon == null)
+                {
+                    // Auto-add if missing (Fire and Forget)
+                    blackboard.Weapon = gameObject.AddComponent<PatternExecutor>();
+                    // PatternExecutor requires FirePointRegistry; Unity will add it due to [RequireComponent]
+                }
+            }
+        }
+
+        private void Start()
+        {
+            // Find Player (using Service Locator logic ideally, or global find for now)
+            if (DarkTowerTron.Core.GameServices.Player != null)
+                blackboard.Target = DarkTowerTron.Core.GameServices.Player.transform;
+
+            // Setup ContextSolver target
+            if (blackboard.ContextSolver != null)
+            {
+                var aiData = GetComponent<AIData>();
+                if (aiData) aiData.currentTarget = blackboard.Target;
+            }
+
+            if (currentState != null)
+            {
+                blackboard.StateTimeElapsed = 0f;
+                currentState.EnterState(this);
+            }
         }
 
         private void Update()
         {
-            if (CurrentState != null) CurrentState.LogicUpdate();
+            if (!aiActive || blackboard.Controller.IsStaggered) return;
+
+            blackboard.StateTimeElapsed += Time.deltaTime;
+            if (currentState != null)
+            {
+                currentState.UpdateState(this);
+            }
         }
 
-        private void FixedUpdate()
+        public void TransitionToState(AIState nextState)
         {
-            if (CurrentState != null) CurrentState.PhysicsUpdate();
+            if (nextState != remainState)
+            {
+                currentState = nextState;
+                blackboard.StateTimeElapsed = 0f;
+
+                // --- NEW: Execute OnEnter Actions ---
+                if (currentState != null && currentState.onEnterActions != null)
+                {
+                    for (int i = 0; i < currentState.onEnterActions.Count; i++)
+                    {
+                        var action = currentState.onEnterActions[i];
+                        if (action == null) continue;
+                        action.Act(this);
+                    }
+                }
+            }
+        }
+
+        // Add this helper so you can assign the path in the Prefab/Scene
+        public void SetPatrolPath(PatrolPath path)
+        {
+            if (blackboard == null)
+            {
+                blackboard = new AIBlackboard();
+            }
+
+            blackboard.patrolPath = path;
+        }
+
+        // Draw Gizmos to see current state in Scene View
+        private void OnDrawGizmos()
+        {
+            if (currentState != null)
+            {
+                Gizmos.color = Color.green;
+                UnityEditor.Handles.Label(transform.position + Vector3.up * 2.5f, $"State: {currentState.name}");
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Decisions\Decision_InRange.cs`
+- Lines: 30
+- Size: 0.9 KB
+- Modified: 2026-01-08 07:09
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+
+namespace DarkTowerTron.AI.Pluggable.Decisions
+{
+    [CreateAssetMenu(menuName = "AI/Decisions/In Range")]
+    public class Decision_InRange : AIDecision
+    {
+        public float range = 1.5f;
+
+        public override bool Decide(PluggableAIController controller)
+        {
+            if (controller.blackboard.Target == null) return false;
+
+            // 1. Get Positions
+            Vector3 myPos = controller.transform.position;
+            Vector3 targetPos = controller.blackboard.Target.position;
+
+            // 2. Flatten Y (Ignore Height)
+            // This turns the check from a Sphere into a Cylinder (Infinite height)
+            myPos.y = 0;
+            targetPos.y = 0;
+
+            // 3. Compare Squared Distance (Optimization)
+            float distSqr = (myPos - targetPos).sqrMagnitude;
+
+            return distSqr < (range * range);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Decisions\Decision_LineOfSight.cs`
+- Lines: 33
+- Size: 1.0 KB
+- Modified: 2026-01-08 07:17
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DarkTowerTron.Core; // GameConstants
+
+namespace DarkTowerTron.AI.Pluggable.Decisions
+{
+    [CreateAssetMenu(menuName = "AI/Decisions/Line Of Sight")]
+    public class Decision_LineOfSight : AIDecision
+    {
+        public float range = 15f;
+        public LayerMask blockLayer;
+
+        public override bool Decide(PluggableAIController controller)
+        {
+            if (controller.blackboard.Target == null) return false;
+
+            Vector3 eyePos = controller.transform.position + Vector3.up * 1.0f;
+            Vector3 targetPos = controller.blackboard.Target.position + Vector3.up * 1.0f;
+            Vector3 dir = targetPos - eyePos;
+            float dist = dir.magnitude;
+
+            if (dist > range) return false;
+
+            // Check if wall is in between
+            if (UnityEngine.Physics.Raycast(eyePos, dir, dist, blockLayer))
+            {
+                return false; // Hit a wall
+            }
+
+            return true; // Clear shot
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Pluggable\Decisions\Decision_TimeElapsed.cs`
+- Lines: 16
+- Size: 0.4 KB
+- Modified: 2026-01-07 19:33
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+
+namespace DarkTowerTron.AI.Pluggable.Decisions
+{
+    [CreateAssetMenu(menuName = "AI/Decisions/Time Elapsed")]
+    public class Decision_TimeElapsed : AIDecision
+    {
+        public float duration = 2.0f;
+
+        public override bool Decide(PluggableAIController controller)
+        {
+            return controller.blackboard.StateTimeElapsed >= duration;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Modules\AI\Utils\AIDebugger.cs`
+- Lines: 74
+- Size: 2.8 KB
+- Modified: 2026-01-08 13:47
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Pluggable.Core;
+using DarkTowerTron.Enemy;
+
+namespace DarkTowerTron.AI.Utils
+{
+    [ExecuteAlways]
+    public class AIDebugger : MonoBehaviour
+    {
+        [Header("Settings")]
+        public bool showGizmos = true;
+        public float lineScale = 2.0f;
+
+        [Header("References")]
+        public PluggableAIController controller;
+        public EnemyMotor motor;
+
+        private void OnEnable()
+        {
+            if (controller == null) controller = GetComponent<PluggableAIController>();
+            if (motor == null) motor = GetComponent<EnemyMotor>();
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!showGizmos || Application.isPlaying == false) return;
+
+            Vector3 pos = transform.position + Vector3.up * 1.0f; // Lift up to see better
+
+            // 1. Draw ACTUAL Velocity (Green) - Where we are actually going
+            if (motor != null)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawRay(pos, motor.Velocity.normalized * lineScale);
+                // Draw arrow head
+                Vector3 velTip = pos + motor.Velocity.normalized * lineScale;
+                Gizmos.DrawSphere(velTip, 0.1f);
+            }
+
+            // 2. Draw LOGIC Intent (Yellow) - Where the Blackboard says we should go
+            if (controller != null && controller.blackboard != null)
+            {
+                // Note: You need to ensure your Actions actually write to 'MoveDirection' in Blackboard
+                // Currently Action_Patrol calculates it locally. We should fix that.
+                /* 
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawRay(pos, controller.blackboard.MoveDirection * lineScale * 0.8f);
+                */
+            }
+
+            // 3. Draw TARGET Line (Red)
+            if (controller != null && controller.blackboard != null)
+            {
+                // Target Entity
+                if (controller.blackboard.Target != null)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(pos, controller.blackboard.Target.position);
+                }
+                // Patrol Target
+                else if (controller.blackboard.patrolPath != null && controller.blackboard.patrolPath.waypoints.Count > 0)
+                {
+                    var wp = controller.blackboard.patrolPath.waypoints[controller.blackboard.currentWaypointIndex];
+                    if (wp != null)
+                    {
+                        Gizmos.color = new Color(1, 0.5f, 0); // Orange
+                        Gizmos.DrawLine(pos, wp.transform.position);
+                        Gizmos.DrawWireSphere(wp.transform.position, 0.5f);
+                    }
+                }
+            }
         }
     }
 }
@@ -2760,56 +4108,129 @@ namespace DarkTowerTron.AI.Utils
 ```
 
 ## 📄 `Assets\Scripts\Combat\BaseHitbox.cs`
-- Lines: 32
-- Size: 0.9 KB
-- Modified: 2026-01-06 09:15
+- Lines: 44
+- Size: 1.3 KB
+- Modified: 2026-01-08 18:24
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
+using UnityEngine;
 
 namespace DarkTowerTron.Combat
 {
     public abstract class BaseHitbox : MonoBehaviour, IDamageable
     {
-        // CHANGED: Now references the new Orchestrator
-        [SerializeField] protected DamageReceiver _receiver;
+        // CHANGED: Use Interface, not concrete class
+        protected IDamageable _damageableParent;
 
         protected virtual void Awake()
         {
-            // Auto-link
-            if (_receiver == null) _receiver = GetComponentInParent<DamageReceiver>();
+            // Auto-link: Look for ANY damageable component in parents
+            // BUT ensure we don't grab ourselves!
+            if (_damageableParent != null) return;
+
+            var damageables = GetComponentsInParent<IDamageable>();
+            for (int i = 0; i < damageables.Length; i++)
+            {
+                var d = damageables[i];
+                if (d == null) continue;
+
+                // Skip self (this hitbox also implements IDamageable)
+                if (ReferenceEquals(d, this)) continue;
+
+                _damageableParent = d;
+                break;
+            }
         }
 
         public virtual bool TakeDamage(DamageInfo info)
         {
-            // If no receiver, we still accept the hit but do nothing (Prop logic)
-            if (_receiver != null) 
-            {
-                return _receiver.TakeDamage(info);
-            }
+            // Forward damage to the main health component
+            if (_damageableParent != null)
+                return _damageableParent.TakeDamage(info);
             return true;
         }
 
         public virtual void Kill(bool instant)
         {
-            if (_receiver) _receiver.Kill(instant);
+            if (_damageableParent != null) _damageableParent.Kill(instant);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\ContactDamager.cs`
+- Lines: 53
+- Size: 1.7 KB
+- Modified: 2026-01-09 07:04
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+
+
+namespace DarkTowerTron.Combat
+{
+    public class ContactDamager : MonoBehaviour
+    {
+        public float damage = 1f;
+        public float pushForce = 10f;
+        public float damageCooldown = 1.0f;
+        public bool destroySelfOnHit = false; // Turn on for Kamikaze units
+
+        private float _lastHitTime;
+
+        private void OnTriggerStay(Collider other)
+        {
+
+            GameLogger.Log(LogChannel.Combat, $"ContactDamager triggered with {other.name}", gameObject);
+
+            if (Time.time < _lastHitTime + damageCooldown) return;
+
+            // Check Tag (Optimization)
+            if (!other.CompareTag(GameConstants.TAG_PLAYER)) return;
+
+            IDamageable target = other.GetComponentInParent<IDamageable>();
+            if (target != null)
+            {
+                Vector3 pushDir = (other.transform.position - transform.position).normalized;
+
+                DamageInfo info = new DamageInfo
+                {
+                    damageAmount = damage,
+                    pushDirection = pushDir,
+                    pushForce = pushForce,
+                    source = gameObject,
+                    damageType = DamageType.Melee
+                };
+
+                if (target.TakeDamage(info))
+                {
+                    _lastHitTime = Time.time;
+                    if (destroySelfOnHit)
+                    {
+                        var health = GetComponent<IDamageable>();
+                        if (health != null) health.Kill(false);
+                    }
+                }
+            }
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Combat\DamageReceiver.cs`
-- Lines: 198
-- Size: 6.6 KB
-- Modified: 2026-01-06 11:43
+- Lines: 209
+- Size: 7.1 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Managers;
-
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -2835,6 +4256,13 @@ namespace DarkTowerTron.Combat
 
         [Header("Execution Settings")]
         [SerializeField] private bool _keepPlayerGrounded = true; // Default True for Enemies
+
+        [Header("Juice")]
+        [Tooltip("Played when taking damage (Health or Shield).")]
+        [SerializeField] private FeedbackConfigurationSO _hitFeedback;
+
+        [Tooltip("Played when Health reaches zero.")]
+        [SerializeField] private FeedbackConfigurationSO _deathFeedback;
 
         // Dependencies
         private VitalityModule _vitality;
@@ -2934,6 +4362,8 @@ namespace DarkTowerTron.Combat
                 _vitality.TakeDamage(info.damageAmount);
             }
 
+            if (_hitFeedback != null) _hitFeedback.Play(gameObject, transform.position);
+
             OnHitProcessed?.Invoke(info);
             return true;
         }
@@ -2941,6 +4371,8 @@ namespace DarkTowerTron.Combat
         public void Kill(bool rewardPlayer)
         {
             if (IsDead) return;
+
+            if (_deathFeedback != null) _deathFeedback.Play(gameObject, transform.position);
             
             // Fire event immediately
             OnDeathProcessed?.Invoke(_stats, rewardPlayer);
@@ -3005,15 +4437,84 @@ namespace DarkTowerTron.Combat
 }
 ```
 
-## 📄 `Assets\Scripts\Combat\HazardZone.cs`
-- Lines: 91
-- Size: 3.0 KB
-- Modified: 2026-01-06 09:15
+## 📄 `Assets\Scripts\Combat\FirePointRegistry.cs`
+- Lines: 61
+- Size: 1.8 KB
+- Modified: 2026-01-08 16:48
 
 ```csharp
 using UnityEngine;
+using System.Collections.Generic;
+
+namespace DarkTowerTron.Combat
+{
+    public class FirePointRegistry : MonoBehaviour
+    {
+        [System.Serializable]
+        public struct NamedPoint
+        {
+            public string id;
+            public Transform point;
+        }
+
+        [Header("Configuration")]
+        [Tooltip("If empty, auto-collects children starting with 'FirePoint_'.")]
+        public List<NamedPoint> points = new List<NamedPoint>();
+
+        private Dictionary<string, Transform> _lookup = new Dictionary<string, Transform>();
+
+        private void Awake()
+        {
+            // 1. Load Manual Assignments
+            foreach (var p in points)
+            {
+                if (!string.IsNullOrEmpty(p.id) && p.point != null)
+                    _lookup[p.id] = p.point;
+            }
+
+            // 2. Auto-Discovery (Naming Convention: "FirePoint_Muzzle")
+            var children = GetComponentsInChildren<Transform>(true);
+            foreach (var t in children)
+            {
+                if (t.name.StartsWith("FirePoint_"))
+                {
+                    string id = t.name.Replace("FirePoint_", ""); // "Muzzle"
+                    if (!_lookup.ContainsKey(id))
+                    {
+                        _lookup.Add(id, t);
+                    }
+                }
+            }
+
+            // 3. Fallback "Default"
+            if (!_lookup.ContainsKey("Default"))
+            {
+                _lookup["Default"] = transform;
+            }
+        }
+
+        public Transform GetPoint(string id)
+        {
+            if (string.IsNullOrEmpty(id)) id = "Default";
+
+            if (_lookup.TryGetValue(id, out Transform t)) return t;
+
+            // Graceful failure
+            return _lookup["Default"];
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\HazardZone.cs`
+- Lines: 91
+- Size: 3.0 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
 using DarkTowerTron.Core;
 using DG.Tweening;
+using UnityEngine;
 
 namespace DarkTowerTron.Combat
 {
@@ -3105,17 +4606,15 @@ namespace DarkTowerTron.Combat
 ```
 
 ## 📄 `Assets\Scripts\Combat\HitBox\ShieldHitbox.cs`
-- Lines: 153
+- Lines: 152
 - Size: 4.8 KB
-- Modified: 2026-01-06 09:45
+- Modified: 2026-01-08 18:01
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Events; // NEW: For Popup Text
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
-
-// ALIAS: Resolves Services conflict
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Combat
@@ -3151,7 +4650,7 @@ namespace DarkTowerTron.Combat
 
         protected override void Awake()
         {
-            base.Awake();
+            base.Awake(); // Sets up _damageableParent
 
             _propBlock = new MaterialPropertyBlock();
             _baseColorID = Shader.PropertyToID("_BaseColor");
@@ -3179,7 +4678,8 @@ namespace DarkTowerTron.Combat
 
         public override bool TakeDamage(DamageInfo info)
         {
-            if (_receiver == null) return false;
+            // FIX: Use the Interface reference from BaseHitbox
+            if (_damageableParent == null) return false;
 
             if (isBroken) return base.TakeDamage(info);
 
@@ -3441,18 +4941,160 @@ namespace DarkTowerTron.Combat
 }
 ```
 
-## 📄 `Assets\Scripts\Combat\Projectile.cs`
-- Lines: 176
-- Size: 6.0 KB
-- Modified: 2026-01-06 09:15
+## 📄 `Assets\Scripts\Combat\PatternExecutor.cs`
+- Lines: 133
+- Size: 4.6 KB
+- Modified: 2026-01-08 23:38
 
 ```csharp
 using UnityEngine;
+using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Combat.Strategies;
+using DarkTowerTron.Core.Data;
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
 
-// ALIAS: Resolves the conflict between 'Services' (Namespace) and 'Services' (Class)
-using Global = DarkTowerTron.Core.Services.Services; 
+namespace DarkTowerTron.Combat
+{
+    [RequireComponent(typeof(FirePointRegistry))]
+    public class PatternExecutor : MonoBehaviour
+    {
+        private FirePointRegistry _registry;
+        private bool _isFiring;
+
+        // Exposed for AI Decision making
+        public bool IsFiring => _isFiring;
+
+        private void Awake()
+        {
+            _registry = GetComponent<FirePointRegistry>();
+        }
+
+        public bool Fire(AttackPatternSO pattern, EnemyAttackSO stats, Transform target)
+        {
+            if (_isFiring) return false; // Busy
+            if (pattern == null || stats == null || stats.projectilePrefab == null) return false;
+
+            StartCoroutine(ExecuteRoutine(pattern, stats, target));
+            return true;
+        }
+
+        public void StopFiring()
+        {
+            StopAllCoroutines();
+            _isFiring = false;
+        }
+
+        private IEnumerator ExecuteRoutine(AttackPatternSO pattern, EnemyAttackSO stats, Transform target)
+        {
+            _isFiring = true;
+
+            // 1. Resolve Fire Point
+            Transform firePoint = _registry.GetPoint(pattern.firePointID);
+
+            // 2. Resolve Smart Aim Target (Optimization: Check once per burst)
+            IAimTarget aimTarget = null;
+            if (target != null)
+            {
+                aimTarget = target.GetComponent<IAimTarget>();
+                if (aimTarget == null) aimTarget = target.GetComponentInChildren<IAimTarget>();
+            }
+
+            // 3. Windup
+            yield return new WaitForSeconds(pattern.startDelay);
+
+            // 4. Burst Loop
+            float spinOffset = 0f;
+
+            for (int i = 0; i < pattern.projectileCount; i++)
+            {
+                // Dynamic Aim Calculation per shot (Tracks moving player)
+                Vector3 aimDir = firePoint.forward;
+
+                if (pattern.aimMode == AimType.TargetPlayer && target != null)
+                {
+                    Vector3 targetPos;
+
+                    // --- SMART AIM LOGIC ---
+                    if (aimTarget != null)
+                    {
+                        targetPos = aimTarget.AimPoint;
+                    }
+                    else
+                    {
+                        // Fallback: Guess center mass
+                        targetPos = target.position + Vector3.up;
+                    }
+                    // -----------------------
+
+                    aimDir = (targetPos - firePoint.position).normalized;
+                }
+
+                // Apply Spin
+                if (pattern.spinDuringFire)
+                {
+                    spinOffset += pattern.spinSpeed * pattern.delayBetweenShots; // Increment spin
+                    aimDir = Quaternion.Euler(0, spinOffset, 0) * aimDir;
+                }
+
+                // Apply Spread (Random noise)
+                float totalSpread = pattern.spreadAngle + stats.spreadAngle;
+                if (totalSpread > 0)
+                {
+                    float noise = Random.Range(-totalSpread / 2f, totalSpread / 2f);
+                    aimDir = Quaternion.Euler(0, noise, 0) * aimDir;
+                }
+
+                SpawnProjectile(pattern, stats, firePoint.position, aimDir);
+
+                if (pattern.delayBetweenShots > 0)
+                    yield return new WaitForSeconds(pattern.delayBetweenShots);
+            }
+
+            // 5. Cooldown
+            yield return new WaitForSeconds(pattern.cooldownAfterBurst);
+
+            _isFiring = false;
+        }
+
+        private void SpawnProjectile(AttackPatternSO pattern, EnemyAttackSO stats, Vector3 pos, Vector3 dir)
+        {
+            if (Global.Pool == null) return;
+
+            GameObject p = Global.Pool.Spawn(stats.projectilePrefab, pos, Quaternion.LookRotation(dir));
+            var proj = p.GetComponent<Projectile>();
+            if (proj)
+            {
+                proj.ResetHostility(true);
+
+                proj.damage = stats.damage;
+                proj.stagger = stats.stagger;
+
+                // Prefer stats as the source of truth for ballistics; fallback to pattern if needed.
+                proj.speed = stats.projectileSpeed > 0 ? stats.projectileSpeed : pattern.speed;
+                if (stats.lifetime > 0) proj.lifetime = stats.lifetime;
+
+                proj.SetSource(gameObject); // Ignore self
+                proj.Initialize(dir);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Combat\Projectile.cs`
+- Lines: 283
+- Size: 10.3 KB
+- Modified: 2026-01-08 18:21
+
+```csharp
+using System.Collections.Generic;
+using DarkTowerTron.Combat.Strategies;
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Feedback;
+using UnityEngine;
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Combat
 {
@@ -3470,6 +5112,10 @@ namespace DarkTowerTron.Combat
         public int stagger = 1;
         public DamageType damageType = DamageType.Projectile;
 
+        [Header("Juice")]
+        public FeedbackConfigurationSO spawnFeedback;
+        public FeedbackConfigurationSO impactFeedback;
+
         [Header("Visuals")]
         public Renderer meshRenderer; 
         public Material friendlyMaterial; 
@@ -3483,17 +5129,61 @@ namespace DarkTowerTron.Combat
         private bool _isRedirected = false; 
         private float _lifeTimer;
         private bool _wasDeflectedThisFrame = false;
+        private List<Collider> _ignoredColliders = new List<Collider>();
 
-        public void OnSpawn() { }
+        public void OnSpawn()
+        {
+            // LOG 1: Check initial state coming out of pool
+            GameLogger.Log(LogChannel.Combat, $"[PROJ] OnSpawn - Pos: {transform.position} | Active: {gameObject.activeSelf}", gameObject);
+
+            // 1. SAFE PHYSICS RESET
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                // Only reset velocity if the body is NOT Kinematic
+                // (Kinematic bodies are moved by transform, so velocity doesn't apply)
+                if (!rb.isKinematic)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    rb.Sleep();
+                }
+                else
+                {
+                    // Verify if we are kinematic
+                    GameLogger.Log(LogChannel.Combat, "[PROJ] Body is Kinematic. Skipping velocity reset.", gameObject);
+                }
+            }
+
+            // 2. RESET TRAILS
+            var trail = GetComponent<TrailRenderer>();
+            if (trail != null)
+            {
+                trail.emitting = false;
+                trail.Clear();
+                GameLogger.Log(LogChannel.Combat, "[PROJ] Trail Cleared.", gameObject);
+            }
+
+            // 3. Play spawn feedback
+            if (spawnFeedback != null) spawnFeedback.Play(gameObject, transform.position);
+        }
 
         public void OnDespawn() 
         {
+            // 1. Clean up Physics (CRITICAL for Pooling)
+            ResetIgnoredColliders();
+
+            // 2. Reset Logic
             _isInitialized = false;
             _movementStrategy = null; 
+            _source = null;
+            isHostile = true; // Reset default hostility
         }
 
         public void Initialize(Vector3 dir)
         {
+            // LOG 2: Check state right before moving
+            GameLogger.Log(LogChannel.Combat, $"[PROJ] Initialize - Dir: {dir} | StartPos: {transform.position}", gameObject);
+
             if (_movementStrategy == null) SetStrategy(new LinearMovement());
 
             _direction = dir.normalized;
@@ -3504,11 +5194,62 @@ namespace DarkTowerTron.Combat
             _isRedirected = false;
             
             UpdateVisuals();
+
+            // 4. RE-ENABLE TRAIL (The second half of the fix)
+            var trail = GetComponent<TrailRenderer>();
+            if (trail != null)
+            {
+                trail.Clear();
+                trail.emitting = true;
+                GameLogger.Log(LogChannel.Combat, "[PROJ] Trail Restarted.", gameObject);
+            }
         }
 
         public void SetStrategy(IMovementStrategy strategy) => _movementStrategy = strategy;
-        public void SetSource(GameObject source) => _source = source;
+        
+        public void SetSource(GameObject source)
+        {
+            _source = source;
+            
+            // 1. Reset previous ignores (Safety if reused without Despawn)
+            ResetIgnoredColliders();
+
+            if (_source != null)
+            {
+                Collider myCol = GetComponent<Collider>();
+                Collider[] sourceCols = _source.GetComponentsInChildren<Collider>();
+
+                foreach (Collider c in sourceCols)
+                {
+                    // CRITICAL: Don't ignore triggers (like detection zones), only physical blockers
+                    if (!c.isTrigger) 
+                    {
+                        UnityEngine.Physics.IgnoreCollision(myCol, c, true);
+                        _ignoredColliders.Add(c); // Remember this so we can undo it
+                    }
+                }
+            }
+        }
+        
         public void ResetHostility(bool startHostile) { isHostile = startHostile; UpdateVisuals(); }
+
+        private void ResetIgnoredColliders()
+        {
+            Collider myCol = GetComponent<Collider>();
+            
+            // If our collider was destroyed or missing, we can't un-ignore
+            if (myCol == null) return;
+
+            // Loop backwards or forwards, doesn't matter here
+            foreach (Collider c in _ignoredColliders)
+            {
+                if (c != null)
+                {
+                    UnityEngine.Physics.IgnoreCollision(myCol, c, false);
+                }
+            }
+            _ignoredColliders.Clear();
+        }
 
         private void Update()
         {
@@ -3527,7 +5268,8 @@ namespace DarkTowerTron.Combat
             {
                 int mask = GameConstants.MASK_PROJECTILE_COLLISION;
 
-                if (UnityEngine.Physics.Raycast(oldPos, travelVec.normalized, out RaycastHit hit, moveDistance, mask))
+                // Ensure the Raycast detects Trigger hitboxes (e.g. Player/Enemy hitbox colliders)
+                if (UnityEngine.Physics.Raycast(oldPos, travelVec.normalized, out RaycastHit hit, moveDistance, mask, QueryTriggerInteraction.Collide))
                 {
                     if (_source != null && (hit.collider.gameObject == _source || hit.transform.IsChildOf(_source.transform)))
                     {
@@ -3545,15 +5287,18 @@ namespace DarkTowerTron.Combat
 
         private void HandleCollision(Collider other)
         {
-            if (other.isTrigger && other.GetComponent<ShieldHitbox>() == null) return;
+            // If this is a trigger and NOT a hitbox/health component, ignore it (it's likely a zone)
+            IDamageable target = other.GetComponent<IDamageable>();
+            if (target == null) target = other.GetComponentInParent<IDamageable>();
+            if (other.isTrigger && target == null) return;
 
             if (other.gameObject.layer == GameConstants.LAYER_WALL || other.gameObject.layer == GameConstants.LAYER_DEFAULT)
             {
+                if (impactFeedback != null) impactFeedback.Play(null, transform.position);
                 Despawn();
                 return;
             }
 
-            IDamageable target = other.GetComponentInParent<IDamageable>();
             if (target != null)
             {
                 if (isHostile && other.CompareTag(GameConstants.TAG_ENEMY)) return;
@@ -3565,13 +5310,14 @@ namespace DarkTowerTron.Combat
                     staggerAmount = this.stagger,
                     pushDirection = transform.forward,
                     pushForce = 5f,
-                    source = _source,
+                    source = gameObject,
                     isRedirected = this._isRedirected,
                     damageType = this.damageType
                 };
 
                 if (target.TakeDamage(info))
                 {
+                    if (impactFeedback != null) impactFeedback.Play(null, transform.position);
                     if (!_wasDeflectedThisFrame) Despawn();
                 }
             }
@@ -3617,6 +5363,8 @@ namespace DarkTowerTron.Combat
 
         private void Despawn()
         {
+            GameLogger.Log(LogChannel.Combat, $"[PROJ] Despawn at {transform.position}", gameObject);
+
             // USE ALIAS 'Global' to avoid namespace collision
             if (Global.Pool) Global.Pool.Despawn(gameObject);
             else Destroy(gameObject);
@@ -3980,9 +5728,9 @@ namespace DarkTowerTron.Core.Data
 ```
 
 ## 📄 `Assets\Scripts\Core\Data\AttackPatternSO.cs`
-- Lines: 30
-- Size: 1.1 KB
-- Modified: 2025-12-30 09:50
+- Lines: 37
+- Size: 1.3 KB
+- Modified: 2026-01-08 16:47
 
 ```csharp
 using UnityEngine;
@@ -3999,6 +5747,10 @@ namespace DarkTowerTron.Core.Data
     [CreateAssetMenu(menuName = "DarkTowerTron/Combat/Attack Pattern")]
     public class AttackPatternSO : ScriptableObject
     {
+        [Header("Anatomy")]
+        [Tooltip("Must match an ID in the Enemy's FirePointRegistry (e.g. 'Muzzle', 'Eye').")]
+        public string firePointID = "Default";
+
         [Header("Aiming & Visuals")]
         public AimType aimMode = AimType.TargetPlayer;
         public float scaleMultiplier = 1.0f; // Boss bullets are huge
@@ -4013,6 +5765,9 @@ namespace DarkTowerTron.Core.Data
         [Header("Timing")]
         public float startDelay = 0.5f;      // Windup time
         public float delayBetweenShots = 0.1f; // Time between individual bullets in a burst/stream
+
+        [Header("Cooldown")]
+        public float cooldownAfterBurst = 1.0f; // Enforce pacing
     }
 }
 ```
@@ -4200,13 +5955,14 @@ namespace DarkTowerTron.Core.Data
 ```
 
 ## 📄 `Assets\Scripts\Core\Data\DebugProfileSO.cs`
-- Lines: 53
+- Lines: 54
 - Size: 1.8 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 05:58
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
+using DarkTowerTron.Core.Debug;
 
 namespace DarkTowerTron.Core.Data
 {
@@ -4693,14 +6449,14 @@ namespace DarkTowerTron.Core.Data
 ## 📄 `Assets\Scripts\Core\Debug\GameLogger.cs`
 - Lines: 51
 - Size: 1.9 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
-using System.Diagnostics; // Required for Conditional attribute
+using System.Diagnostics;
 using DarkTowerTron.Core.Data;
+using UnityEngine;
 
-namespace DarkTowerTron.Core
+namespace DarkTowerTron.Core.Debug
 {
     public static class GameLogger
     {
@@ -4749,12 +6505,35 @@ namespace DarkTowerTron.Core
 }
 ```
 
-## 📄 `Assets\Scripts\Core\Events\BoolEventChannelSO.cs`
-- Lines: 17
-- Size: 0.4 KB
-- Modified: 2026-01-06 09:15
+## 📄 `Assets\Scripts\Core\Debug\LogChannel.cs`
+- Lines: 14
+- Size: 0.5 KB
+- Modified: 2026-01-08 05:51
 
 ```csharp
+namespace DarkTowerTron.Core.Debug
+{
+    public enum LogChannel
+    {
+        General,    // Default
+        Player,     // Input, Movement, State
+        AI,         // Decisions, State changes, Pathing
+        Combat,     // Damage, Projectiles, Hitboxes
+        UI,         // Menu navigation, HUD updates
+        Physics,    // Collisions, Triggers
+        System,     // Wave Manager, Loading, Saving
+        VFX         // Particles, Audio
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\BoolEventChannelSO.cs`
+- Lines: 21
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -4767,18 +6546,22 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(bool value)
         {
-            OnEventRaised?.Invoke(value);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(value);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"Bool Event [{name}] was raised but nothing picked it up.");
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Core\Events\DamageTextEventChannelSO.cs`
-- Lines: 23
-- Size: 0.8 KB
-- Modified: 2026-01-06 09:52
+- Lines: 35
+- Size: 1.2 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -4791,28 +6574,40 @@ namespace DarkTowerTron.Core.Events
         public UnityAction<Vector3, float, bool, bool> OnEventRaised;
 
         public void Raise(Vector3 pos, float amount, bool isCrit, bool isStagger)
-            => OnEventRaised?.Invoke(pos, amount, isCrit, isStagger);
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(pos, amount, isCrit, isStagger);
+            else
+                GameLogger.LogWarning(LogChannel.UI, $"DamageText Event [{name}] was raised but nothing picked it up.");
+        }
     }
 
     [CreateAssetMenu(menuName = "Events/Popup Text Channel")]
     public class PopupTextEventChannelSO : ScriptableObject
     {
         public UnityAction<Vector3, string> OnEventRaised;
+
         public void Raise(Vector3 pos, string message)
-            => OnEventRaised?.Invoke(pos, message);
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(pos, message);
+            else
+                GameLogger.LogWarning(LogChannel.UI, $"PopupText Event [{name}] was raised but nothing picked it up.");
+        }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Core\Events\EnemyKilledEventChannelSO.cs`
-- Lines: 18
-- Size: 0.6 KB
-- Modified: 2026-01-06 09:15
+- Lines: 22
+- Size: 0.8 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
-using DarkTowerTron.Core.Data; // For EnemyStatsSO
 
 namespace DarkTowerTron.Core.Events
 {
@@ -4824,18 +6619,22 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(Vector3 position, EnemyStatsSO stats, bool rewardPlayer)
         {
-            OnEventRaised?.Invoke(position, stats, rewardPlayer);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(position, stats, rewardPlayer);
+            else
+                GameLogger.LogWarning(LogChannel.Combat, $"EnemyKilled Event [{name}] was raised but nothing picked it up.");
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Core\Events\FloatFloatEventChannelSO.cs`
-- Lines: 17
-- Size: 0.4 KB
-- Modified: 2026-01-06 09:15
+- Lines: 21
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -4848,18 +6647,50 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(float current, float max)
         {
-            OnEventRaised?.Invoke(current, max);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(current, max);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"FloatFloat Event [{name}] was raised but nothing picked it up.");
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\IntEventChannelSO.cs`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Int Event Channel")]
+    public class IntEventChannelSO : ScriptableObject
+    {
+        public UnityAction<int> OnEventRaised;
+
+        public void Raise(int value)
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(value);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"Int Event [{name}] was raised but nothing picked it up.");
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Core\Events\IntIntEventChannelSO.cs`
-- Lines: 17
-- Size: 0.4 KB
-- Modified: 2026-01-06 09:15
+- Lines: 21
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -4872,18 +6703,106 @@ namespace DarkTowerTron.Core.Events
 
         public void Raise(int current, int max)
         {
-            OnEventRaised?.Invoke(current, max);
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(current, max);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"IntInt Event [{name}] was raised but nothing picked it up.");
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\StringEventChannelSO.cs`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/String Event Channel")]
+    public class StringEventChannelSO : ScriptableObject
+    {
+        public UnityAction<string> OnEventRaised;
+
+        public void Raise(string value)
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(value);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"String Event [{name}] was raised but nothing picked it up.");
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\TransformEventChannelSO.cs`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Transform Event Channel")]
+    public class TransformEventChannelSO : ScriptableObject
+    {
+        public UnityAction<Transform> OnEventRaised;
+
+        public void Raise(Transform value)
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(value);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"Transform Event [{name}] was raised but nothing picked it up.");
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\Vector3EventChannelSO.cs`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Vector3 Event Channel")]
+    public class Vector3EventChannelSO : ScriptableObject
+    {
+        public UnityAction<Vector3> OnEventRaised;
+
+        public void Raise(Vector3 value)
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(value);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"Vector3 Event [{name}] was raised but nothing picked it up.");
         }
     }
 }
 ```
 
 ## 📄 `Assets\Scripts\Core\Events\VoidEventChannelSO.cs`
-- Lines: 19
-- Size: 0.5 KB
-- Modified: 2026-01-06 09:15
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -4899,7 +6818,7 @@ namespace DarkTowerTron.Core.Events
             if (OnEventRaised != null)
                 OnEventRaised.Invoke();
             else
-                Debug.LogWarning($"Void Event [{name}] was raised but nothing picked it up.");
+                GameLogger.LogWarning(LogChannel.System, $"Void Event [{name}] was raised but nothing picked it up.");
         }
     }
 }
@@ -4942,10 +6861,207 @@ namespace DarkTowerTron.Core.Events
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Feedback\Command\CameraShakeCommand.cs`
+- Lines: 20
+- Size: 0.6 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Visuals;
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Feedback.Commands
+{
+    [CreateAssetMenu(menuName = "DarkTowerTron/Feedback/Commands/Camera Shake")]
+    public class CameraShakeCommand : FeedbackCommand
+    {
+        public float duration = 0.2f;
+        public float strength = 0.5f;
+
+        public override void Execute(GameObject owner, Vector3 position)
+        {
+            if (CameraShaker.Instance != null)
+            {
+                CameraShaker.Instance.Shake(duration, strength);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Feedback\Command\PlaySoundCommand.cs`
+- Lines: 23
+- Size: 0.8 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using DarkTowerTron.Core.Data;
+using UnityEngine;
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Core.Feedback.Commands
+{
+    [CreateAssetMenu(menuName = "DarkTowerTron/Feedback/Commands/Play Sound")]
+    public class PlaySoundCommand : FeedbackCommand
+    {
+        [Tooltip("The sound definition to play.")]
+        public SoundDef sound;
+
+        public override void Execute(GameObject owner, Vector3 position)
+        {
+            if (sound != null && Global.Audio != null)
+            {
+                // Note: Your AudioManager.PlaySound currently ignores position (2D).
+                // If you add 3D sound support later, pass 'position' here.
+                Global.Audio.PlaySound(sound);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Feedback\Command\SpawnVFXCommand.cs`
+- Lines: 37
+- Size: 1.2 KB
+- Modified: 2026-01-07 07:28
+
+```csharp
+using UnityEngine;
+
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Core.Feedback.Commands
+{
+    [CreateAssetMenu(menuName = "DarkTowerTron/Feedback/Commands/Spawn VFX")]
+    public class SpawnVFXCommand : FeedbackCommand
+    {
+        public GameObject prefab;
+        public bool attachToParent = false;
+
+        [Tooltip("Offset relative to the position rotation.")]
+        public Vector3 offset = Vector3.zero;
+
+        public override void Execute(GameObject owner, Vector3 position)
+        {
+            if (prefab == null || Global.Pool == null) return;
+
+            // Calculate rotation
+            Quaternion rot = Quaternion.identity;
+            if (owner != null) rot = owner.transform.rotation;
+
+            // Spawn
+            GameObject instance = Global.Pool.Spawn(prefab, position + (rot * offset), rot);
+            // Logic
+            if (attachToParent && owner != null)
+            {
+                instance.transform.SetParent(owner.transform);
+            }
+
+            // Auto-Play Particle if it exists
+            var ps = instance.GetComponent<ParticleSystem>();
+            if (ps) ps.Play();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Feedback\Command\TimeFreezeCommand.cs`
+- Lines: 20
+- Size: 0.5 KB
+- Modified: 2026-01-07 07:27
+
+```csharp
+using UnityEngine;
+
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Core.Feedback.Commands
+{
+    [CreateAssetMenu(menuName = "DarkTowerTron/Feedback/Commands/Time Freeze")]
+    public class TimeFreezeCommand : FeedbackCommand
+    {
+        [Range(0f, 1f)] public float duration = 0.05f;
+
+        public override void Execute(GameObject owner, Vector3 position)
+        {
+            if (Global.Time != null)
+            {
+                Global.Time.HitStop(duration);
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Feedback\FeedbackCommand.cs`
+- Lines: 17
+- Size: 0.6 KB
+- Modified: 2026-01-06 19:21
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Feedback
+{
+    /// <summary>
+    /// Base class for a single "Juice" action (e.g., Play Sound, Shake Camera).
+    /// </summary>
+    public abstract class FeedbackCommand : ScriptableObject
+    {
+        /// <summary>
+        /// Executes the feedback.
+        /// </summary>
+        /// <param name="owner">The object causing the feedback (e.g. Player, Bullet).</param>
+        /// <param name="position">Where the effect happens (e.g. Impact point).</param>
+        public abstract void Execute(GameObject owner, Vector3 position);
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Feedback\FeedbackConfigurationSO.cs`
+- Lines: 32
+- Size: 1.0 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Feedback
+{
+    [CreateAssetMenu(fileName = "Feedback_New", menuName = "DarkTowerTron/Feedback/Configuration Package")]
+    public class FeedbackConfigurationSO : ScriptableObject
+    {
+        [Header("Juice List")]
+        public List<FeedbackCommand> commands = new List<FeedbackCommand>();
+
+        /// <summary>
+        /// Runs every command in the package.
+        /// </summary>
+        public void Play(GameObject owner, Vector3 position)
+        {
+            for (int i = 0; i < commands.Count; i++)
+            {
+                if (commands[i] != null)
+                {
+                    commands[i].Execute(owner, position);
+                }
+            }
+        }
+
+        // Overload for simple usage (uses owner's position)
+        public void Play(GameObject owner)
+        {
+            if (owner != null) Play(owner, owner.transform.position);
+        }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\GameConstants.cs`
-- Lines: 55
-- Size: 3.0 KB
-- Modified: 2026-01-06 09:15
+- Lines: 56
+- Size: 3.1 KB
+- Modified: 2026-01-08 14:07
 
 ```csharp
 using UnityEngine;
@@ -4976,6 +7092,7 @@ namespace DarkTowerTron.Core
         public static readonly int LAYER_PLAYER = LayerMask.NameToLayer("Player");
         public static readonly int LAYER_ENEMY = LayerMask.NameToLayer("Enemy");
         public static readonly int LAYER_PROJECTILE = LayerMask.NameToLayer("Projectile");
+        public static readonly int LAYER_HITBOX = LayerMask.NameToLayer("Hitbox");
         public static readonly int LAYER_WALL = LayerMask.NameToLayer("Wall");
         public static readonly int LAYER_GROUND = LayerMask.NameToLayer("Ground");
 
@@ -4983,15 +7100,14 @@ namespace DarkTowerTron.Core
         // 🎭 MASKS (Bitmasks - for Physics.Raycast / OverlapSphere)
         // ========================================================================
         
-        // Used by Player Movement / KinematicMover
-        // What stops a character from walking? (Walls + Floor + Default objects)
+        // 1. Movement: Can I walk here?
+        // EXCLUDES 'Hitbox' and 'Enemy'. Enemies should not treat other enemies as static walls.
+        // They should overlap and let 'EnemyMotor' separation handle the spacing.
         public static readonly int MASK_PHYSICS_OBSTACLES = LayerMask.GetMask("Default", "Wall", "Ground");
 
-        // Used by Projectiles / Shooting
-        // What stops a bullet? (Walls + Default + Players + Enemies)
-        // Note: Ground is usually excluded if bullets fly high, included if they can hit floor.
-        // Let's stick to the mask we defined in Session 4.
-        public static readonly int MASK_PROJECTILE_COLLISION = LayerMask.GetMask("Default", "Wall", "Player", "Enemy");
+        // 2. Projectiles: What do I hit?
+        // INCLUDES 'Hitbox' (Shoot the arm) and 'Enemy' (Shoot the capsule)
+        public static readonly int MASK_PROJECTILE_COLLISION = LayerMask.GetMask("Default", "Wall", "Player", "Enemy", "Hitbox");
 
         // Used by Wall Detection (Pushback)
         public static readonly int MASK_WALLS = LayerMask.GetMask("Default", "Wall");
@@ -4999,103 +7115,24 @@ namespace DarkTowerTron.Core
         // Used by "Safe Ground" checks (Falling into void)
         public static readonly int MASK_GROUND_ONLY = LayerMask.GetMask("Ground");
         
-        // Used by Enemy AI (Line of Sight)
+        // 3. Sight/AI: What blocks vision?
+        // Usually just Walls and Ground. We don't want an enemy to block another enemy's view of the player.
         public static readonly int MASK_SIGHT_BLOCKING = LayerMask.GetMask("Default", "Wall", "Ground");
     }
 }
 ```
 
-## 📄 `Assets\Scripts\Core\GameEvents.cs`
-- Lines: 73
-- Size: 2.5 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-using System;
-using UnityEngine;
-using DarkTowerTron.Core.Data; // Needed for EnemyStatsSO
-
-namespace DarkTowerTron.Core
-{
-    public static class GameEvents
-    {
-        // --- COMBAT ---
-        // OLD: public static Action<Vector3> OnEnemyKilled;
-
-        // Updated Signature: Vector3 pos, Stats, bool rewardPlayer
-        public static Action<Vector3, EnemyStatsSO, bool> OnEnemyKilled;
-
-        public static Action OnPlayerHit;
-        public static Action OnPlayerDied;
-
-        // Feedback
-        public static Action<Vector3, float, bool> OnDamageDealt;
-        public static Action<Vector3, string> OnPopupText;
-
-        // Resources
-        public static Action<float, float> OnFocusChanged;
-        public static Action<int, int> OnGritChanged; // Current, Max
-
-        // NEW: True = Hull Active, False = Hull Broken (Danger)
-        public static Action<bool> OnHullStateChanged;
-
-        // System
-        public static Action<Vector3> OnEnemySpawned;
-        public static Action OnWaveCleared;
-        public static Action OnRoomCleared; // Doors open, but game continues
-        public static Action OnGameVictory; // Roll credits
-        public static Action<int> OnWaveAnnounce;
-        public static Action<string> OnCountdownChange;
-        public static Action OnWaveCombatStarted;
-
-        // AI
-        public static Action<Transform> OnDecoySpawned;
-        public static Action OnDecoyExpired;
-
-        // UI
-        public static Action<int, int> OnScoreChanged;
-
-        /// <summary>
-        /// CRITICAL FIX-004: Call this when loading scenes or quitting.
-        /// Prevents static events from holding references to destroyed objects.
-        /// </summary>
-        public static void Cleanup()
-        {
-            OnEnemyKilled = null;
-            OnPlayerHit = null;
-            OnPlayerDied = null;
-            OnDamageDealt = null;
-            OnPopupText = null;
-            OnFocusChanged = null;
-            OnGritChanged = null;
-            OnHullStateChanged = null;
-            OnEnemySpawned = null;
-            OnWaveCleared = null;
-            OnRoomCleared = null;
-            OnGameVictory = null;
-            OnWaveAnnounce = null;
-            OnCountdownChange = null;
-            OnWaveCombatStarted = null;
-            OnDecoySpawned = null;
-            OnDecoyExpired = null;
-            OnScoreChanged = null;
-            
-            GameLogger.Log(LogChannel.System, "[GameEvents] All static listeners cleared.", null);
-        }
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Core\GameServices.cs`
-- Lines: 53
+- Lines: 54
 - Size: 2.1 KB
-- Modified: 2026-01-06 10:39
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Managers;
 using DarkTowerTron.Player.Controller;
 using DarkTowerTron.UI;
+using UnityEngine;
 
 namespace DarkTowerTron.Core
 {
@@ -5315,6 +7352,32 @@ namespace DarkTowerTron.Core
 }
 ```
 
+## 📄 `Assets\Scripts\Core\Interfaces\IMover.cs`
+- Lines: 18
+- Size: 0.4 KB
+- Modified: 2026-01-06 15:00
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Physics
+{
+    public interface IMover
+    {
+        // Data Access
+        Vector3 Velocity { get; }
+        bool IsGrounded { get; }
+
+        // Actions
+        void Move(Vector3 velocity); // Accepts Velocity (units/sec)
+        void Teleport(Vector3 position);
+
+        // Settings (Optional, for syncing)
+        void SetEnabled(bool state);
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Core\Interfaces\IPoolable.cs`
 - Lines: 8
 - Size: 0.1 KB
@@ -5364,34 +7427,13 @@ namespace DarkTowerTron.Core
 }
 ```
 
-## 📄 `Assets\Scripts\Core\LogChannel.cs`
-- Lines: 14
-- Size: 0.4 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-namespace DarkTowerTron.Core
-{
-    public enum LogChannel
-    {
-        General,    // Default
-        Player,     // Input, Movement, State
-        AI,         // Decisions, State changes, Pathing
-        Combat,     // Damage, Projectiles, Hitboxes
-        UI,         // Menu navigation, HUD updates
-        Physics,    // Collisions, Triggers
-        System,     // Wave Manager, Loading, Saving
-        VFX         // Particles, Audio
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Core\Services\BootLoader.cs`
-- Lines: 31
-- Size: 1.0 KB
-- Modified: 2026-01-06 09:15
+- Lines: 32
+- Size: 1.1 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 
 namespace DarkTowerTron.Core.Services
@@ -5411,7 +7453,7 @@ namespace DarkTowerTron.Core.Services
             var prefab = Resources.Load<GameObject>("SystemBootloader");
             if (prefab == null)
             {
-                Debug.LogError("CRITICAL: Missing 'SystemBootloader' in Resources folder!");
+                GameLogger.LogError(LogChannel.System, "CRITICAL: Missing 'SystemBootloader' in Resources folder!");
                 return;
             }
 
@@ -5426,14 +7468,15 @@ namespace DarkTowerTron.Core.Services
 ```
 
 ## 📄 `Assets\Scripts\Core\Services\GameBootstrap.cs`
-- Lines: 42
+- Lines: 43
 - Size: 1.3 KB
-- Modified: 2026-01-06 10:45
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Managers;
 using DarkTowerTron.Services;
+using UnityEngine;
 
 namespace DarkTowerTron.Core.Services
 {
@@ -5476,13 +7519,14 @@ namespace DarkTowerTron.Core.Services
 ```
 
 ## 📄 `Assets\Scripts\Core\Services\ServiceLocator.cs`
-- Lines: 68
+- Lines: 69
 - Size: 2.1 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:09
 
 ```csharp
 using System;
 using System.Collections.Generic;
+using DarkTowerTron.Core.Debug;
 using UnityEngine;
 
 namespace DarkTowerTron.Core.Services
@@ -5505,7 +7549,7 @@ namespace DarkTowerTron.Core.Services
             var type = typeof(T);
             if (_services.ContainsKey(type))
             {
-                Debug.LogWarning($"[ServiceLocator] Service {type.Name} is being overwritten.");
+                GameLogger.LogWarning(LogChannel.System, $"[ServiceLocator] Service {type.Name} is being overwritten.");
             }
             _services[type] = service;
         }
@@ -5619,6 +7663,90 @@ namespace DarkTowerTron.Core
         public GameObject source;
         public bool isRedirected;
         public DamageType damageType; 
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Utils\LayerAutomator.cs`
+- Lines: 76
+- Size: 2.2 KB
+- Modified: 2026-01-08 14:10
+
+```csharp
+using UnityEngine;
+
+namespace DarkTowerTron.Core.Utils
+{
+    [ExecuteAlways] // Runs in Editor Mode
+    public class LayerAutomator : MonoBehaviour
+    {
+        [Header("Configuration")]
+        [Tooltip("The layer for the Root object (Movement Capsule).")]
+        public string rootLayerName = "Enemy";
+
+        [Tooltip("The layer for all child objects (Visuals/Hitboxes).")]
+        public string childLayerName = "Hitbox";
+
+        [Tooltip("If true, updates happens automatically when you change something.")]
+        public bool autoUpdate = true;
+
+        private void Update()
+        {
+            // Don't run in the actual game, only in Editor
+            if (Application.isPlaying) return;
+
+            if (autoUpdate)
+            {
+                EnforceLayers();
+            }
+        }
+
+        [ContextMenu("Force Fix Layers Now")]
+        public void EnforceLayers()
+        {
+            int rootLayer = LayerMask.NameToLayer(rootLayerName);
+            int childLayer = LayerMask.NameToLayer(childLayerName);
+
+            // Safety Check: Do layers exist?
+            if (rootLayer == -1 || childLayer == -1) return;
+
+            // 1. Fix Root
+            if (gameObject.layer != rootLayer)
+            {
+                gameObject.layer = rootLayer;
+            }
+
+            // 2. Fix Children
+            foreach (Transform child in transform)
+            {
+                SetLayerRecursive(child, childLayer);
+            }
+        }
+
+        private void SetLayerRecursive(Transform t, int layer)
+        {
+            // Optional: Don't overwrite Triggers if you want them on a specific layer?
+            // For now, Hitbox layer is usually fine for triggers too if configured right.
+
+            if (t.gameObject.layer != layer)
+            {
+                t.gameObject.layer = layer;
+            }
+
+            foreach (Transform child in t)
+            {
+                SetLayerRecursive(child, layer);
+            }
+        }
+
+        private void Awake()
+        {
+            // Self-Destruct in Play Mode to save memory
+            if (Application.isPlaying)
+            {
+                Destroy(this);
+            }
+        }
     }
 }
 ```
@@ -5795,505 +7923,10 @@ namespace DarkTowerTron.EditorTools
 }
 ```
 
-## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Chaser.cs`
-- Lines: 136
-- Size: 4.2 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.AI.Core;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.States.Chaser;
-
-namespace DarkTowerTron.Enemy.Agents
-{
-    public enum ChaserMode { Missile, MineLayer }
-
-    [RequireComponent(typeof(StateMachine))]
-    [RequireComponent(typeof(ContextSolver))]
-    [RequireComponent(typeof(AIData))]
-    public class EnemyAgent_Chaser : EnemyBaseAI
-    {
-        [Header("Mode Selection")]
-        public ChaserMode mode = ChaserMode.Missile;
-
-        [Header("Settings")]
-        public float attackRange = 1.5f; 
-        
-        [Header("Mine Settings")]
-        public GameObject hazardPrefab;
-        public float fuseDuration = 0.5f;
-
-        [Header("Missile Settings")]
-        public float damage = 1f;
-        public float explosionForce = 20f;
-
-        [Header("Steering")]
-        public System.Collections.Generic.List<SteeringBehavior> chaseBehaviors;
-
-        // -- COMPONENTS --
-        public ContextSolver Brain { get; private set; }
-        public StateMachine FSM { get; private set; }
-
-        // -- STATES --
-        public ChaserState_Chase StateChase { get; private set; }
-        public ChaserState_Priming StatePriming { get; private set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Brain = GetComponent<ContextSolver>();
-            FSM = GetComponent<StateMachine>();
-
-            StateChase = new ChaserState_Chase(this);
-            StatePriming = new ChaserState_Priming(this);
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-            FSM.Initialize(StateChase);
-        }
-
-        protected override void RunAI() { }
-
-        // --- ATTACK LOGIC ---
-
-        public void TriggerAttack()
-        {
-            if (mode == ChaserMode.Missile)
-            {
-                // INSTANT BOOM
-                DetonateMissile();
-            }
-            else
-            {
-                // PRIME MINE (Shake then Boom)
-                FSM.ChangeState(StatePriming);
-            }
-        }
-
-        public void DetonateMissile()
-        {
-            // Standard damage logic
-            if (_currentTarget != null)
-            {
-                IDamageable targetHealth = _currentTarget.GetComponentInParent<IDamageable>();
-                if (targetHealth != null)
-                {
-                    DamageInfo info = new DamageInfo
-                    {
-                        damageAmount = damage,
-                        pushDirection = transform.forward,
-                        pushForce = explosionForce,
-                        source = gameObject
-                        ,
-                        // NEW: Explicitly Explosion
-                        damageType = DamageType.Explosion
-                    };
-                    targetHealth.TakeDamage(info);
-                    _controller.SelfDestruct();
-                }
-                else
-                {
-                    // Hit Decoy? Reward.
-                    if (_currentTarget.name.Contains("AfterImage")) _controller.Kill(true);
-                    else _controller.SelfDestruct();
-                }
-            }
-            else
-            {
-                _controller.SelfDestruct();
-            }
-        }
-
-        public void DeployMine()
-        {
-            // Spawn Hazard
-            if (hazardPrefab)
-            {
-                // Spawn at ground level
-                Vector3 pos = transform.position;
-                pos.y = 0;
-                Instantiate(hazardPrefab, pos, Quaternion.identity);
-            }
-            
-            // Die (No Reward, because you didn't kill it, it deployed)
-            // Or Reward? Let's say SelfDestruct (No reward).
-            _controller.SelfDestruct();
-        }
-
-        // ... Gizmos and Getters ...
-        public Transform GetTarget() => _currentTarget;
-        public EnemyController GetController() => _controller;
-        public EnemyMotor GetMotor() => _motor;
-        
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, attackRange);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Guardian.cs`
-- Lines: 152
-- Size: 5.1 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.AI.Core;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Combat;
-using DarkTowerTron.Enemy.States.Guardian;
-
-namespace DarkTowerTron.Enemy.Agents
-{
-    [RequireComponent(typeof(StateMachine))]
-    [RequireComponent(typeof(ContextSolver))]
-    [RequireComponent(typeof(AIData))]
-    public class EnemyAgent_Guardian : EnemyBaseAI
-    {
-        [Header("Patrol Config")]
-        public float waypointTolerance = 1.5f;
-        public List<SteeringBehavior> moveBehaviors;
-
-        [Header("Combat Config")]
-        public GameObject projectilePrefab;
-        public Transform firePoint;
-        public List<AttackPatternSO> attackPatterns;
-
-        // -- COMPONENTS --
-        public ContextSolver Brain { get; private set; }
-        public StateMachine FSM { get; private set; }
-
-        // -- STATE DATA --
-        public PatrolPath ActivePath { get; private set; }
-        public int CurrentWaypointIndex { get; set; } = 0;
-
-        // -- STATES --
-        public GuardianState_Move StateMove { get; private set; }
-        public GuardianState_Attack StateAttack { get; private set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Brain = GetComponent<ContextSolver>();
-            FSM = GetComponent<StateMachine>();
-
-            StateMove = new GuardianState_Move(this);
-            StateAttack = new GuardianState_Attack(this);
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-
-            // Auto-find path if not assigned
-            if (ActivePath == null)
-            {
-                ActivePath = FindNearestPath();
-            }
-
-            if (ActivePath != null && ActivePath.waypoints.Count > 0)
-            {
-                FSM.Initialize(StateMove);
-            }
-            else
-            {
-                GameLogger.LogWarning(LogChannel.AI, $"{name}: No PatrolPath found! Standing still.", gameObject);
-                FSM.Initialize(StateAttack);
-            }
-        }
-
-        protected override void RunAI() { }
-
-        public IEnumerator ExecutePattern(AttackPatternSO pattern)
-        {
-            if (pattern == null || projectilePrefab == null) yield break;
-
-            yield return new WaitForSeconds(pattern.startDelay);
-
-            float angleStep = (pattern.spreadAngle > 0 && pattern.projectileCount > 1)
-                ? pattern.spreadAngle / (pattern.projectileCount - 1)
-                : 0;
-
-            float startAngle = -pattern.spreadAngle / 2f;
-
-            for (int i = 0; i < pattern.projectileCount; i++)
-            {
-                if (_controller.IsStaggered) yield break;
-
-                float currentAngle = startAngle + (angleStep * i);
-
-                if (pattern.spinDuringFire)
-                    startAngle += pattern.spinSpeed * pattern.delayBetweenShots;
-
-                Quaternion rot = transform.rotation * Quaternion.Euler(0, currentAngle, 0);
-                Vector3 fireDir = rot * Vector3.forward;
-
-                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
-
-                FireProjectile(projectilePrefab, spawnPos, rot, fireDir, pattern.speed);
-
-                if (pattern.delayBetweenShots > 0)
-                    yield return new WaitForSeconds(pattern.delayBetweenShots);
-            }
-        }
-
-        // --- PATHFINDING HELPERS ---
-        private PatrolPath FindNearestPath()
-        {
-            PatrolPath[] allPaths = FindObjectsOfType<PatrolPath>();
-            if (allPaths.Length == 0) return null;
-
-            PatrolPath closest = null;
-            float closestDist = float.MaxValue;
-
-            foreach (var path in allPaths)
-            {
-                if (path.waypoints.Count > 0 && path.waypoints[0] != null)
-                {
-                    float dist = Vector3.Distance(transform.position, path.waypoints[0].position);
-                    if (dist < closestDist)
-                    {
-                        closestDist = dist;
-                        closest = path;
-                    }
-                }
-            }
-            return closest;
-        }
-
-        public Transform GetCurrentWaypoint()
-        {
-            if (ActivePath == null || ActivePath.waypoints.Count == 0) return null;
-            return ActivePath.waypoints[CurrentWaypointIndex];
-        }
-
-        public void AdvanceWaypoint()
-        {
-            if (ActivePath == null) return;
-            CurrentWaypointIndex++;
-            if (CurrentWaypointIndex >= ActivePath.waypoints.Count)
-            {
-                CurrentWaypointIndex = (ActivePath.loop) ? 0 : ActivePath.waypoints.Count - 1;
-            }
-        }
-
-        // --- PUBLIC ACCESSORS (Fixes CS1061) ---
-        public EnemyController GetController() => _controller;
-        public EnemyMotor GetMotor() => _motor;
-
-        // This was the missing one:
-        public Transform GetTarget() => _currentTarget;
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Sentinel.cs`
-- Lines: 89
-- Size: 3.0 KB
-- Modified: 2026-01-06 12:15
-
-```csharp
-using UnityEngine;
-using System.Collections.Generic;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.AI.Core;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.States.Sentinel; // Sub-namespace for States
-
-namespace DarkTowerTron.Enemy.Agents
-{
-    [RequireComponent(typeof(StateMachine))]
-    [RequireComponent(typeof(ContextSolver))]
-    [RequireComponent(typeof(AIData))]
-    public class EnemyAgent_Sentinel : EnemyBaseAI
-    {
-        [Header("Tactics")]
-        public float combatRange = 10f; // Switch to Combat
-        public float huntRange = 15f;   // Switch back to Hunt
-
-        [Header("Loadout")]
-        public EnemyAttackSO weaponProfile; // <--- REPLACES prefab and speed fields
-        public Transform firePoint;
-        public float fireRate = 2.0f;
-
-        [Header("Steering Profiles")]
-        // Assigned in Inspector (e.g. Seek, AvoidWalls)
-        public List<SteeringBehavior> huntBehaviors;
-        // Assigned in Inspector (e.g. Orbit, Flee, AvoidWalls)
-        public List<SteeringBehavior> combatBehaviors;
-
-        // -- COMPONENTS --
-        public ContextSolver Brain { get; private set; }
-        public StateMachine FSM { get; private set; }
-
-        // -- STATES --
-        public SentinelState_Hunt StateHunt { get; private set; }
-        public SentinelState_Combat StateCombat { get; private set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Brain = GetComponent<ContextSolver>();
-            FSM = GetComponent<StateMachine>();
-
-            // Initialize States
-            StateHunt = new SentinelState_Hunt(this);
-            StateCombat = new SentinelState_Combat(this);
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-            // Start Hunting immediately
-            FSM.Initialize(StateHunt);
-        }
-
-        protected override void RunAI()
-        {
-            // Logic is delegated to the FSM component via its own Update loop.
-        }
-
-        // --- HELPERS FOR STATES ---
-
-        public void HelperFireProjectile()
-        {
-            if (weaponProfile && !_controller.IsStaggered)
-            {
-                Transform fp = firePoint ? firePoint : transform;
-
-                // Pass the Profile, not manual numbers
-                FireAtTarget(weaponProfile, fp);
-            }
-        }
-
-        // Expose protected members to States
-        public Transform GetTarget() => _currentTarget;
-        public EnemyController GetController() => _controller;
-        public EnemyMotor GetMotor() => _motor;
-
-        private void OnDrawGizmosSelected()
-        {
-            // Visualize the hysteresis ranges
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, combatRange);
-            Gizmos.color = new Color(1, 1, 0, 0.3f);
-            Gizmos.DrawWireSphere(transform.position, huntRange);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\Agents\EnemyAgent_Sniper.cs`
-- Lines: 86
-- Size: 2.9 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-using UnityEngine;
-using System.Collections.Generic;
-using DarkTowerTron.Core;
-using DarkTowerTron.AI.Core;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Combat;
-using DarkTowerTron.Enemy.States.Sniper;
-
-namespace DarkTowerTron.Enemy.Agents
-{
-    [RequireComponent(typeof(StateMachine))]
-    [RequireComponent(typeof(ContextSolver))]
-    [RequireComponent(typeof(AIData))]
-    public class EnemyAgent_Sniper : EnemyBaseAI
-    {
-        [Header("Tactics")]
-        public float panicDistance = 6f;
-        public float attackRange = 18f;
-
-        [Tooltip("How far to jump when panicking")]
-        public float teleportDistance = 12f; // NEW: Configurable
-        public float teleportCooldown = 5f;
-        public LayerMask wallLayer;
-
-        [Header("Combat")]
-        public GameObject projectilePrefab;
-        public Transform firePoint;
-        public LineRenderer laserSight;
-        public float fireRate = 3.0f;
-        public float aimDuration = 1.5f;
-
-        [Header("Steering Profiles (Optimization)")]
-        // NEW: Pre-allocated lists to prevent Garbage Collection spikes
-        public List<SteeringBehavior> positioningBehaviors;
-
-        // -- COMPONENTS --
-        public ContextSolver Brain { get; private set; }
-        public StateMachine FSM { get; private set; }
-
-        // -- STATES --
-        public SniperState_Positioning StatePositioning { get; private set; }
-        public SniperState_Aiming StateAiming { get; private set; }
-        public SniperState_Teleport StateTeleport { get; private set; }
-        public SniperState_Firing StateFiring { get; private set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Brain = GetComponent<ContextSolver>();
-            FSM = GetComponent<StateMachine>();
-
-            if (wallLayer == 0) wallLayer = GameConstants.MASK_WALLS;
-
-            // Initialize States
-            StatePositioning = new SniperState_Positioning(this);
-            StateAiming = new SniperState_Aiming(this);
-            StateTeleport = new SniperState_Teleport(this);
-            StateFiring = new SniperState_Firing(this);
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-            if (laserSight) laserSight.enabled = false;
-
-            FSM.Initialize(StatePositioning);
-        }
-
-        protected override void RunAI()
-        {
-            // Logic delegated to FSM
-        }
-
-        // Helpers
-        public void HelperFireProjectile(float speed)
-        {
-            if (projectilePrefab)
-            {
-                Vector3 spawnPos = firePoint ? firePoint.position : transform.position;
-                FireProjectile(projectilePrefab, spawnPos, transform.rotation, transform.forward, speed);
-            }
-        }
-
-        public Transform GetTarget() => _currentTarget;
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Enemy\Bosses\Architect\ArchitectController.cs`
-- Lines: 285
-- Size: 8.7 KB
-- Modified: 2026-01-06 09:37
+- Lines: 271
+- Size: 8.8 KB
+- Modified: 2026-01-08 07:50
 
 ```csharp
 using UnityEngine;
@@ -6301,17 +7934,16 @@ using System.Collections;
 using System.Collections.Generic;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Events
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.AI.FSM;
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
 
+// ALIAS
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
-    [RequireComponent(typeof(StateMachine))]
-    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget, IAimTarget // NEW: IAimTarget
+    // REMOVED: [RequireComponent(typeof(StateMachine))] <-- Old FSM deleted
+    public class ArchitectController : MonoBehaviour, IDamageable, ICombatTarget, IAimTarget
     {
         [Header("Parts")]
         public Transform rotationRig;
@@ -6326,67 +7958,43 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         [Header("Configuration")]
         public float radiusOuter = 2.5f;
         public float radiusInner = 0.8f;
-        public float patternInterval = 2.0f;
 
+        // We keep the data, but we aren't using it automatically right now
         [Header("Patterns")]
         public List<ArchitectPatternSO> phase1Patterns;
 
-        [Header("Debug")]
-        public bool autoStartCombat = false;
-
-        [Header("Events (Wiring)")]
+        [Header("Event Wiring")]
         [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
-        [SerializeField] private IntIntEventChannelSO _waveAnnounceEvent; // For "Wave 666"
+        [SerializeField] private IntEventChannelSO _waveAnnounceEvent; // Updated type
         [SerializeField] private VoidEventChannelSO _combatStartedEvent;
-        // Note: Popup/Damage text might still be static or you can inject a channel if you have one.
-        // Assuming GameEvents.OnPopupText is still static for now as per previous sessions.
+        [SerializeField] private PopupTextEventChannelSO _popupEvent;
+        [SerializeField] private DamageTextEventChannelSO _damageTextEvent;
 
         [Header("Aiming")]
         [SerializeField] private float _aimOffset = 0f;
         [SerializeField] private float _coreRadius = 1.5f;
 
+        // Interfaces
         public bool KeepPlayerGrounded => true;
-
-        // IAimTarget Implementation
         public Vector3 AimPoint => transform.position + (Vector3.up * _aimOffset);
         public float TargetRadius => _coreRadius;
+        public bool IsStaggered => false;
 
-        // State
-        private bool _isCombatActive = false;
+        // Internal State
         private bool _isVulnerable = false;
-        private Transform _player;
         private float _currentRotationSpeed;
-        private int _currentPatternIndex = 0;
+        private Transform _player;
 
-        // Components
-        private StateMachine _fsm;
-
-        // State Cache (No more GC allocation)
-        public ArchitectState_Idle StateIdle { get; private set; }
-        private List<ArchitectState_Pattern> _patternStates = new List<ArchitectState_Pattern>();
-
-        private void Awake()
-        {
-            _fsm = GetComponent<StateMachine>();
-            StateIdle = new ArchitectState_Idle();
-        }
+        // REMOVED: StateMachine _fsm;
+        // REMOVED: ArchitectState_Idle, ArchitectState_Pattern variables
 
         private void Start()
         {
-            if (GameServices.Player != null)
-                _player = GameServices.Player.transform;
-
-            // Pre-allocate Pattern States
-            foreach (var pattern in phase1Patterns)
-            {
-                _patternStates.Add(new ArchitectState_Pattern(this, pattern));
-            }
+            if (DarkTowerTron.Core.GameServices.Player != null)
+                _player = DarkTowerTron.Core.GameServices.Player.transform;
 
             SetShield(true);
             _currentRotationSpeed = rotationSpeedIdle;
-
-            if (autoStartCombat)
-                Invoke(nameof(ActivateBoss), 1.0f);
         }
 
         private void Update()
@@ -6394,9 +8002,7 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             if (rotationRig)
                 rotationRig.Rotate(Vector3.up, _currentRotationSpeed * Time.deltaTime);
 
-            if (!_isCombatActive) return;
-
-            // Phase Transition Check
+            // Phase Logic (Simplified for now)
             if (!_isVulnerable)
             {
                 bool anyHandAlive = false;
@@ -6416,52 +8022,87 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        // --- COMBAT FLOW ---
+        // --- PUBLIC API (The "Body" Commands) ---
+        // These will be called by the Pluggable AI Action later
+
+        public void SetRotationSpeed(float speed) => _currentRotationSpeed = speed;
 
         public void ActivateBoss()
         {
-            if (_isCombatActive) return;
-
-            _isCombatActive = true;
             _currentRotationSpeed = rotationSpeedCombat;
-
-            StartNextPattern();
-
-            // Juice
-            _waveAnnounceEvent?.Raise(666, 0); // Custom ID for Boss
+            _waveAnnounceEvent?.Raise(666);
             _combatStartedEvent?.Raise();
+
+            // Temporary: Just run the first pattern manually to prove it works
+            // In future, the Pluggable AI will call RunPattern()
+            if (phase1Patterns.Count > 0) StartCoroutine(RunPatternSequence(phase1Patterns[0]));
         }
 
-        public void StartNextPattern()
+        // Adapted from the old State logic into a standalone Coroutine
+        public IEnumerator RunPatternSequence(ArchitectPatternSO pattern)
         {
-            if (_isVulnerable) return;
-            if (_patternStates.Count == 0) return;
+            if (_isVulnerable) yield break;
 
-            // Pick pre-cached state
-            ArchitectState_Pattern nextState = _patternStates[_currentPatternIndex];
+            SetRotationSpeed(pattern.rotationSpeed);
 
-            // Increment loop
-            _currentPatternIndex = (_currentPatternIndex + 1) % _patternStates.Count;
+            // 1. Setup
+            MoveHands(pattern.extendHands);
+            TelegraphWalls(pattern.activateWalls);
 
-            _fsm.ChangeState(nextState);
-        }
+            yield return new WaitForSeconds(pattern.startDelay);
 
-        public void OnPatternFinished()
-        {
-            if (_isVulnerable) return;
-            _fsm.ChangeState(StateIdle);
-            StartCoroutine(WaitAndNextPattern());
-        }
+            // 2. Active
+            ActivateWalls(pattern.activateWalls);
 
-        private IEnumerator WaitAndNextPattern()
-        {
-            yield return new WaitForSeconds(patternInterval);
-            StartNextPattern();
+            float timer = 0f;
+            float duration = pattern.activeDuration - pattern.startDelay;
+            float shotCooldown = 0f;
+            bool hasGun = pattern.shootingPattern != null;
+
+            while (timer < duration)
+            {
+                if (_isVulnerable) break;
+
+                float dt = Time.deltaTime;
+                timer += dt;
+
+                if (hasGun)
+                {
+                    shotCooldown -= dt;
+                    if (shotCooldown <= 0)
+                    {
+                        FireProjectiles(pattern);
+                        shotCooldown = pattern.shootingPattern.delayBetweenShots;
+                    }
+                }
+                yield return null;
+            }
+
+            // 3. Cleanup
+            ResetHands();
         }
 
         // --- HELPER METHODS ---
 
-        public void SetRotationSpeed(float speed) => _currentRotationSpeed = speed;
+        private void FireProjectiles(ArchitectPatternSO pattern)
+        {
+            if (pattern.shootingPattern == null) return;
+            bool useForward = pattern.shootingPattern.aimMode == AimType.ForwardRadial;
+            float scale = pattern.shootingPattern.scaleMultiplier;
+
+            for (int i = 0; i < hands.Count; i++)
+            {
+                var hand = hands[i];
+                if (hand == null || !hand.IsAlive()) continue;
+
+                // Check Config Array safety
+                if (pattern.activeGuns != null && i < pattern.activeGuns.Length && pattern.activeGuns[i])
+                {
+                    Vector3 targetPos = (_player != null) ? _player.position : Vector3.zero;
+                    hand.Shoot(targetPos, useForward, scale);
+                }
+            }
+        }
 
         public void MoveHands(bool[] extendConfig)
         {
@@ -6504,23 +8145,14 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
             }
         }
 
-        public Transform GetTarget()
-        {
-            if (_player == null && GameServices.Player != null)
-                _player = GameServices.Player.transform;
-            return _player;
-        }
-
         // --- PHASE LOGIC ---
 
         private IEnumerator EnterVulnerablePhase()
         {
             _isVulnerable = true;
             SetShield(false);
-            _fsm.ChangeState(null); // Stop AI
-            _currentRotationSpeed = 60f; // Panic
-
-            GameEvents.OnPopupText?.Invoke(transform.position, "SHIELD DOWN"); // Legacy Event
+            _currentRotationSpeed = 60f;
+            _popupEvent?.Raise(transform.position, "SHIELD DOWN");
             yield return null;
         }
 
@@ -6535,14 +8167,12 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
         {
             if (!_isVulnerable)
             {
-                GameEvents.OnPopupText?.Invoke(transform.position, "SHIELDED");
+                _popupEvent?.Raise(transform.position, "SHIELDED");
                 return false;
             }
 
             coreHealth -= info.damageAmount;
-
-            // Legacy Events for text
-            GameEvents.OnDamageDealt?.Invoke(transform.position, info.damageAmount, true);
+            _damageTextEvent?.Raise(transform.position, info.damageAmount, true, false);
 
             if (coreHealth <= 0) Kill(true);
             return true;
@@ -6550,33 +8180,22 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 
         public void Kill(bool instant)
         {
-            _isCombatActive = false;
-            _currentRotationSpeed = 0;
-
+            _gameVictoryEvent?.Raise();
             if (Global.VFX != null && Global.VFX.explosionPrefab)
-            {
                 Global.Pool?.Spawn(Global.VFX.explosionPrefab, transform.position, Quaternion.identity);
-            }
-
-            _gameVictoryEvent?.Raise(); // Updated
 
             Destroy(gameObject, 0.5f);
         }
-
-        // --- ICOMBATTARGET ---
-
-        public bool IsStaggered => false;
 
         public void OnExecutionHit()
         {
             if (_isVulnerable)
             {
-                DamageInfo info = new DamageInfo { damageAmount = 50f };
-                TakeDamage(info);
+                TakeDamage(new DamageInfo { damageAmount = 50f });
             }
             else
             {
-                GameEvents.OnPopupText?.Invoke(transform.position, "SHIELDED");
+                _popupEvent?.Raise(transform.position, "SHIELDED");
             }
         }
     }
@@ -6789,9 +8408,9 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyBaseAI.cs`
-- Lines: 214
-- Size: 7.2 KB
-- Modified: 2026-01-06 12:13
+- Lines: 220
+- Size: 7.7 KB
+- Modified: 2026-01-06 15:28
 
 ```csharp
 using UnityEngine;
@@ -6799,6 +8418,7 @@ using DG.Tweening; // Logic relies on Tweening
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Events;
 using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
 
@@ -6810,6 +8430,11 @@ namespace DarkTowerTron.Enemy
     [RequireComponent(typeof(EnemyController))]
     public abstract class EnemyBaseAI : MonoBehaviour, IPoolable
     {
+        [Header("AI Event Wiring")]
+        [SerializeField] private Vector3EventChannelSO _enemySpawnedEvent;
+        [SerializeField] private TransformEventChannelSO _decoySpawnedEvent;
+        [SerializeField] private VoidEventChannelSO _decoyExpiredEvent;
+
         protected EnemyMotor _motor;
         protected EnemyController _controller;
         protected Transform _player;
@@ -6830,7 +8455,7 @@ namespace DarkTowerTron.Enemy
             _isSpawning = true;
             transform.localScale = Vector3.zero;
 
-            GameEvents.OnEnemySpawned?.Invoke(transform.position);
+            _enemySpawnedEvent?.Raise(transform.position);
 
             transform.DOScale(Vector3.one, 0.8f)
                 .SetEase(Ease.OutBack)
@@ -6857,15 +8482,15 @@ namespace DarkTowerTron.Enemy
                 _player = GameServices.Player.transform;
                 _currentTarget = _player;
             }
-            
-            GameEvents.OnDecoySpawned += OnDecoySpawned;
-            GameEvents.OnDecoyExpired += OnDecoyExpired;
+
+            if (_decoySpawnedEvent != null) _decoySpawnedEvent.OnEventRaised += OnDecoySpawned;
+            if (_decoyExpiredEvent != null) _decoyExpiredEvent.OnEventRaised += OnDecoyExpired;
         }
 
         protected virtual void OnDestroy()
         {
-            GameEvents.OnDecoySpawned -= OnDecoySpawned;
-            GameEvents.OnDecoyExpired -= OnDecoyExpired;
+            if (_decoySpawnedEvent != null) _decoySpawnedEvent.OnEventRaised -= OnDecoySpawned;
+            if (_decoyExpiredEvent != null) _decoyExpiredEvent.OnEventRaised -= OnDecoyExpired;
         }
 
         private void Update()
@@ -7011,9 +8636,9 @@ namespace DarkTowerTron.Enemy
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyController.cs`
-- Lines: 161
-- Size: 5.2 KB
-- Modified: 2026-01-06 09:55
+- Lines: 165
+- Size: 5.4 KB
+- Modified: 2026-01-08 16:54
 
 ```csharp
 using UnityEngine;
@@ -7081,6 +8706,8 @@ namespace DarkTowerTron.Enemy
         public void OnSpawn()
         {
             if (_motor != null) _stats = _motor.stats;
+            
+            // Reset Modules
             _receiver.Initialize(_stats);
             _visuals.ResetVisuals();
         }
@@ -7088,6 +8715,8 @@ namespace DarkTowerTron.Enemy
         public void OnDespawn()
         {
             _visuals.ResetVisuals();
+            // Note: Shooting coroutines in PatternExecutor are automatically killed 
+            // when the GameObject is disabled/despawned.
         }
 
         private void OnEnable()
@@ -7161,10 +8790,10 @@ namespace DarkTowerTron.Enemy
 
         private void HandleDeath(EnemyStatsSO stats, bool reward)
         {
-            // Notify Game Logic
+            // Notify Game Logic (Wave Director / Score)
             _enemyKilledEvent?.Raise(transform.position, stats, reward);
 
-            // Despawn via Service Locator
+            // Despawn
             if (Global.Pool != null) Global.Pool.Despawn(gameObject);
             else Destroy(gameObject);
         }
@@ -7180,20 +8809,21 @@ namespace DarkTowerTron.Enemy
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyMotors.cs`
-- Lines: 192
-- Size: 6.6 KB
-- Modified: 2026-01-06 09:15
+- Lines: 226
+- Size: 8.0 KB
+- Modified: 2026-01-08 23:27
 
 ```csharp
-using UnityEngine;
-using DarkTowerTron.Physics;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Physics;
+using UnityEngine;
 
 namespace DarkTowerTron.Enemy
 {
-    [RequireComponent(typeof(KinematicMover))]
-    public class EnemyMotor : MonoBehaviour, IPoolable
+    // We implement IMover so the PluggableAIController can talk to us directly.
+    public class EnemyMotor : MonoBehaviour, IPoolable, IMover
     {
         [Header("Data Profile")]
         public EnemyStatsSO stats;
@@ -7201,129 +8831,161 @@ namespace DarkTowerTron.Enemy
         [Header("Layers")]
         public LayerMask allyLayer;
 
-        private KinematicMover _mover;
+        // The underlying Physics Engine (KinematicMover or UnityCharacterMover)
+        private IMover _physicsMover;
+
+        // Internal State
         private Vector3 _currentVelocity;
         private Vector3 _knockbackForce;
-        private float _currentVerticalSpeed;
-        private Collider[] _neighbors = new Collider[10];
+        private float _currentVerticalSpeed; // For smooth hovering
+        private Collider[] _neighbors = new Collider[10]; // For separation
+
+        // --- IMover Interface Properties (Pass-Through) ---
+        public Vector3 Velocity => _physicsMover != null ? _physicsMover.Velocity : Vector3.zero;
+        public bool IsGrounded => _physicsMover != null && _physicsMover.IsGrounded;
 
         private void Awake()
         {
-            _mover = GetComponent<KinematicMover>();
+            // 1. Find the REAL physics mover attached to this object.
+            // Since EnemyMotor acts as a wrapper, we need to find the "Other" IMover.
+            var allMovers = GetComponents<IMover>();
+            foreach (var m in allMovers)
+            {
+                // Cast to interface to compare references
+                if (m != (IMover)this)
+                {
+
+                    GameLogger.Log(LogChannel.AI, "[EnemyMotor] Found Physics Mover: " + m.GetType().Name, this.gameObject);
+
+                    _physicsMover = m;
+                    break;
+                }
+            }
+
+            // 2. Fallback Safety: If no physics mover exists, add the default KinematicMover.
+            if (_physicsMover == null)
+            {
+                _physicsMover = gameObject.AddComponent<KinematicMover>();
+            }
+
             if (allyLayer == 0) allyLayer = 1 << GameConstants.LAYER_ENEMY;
         }
 
-        private void OnEnable()
-        {
-            _currentVelocity = Vector3.zero;
-            _knockbackForce = Vector3.zero;
-            _currentVerticalSpeed = 0f;
+        // --- IPoolable Implementation ---
 
-            // REMOVED: The code that snapped transform.position.y = 0
-            // logic: We trust the Spawner to put us where we need to be.
-            // If rideHeight > 0, the Update loop will naturally float us up/down to that height.
-            OnSpawn();
-        }
-
-        // --- IPoolable ---
         public void OnSpawn()
         {
-            // Reset Physics State
             _currentVelocity = Vector3.zero;
             _knockbackForce = Vector3.zero;
             _currentVerticalSpeed = 0f;
 
-            // Reset Position logic
-            // (Removed y=0 snap. Spawner is responsible for initial Y. If rideHeight > 0, Update loop will float us.)
+            // Forward the spawn event to the physics engine if it supports it
+            if (_physicsMover is IPoolable p) p.OnSpawn();
         }
 
         public void OnDespawn()
         {
-            // Stop moving immediately so we don't drift while in the pool
             _currentVelocity = Vector3.zero;
+            if (_physicsMover is IPoolable p) p.OnDespawn();
         }
 
-        public void Move(Vector3 desiredDirection)
+        // --- IMover Implementation (The Logic) ---
+
+        public void Teleport(Vector3 pos) => _physicsMover?.Teleport(pos);
+
+        public void SetEnabled(bool state)
         {
-            if (stats == null) return;
+            this.enabled = state;
+            // Optionally enable/disable the physics mover too, 
+            // though usually we want physics to run even if AI logic is paused.
+        }
+
+        /// <summary>
+        /// Receives a Direction (usually Magnitude 1) from the AI.
+        /// Applies Speed, Acceleration, Hovering, and Separation.
+        /// </summary>
+        public void Move(Vector3 inputVector)
+        {
+
+            GameLogger.Log(LogChannel.AI, "[EnemyMotor] Move Called with Input: " + inputVector.ToString("F2"), this.gameObject);
+
+            if (stats == null || _physicsMover == null) return;
 
             float dt = Time.deltaTime;
             if (dt < 1e-5f) return;
-            Vector3 targetVel = desiredDirection * stats.moveSpeed;
 
-            // 1. Separation
+            GameLogger.Log(LogChannel.AI, "[EnemyMotor] Move Input: " + inputVector.ToString("F2"), this.gameObject);
+
+            // 1. Apply Speed Stats
+            // The AI sends a direction. We make it a Velocity based on stats.
+            Vector3 targetVel = inputVector.normalized * stats.moveSpeed;
+
+            // 2. Separation Logic (Don't stack on top of other enemies)
             if (stats.moveSpeed > 0.1f)
             {
-                Vector3 separationPush = CalculateSeparation();
-                targetVel += separationPush;
+                targetVel += CalculateSeparation();
             }
 
-            // 2. Inertia
+            // 3. Inertia (Acceleration)
             _currentVelocity = Vector3.MoveTowards(_currentVelocity, targetVel, stats.acceleration * dt);
 
-            // 3. Knockback
+            // 4. Knockback Decay
             if (_knockbackForce.magnitude > 0.1f)
             {
                 _knockbackForce = Vector3.Lerp(_knockbackForce, Vector3.zero, 5f * dt);
             }
 
-            // 4. COMBINE
             Vector3 finalVelocity = _currentVelocity + _knockbackForce;
 
-            // 5. VERTICAL LOGIC (Flight vs Gravity)
+            // 5. Vertical Logic (Hover vs Gravity)
             if (stats.rideHeight > 0)
             {
-                // A. Determine Ground Height
-                float groundY = -999f; // Fallback (Void)
-
-                // Start raycast slightly above current position to catch the floor even if we clipped in slightly
+                // --- HOVER LOGIC ---
+                float groundY = -999f;
                 Vector3 rayOrigin = transform.position + Vector3.up * 1.0f;
 
-                // Cast down 20 units (Enough for high hoverers)
-                // Use OBSTACLES mask (Ground + Default + Wall) so they hover over bridges/crates too
+                // Cast down to find floor/obstacles
                 if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f, GameConstants.MASK_PHYSICS_OBSTACLES))
                 {
                     groundY = hit.point.y;
                 }
                 else
                 {
-                    // No ground found? Maintain current height (don't fall into void)
+                    // No ground? Maintain current relative height
                     groundY = transform.position.y - stats.rideHeight;
                 }
 
-                // B. Calculate Target Y
                 float targetY = groundY + stats.rideHeight;
-
-                // C. Smoothly Fly There
                 float currentY = transform.position.y;
+
+                // Smoothly interpolate height
                 float newY = Mathf.SmoothDamp(currentY, targetY, ref _currentVerticalSpeed, stats.verticalSmoothTime);
 
-                // D. Convert to Velocity for the KinematicMover
-                float verticalVel = (newY - currentY) / dt;
-                finalVelocity.y = verticalVel;
+                // Convert position change back to velocity for the Mover
+                finalVelocity.y = (newY - currentY) / dt;
             }
             else
             {
-                // WALKING: Apply Gravity if not grounded
-                if (!_mover.IsGrounded)
+                // --- GRAVITY LOGIC ---
+                if (!_physicsMover.IsGrounded)
                 {
-                    finalVelocity.y -= 20f; // Standard gravity
+                    finalVelocity.y -= 20f; // Standard Gravity
                 }
                 else
                 {
-                    finalVelocity.y = -2f; // Stick
+                    finalVelocity.y = -2f; // Stick to ground
                 }
             }
 
-            // 6. EXECUTE
-            _mover.Move(finalVelocity);
+            // 6. Final Execution
+            _physicsMover.Move(finalVelocity);
         }
+
+        // --- Helper Methods ---
 
         private Vector3 CalculateSeparation()
         {
             Vector3 pushVector = Vector3.zero;
-
-            // Use stats.separationRadius
             int count = UnityEngine.Physics.OverlapSphereNonAlloc(transform.position, stats.separationRadius, _neighbors, allyLayer);
 
             for (int i = 0; i < count; i++)
@@ -7334,40 +8996,14 @@ namespace DarkTowerTron.Enemy
                 Vector3 direction = transform.position - neighbor.transform.position;
                 float dist = direction.magnitude;
 
+                // Prevent division by zero
                 if (dist < 0.01f) direction = Random.insideUnitSphere;
 
+                // Stronger push the closer they are
                 pushVector += direction.normalized / (dist + 0.1f);
             }
 
-            // Use stats.separationForce
             return pushVector * stats.separationForce;
-        }
-
-        // Standard Face Target (Uses Navigation Speed)
-        public void FaceTarget(Vector3 targetPosition)
-        {
-            if (stats == null) return;
-            RotateTowards(targetPosition, stats.rotationSpeed);
-        }
-
-        // Combat Face Target (Uses Slower Combat Speed)
-        public void FaceCombatTarget(Vector3 targetPosition)
-        {
-            if (stats == null) return;
-            RotateTowards(targetPosition, stats.combatRotationSpeed);
-        }
-
-        // Helper to avoid duplicate code
-        private void RotateTowards(Vector3 targetPosition, float speed)
-        {
-            Vector3 dir = targetPosition - transform.position;
-            dir.y = 0; 
-            
-            if (dir != Vector3.zero)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(dir);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, speed * Time.deltaTime);
-            }
         }
 
         public void ApplyKnockback(Vector3 force)
@@ -7375,858 +9011,31 @@ namespace DarkTowerTron.Enemy
             force.y = 0;
             _knockbackForce += force;
         }
-    }
-}
-```
 
-## 📄 `Assets\Scripts\Enemy\PatrolPath.cs`
-- Lines: 28
-- Size: 0.8 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using System.Collections.Generic;
-
-namespace DarkTowerTron.Enemy
-{
-    public class PatrolPath : MonoBehaviour
-    {
-        public List<Transform> waypoints;
-        public bool loop = true;
-
-        private void OnDrawGizmos()
+        public void FaceTarget(Vector3 targetPos)
         {
-            if (waypoints == null || waypoints.Count < 2) return;
+            // Ignore Y axis for rotation
+            Vector3 dir = targetPos - transform.position;
+            dir.y = 0;
 
-            Gizmos.color = Color.cyan;
-            for (int i = 0; i < waypoints.Count - 1; i++)
+            if (dir.sqrMagnitude > 0.01f)
             {
-                if (waypoints[i] && waypoints[i + 1])
-                    Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
-            }
-
-            if (loop && waypoints[0] && waypoints[waypoints.Count - 1])
-            {
-                Gizmos.DrawLine(waypoints[waypoints.Count - 1].position, waypoints[0].position);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Bosses\Architect\ArchitectState_Idle.cs`
-- Lines: 10
-- Size: 0.3 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using DarkTowerTron.AI.FSM;
-
-namespace DarkTowerTron.Enemy.Bosses.Architect
-{
-    public class ArchitectState_Idle : State
-    {
-        // Does nothing. Just sits there while the Controller handles the timer.
-        // The BossController.Update() handles the rotation, so we don't need logic here.
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Bosses\Architect\ArchitectState_Pattern.cs`
-- Lines: 153
-- Size: 5.4 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic; // FIX: Added for List<>
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Combat;
-
-namespace DarkTowerTron.Enemy.Bosses.Architect
-{
-    public class ArchitectState_Pattern : State
-    {
-        // FIX: Reference the Boss Controller, NOT the Guardian Agent
-        private ArchitectController _boss;
-
-        private ArchitectPatternSO _currentPattern;
-        private float _patternTimer;
-
-        public ArchitectState_Pattern(ArchitectController boss, ArchitectPatternSO pattern)
-        {
-            _boss = boss;
-            _currentPattern = pattern;
-        }
-
-        public override void Enter()
-        {
-            // 1. Apply Rotation
-            _boss.SetRotationSpeed(_currentPattern.rotationSpeed);
-
-            // 2. Timer
-            _patternTimer = _currentPattern.activeDuration;
-
-            _boss.StartCoroutine(RunPatternSequence());
-        }
-
-        // Helper to handle array safety
-        private bool GetHandExtend(bool outer)
-        {
-            // Simple logic: if any in array are true, extend? 
-            // Or better: The Controller's SetHandsState iterates the hands and checks the array index.
-            // But ArchitectController.SetHandsState currently takes a simple BOOL.
-            // Let's stick to simple: If pattern says extend, we extend all.
-            // If you want per-hand logic, we need to update Controller.
-            // For now: Just check the first element as a master switch
-            if (_currentPattern.extendHands != null && _currentPattern.extendHands.Length > 0)
-                return _currentPattern.extendHands[0];
-            return false;
-        }
-
-        private bool GetWallStatus(bool active)
-        {
-            if (_currentPattern.activateWalls != null && _currentPattern.activateWalls.Length > 0)
-                return _currentPattern.activateWalls[0];
-            return false;
-        }
-
-        public override void LogicUpdate()
-        {
-            // Boss Core doesn't stagger, so we don't check for it here.
-
-            // Handle Pattern Timer
-            _patternTimer -= Time.deltaTime;
-            if (_patternTimer <= 0)
-            {
-                // In a real FSM, we would define what "Next" is.
-                // For now, we rely on the Coroutine to transition us back to Idle/Move
+                Quaternion rot = Quaternion.LookRotation(dir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, stats.rotationSpeed * Time.deltaTime);
             }
         }
 
-        private IEnumerator RunPatternSequence()
+        public void FaceCombatTarget(Vector3 targetPos)
         {
-            // --- 1. SETUP & TELEGRAPH ---
-            bool[] extendConfig = _currentPattern.extendHands;
-            bool[] wallConfig = _currentPattern.activateWalls;
+            // Ignore Y axis
+            Vector3 dir = targetPos - transform.position;
+            dir.y = 0;
 
-            _boss.MoveHands(extendConfig);
-            _boss.TelegraphWalls(wallConfig);
-
-            // Wait for Telegraph
-            yield return new WaitForSeconds(_currentPattern.startDelay);
-            
-            // --- 2. ACTIVATE HAZARDS ---
-            _boss.ActivateWalls(wallConfig);
-
-            // --- 3. ACTIVE PHASE (Loop for Duration) ---
-            float phaseDuration = _currentPattern.activeDuration - _currentPattern.startDelay;
-            float timer = 0f;
-            
-            // vars for shooting
-            float shotCooldown = 0f;
-            bool hasGun = _currentPattern.shootingPattern != null;
-
-            while (timer < phaseDuration)
+            if (dir.sqrMagnitude > 0.01f)
             {
-                if (_boss.IsStaggered) break; ; // Optional break on stagger
-
-                float dt = Time.deltaTime;
-                timer += dt;
-
-                // SHOOTING LOGIC (Running inside the main timer loop)
-                if (hasGun)
-                {
-                    shotCooldown -= dt;
-                    if (shotCooldown <= 0)
-                    {
-                        FireProjectilesFromHands();
-                        shotCooldown = _currentPattern.shootingPattern.delayBetweenShots;
-                    }
-                }
-
-                yield return null;
-            }
-
-            // --- 4. CLEANUP ---
-            _boss.ResetHands(); // Retracts and turns off walls
-            
-            yield return new WaitForSeconds(1.0f); // Retract animation buffer
-
-            _boss.OnPatternFinished();
-        }
-
-        private void FireProjectilesFromHands()
-        {
-            // Safety check for shooting pattern
-            if (_currentPattern.shootingPattern == null) return;
-
-            AttackPatternSO attackData = _currentPattern.shootingPattern;
-            bool useForward = attackData.aimMode == AimType.ForwardRadial;
-            float scale = attackData.scaleMultiplier;
-
-            // FIX: Use FOR loop to check index against the Config Arrays
-            for (int i = 0; i < _boss.hands.Count; i++)
-            {
-                var hand = _boss.hands[i];
-                if (hand == null) continue;
-
-                // CHECK CONFIG: Does this specific hand have permission to shoot?
-                bool canShoot = false;
-                if (_currentPattern.activeGuns != null && i < _currentPattern.activeGuns.Length)
-                {
-                    canShoot = _currentPattern.activeGuns[i];
-                }
-
-                if (canShoot)
-                {
-                    Vector3 targetPos = Vector3.zero;
-                    if (_boss.GetTarget() != null) targetPos = _boss.GetTarget().position;
-
-                    hand.Shoot(targetPos, useForward, scale);
-                }
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Chaser\ChaserState_Chase.cs`
-- Lines: 52
-- Size: 1.5 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Chaser
-{
-    public class ChaserState_Chase : State
-    {
-        private EnemyAgent_Chaser _agent;
-
-        public ChaserState_Chase(EnemyAgent_Chaser agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            _agent.Brain.behaviors = _agent.chaseBehaviors;
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetTarget() == null) return;
-
-            // 1. Move
-            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
-            _agent.GetMotor().Move(moveDir);
-
-            if (moveDir.sqrMagnitude > 0.1f)
-                _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
-
-            // 2. Transition (Distance Check)
-            // FIX: Flatten positions to ignore height (Y-Axis)
-            Vector3 myPos = _agent.transform.position;
-            myPos.y = 0;
-
-            Vector3 targetPos = _agent.GetTarget().position;
-            targetPos.y = 0;
-
-            float dist = Vector3.Distance(myPos, targetPos);
-
-            // Debug to verify
-            // Debug.Log($"Chaser Distance: {dist} / Range: {_agent.attackRange}");
-
-            if (dist <= _agent.attackRange)
-            {
-                // DELEGATE DECISION TO AGENT
-                _agent.TriggerAttack();
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Chaser\ChaserState_Primer.cs`
-- Lines: 65
-- Size: 1.8 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using System.Collections.Generic;
-using DG.Tweening;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Chaser
-{
-    public class ChaserState_Priming : State
-    {
-        private EnemyAgent_Chaser _agent;
-        private float _timer;
-
-        public ChaserState_Priming(EnemyAgent_Chaser agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // STOP MOVING
-            _agent.Brain.behaviors = new List<DarkTowerTron.AI.Core.SteeringBehavior>();
-
-            _timer = _agent.fuseDuration;
-
-            // 1. VISUAL WARNING (The Fix)
-            // Use the Visuals component via the Controller
-            if (_agent.GetController() != null && _agent.GetController().Visuals != null)
-            {
-                _agent.GetController().Visuals.StartPrimingEffect();
-            }
-
-            // 2. PHYSICAL WARNING (Shake)
-            _agent.transform.DOShakeScale(_agent.fuseDuration, 0.5f, 20, 90);
-        }
-
-        public override void LogicUpdate()
-        {
-            _timer -= Time.deltaTime;
-
-            // Lock rotation to target
-            if (_agent.GetTarget() != null)
-            {
-                _agent.GetMotor().FaceTarget(_agent.GetTarget().position);
-            }
-
-            if (_timer <= 0)
-            {
-                _agent.DeployMine();
-            }
-        }
-
-        public override void Exit()
-        {
-            // Cleanup tweens
-            _agent.transform.DOKill();
-            
-            // Reset Color (The Fix)
-            if (_agent.GetController() != null && _agent.GetController().Visuals != null)
-            {
-                _agent.GetController().Visuals.StopPrimingEffect();
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Guardian\GuardianState_Attack.cs`
-- Lines: 63
-- Size: 2.0 KB
-- Modified: 2026-01-06 09:15
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Core.Data;
-using System.Collections.Generic;
-using DarkTowerTron.Enemy.Agents;
-using DarkTowerTron.Core;
-
-namespace DarkTowerTron.Enemy.States.Guardian
-{
-    public class GuardianState_Attack : State
-    {
-        private EnemyAgent_Guardian _agent;
-
-        public GuardianState_Attack(EnemyAgent_Guardian agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // 1. Stop Moving
-            _agent.Brain.behaviors = new List<DarkTowerTron.AI.Core.SteeringBehavior>(); 
-            
-            // 2. Start Shooting Routine
-            _agent.StartCoroutine(AttackRoutine());
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetController().IsStaggered) return;
-
-            // Keep facing player while shooting (Slowly!)
-            Transform combatTarget = _agent.GetTarget();
-            if (combatTarget != null)
-            {
-                _agent.GetMotor().FaceCombatTarget(combatTarget.position);
-            }
-        }
-
-        private System.Collections.IEnumerator AttackRoutine()
-        {
-            // Debug check
-            if (_agent.attackPatterns == null || _agent.attackPatterns.Count == 0)
-            {
-                GameLogger.LogWarning(LogChannel.AI, "Guardian has no Attack Patterns assigned!", _agent.gameObject);
-            }
-            else
-            {
-                // Pick random pattern
-                AttackPatternSO pattern = _agent.attackPatterns[Random.Range(0, _agent.attackPatterns.Count)];
-                
-                // Execute and Wait for it to finish
-                yield return _agent.ExecutePattern(pattern);
-            }
-            
-            // Cooldown after firing
-            yield return new WaitForSeconds(1.5f);
-
-            // Go back to moving
-            _stateMachine.ChangeState(_agent.StateMove);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Guardian\GuardianState_Move.cs`
-- Lines: 75
-- Size: 2.5 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.AI.Core; // For AIData
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Guardian
-{
-    public class GuardianState_Move : State
-    {
-        private EnemyAgent_Guardian _agent;
-
-        public GuardianState_Move(EnemyAgent_Guardian agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // 1. Set Steering to "Move Profile"
-            _agent.Brain.behaviors = _agent.moveBehaviors;
-
-            // 2. Tell the Brain to Seek the Waypoint
-            // We must update AIData so ContextSolver knows where to go
-            var aiData = _agent.GetComponent<AIData>();
-            if (aiData != null)
-            {
-                aiData.currentTarget = _agent.GetCurrentWaypoint();
-            }
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetController().IsStaggered) return;
-
-            Transform wp = _agent.GetCurrentWaypoint();
-
-            // Safety: If path is broken/missing, switch to attack in place
-            if (wp == null)
-            {
-                _stateMachine.ChangeState(_agent.StateAttack);
-                return;
-            }
-
-            // --- MOVEMENT ---
-            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
-            _agent.GetMotor().Move(moveDir);
-
-            // --- ROTATION (Use SLOW Combat Speed when looking at player) ---
-            Transform combatTarget = _agent.GetTarget();
-
-            if (combatTarget != null)
-            {
-                // Use the slow rotation method for aiming at player
-                _agent.GetMotor().FaceCombatTarget(combatTarget.position);
-            }
-            else
-            {
-                // Fallback: Face movement direction using normal speed
-                if (moveDir.sqrMagnitude > 0.1f)
-                    _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
-            }
-
-            // --- TRANSITION ---
-            // Check distance to Waypoint (flat check to ignore height diff)
-            Vector3 toWaypoint = wp.position - _agent.transform.position;
-            toWaypoint.y = 0;
-
-            if (toWaypoint.magnitude < _agent.waypointTolerance)
-            {
-                _agent.AdvanceWaypoint(); // Select next point for NEXT time
-                _stateMachine.ChangeState(_agent.StateAttack);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Sentinel\SentinelState_Combat.cs`
-- Lines: 56
-- Size: 1.7 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Sentinel
-{
-    public class SentinelState_Combat : State
-    {
-        private EnemyAgent_Sentinel _agent;
-        private float _fireTimer;
-
-        public SentinelState_Combat(EnemyAgent_Sentinel agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // Load "Orbit + Flee" Profile
-            _agent.Brain.behaviors = _agent.combatBehaviors;
-
-            // Randomize first shot
-            _fireTimer = Random.Range(0.5f, _agent.fireRate);
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetController().IsStaggered) return;
-            if (_agent.GetTarget() == null) return;
-
-            // 1. Move (Orbit/Strafe)
-            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
-            _agent.GetMotor().Move(moveDir);
-
-            // 2. Aim (Always lock on target)
-            _agent.GetMotor().FaceTarget(_agent.GetTarget().position);
-
-            // 3. Fire
-            _fireTimer -= Time.deltaTime;
-            if (_fireTimer <= 0)
-            {
-                _agent.HelperFireProjectile();
-                _fireTimer = _agent.fireRate;
-            }
-
-            // 4. Transition Check
-            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
-
-            // Use "HuntRange" (hysteresis) to prevent flickering
-            if (dist > _agent.huntRange)
-            {
-                _stateMachine.ChangeState(_agent.StateHunt);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Sentinel\SentinelState_Hunt.cs`
-- Lines: 44
-- Size: 1.2 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Sentinel
-{
-    public class SentinelState_Hunt : State
-    {
-        private EnemyAgent_Sentinel _agent;
-
-        public SentinelState_Hunt(EnemyAgent_Sentinel agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // Load "Seek" Profile
-            _agent.Brain.behaviors = _agent.huntBehaviors;
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetController().IsStaggered) return;
-            if (_agent.GetTarget() == null) return;
-
-            // 1. Move
-            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
-            _agent.GetMotor().Move(moveDir);
-
-            // Face movement
-            if (moveDir.sqrMagnitude > 0.1f)
-                _agent.GetMotor().FaceTarget(_agent.transform.position + moveDir);
-
-            // 2. Transition Check
-            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
-
-            if (dist <= _agent.combatRange)
-            {
-                _stateMachine.ChangeState(_agent.StateCombat);
-            }
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Aiming.cs`
-- Lines: 65
-- Size: 1.9 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using System.Collections.Generic;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Sniper
-{
-    public class SniperState_Aiming : State
-    {
-        private EnemyAgent_Sniper _agent;
-        private float _timer;
-
-        public SniperState_Aiming(EnemyAgent_Sniper agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // STOP MOVING (Clear behaviors or set empty list)
-            _agent.Brain.behaviors = new List<DarkTowerTron.AI.Core.SteeringBehavior>();
-
-            _timer = _agent.aimDuration;
-            if (_agent.laserSight) _agent.laserSight.enabled = true;
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetTarget() == null)
-            {
-                _stateMachine.ChangeState(_agent.StatePositioning);
-                return;
-            }
-
-            _timer -= Time.deltaTime;
-
-            // 1. Visuals
-            if (_agent.laserSight)
-            {
-                Vector3 start = _agent.firePoint ? _agent.firePoint.position : _agent.transform.position;
-                // Aim at chest
-                Vector3 end = _agent.GetTarget().position + Vector3.up * 1.0f;
-                _agent.laserSight.SetPosition(0, start);
-                _agent.laserSight.SetPosition(1, end);
-            }
-
-            // 2. Tracking (Stop tracking in last 0.2s for fairness)
-            if (_timer > 0.2f)
-            {
-                _agent.GetComponent<EnemyMotor>().FaceTarget(_agent.GetTarget().position);
-            }
-
-            // 3. Transition
-            if (_timer <= 0)
-            {
-                _stateMachine.ChangeState(_agent.StateFiring);
-            }
-        }
-
-        public override void Exit()
-        {
-            if (_agent.laserSight) _agent.laserSight.enabled = false;
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Firing.cs`
-- Lines: 24
-- Size: 0.6 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Sniper
-{
-    public class SniperState_Firing : State
-    {
-        private EnemyAgent_Sniper _agent;
-
-        public SniperState_Firing(EnemyAgent_Sniper agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // Shoot
-            _agent.HelperFireProjectile(35f); // Fast bullet
-
-            // Immediately return to positioning
-            _stateMachine.ChangeState(_agent.StatePositioning);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Positioning.cs`
-- Lines: 54
-- Size: 1.6 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Sniper
-{
-    public class SniperState_Positioning : State
-    {
-        private EnemyAgent_Sniper _agent;
-        private float _cooldownTimer;
-
-        public SniperState_Positioning(EnemyAgent_Sniper agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            // OPTIMIZATION: Assign the pre-filled list reference. 
-            // Zero Garbage Allocation.
-            _agent.Brain.behaviors = _agent.positioningBehaviors;
-
-            _cooldownTimer = 1.0f;
-        }
-
-        public override void LogicUpdate()
-        {
-            if (_agent.GetTarget() == null) return;
-
-            if (_cooldownTimer > 0) _cooldownTimer -= Time.deltaTime;
-
-            float dist = Vector3.Distance(_agent.transform.position, _agent.GetTarget().position);
-
-            // 1. Panic
-            if (dist < _agent.panicDistance)
-            {
-                _stateMachine.ChangeState(_agent.StateTeleport);
-                return;
-            }
-
-            // 2. Attack
-            if (dist < _agent.attackRange && _cooldownTimer <= 0)
-            {
-                _stateMachine.ChangeState(_agent.StateAiming);
-                return;
-            }
-
-            // 3. Move
-            Vector3 moveDir = _agent.Brain.GetDirectionToMove();
-            _agent.GetComponent<EnemyMotor>().Move(moveDir);
-            _agent.GetComponent<EnemyMotor>().FaceTarget(_agent.GetTarget().position);
-        }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Enemy\States\Sniper\SniperState_Teleport.cs`
-- Lines: 61
-- Size: 1.7 KB
-- Modified: 2025-12-30 09:50
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.AI.FSM;
-using DG.Tweening;
-using DarkTowerTron.Enemy.Agents;
-
-namespace DarkTowerTron.Enemy.States.Sniper
-
-{
-    public class SniperState_Teleport : State
-    {
-        private EnemyAgent_Sniper _agent;
-        private bool _isTeleporting;
-
-        public SniperState_Teleport(EnemyAgent_Sniper agent)
-        {
-            _agent = agent;
-        }
-
-        public override void Enter()
-        {
-            _isTeleporting = true;
-            _agent.transform.DOScale(Vector3.zero, 0.2f).OnComplete(PerformJump);
-        }
-
-        private void PerformJump()
-        {
-            if (_agent == null) return;
-
-            Vector3 dirAway = (_agent.transform.position - _agent.GetTarget().position).normalized;
-
-            // CONFIGURABLE DISTANCE
-            float dist = _agent.teleportDistance;
-            Vector3 dest = _agent.transform.position + (dirAway * dist);
-
-            // Wall Check
-            if (UnityEngine.Physics.Raycast(_agent.transform.position, dirAway, out RaycastHit hit, dist, _agent.wallLayer))
-            {
-                dest = hit.point - (dirAway * 2f);
-            }
-
-            dest.y = 0;
-            _agent.transform.position = dest;
-
-            // Reset Velocity
-            _agent.GetComponent<EnemyMotor>().OnSpawn();
-
-            _agent.transform.DOScale(Vector3.one, 0.2f).OnComplete(() =>
-            {
-                _isTeleporting = false;
-            });
-        }
-
-        public override void LogicUpdate()
-        {
-            if (!_isTeleporting)
-            {
-                _stateMachine.ChangeState(_agent.StatePositioning);
+                Quaternion rot = Quaternion.LookRotation(dir);
+                // Use COMBAT rotation speed (slower/smoother) instead of navigation speed
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, stats.combatRotationSpeed * Time.deltaTime);
             }
         }
     }
@@ -8234,16 +9043,18 @@ namespace DarkTowerTron.Enemy.States.Sniper
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Visuals\EnemyVisuals.cs`
-- Lines: 208
+- Lines: 210
 - Size: 7.0 KB
-- Modified: 2026-01-06 11:56
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
-using DG.Tweening;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Services;
-using DarkTowerTron.Services; // PaletteManager
+using DarkTowerTron.Services;
+using DG.Tweening;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Enemy.Visuals
@@ -8283,7 +9094,7 @@ namespace DarkTowerTron.Enemy.Visuals
             if (_renderers.Length == 0)
             {
                 // Warn but don't crash, logic will just loop 0 times
-                Debug.LogWarning($"[EnemyVisuals] No Renderers found on {name}", gameObject);
+                GameLogger.LogWarning(LogChannel.AI, $"[EnemyVisuals] No Renderers found on {name}", gameObject);
             }
 
             _baseColors = new Color[_renderers.Length];
@@ -8297,7 +9108,7 @@ namespace DarkTowerTron.Enemy.Visuals
         {
             if (profile == null)
             {
-                Debug.LogError($"[EnemyVisuals] Profile missing on {gameObject.name}. Animations will fail.", gameObject);
+                GameLogger.LogError(LogChannel.AI, $"[EnemyVisuals] Profile missing on {gameObject.name}. Animations will fail.", gameObject);
                 enabled = false;
                 return;
             }
@@ -8450,19 +9261,23 @@ namespace DarkTowerTron.Enemy.Visuals
 ```
 
 ## 📄 `Assets\Scripts\Environment\ArenaGate.cs`
-- Lines: 77
-- Size: 2.6 KB
-- Modified: 2025-12-30 09:50
+- Lines: 89
+- Size: 2.9 KB
+- Modified: 2026-01-06 15:31
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
 
 namespace DarkTowerTron.Environment
 {
     public class ArenaGate : MonoBehaviour
     {
+        [Header("Wiring")]
+        [SerializeField] private VoidEventChannelSO _roomClearedEvent;
+
         [Header("Parts")]
         public Transform laserWall;    // The Pivot (Scales up/down)
         public Renderer baseRenderer;  // The Floor Strip
@@ -8481,13 +9296,21 @@ namespace DarkTowerTron.Environment
         {
             // Initial State: Open
             SetGate(false, true);
-
-            GameEvents.OnRoomCleared += () => SetGate(false);
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            GameEvents.OnRoomCleared -= () => SetGate(false);
+            if (_roomClearedEvent != null) _roomClearedEvent.OnEventRaised += OnRoomCleared;
+        }
+
+        private void OnDisable()
+        {
+            if (_roomClearedEvent != null) _roomClearedEvent.OnEventRaised -= OnRoomCleared;
+        }
+
+        private void OnRoomCleared()
+        {
+            SetGate(false);
         }
 
         public void ForceClose()
@@ -8591,18 +9414,23 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Environment\LevelEndTrigger.cs`
-- Lines: 32
-- Size: 0.9 KB
-- Modified: 2026-01-06 09:15
+- Lines: 37
+- Size: 1.1 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using UnityEngine;
 
 namespace DarkTowerTron.Environment
 {
     public class LevelEndTrigger : MonoBehaviour
     {
+        [Header("Broadcasting")]
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
+
         private bool _triggered = false;
 
         private void OnTriggerEnter(Collider other)
@@ -8615,7 +9443,7 @@ namespace DarkTowerTron.Environment
                 GameLogger.Log(LogChannel.System, "LEVEL COMPLETE", gameObject);
 
                 // Trigger Victory Logic
-                GameEvents.OnGameVictory?.Invoke();
+                _gameVictoryEvent?.Raise();
             }
         }
 
@@ -9022,16 +9850,17 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Environment\WaveTrigger.cs`
-- Lines: 70
+- Lines: 71
 - Size: 2.0 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
 using System.Collections.Generic;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core; // <--- THIS WAS MISSING
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Managers;
+using UnityEngine;
 
 namespace DarkTowerTron.Environment
 {
@@ -9100,16 +9929,14 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Managers\ArenaSpawner.cs`
-- Lines: 87
-- Size: 3.4 KB
-- Modified: 2026-01-06 09:37
+- Lines: 85
+- Size: 3.3 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Services;
 using UnityEngine;
-using DarkTowerTron.Managers; // For PoolManager
-using DarkTowerTron.Core;          // For GameConstants, GameLogger
-using DarkTowerTron.Core.Services; // For Services
-
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
@@ -9195,20 +10022,19 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\DebugController.cs`
-- Lines: 137
-- Size: 4.7 KB
-- Modified: 2026-01-06 10:06
+- Lines: 139
+- Size: 4.8 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
-using UnityEngine.InputSystem; // NEW: For Keyboard
 using System.Collections;
-using DarkTowerTron.Core;
+using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Controller;
 using DarkTowerTron.Player.Stats;
-using DarkTowerTron.Combat; // For DamageReceiver
-
-// ALIAS: Resolves Services conflict
+using UnityEngine;
+using UnityEngine.InputSystem;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
@@ -9217,6 +10043,9 @@ namespace DarkTowerTron.Managers
     {
         [Header("Workflow")]
         public bool autoStartGame = false;
+
+        [Header("Events")]
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;
 
         [Header("Cheats")]
         public bool godMode = false;
@@ -9251,7 +10080,7 @@ namespace DarkTowerTron.Managers
                     session.BeginGame();
 
                     // Force combat state active
-                    GameEvents.OnWaveCombatStarted?.Invoke();
+                    _combatStartedEvent?.Raise();
                 }
             }
 
@@ -9339,123 +10168,28 @@ namespace DarkTowerTron.Managers
 }
 ```
 
-## 📄 `Assets\Scripts\Managers\FeedbackDirector.cs`
-- Lines: 93
-- Size: 3.2 KB
-- Modified: 2026-01-06 10:36
-
-```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Event Channels
-using DarkTowerTron.Visuals;
-
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
-
-namespace DarkTowerTron.Managers
-{
-    public class FeedbackDirector : MonoBehaviour
-    {
-        [Header("Event Wiring")]
-        [SerializeField] private VoidEventChannelSO _playerHitEvent;
-        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
-        [SerializeField] private BoolEventChannelSO _hullEvent;
-
-        [Header("Profiles")]
-        public FeedbackProfileSO killProfile;
-        public FeedbackProfileSO playerHurtProfile;
-
-        // Note: 'hitProfile' seemed unused in your previous logic, 
-        // kept here if you plan to wire it to an EnemyHit event later.
-        public FeedbackProfileSO hitProfile;
-
-        [Header("Hull")]
-        public AudioClip hullBreakClip;
-
-        // State for Edge Detection
-        private bool _hasLastHullState;
-        private bool _lastHasHull;
-
-        private void OnEnable()
-        {
-            if (_playerHitEvent != null) _playerHitEvent.OnEventRaised += OnPlayerHit;
-            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
-            if (_hullEvent != null) _hullEvent.OnEventRaised += OnHullChanged;
-        }
-
-        private void OnDisable()
-        {
-            if (_playerHitEvent != null) _playerHitEvent.OnEventRaised -= OnPlayerHit;
-            if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
-            if (_hullEvent != null) _hullEvent.OnEventRaised -= OnHullChanged;
-        }
-
-        private void OnHullChanged(bool hasHull)
-        {
-            bool lostHull = _hasLastHullState && _lastHasHull && !hasHull;
-
-            _hasLastHullState = true;
-            _lastHasHull = hasHull;
-
-            // Only play feedback if we LOST the hull (became false)
-            if (!lostHull) return;
-
-            if (Global.Audio != null) Global.Audio.PlaySound(hullBreakClip, 1.0f);
-
-            // Legacy Singletons (Consider refactoring these to Services later)
-            if (CameraShaker.Instance) CameraShaker.Instance.Shake(0.5f, 0.7f);
-            if (Global.Time != null) Global.Time.HitStop(0.2f);
-        }
-
-        private void OnPlayerHit()
-        {
-            ApplyProfile(playerHurtProfile);
-        }
-
-        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
-        {
-            ApplyProfile(killProfile);
-        }
-
-        // --- HELPER ---
-        private void ApplyProfile(FeedbackProfileSO profile)
-        {
-            if (profile == null) return;
-
-            // 1. Audio
-            if (profile.sound && Global.Audio != null)
-                Global.Audio.PlaySound(profile.sound);
-
-            // 2. Camera
-            if (CameraShaker.Instance)
-                CameraShaker.Instance.Shake(profile.shakeDuration, profile.shakeStrength);
-
-            // 3. Time
-            if (Global.Time != null && profile.hitStopDuration > 0)
-                Global.Time.HitStop(profile.hitStopDuration);
-        }
-    }
-}
-```
-
 ## 📄 `Assets\Scripts\Managers\GameSession.cs`
-- Lines: 173
-- Size: 5.1 KB
-- Modified: 2026-01-06 10:38
+- Lines: 180
+- Size: 5.5 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Stats;
 using DarkTowerTron.UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DarkTowerTron.Managers
 {
     public class GameSession : MonoBehaviour
     {
+        [Header("Wiring")]
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;
+
         [Header("Manager References")]
         public UIManager uiManager;
 
@@ -9472,8 +10206,19 @@ namespace DarkTowerTron.Managers
             _controls.Gameplay.Pause.performed += ctx => TogglePause();
         }
 
-        private void OnEnable() => _controls.Enable();
-        private void OnDisable() => _controls.Disable();
+        private void OnEnable()
+        {
+            _controls.Enable();
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += TriggerGameOver;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised += TriggerVictory;
+        }
+
+        private void OnDisable()
+        {
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= TriggerGameOver;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised -= TriggerVictory;
+            _controls.Disable();
+        }
 
         private void Start()
         {
@@ -9485,16 +10230,6 @@ namespace DarkTowerTron.Managers
             // Locate Player via Service
             MovePlayerToStart();
             if (GameServices.Player) GameServices.Player.ToggleInput(false);
-
-            GameEvents.OnPlayerDied += TriggerGameOver;
-            GameEvents.OnGameVictory += TriggerVictory;
-        }
-
-        private void OnDestroy()
-        {
-            GameEvents.OnPlayerDied -= TriggerGameOver;
-            GameEvents.OnGameVictory -= TriggerVictory;
-            GameEvents.Cleanup();
         }
 
         // --- PUBLIC UI FUNCTIONS ---
@@ -9624,13 +10359,13 @@ namespace DarkTowerTron.Managers
 ## 📄 `Assets\Scripts\Managers\LevelBuilder.cs`
 - Lines: 43
 - Size: 1.1 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
 using System.Collections.Generic;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Environment;
-using DarkTowerTron.Core;
+using UnityEngine;
 
 namespace DarkTowerTron.Managers
 {
@@ -9672,19 +10407,58 @@ namespace DarkTowerTron.Managers
 }
 ```
 
-## 📄 `Assets\Scripts\Managers\WaveDirector.cs`
-- Lines: 218
-- Size: 7.5 KB
-- Modified: 2026-01-06 09:15
+## 📄 `Assets\Scripts\Managers\LevelPrewarmer.cs`
+- Lines: 32
+- Size: 0.8 KB
+- Modified: 2026-01-07 19:26
 
 ```csharp
 using UnityEngine;
+using System.Collections.Generic;
+using DarkTowerTron.Core.Services;
+// Alias
+using Global = DarkTowerTron.Core.Services.Services;
+
+namespace DarkTowerTron.Managers
+{
+    public class LevelPrewarmer : MonoBehaviour
+    {
+        [System.Serializable]
+        public struct PoolRequest
+        {
+            public GameObject prefab;
+            public int count;
+        }
+
+        public List<PoolRequest> prewarmList;
+
+        private void Start()
+        {
+            // Wait one frame for Services to be ready (if not using Execution Order)
+            if (Global.Pool != null)
+            {
+                foreach (var req in prewarmList)
+                {
+                    Global.Pool.Prewarm(req.prefab, req.count);
+                }
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Managers\WaveDirector.cs`
+- Lines: 224
+- Size: 7.7 KB
+- Modified: 2026-01-08 06:09
+
+```csharp
 using System.Collections;
 using System.Collections.Generic;
-using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
-using DarkTowerTron.Core.Services;    // For Logger
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using UnityEngine;
 
 namespace DarkTowerTron.Managers
 {
@@ -9694,6 +10468,13 @@ namespace DarkTowerTron.Managers
         [Header("Wiring")]
         [Tooltip("Listens for enemy deaths to track wave progress.")]
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+
+        [Header("Broadcasting")]
+        [SerializeField] private IntEventChannelSO _announceEvent;
+        [SerializeField] private StringEventChannelSO _countdownEvent;
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;
+        [SerializeField] private VoidEventChannelSO _waveClearedEvent;
+        [SerializeField] private VoidEventChannelSO _roomClearedEvent;
 
         [Header("Configuration")]
         public List<WaveDefinitionSO> waves;
@@ -9750,7 +10531,7 @@ namespace DarkTowerTron.Managers
                 GameLogger.Log(LogChannel.System, "ROOM CLEARED", gameObject);
                 
                 // Triggers doors opening, etc.
-                GameEvents.OnRoomCleared?.Invoke(); 
+                _roomClearedEvent?.Raise();
                 yield break;
             }
 
@@ -9758,20 +10539,20 @@ namespace DarkTowerTron.Managers
             GameLogger.Log(LogChannel.System, $"STARTING WAVE {index + 1}: {wave.waveName}", gameObject);
 
             // --- UI ANNOUNCEMENT (Legacy Static Events) ---
-            GameEvents.OnWaveAnnounce?.Invoke(index);
+            _announceEvent?.Raise(index + 1);
             yield return new WaitForSeconds(1.0f);
             
-            GameEvents.OnCountdownChange?.Invoke("3");
+            _countdownEvent?.Raise("3");
             yield return new WaitForSeconds(1.0f);
-            GameEvents.OnCountdownChange?.Invoke("2");
+            _countdownEvent?.Raise("2");
             yield return new WaitForSeconds(1.0f);
-            GameEvents.OnCountdownChange?.Invoke("1");
+            _countdownEvent?.Raise("1");
             yield return new WaitForSeconds(1.0f);
             
-            GameEvents.OnCountdownChange?.Invoke("ENGAGE");
-            GameEvents.OnWaveCombatStarted?.Invoke();
+            _countdownEvent?.Raise("ENGAGE");
+            _combatStartedEvent?.Raise();
             yield return new WaitForSeconds(0.5f);
-            GameEvents.OnCountdownChange?.Invoke("");
+            _countdownEvent?.Raise("");
             // -----------------
 
             // Reset Counters
@@ -9882,7 +10663,7 @@ namespace DarkTowerTron.Managers
 
                 if (_gruntRoutine != null) StopCoroutine(_gruntRoutine);
 
-                GameEvents.OnWaveCleared?.Invoke(); // UI/FX Feedback
+                _waveClearedEvent?.Raise(); // UI/FX Feedback
                 
                 _currentWaveIndex++;
                 StartCoroutine(NextWaveRoutine());
@@ -9899,9 +10680,9 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Physics\KinematicMover.cs`
-- Lines: 276
-- Size: 11.2 KB
-- Modified: 2026-01-06 09:15
+- Lines: 318
+- Size: 12.7 KB
+- Modified: 2026-01-08 14:09
 
 ```csharp
 using UnityEngine;
@@ -9911,7 +10692,7 @@ using DarkTowerTron.Core;
 namespace DarkTowerTron.Physics
 {
     [RequireComponent(typeof(CapsuleCollider))]
-    public class KinematicMover : MonoBehaviour
+    public class KinematicMover : MonoBehaviour, IMover
     {
         [Header("Configuration")]
         [SerializeField] private LayerMask _obstacleMask;
@@ -9941,7 +10722,9 @@ namespace DarkTowerTron.Physics
 
         // Cache
         private RaycastHit[] _hitBuffer = new RaycastHit[8];
-        private HashSet<Collider> _ignoredColliders = new HashSet<Collider>();
+        // OPTIMIZATION: HashSet lookup is O(1) - incredibly fast
+        private readonly HashSet<Collider> _myColliders = new HashSet<Collider>();
+        private readonly HashSet<Collider> _ignoredExternalColliders = new HashSet<Collider>();
 
         // Properties
         public Vector3 Velocity => _velocity;
@@ -9951,6 +10734,22 @@ namespace DarkTowerTron.Physics
         private void Awake()
         {
             _capsule = GetComponent<CapsuleCollider>();
+
+            // 1. Auto-Register Self
+            // Find ALL colliders in children (Hitboxes, sensors, shield)
+            var childCols = GetComponentsInChildren<Collider>(true); // true = include inactive
+            foreach (var c in childCols)
+            {
+                _myColliders.Add(c);
+
+                // Also ignore physical collision between the capsule and children
+                // (Redundant if using Layers, but good for safety)
+                if (c != _capsule)
+                {
+                    UnityEngine.Physics.IgnoreCollision(_capsule, c, true);
+                }
+            }
+
             if (Camera.main) _camTransform = Camera.main.transform;
             if (_obstacleMask == 0) _obstacleMask = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
@@ -9992,7 +10791,16 @@ namespace DarkTowerTron.Physics
         }
 
         public void Teleport(Vector3 pos) { transform.position = pos; _velocity = Vector3.zero; }
-        public void IgnoreCollider(Collider col) => _ignoredColliders.Add(col);
+        public void SetEnabled(bool state) => enabled = state;
+
+        // Helper for other scripts to check "Is this me?"
+        public bool IsMyCollider(Collider c) => c != null && _myColliders.Contains(c);
+
+        public void IgnoreCollider(Collider col)
+        {
+            if (col == null) return;
+            _ignoredExternalColliders.Add(col);
+        }
 
         // ================= INTERNAL PHYSICS =================
 
@@ -10034,11 +10842,26 @@ namespace DarkTowerTron.Physics
                     // Double safety check (redundant with QueryTriggerInteraction.Ignore, but good to keep)
                     if (_hitBuffer[j].collider.isTrigger) continue;
 
-                    if (_hitBuffer[j].distance <= 0 || _ignoredColliders.Contains(_hitBuffer[j].collider) || _hitBuffer[j].transform == transform) continue;
-                    if (_hitBuffer[j].distance < closestDist)
+                    RaycastHit hit = _hitBuffer[j];
+                    Collider col = hit.collider;
+
+                    // FAST CHECK:
+                    // 1. Is it me? (O(1))
+                    // 2. Is it explicitly ignored? (O(1))
+                    // 3. Is it a trigger?
+                    if (_myColliders.Contains(col) ||
+                        _ignoredExternalColliders.Contains(col) ||
+                        col.isTrigger)
                     {
-                        closestDist = _hitBuffer[j].distance;
-                        closest = _hitBuffer[j];
+                        continue;
+                    }
+
+                    if (hit.distance <= 0) continue;
+
+                    if (hit.distance < closestDist)
+                    {
+                        closestDist = hit.distance;
+                        closest = hit;
                         hitFound = true;
                     }
                 }
@@ -10159,7 +10982,7 @@ namespace DarkTowerTron.Physics
             {
                 var col = buffer[i];
                 // Ignore self AND ignored colliders
-                if (col == _capsule || _ignoredColliders.Contains(col)) continue;
+                if (_myColliders.Contains(col) || _ignoredExternalColliders.Contains(col)) continue;
                 
                 // CRITICAL FIX: Do not push out of Triggers!
                 if (col.isTrigger) continue;
@@ -10182,16 +11005,79 @@ namespace DarkTowerTron.Physics
 }
 ```
 
-## 📄 `Assets\Scripts\Player\Combat\PlayerBeam.cs`
-- Lines: 83
-- Size: 2.8 KB
-- Modified: 2026-01-06 09:39
+## 📄 `Assets\Scripts\Physics\UnityCharacterMover.cs`
+- Lines: 54
+- Size: 1.6 KB
+- Modified: 2026-01-06 15:01
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Core; // DamageInfo
+
+namespace DarkTowerTron.Physics
+{
+    [RequireComponent(typeof(CharacterController))]
+    public class UnityCharacterMover : MonoBehaviour, IMover
+    {
+        private CharacterController _cc;
+
+        // We calculate velocity manually because _cc.velocity is sometimes 
+        // strictly based on movement, not external forces we want to track.
+        public Vector3 Velocity { get; private set; }
+
+        public bool IsGrounded => _cc.isGrounded;
+
+        private void Awake()
+        {
+            _cc = GetComponent<CharacterController>();
+        }
+
+        public void Move(Vector3 velocity)
+        {
+            if (!_cc.enabled) return;
+
+            float dt = Time.deltaTime;
+
+            // 1. Apply Movement
+            // CC.Move takes Displacement (Velocity * Time)
+            _cc.Move(velocity * dt);
+
+            // 2. Update Public Velocity
+            // We store what was passed in, so other scripts (Animation/Sound) know how fast we intend to go
+            Velocity = velocity;
+        }
+
+        public void Teleport(Vector3 position)
+        {
+            // Critical: CC overrides transform.position. 
+            // You must disable it, move, then re-enable.
+            bool wasEnabled = _cc.enabled;
+            _cc.enabled = false;
+            transform.position = position;
+            _cc.enabled = wasEnabled;
+
+            Velocity = Vector3.zero;
+        }
+
+        public void SetEnabled(bool state)
+        {
+            this.enabled = state;
+            if (_cc) _cc.enabled = state;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Player\Combat\PlayerBeam.cs`
+- Lines: 84
+- Size: 2.8 KB
+- Modified: 2026-01-08 06:10
+
+```csharp
+using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Player.Stats;
 using DG.Tweening;
-// ALIAS
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
@@ -10204,12 +11090,12 @@ namespace DarkTowerTron.Player.Combat
         public float selfRecoil = 15f;
         public GameObject beamVisualPrefab;
 
-        private DarkTowerTron.Player.Movement.PlayerMovement _movement;
+        private DarkTowerTron.Player.Movement.PlayerMotor _movement;
 
         protected override void Awake()
         {
             base.Awake();
-            _movement = GetComponent<DarkTowerTron.Player.Movement.PlayerMovement>();
+            _movement = GetComponent<DarkTowerTron.Player.Movement.PlayerMotor>();
         }
 
         protected override float GetCurrentFireRate()
@@ -10274,18 +11160,16 @@ namespace DarkTowerTron.Player.Combat
 ```
 
 ## 📄 `Assets\Scripts\Player\Combat\PlayerExecution.cs`
-- Lines: 116
-- Size: 3.7 KB
-- Modified: 2026-01-06 10:36
+- Lines: 129
+- Size: 4.6 KB
+- Modified: 2026-01-09 08:17
 
 ```csharp
-using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
-using DarkTowerTron.Player.Stats;
 using DarkTowerTron.Player.Movement;
-
-// ALIAS: Resolves Services conflict
+using DarkTowerTron.Player.Stats;
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
@@ -10293,7 +11177,7 @@ namespace DarkTowerTron.Player.Combat
     [RequireComponent(typeof(PlayerEnergy))]
     [RequireComponent(typeof(PlayerHealth))]
     [RequireComponent(typeof(TargetScanner))]
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerExecution : MonoBehaviour
     {
@@ -10301,10 +11185,14 @@ namespace DarkTowerTron.Player.Combat
         public float killRewardFocus = 50f;
         public AudioClip executeClip;
 
+        [Header("Positioning")]
+        [Tooltip("How high above the ground to teleport to prevent clipping. 0.1 is usually enough.")]
+        public float verticalBuffer = 0.2f;
+
         private PlayerEnergy _energy;
         private PlayerHealth _health;
         private TargetScanner _scanner;
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerStats _stats;
         private bool _isBusy;
 
@@ -10313,7 +11201,7 @@ namespace DarkTowerTron.Player.Combat
             _energy = GetComponent<PlayerEnergy>();
             _health = GetComponent<PlayerHealth>();
             _scanner = GetComponent<TargetScanner>();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _stats = GetComponent<PlayerStats>();
         }
 
@@ -10333,36 +11221,47 @@ namespace DarkTowerTron.Player.Combat
         {
             _isBusy = true;
 
-            // 1. Calculate Position
+            // 1. Calculate Base Position (Horizontal only first)
             Vector3 targetPos = target.transform.position;
-            Vector3 attackPos = targetPos - (transform.forward * 1.0f);
+            
+            // Back up slightly from the target so we don't clip inside them
+            Vector3 attackPos = targetPos - (transform.forward * 1.5f);
 
-            // 2. Y-Axis Logic (Verticality Support)
+            // 2. Y-Axis Logic (Safe Ground Snap)
             if (target.KeepPlayerGrounded)
             {
-                // HYGIENE: Use Constant Mask
-                if (UnityEngine.Physics.Raycast(targetPos + Vector3.up, Vector3.down, out RaycastHit hit, 10f, GameConstants.MASK_GROUND_ONLY))
+                // FIX: Cast from High Up (Enemy Head + 2m) downwards
+                // This ensures we don't start the raycast inside the floor if the enemy is short
+                Vector3 rayOrigin = targetPos;
+                rayOrigin.y += 2.0f;
+
+                int groundMask = DarkTowerTron.Core.GameConstants.MASK_GROUND_ONLY;
+
+                if (UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 10f, groundMask))
                 {
-                    attackPos.y = hit.point.y;
+                    // Add a small buffer so we don't clip into the floor after teleport.
+                    attackPos.y = hit.point.y + verticalBuffer;
                 }
                 else
                 {
-                    attackPos.y = targetPos.y; // Fallback
+                    // Fallback: Use Player's current height if we can't find ground
+                    // This prevents teleporting into the void if the enemy is flying over a pit
+                    attackPos.y = transform.position.y + verticalBuffer;
                 }
             }
             else
             {
-                // Go to exact height (e.g. Floating Anchor)
+                // Air execution (maintain enemy height)
                 attackPos.y = targetPos.y;
             }
 
-            transform.position = attackPos;
-
-            // 3. Suspend Gravity (The "Matrix" Pause)
+            // 3. SAFE TELEPORT (Fixes the "Falling through ground" bug)
             if (_movement)
             {
-                _movement.ResetVelocity();
-                _movement.SuspendGravity(_stats.ActionHangTime);
+                _movement.Teleport(attackPos);
+                
+                // Suspend gravity so we hang in the air during the animation
+                _movement.SuspendGravity(_stats.ActionHangTime + 0.5f);
             }
 
             // 4. Trigger Target Reaction (Die or Reset)
@@ -10398,16 +11297,14 @@ namespace DarkTowerTron.Player.Combat
 ```
 
 ## 📄 `Assets\Scripts\Player\Combat\PlayerGun.cs`
-- Lines: 59
+- Lines: 57
 - Size: 1.6 KB
-- Modified: 2026-01-06 09:42
+- Modified: 2026-01-08 06:10
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
-
-// ALIAS
+using UnityEngine;
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Player.Combat
@@ -10627,19 +11524,15 @@ namespace DarkTowerTron.Player.Combat
 ```
 
 ## 📄 `Assets\Scripts\Player\Combat\WeaponBase.cs`
-- Lines: 153
+- Lines: 151
 - Size: 4.9 KB
-- Modified: 2026-01-06 09:39
+- Modified: 2026-01-08 06:10
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Managers;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Player.Stats;
-
-// ALIAS: Safety against namespace collisions
-using Global = DarkTowerTron.Core.Services.Services;
+using UnityEngine;
 
 namespace DarkTowerTron.Player.Combat
 {
@@ -10652,10 +11545,11 @@ namespace DarkTowerTron.Player.Combat
         [Header("Behavior")]
         public bool isAutomatic = true;
 
-        [Header("Audio")]
-        public SoundDef fireSound;
+        [Header("Game Feel")]
+        [Tooltip("Audio, Shake, Flash, etc. happens here.")]
+        public FeedbackConfigurationSO fireFeedback;
 
-        [Header("Feel")]
+        [Header("Input")]
         public float inputBufferTime = 0.2f;
 
         protected PlayerStats _stats;
@@ -10696,7 +11590,7 @@ namespace DarkTowerTron.Player.Combat
                 if (!isAutomatic && _hasFiredThisPress) return;
 
                 Fire();
-                PlayFireSound();
+                PlayFireFeedback();
 
                 _timer = GetCurrentFireRate();
                 _bufferTimer = 0;
@@ -10707,11 +11601,12 @@ namespace DarkTowerTron.Player.Combat
         protected abstract float GetCurrentFireRate();
         protected abstract void Fire();
 
-        protected void PlayFireSound()
+        protected void PlayFireFeedback()
         {
-            // CHANGE: Services -> Global
-            if (fireSound && Global.Audio != null)
-                Global.Audio.PlaySound(fireSound);
+            if (fireFeedback == null) return;
+
+            Vector3 playPos = firePoint != null ? firePoint.position : transform.position;
+            fireFeedback.Play(gameObject, playPos);
         }
 
         protected Vector3 GetAimDirection()
@@ -10790,7 +11685,7 @@ namespace DarkTowerTron.Player.Combat
 ## 📄 `Assets\Scripts\Player\Controller\PlayerController.cs`
 - Lines: 94
 - Size: 3.0 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:00
 
 ```csharp
 using UnityEngine;
@@ -10802,7 +11697,7 @@ using DarkTowerTron.Player.Stats;
 namespace DarkTowerTron.Player.Controller
 {
     [RequireComponent(typeof(PlayerInputHandler))]
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerDodge))]
     [RequireComponent(typeof(PlayerExecution))]
     [RequireComponent(typeof(PlayerWeaponController))]
@@ -10810,7 +11705,7 @@ namespace DarkTowerTron.Player.Controller
     {
         // --- Dependencies ---
         private PlayerInputHandler _input;
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerDodge _dodge;
         private PlayerExecution _execution;
         private PlayerWeaponController _weapons;
@@ -10820,7 +11715,7 @@ namespace DarkTowerTron.Player.Controller
         {
             // 1. Get Components
             _input = GetComponent<PlayerInputHandler>();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _dodge = GetComponent<PlayerDodge>();
             _execution = GetComponent<PlayerExecution>();
             _weapons = GetComponent<PlayerWeaponController>();
@@ -10892,14 +11787,14 @@ namespace DarkTowerTron.Player.Controller
 ## 📄 `Assets\Scripts\Player\Controller\PlayerInputHandler.cs`
 - Lines: 207
 - Size: 7.0 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:11
 
 ```csharp
+using System;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Input; // Namespace for Buffer
 
 namespace DarkTowerTron.Player.Controller
 {
@@ -10939,7 +11834,7 @@ namespace DarkTowerTron.Player.Controller
             // 1. Dependency Validation
             if (!AreInputsBound())
             {
-                GameLogger.LogError(DarkTowerTron.Core.LogChannel.Player,
+                GameLogger.LogError(LogChannel.Player,
                     "CRITICAL: Missing Input Action References! Disabling InputHandler to prevent crash.", gameObject);
 
                 enabled = false; // Stop Update() from running
@@ -11105,20 +12000,25 @@ namespace DarkTowerTron.Player.Controller
 ```
 
 ## 📄 `Assets\Scripts\Player\Movement\AfterImage.cs`
-- Lines: 88
-- Size: 2.3 KB
-- Modified: 2026-01-06 09:15
+- Lines: 93
+- Size: 2.5 KB
+- Modified: 2026-01-06 15:28
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core.Events;
 using DG.Tweening;
 
 namespace DarkTowerTron.Player.Movement
 {
     public class AfterImage : MonoBehaviour, IDamageable, ICombatTarget
     {
+        [Header("Broadcasting")]
+        [SerializeField] private TransformEventChannelSO _decoySpawnedEvent;
+        [SerializeField] private VoidEventChannelSO _decoyExpiredEvent;
+
         [Header("Stats")]
         public float lifetime = 1.0f;
         public float health = 10f; // Default hp
@@ -11135,7 +12035,7 @@ namespace DarkTowerTron.Player.Movement
         private void Start()
         {
             // 1. Notify AI
-            GameEvents.OnDecoySpawned?.Invoke(transform);
+            _decoySpawnedEvent?.Raise(transform);
 
             // 2. Visual Fade
             Renderer rend = GetComponentInChildren<Renderer>();
@@ -11153,8 +12053,8 @@ namespace DarkTowerTron.Player.Movement
         {
             // Cleanup
             if (_fadeTween != null) _fadeTween.Kill();
-            
-            GameEvents.OnDecoyExpired?.Invoke();
+
+            _decoyExpiredEvent?.Raise();
         }
 
         public void OnExecutionHit()
@@ -11203,7 +12103,7 @@ namespace DarkTowerTron.Player.Movement
 ## 📄 `Assets\Scripts\Player\Movement\PlayerDodge.cs`
 - Lines: 189
 - Size: 6.0 KB
-- Modified: 2026-01-06 10:04
+- Modified: 2026-01-08 06:01
 
 ```csharp
 using UnityEngine;
@@ -11220,7 +12120,7 @@ namespace DarkTowerTron.Player.Movement
 {
     [RequireComponent(typeof(KinematicMover))]
     [RequireComponent(typeof(PlayerEnergy))]
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerLoadout))]
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerDodge : MonoBehaviour
@@ -11248,7 +12148,7 @@ namespace DarkTowerTron.Player.Movement
         // Dependencies
         private KinematicMover _mover;
         private PlayerEnergy _energy;
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerLoadout _loadout;
         private PlayerStats _stats;
 
@@ -11256,7 +12156,7 @@ namespace DarkTowerTron.Player.Movement
         {
             _mover = GetComponent<KinematicMover>();
             _energy = GetComponent<PlayerEnergy>();
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _loadout = GetComponent<PlayerLoadout>();
             _stats = GetComponent<PlayerStats>();
         }
@@ -11397,23 +12297,28 @@ namespace DarkTowerTron.Player.Movement
 }
 ```
 
-## 📄 `Assets\Scripts\Player\Movement\PlayerMovement.cs`
-- Lines: 228
-- Size: 7.7 KB
-- Modified: 2026-01-06 09:15
+## 📄 `Assets\Scripts\Player\Movement\PlayerMotor.cs`
+- Lines: 291
+- Size: 9.9 KB
+- Modified: 2026-01-09 07:11
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Player.Stats;
+using UnityEngine;
 
 namespace DarkTowerTron.Player.Movement
 {
-    [RequireComponent(typeof(KinematicMover))]
+    // Intentionally not requiring a specific mover so we can swap implementations.
     [RequireComponent(typeof(PlayerStats))]
-    public class PlayerMovement : MonoBehaviour
+    public class PlayerMotor : MonoBehaviour
     {
+        [Header("Mover Selection")]
+        [Tooltip("If true, attempts to use UnityCharacterMover. If false, uses KinematicMover.")]
+        public bool useUnityController = false;
+
         [Header("Wall Repulsion")]
         public float wallBuffer = 0.6f; // Keep this (Collider size dependency)
 
@@ -11426,7 +12331,7 @@ namespace DarkTowerTron.Player.Movement
         // Expose input for Blitz
         public Vector3 MoveInput => _inputDir;
 
-        private KinematicMover _mover;
+        private IMover _mover;
         private Camera _cam;
         private PlayerStats _stats;
 
@@ -11441,14 +12346,54 @@ namespace DarkTowerTron.Player.Movement
 
         private void Awake()
         {
-            _mover = GetComponent<KinematicMover>();
             _cam = Camera.main;
             _stats = GetComponent<PlayerStats>();
+
+            InitializeMover();
         }
 
         private void Start()
         {
             LastSafePosition = transform.position;
+        }
+
+        private void InitializeMover()
+        {
+            var kMover = GetComponent<KinematicMover>();
+            var uMover = GetComponent<UnityCharacterMover>();
+
+            // Disable both initially
+            if (kMover) kMover.SetEnabled(false);
+            if (uMover) uMover.SetEnabled(false);
+
+            if (useUnityController)
+            {
+                if (uMover == null) uMover = gameObject.AddComponent<UnityCharacterMover>();
+                _mover = uMover;
+
+                // Disable collision on KinematicMover (CapsuleCollider) to avoid double collision
+                if (kMover && kMover.GetComponent<Collider>())
+                    kMover.GetComponent<Collider>().enabled = false;
+            }
+            else
+            {
+                if (kMover == null) kMover = gameObject.AddComponent<KinematicMover>();
+                _mover = kMover;
+
+                // Re-enable CapsuleCollider
+                if (kMover.GetComponent<Collider>())
+                    kMover.GetComponent<Collider>().enabled = true;
+            }
+
+            _mover?.SetEnabled(true);
+            if (_mover != null) GameLogger.Log(LogChannel.Player, $"[PlayerMovement] Using Mover: {_mover.GetType().Name}");
+        }
+
+        [ContextMenu("Swap Mover")]
+        public void SwapMover()
+        {
+            useUnityController = !useUnityController;
+            InitializeMover();
         }
 
         public void SetMoveInput(Vector3 dir)
@@ -11554,6 +12499,24 @@ namespace DarkTowerTron.Player.Movement
             _inputDir = Vector3.zero; // Optional: Stop input until player presses again
         }
 
+        public void Teleport(Vector3 position)
+        {
+            // 1. Reset Velocities
+            _currentVelocity = Vector3.zero;
+            _externalForce = Vector3.zero;
+            _gravitySuspendTimer = 0f;
+
+            // 2. Delegate to the Interface (which handles the CC enable/disable safety)
+            if (_mover != null)
+            {
+                _mover.Teleport(position);
+            }
+            else
+            {
+                transform.position = position;
+            }
+        }
+
         private void HandleSafeGround()
         {
             // STRICT CHECK:
@@ -11634,9 +12597,9 @@ namespace DarkTowerTron.Player.Movement
 ```
 
 ## 📄 `Assets\Scripts\Player\Stats\PlayerEnergy.cs`
-- Lines: 112
-- Size: 3.5 KB
-- Modified: 2026-01-06 09:15
+- Lines: 115
+- Size: 4.2 KB
+- Modified: 2026-01-06 15:30
 
 ```csharp
 using UnityEngine;
@@ -11654,6 +12617,10 @@ namespace DarkTowerTron.Player.Stats
 
         [Header("Listening")]
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;         // Replaces OnPlayerDied
+        [SerializeField] private VoidEventChannelSO _combatStartedEvent;      // Replaces OnWaveCombatStarted
+        [SerializeField] private VoidEventChannelSO _waveClearedEvent;        // Replaces OnWaveCleared
+        [SerializeField] private VoidEventChannelSO _gameVictoryEvent;        // Replaces OnGameVictory
 
         private float _currentFocus;
         private bool _isDead;
@@ -11678,21 +12645,20 @@ namespace DarkTowerTron.Player.Stats
             // Subscribe to SO Event
             if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
 
-            // Subscribe to remaining Static Events (Phase 2 migration)
-            GameEvents.OnPlayerDied += OnPlayerDied;
-            GameEvents.OnWaveCombatStarted += EnableDecay;
-            GameEvents.OnWaveCleared += DisableDecay;
-            GameEvents.OnGameVictory += DisableDecay;
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += OnPlayerDied;
+            if (_combatStartedEvent != null) _combatStartedEvent.OnEventRaised += EnableDecay;
+            if (_waveClearedEvent != null) _waveClearedEvent.OnEventRaised += DisableDecay;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised += DisableDecay;
         }
 
         private void OnDisable()
         {
             if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
 
-            GameEvents.OnPlayerDied -= OnPlayerDied;
-            GameEvents.OnWaveCombatStarted -= EnableDecay;
-            GameEvents.OnWaveCleared -= DisableDecay;
-            GameEvents.OnGameVictory -= DisableDecay;
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= OnPlayerDied;
+            if (_combatStartedEvent != null) _combatStartedEvent.OnEventRaised -= EnableDecay;
+            if (_waveClearedEvent != null) _waveClearedEvent.OnEventRaised -= DisableDecay;
+            if (_gameVictoryEvent != null) _gameVictoryEvent.OnEventRaised -= DisableDecay;
         }
 
         private void Update()
@@ -11754,22 +12720,22 @@ namespace DarkTowerTron.Player.Stats
 ```
 
 ## 📄 `Assets\Scripts\Player\Stats\PlayerHealth.cs`
-- Lines: 173
-- Size: 5.4 KB
-- Modified: 2026-01-06 11:43
+- Lines: 187
+- Size: 6.1 KB
+- Modified: 2026-01-08 23:44
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
-using DarkTowerTron.Core.Services;    // For GameLogger
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Player.Movement;
-using DarkTowerTron.Player.Stats;
+using UnityEngine;
 
 namespace DarkTowerTron.Player.Stats
 {
-    [RequireComponent(typeof(PlayerMovement))]
+    [RequireComponent(typeof(PlayerMotor))]
     [RequireComponent(typeof(PlayerDodge))]
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerHealth : MonoBehaviour, IDamageable, IAimTarget
@@ -11780,10 +12746,15 @@ namespace DarkTowerTron.Player.Stats
         [Header("Aiming")]
         [SerializeField] private Transform _aimTarget; // Assign 'CameraTarget' or 'Visuals/Spine'
 
+        [Header("Juice")]
+        [SerializeField] private FeedbackConfigurationSO _damageFeedback;
+        [SerializeField] private FeedbackConfigurationSO _deathFeedback;
+
         [Header("Broadcasting")]
         [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
         [SerializeField] private BoolEventChannelSO _hullEvent;        // Replaces OnHullStateChanged
         [SerializeField] private VoidEventChannelSO _playerHitEvent;   // Replaces OnPlayerHit
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;  // Replaces OnPlayerDied
 
         [Header("Listening")]
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
@@ -11792,13 +12763,13 @@ namespace DarkTowerTron.Player.Stats
         private bool _hasHull;
         private bool _isDead;
         
-        private PlayerMovement _movement;
+        private PlayerMotor _movement;
         private PlayerDodge _dodge;
         private PlayerStats _stats;
 
         private void Awake()
         {
-            _movement = GetComponent<PlayerMovement>();
+            _movement = GetComponent<PlayerMotor>();
             _dodge = GetComponent<PlayerDodge>();
             _stats = GetComponent<PlayerStats>();
         }
@@ -11827,6 +12798,8 @@ namespace DarkTowerTron.Player.Stats
 
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
+            GameLogger.Log(LogChannel.Player, $"[PlayerHealth] Taking {dmg} Damage. Grit: {_currentGrit} -> {_currentGrit - dmg}", gameObject);
+
             if (_currentGrit > 0)
             {
                 _currentGrit -= dmg;
@@ -11834,11 +12807,13 @@ namespace DarkTowerTron.Player.Stats
 
                 // NEW: Raise Void Event for FX/Camera Shake
                 _playerHitEvent?.Raise();
+                _damageFeedback?.Play(gameObject, transform.position);
             }
             else if (_hasHull)
             {
                 _hasHull = false;
                 _playerHitEvent?.Raise();
+                _damageFeedback?.Play(gameObject, transform.position);
             }
             else
             {
@@ -11847,6 +12822,8 @@ namespace DarkTowerTron.Player.Stats
 
             if (!_isDead && _movement) 
                 _movement.ApplyKnockback(info.pushDirection * info.pushForce);
+
+            GameLogger.Log(LogChannel.Player, $"[PlayerHealth] Post-Damage State. Grit: {_currentGrit}, HasHull: {_hasHull}", gameObject);
 
             UpdateUI();
             return true;
@@ -11871,13 +12848,16 @@ namespace DarkTowerTron.Player.Stats
         public void Kill(bool instant)
         {
             if (_isDead) return;
+            
+            _deathFeedback?.Play(gameObject, transform.position);
+            
             _isDead = true;
             _currentGrit = 0;
             _hasHull = false;
             UpdateUI();
             
             GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
-            GameEvents.OnPlayerDied?.Invoke(); // Still static for now
+            _playerDiedEvent?.Raise();
         }
 
         public void HealGrit(int amount = 1)
@@ -11980,13 +12960,14 @@ namespace DarkTowerTron.Player.Stats
 ```
 
 ## 📄 `Assets\Scripts\Player\Stats\PlayerStats.cs`
-- Lines: 78
-- Size: 3.0 KB
-- Modified: 2026-01-06 09:15
+- Lines: 79
+- Size: 3.1 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
 
 namespace DarkTowerTron.Player.Stats
 {
@@ -12004,7 +12985,7 @@ namespace DarkTowerTron.Player.Stats
         {
             if (baseStats == null)
             {
-                Debug.LogError(
+                GameLogger.LogError(LogChannel.Player,
                     $"[PlayerStats] CRITICAL: Missing PlayerStatsSO on {name}! Drag 'Stats_Player_Default' into the inspector.",
                     gameObject);
             }
@@ -12112,20 +13093,24 @@ namespace DarkTowerTron.Core.Services
 ```
 
 ## 📄 `Assets\Scripts\Services\MusicManager.cs`
-- Lines: 59
-- Size: 1.6 KB
-- Modified: 2026-01-06 10:31
+- Lines: 61
+- Size: 1.7 KB
+- Modified: 2026-01-06 15:21
 
 ```csharp
 using UnityEngine;
 using DG.Tweening;
 using DarkTowerTron.Core; // For GameEvents
+using DarkTowerTron.Core.Events;
 
 namespace DarkTowerTron.Services
 {
     [RequireComponent(typeof(AudioSource))]
     public class MusicManager : MonoBehaviour
     {
+        [Header("Listening")]
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+
         private AudioSource _source;
         private float _originalPitch;
         private float _originalVolume;
@@ -12146,14 +13131,12 @@ namespace DarkTowerTron.Services
 
         private void OnEnable()
         {
-            // We can listen to Global Events here
-            GameEvents.OnPlayerDied += OnDeath; // Legacy Event
-            // TODO: Subscribe to 'Event_PlayerDeath' SO when migrated
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += OnDeath;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnPlayerDied -= OnDeath;
+            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= OnDeath;
         }
 
         private void OnDeath()
@@ -12181,15 +13164,15 @@ namespace DarkTowerTron.Services
 ## 📄 `Assets\Scripts\Services\PaletteManager.cs`
 - Lines: 137
 - Size: 4.5 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:11
 
 ```csharp
-using UnityEngine;
-using System; // <--- REQUIRED for Action
+using System;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Services;
-using DarkTowerTron.Core;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace DarkTowerTron.Services
@@ -12264,7 +13247,7 @@ namespace DarkTowerTron.Services
             foreach (var binding in bindings)
             {
 
-                GameLogger.Log(DarkTowerTron.Core.LogChannel.VFX, $"Applying Surface: {binding.type} to Collection: {binding.collection?.name}", gameObject);
+                GameLogger.Log(LogChannel.VFX, $"Applying Surface: {binding.type} to Collection: {binding.collection?.name}", gameObject);
 
                 if (binding.collection == null) continue;
 
@@ -12290,7 +13273,7 @@ namespace DarkTowerTron.Services
             // 4. Notify Listeners (PaletteReceiver)
             OnPaletteChanged?.Invoke(); // <--- RESTORED
 
-            GameLogger.Log(DarkTowerTron.Core.LogChannel.VFX, $"Palette Applied: {activePalette.name} [{activeVariant}]", gameObject);
+            GameLogger.Log(LogChannel.VFX, $"Palette Applied: {activePalette.name} [{activeVariant}]", gameObject);
         }
 
         private void ApplyToCollection(MaterialCollectionSO col, SurfaceDefinition def)
@@ -12324,37 +13307,43 @@ namespace DarkTowerTron.Services
 ```
 
 ## 📄 `Assets\Scripts\Services\PoolManager.cs`
-- Lines: 129
-- Size: 4.4 KB
-- Modified: 2026-01-06 09:15
+- Lines: 168
+- Size: 5.8 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement; // Needed for cleanup
-using DarkTowerTron.Core;
+using DarkTowerTron.Core.Debug;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DarkTowerTron.Core.Services
 {
     public class PoolManager : MonoBehaviour
     {
-        // REMOVED: public static PoolManager Instance;
-
+        // Dictionary mapping Prefab InstanceID -> Queue of inactive objects
         private Dictionary<int, Queue<GameObject>> _poolDictionary = new Dictionary<int, Queue<GameObject>>();
+
+        // Dictionary mapping Spawned Object InstanceID -> Prefab InstanceID (to know where to return it)
         private Dictionary<int, int> _spawnedObjectsParentId = new Dictionary<int, int>();
+
+        private Transform _poolRoot;
 
         private void Awake()
         {
-            // REMOVED: Singleton check
+            // Create a clean container so the Hierarchy doesn't get messy
+            GameObject rootObj = new GameObject("Pool_Container");
+            _poolRoot = rootObj.transform;
+            DontDestroyOnLoad(rootObj);
         }
 
         private void OnEnable() => SceneManager.activeSceneChanged += OnSceneChanged;
         private void OnDisable() => SceneManager.activeSceneChanged -= OnSceneChanged;
 
-        // CRITICAL FIX: When scene changes, all GameObjects in the scene are destroyed.
-        // We must clear our references, or we hold onto "Missing" objects.
         private void OnSceneChanged(Scene current, Scene next)
         {
+            // Clear tracking lists, but logic dictates we should also clear the physical container
+            // if we want a fresh start per scene (usually safer for references).
             ClearPools();
         }
 
@@ -12362,14 +13351,39 @@ namespace DarkTowerTron.Core.Services
         {
             _poolDictionary.Clear();
             _spawnedObjectsParentId.Clear();
-            
-            // Destroy any children still hanging under this transform (if any were reparented)
-            foreach (Transform child in transform)
+
+            // Nuke the physical objects
+            foreach (Transform child in _poolRoot)
             {
                 Destroy(child.gameObject);
             }
-            
-            GameLogger.Log(LogChannel.System, "PoolManager cleaned up for new scene.", gameObject);
+
+            GameLogger.Log(LogChannel.System, "Pool memory flushed.", gameObject);
+        }
+
+        /// <summary>
+        /// Call this during Loading Screens to prevent stutter during gameplay.
+        /// </summary>
+        public void Prewarm(GameObject prefab, int count)
+        {
+            if (prefab == null) return;
+
+            int poolKey = prefab.GetInstanceID();
+
+            // Initialize the queue if missing
+            if (!_poolDictionary.ContainsKey(poolKey))
+            {
+                _poolDictionary.Add(poolKey, new Queue<GameObject>());
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                GameObject obj = CreateNewInstance(prefab, poolKey);
+                // Immediately disable and enqueue
+                obj.SetActive(false);
+                obj.transform.SetParent(_poolRoot);
+                _poolDictionary[poolKey].Enqueue(obj);
+            }
         }
 
         public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
@@ -12378,83 +13392,91 @@ namespace DarkTowerTron.Core.Services
 
             int poolKey = prefab.GetInstanceID();
 
+            // 1. Ensure Queue Exists
             if (!_poolDictionary.ContainsKey(poolKey))
             {
                 _poolDictionary.Add(poolKey, new Queue<GameObject>());
             }
 
-            GameObject objectToSpawn;
+            GameObject objToSpawn = null;
 
-            // Simple validation: Ensure queue item isn't null (destroyed externally)
+            // 2. Try Dequeue (Find inactive)
             if (_poolDictionary[poolKey].Count > 0)
             {
-                objectToSpawn = _poolDictionary[poolKey].Dequeue();
-                
-                // Safety check: Was it destroyed?
-                while (objectToSpawn == null && _poolDictionary[poolKey].Count > 0)
-                {
-                    objectToSpawn = _poolDictionary[poolKey].Dequeue();
-                }
+                objToSpawn = _poolDictionary[poolKey].Dequeue();
 
-                if (objectToSpawn == null)
+                // Validation: Was it destroyed externally?
+                while (objToSpawn == null && _poolDictionary[poolKey].Count > 0)
                 {
-                    objectToSpawn = Instantiate(prefab, position, rotation);
-                }
-                else
-                {
-                    objectToSpawn.transform.position = position;
-                    objectToSpawn.transform.rotation = rotation;
-                    objectToSpawn.SetActive(true);
+                    objToSpawn = _poolDictionary[poolKey].Dequeue();
                 }
             }
-            else
+
+            // 3. If missing or null, Create New
+            if (objToSpawn == null)
             {
-                objectToSpawn = Instantiate(prefab, position, rotation);
+                objToSpawn = CreateNewInstance(prefab, poolKey);
             }
 
-            // Interface Logic
-            var poolables = objectToSpawn.GetComponentsInChildren<IPoolable>();
+            // 4. Setup
+            objToSpawn.transform.SetPositionAndRotation(position, rotation);
+            objToSpawn.SetActive(true);
+
+            // NOTE: We don't unparent from _poolRoot. 
+            // Keeping them organized under one parent is cleaner for the Hierarchy view,
+            // though slightly (negligibly) more expensive for Transform updates.
+            // For a solo dev, clean Hierarchy > Micro-optimization.
+
+            // 5. Interface Call
+            var poolables = objToSpawn.GetComponentsInChildren<IPoolable>();
             foreach (var p in poolables) p.OnSpawn();
 
-            // Track ID
-            int instanceKey = objectToSpawn.GetInstanceID();
-            if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
-            {
-                _spawnedObjectsParentId.Add(instanceKey, poolKey);
-            }
-
-            return objectToSpawn;
+            return objToSpawn;
         }
 
         public void Despawn(GameObject obj)
         {
             if (obj == null) return;
+            if (!obj.scene.isLoaded) { Destroy(obj); return; }
 
             int instanceKey = obj.GetInstanceID();
 
-            if (_spawnedObjectsParentId.ContainsKey(instanceKey))
+            if (_spawnedObjectsParentId.TryGetValue(instanceKey, out int poolKey))
             {
+                // Interface Call
                 var poolables = obj.GetComponentsInChildren<IPoolable>();
                 foreach (var p in poolables) p.OnDespawn();
 
-                int poolKey = _spawnedObjectsParentId[instanceKey];
-                
-                // PREVENT LEAK: Remove from tracking
-                _spawnedObjectsParentId.Remove(instanceKey);
-
                 obj.SetActive(false);
-                obj.transform.SetParent(transform); // Store under manager
+
+                // Reparent to root to keep scene tidy
+                if (obj.transform.parent != _poolRoot)
+                    obj.transform.SetParent(_poolRoot);
 
                 // Add back to queue
-                if (!_poolDictionary.ContainsKey(poolKey)) 
+                if (!_poolDictionary.ContainsKey(poolKey))
                     _poolDictionary[poolKey] = new Queue<GameObject>();
-                    
+
                 _poolDictionary[poolKey].Enqueue(obj);
             }
             else
             {
+                // Wasn't pooled? Just destroy.
                 Destroy(obj);
             }
+        }
+
+        // Helper to keep logic DRY
+        private GameObject CreateNewInstance(GameObject prefab, int poolKey)
+        {
+            GameObject obj = Instantiate(prefab, _poolRoot); // Spawn directly in root
+            int instanceKey = obj.GetInstanceID();
+
+            if (!_spawnedObjectsParentId.ContainsKey(instanceKey))
+            {
+                _spawnedObjectsParentId.Add(instanceKey, poolKey);
+            }
+            return obj;
         }
     }
 }
@@ -12463,13 +13485,13 @@ namespace DarkTowerTron.Core.Services
 ## 📄 `Assets\Scripts\Services\ScoreManager.cs`
 - Lines: 98
 - Size: 3.0 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-08 06:09
 
 ```csharp
-using UnityEngine;
-using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // NEW: Access to Event Channels
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using UnityEngine;
 
 namespace DarkTowerTron.Services
 {
@@ -12567,21 +13589,25 @@ namespace DarkTowerTron.Services
 ```
 
 ## 📄 `Assets\Scripts\Services\VFXManager.cs`
-- Lines: 65
-- Size: 2.1 KB
-- Modified: 2026-01-06 09:15
+- Lines: 64
+- Size: 2.2 KB
+- Modified: 2026-01-06 15:26
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Services; // Add namespace
+using DarkTowerTron.Core.Events; // NEW
+// ALIAS
+using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Core.Services
 {
     public class VFXManager : MonoBehaviour
     {
-        // REMOVED: public static VFXManager Instance;
+        [Header("Wiring")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+        [SerializeField] private Vector3EventChannelSO _enemySpawnedEvent; // NEW
 
         [Header("Prefabs")]
         public GameObject explosionPrefab;
@@ -12590,29 +13616,26 @@ namespace DarkTowerTron.Core.Services
 
         private void Awake()
         {
-            // REMOVED: Singleton check
             if (groundLayer == 0) groundLayer = GameConstants.MASK_PHYSICS_OBSTACLES;
         }
 
         private void OnEnable()
         {
-            // Keep event subscriptions for now (Session 3 will refactor this)
-            GameEvents.OnEnemyKilled += PlayDeathVFX;
-            GameEvents.OnEnemySpawned += PlaySpawnVFX;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += PlayDeathVFX;
+            if (_enemySpawnedEvent) _enemySpawnedEvent.OnEventRaised += PlaySpawnVFX;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnEnemyKilled -= PlayDeathVFX;
-            GameEvents.OnEnemySpawned -= PlaySpawnVFX;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised -= PlayDeathVFX;
+            if (_enemySpawnedEvent) _enemySpawnedEvent.OnEventRaised -= PlaySpawnVFX;
         }
 
         private void PlayDeathVFX(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
-            if (explosionPrefab)
+            if (explosionPrefab && Global.Pool != null)
             {
-                // UPDATED: Use Services.Pool
-                GameObject vfx = Services.Pool.Spawn(explosionPrefab, pos, Quaternion.identity);
+                GameObject vfx = Global.Pool.Spawn(explosionPrefab, pos, Quaternion.identity);
                 var ps = vfx.GetComponent<ParticleSystem>();
                 if (ps) ps.Play();
             }
@@ -12620,17 +13643,15 @@ namespace DarkTowerTron.Core.Services
 
         private void PlaySpawnVFX(Vector3 pos)
         {
-            if (spawnPrefab)
+            if (spawnPrefab && Global.Pool != null)
             {
                 Vector3 vfxPos = pos + Vector3.up * 0.1f;
-                // Simplified Raycast for brevity
                 if (UnityEngine.Physics.Raycast(pos + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 10f, groundLayer))
                 {
                     vfxPos = hit.point + Vector3.up * 0.1f;
                 }
 
-                // UPDATED: Use Services.Pool
-                GameObject vfx = Services.Pool.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
+                GameObject vfx = Global.Pool.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
                 var ps = vfx.GetComponent<ParticleSystem>();
                 if (ps) ps.Play();
             }
@@ -12640,20 +13661,24 @@ namespace DarkTowerTron.Core.Services
 ```
 
 ## 📄 `Assets\Scripts\UI\CountdownUI.cs`
-- Lines: 68
-- Size: 2.2 KB
-- Modified: 2025-12-11 07:51
+- Lines: 72
+- Size: 2.4 KB
+- Modified: 2026-01-06 15:22
 
 ```csharp
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-using DarkTowerTron.Core;
+using DarkTowerTron.Core.Events;
 
 namespace DarkTowerTron.UI
 {
     public class CountdownUI : MonoBehaviour
     {
+        [Header("Listening")]
+        [SerializeField] private IntEventChannelSO _announceEvent;
+        [SerializeField] private StringEventChannelSO _countdownEvent;
+
         [Header("UI References")]
         public TextMeshProUGUI waveTitleText; // "WAVE 1"
         public TextMeshProUGUI countdownText; // "3"
@@ -12667,21 +13692,21 @@ namespace DarkTowerTron.UI
 
         private void OnEnable()
         {
-            GameEvents.OnWaveAnnounce += ShowWaveTitle;
-            GameEvents.OnCountdownChange += UpdateCountdown;
+            if (_announceEvent != null) _announceEvent.OnEventRaised += ShowWaveTitle;
+            if (_countdownEvent != null) _countdownEvent.OnEventRaised += UpdateCountdown;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnWaveAnnounce -= ShowWaveTitle;
-            GameEvents.OnCountdownChange -= UpdateCountdown;
+            if (_announceEvent != null) _announceEvent.OnEventRaised -= ShowWaveTitle;
+            if (_countdownEvent != null) _countdownEvent.OnEventRaised -= UpdateCountdown;
         }
 
         private void ShowWaveTitle(int waveIndex)
         {
             if (waveTitleText)
             {
-                waveTitleText.text = $"WAVE {waveIndex + 1}"; // +1 because index starts at 0
+                waveTitleText.text = $"WAVE {waveIndex}";
                 waveTitleText.gameObject.SetActive(true);
 
                 // Animation: Scale Up and Fade In
@@ -12902,20 +13927,18 @@ namespace DarkTowerTron.UI
 ```
 
 ## 📄 `Assets\Scripts\UI\HUDManager.cs`
-- Lines: 140
-- Size: 4.8 KB
-- Modified: 2026-01-06 10:37
+- Lines: 138
+- Size: 4.7 KB
+- Modified: 2026-01-08 06:09
 
 ```csharp
+using System.Collections.Generic;
+using DarkTowerTron.Core.Debug;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Services;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using TMPro;
-using DarkTowerTron.Core;
-using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services; // Needed for ServiceLocator types
-
-// ALIAS: Prevents conflict if you later import DarkTowerTron.Services
 using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.UI

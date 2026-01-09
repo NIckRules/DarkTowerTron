@@ -3,7 +3,7 @@ using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Player.Stats;
 using DG.Tweening;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Combat
 {

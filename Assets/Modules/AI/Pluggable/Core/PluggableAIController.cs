@@ -5,6 +5,10 @@ using DarkTowerTron.AI.Core;
 using DarkTowerTron.AI.Paths;
 using DarkTowerTron.Enemy; // For EnemyController
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace DarkTowerTron.AI.Pluggable.Core
 {
     [RequireComponent(typeof(IMover))]
@@ -116,25 +120,17 @@ namespace DarkTowerTron.AI.Pluggable.Core
             }
         }
 
-        // Add this helper so you can assign the path in the Prefab/Scene
-        public void SetPatrolPath(PatrolPath path)
-        {
-            if (blackboard == null)
-            {
-                blackboard = new AIBlackboard();
-            }
-
-            blackboard.patrolPath = path;
-        }
 
         // Draw Gizmos to see current state in Scene View
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (currentState != null)
             {
                 Gizmos.color = Color.green;
-                UnityEditor.Handles.Label(transform.position + Vector3.up * 2.5f, $"State: {currentState.name}");
+                Handles.Label(transform.position + Vector3.up * 2.5f, $"State: {currentState.name}");
             }
         }
+#endif
     }
 }

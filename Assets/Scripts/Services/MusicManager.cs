@@ -3,7 +3,7 @@ using DG.Tweening;
 using DarkTowerTron.Core; // For GameEvents
 using DarkTowerTron.Core.Events;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     [RequireComponent(typeof(AudioSource))]
     public class MusicManager : MonoBehaviour

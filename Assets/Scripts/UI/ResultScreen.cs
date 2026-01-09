@@ -1,8 +1,7 @@
 using UnityEngine;
 using TMPro;
 using DarkTowerTron.Managers;
-// ALIAS: Prevents conflict if you later add 'using DarkTowerTron.Services;' for Audio
-using Global = DarkTowerTron.Core.Services.Services; 
+using DarkTowerTron;
 
 namespace DarkTowerTron.UI
 {

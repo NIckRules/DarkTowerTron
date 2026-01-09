@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
-using DarkTowerTron.AI.Pluggable.Core; // Needed for Controller
+using DarkTowerTron.Enemy.Modules;
 
 namespace DarkTowerTron.AI.Paths
 {
-    [RequireComponent(typeof(PluggableAIController))]
+    [RequireComponent(typeof(EnemyPatrolModule))]
     public class AutoAssignPatrolPath : MonoBehaviour
     {
         public bool autoFindNearest = true;
@@ -13,31 +13,31 @@ namespace DarkTowerTron.AI.Paths
         private void Start()
         {
             if (gameObject.scene.name == null) return;
-            var controller = GetComponent<PluggableAIController>();
+            var patrolModule = GetComponent<EnemyPatrolModule>();
 
             if (explicitPath != null)
             {
-                SetPath(controller, explicitPath);
+                SetPath(patrolModule, explicitPath);
             }
             else if (autoFindNearest)
             {
-                StartCoroutine(FindAndAssignPathRoutine(controller));
+                StartCoroutine(FindAndAssignPathRoutine(patrolModule));
             }
         }
 
-        private IEnumerator FindAndAssignPathRoutine(PluggableAIController controller)
+        private IEnumerator FindAndAssignPathRoutine(EnemyPatrolModule module)
         {
             yield return null;
             PatrolPath nearest = FindNearestPath();
-            if (nearest != null) SetPath(controller, nearest);
+            if (nearest != null) SetPath(module, nearest);
         }
 
-        private void SetPath(PluggableAIController controller, PatrolPath path)
+        private void SetPath(EnemyPatrolModule module, PatrolPath path)
         {
-            if (controller.blackboard != null)
+            if (module != null)
             {
-                controller.blackboard.patrolPath = path;
-                controller.blackboard.currentWaypointIndex = GetClosestWaypointIndex(path);
+                module.patrolPath = path;
+                module.currentWaypointIndex = GetClosestWaypointIndex(path);
             }
         }
 

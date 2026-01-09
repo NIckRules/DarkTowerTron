@@ -1,6 +1,7 @@
 using UnityEngine;
+
 #if UNITY_EDITOR
-using UnityEditor;
+using UnityEditor; // <--- WRAP THIS
 #endif
 
 namespace DarkTowerTron.Environment
@@ -16,26 +17,18 @@ namespace DarkTowerTron.Environment
         {
             if (!showCoordinates) return;
 
-            // Draw the outline of the tile
             Gizmos.color = new Color(labelColor.r, labelColor.g, labelColor.b, 0.3f);
             Gizmos.DrawWireCube(transform.position, new Vector3(tileSize, 0.1f, tileSize));
 
+            // --- WRAP THE LABEL LOGIC ---
 #if UNITY_EDITOR
-            // Calculate "Local Grid" coordinates relative to parent (The Room Module)
-            // If no parent, use World Space
             Vector3 pos = transform.position;
-            if (transform.parent != null)
-            {
-                pos = transform.localPosition;
-            }
+            if (transform.parent != null) pos = transform.localPosition;
 
-            // Round to nearest logical index
             int x = Mathf.RoundToInt(pos.x / tileSize);
             int z = Mathf.RoundToInt(pos.z / tileSize);
-
             string label = $"{x}, {z}";
             
-            // Draw text in Scene View
             GUIStyle style = new GUIStyle();
             style.normal.textColor = labelColor;
             style.fontSize = 15;

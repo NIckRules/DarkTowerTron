@@ -2,7 +2,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Core.Events;
 using DG.Tweening;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Combat
 {

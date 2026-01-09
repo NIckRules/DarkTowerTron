@@ -1,7 +1,7 @@
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Combat
 {

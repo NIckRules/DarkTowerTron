@@ -1,6 +1,6 @@
 using UnityEngine;
 using DarkTowerTron.AI.Pluggable.Core;
-using DarkTowerTron.AI.Paths;
+using DarkTowerTron.Enemy.Modules;
 
 namespace DarkTowerTron.AI.Pluggable.Actions
 {
@@ -12,38 +12,21 @@ namespace DarkTowerTron.AI.Pluggable.Actions
 
         public override void Act(PluggableAIController controller)
         {
-            var bb = controller.blackboard;
-            if (bb.patrolPath == null || bb.patrolPath.waypoints.Count == 0) return;
+            var patrol = controller.GetComponent<EnemyPatrolModule>();
+            if (patrol == null || patrol.patrolPath == null) return;
 
-            Waypoint currentWaypoint = bb.patrolPath.waypoints[bb.currentWaypointIndex];
-            if (currentWaypoint == null) return;
-
-            Transform targetPoint = currentWaypoint.transform;
+            Transform targetPoint = patrol.GetCurrentWaypointTarget();
+            if (targetPoint == null) return;
 
             // 1. Calculate Flat Distance
             Vector3 flatPos = controller.transform.position; flatPos.y = 0;
             Vector3 flatTarget = targetPoint.position; flatTarget.y = 0;
-            float distance = Vector3.Distance(flatPos, flatTarget);
-
-            // 2. Check Arrival
-            if (distance <= waypointTolerance)
+            if (Vector3.Distance(flatPos, flatTarget) < waypointTolerance)
             {
-                // We Arrived.
+                patrol.AdvanceWaypoint();
 
-                // Optional: Snap position to avoid "Orbiting" if we stop here? 
-                // No, just switch target immediately so we don't stop moving.
-
-                bb.currentWaypointIndex = (bb.currentWaypointIndex + 1) % bb.patrolPath.waypoints.Count;
-
-                // CRITICAL FIX: Don't stop. 
-                // Immediately get the NEXT waypoint and start moving towards IT in this same frame.
-                // This prevents the 1-frame freeze.
-
-                var nextWaypoint = bb.patrolPath.waypoints[bb.currentWaypointIndex];
-                if (nextWaypoint != null)
-                {
-                    MoveTowards(controller, nextWaypoint.transform.position);
-                }
+                Transform nextPoint = patrol.GetCurrentWaypointTarget();
+                if (nextPoint != null) MoveTowards(controller, nextPoint.position);
             }
             else
             {

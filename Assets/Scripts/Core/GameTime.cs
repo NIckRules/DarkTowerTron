@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     public class GameTime : MonoBehaviour
     {

@@ -2,10 +2,9 @@ using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events; // NEW
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
-namespace DarkTowerTron.Core.Services
+namespace DarkTowerTron.Systems
 {
     public class VFXManager : MonoBehaviour
     {

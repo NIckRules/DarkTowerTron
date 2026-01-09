@@ -4,9 +4,7 @@ using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events; // Event Channels
 using DarkTowerTron.Combat;
 using DarkTowerTron.Enemy.Visuals;
-
-// ALIAS: Prevents conflict between 'Services' (Namespace) and 'Services' (Class)
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy
 {

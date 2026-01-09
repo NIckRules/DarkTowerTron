@@ -18,18 +18,4 @@ namespace DarkTowerTron.Core.Events
                 GameLogger.LogWarning(LogChannel.UI, $"DamageText Event [{name}] was raised but nothing picked it up.");
         }
     }
-
-    [CreateAssetMenu(menuName = "Events/Popup Text Channel")]
-    public class PopupTextEventChannelSO : ScriptableObject
-    {
-        public UnityAction<Vector3, string> OnEventRaised;
-
-        public void Raise(Vector3 pos, string message)
-        {
-            if (OnEventRaised != null)
-                OnEventRaised.Invoke(pos, message);
-            else
-                GameLogger.LogWarning(LogChannel.UI, $"PopupText Event [{name}] was raised but nothing picked it up.");
-        }
-    }
 }

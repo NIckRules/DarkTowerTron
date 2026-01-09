@@ -5,9 +5,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
 using DG.Tweening;
-
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {

@@ -1,8 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Events;
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.UI
 {

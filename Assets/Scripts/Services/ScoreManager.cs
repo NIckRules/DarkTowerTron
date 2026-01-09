@@ -3,7 +3,7 @@ using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
 using UnityEngine;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     public class ScoreManager : MonoBehaviour
     {

@@ -1,9 +1,9 @@
 using UnityEngine;
-using DarkTowerTron.Physics; // For IMover
-using DarkTowerTron.Combat;  // For PatternExecutor
-using DarkTowerTron.AI.Core; // For ContextSolver
-using DarkTowerTron.AI.Paths;
+using DarkTowerTron.Physics;
+using DarkTowerTron.Combat;
+using DarkTowerTron.AI.Core;
 using DarkTowerTron.Enemy;
+// REMOVED: using DarkTowerTron.AI.Paths; 
 
 namespace DarkTowerTron.AI.Pluggable.Core
 {
@@ -13,21 +13,16 @@ namespace DarkTowerTron.AI.Pluggable.Core
         [Header("Runtime Data")]
         public Transform Target;
         public Vector3 MoveDirection;
-        public float StateTimeElapsed; // Resets on state change
+        public float StateTimeElapsed;
 
-        public PatternExecutor Weapon;
-
-        [Header("Context Data")]
-        public PatrolPath patrolPath; // Assign this in the Controller Inspector!
-        public int currentWaypointIndex;
-
-        // Component Cache (Filled in Awake)
+        // Component Cache (The "Universal" Body)
         public IMover Mover;
         public ContextSolver ContextSolver;
         public DamageReceiver Health;
-        public EnemyController Controller; // Now this works
+        public EnemyController Controller;
+        public PatternExecutor Weapon; // Optional but common enough to keep
 
-        // Generic Parameters
-        public Vector3 PatrolDestination;
+        // REMOVED: public PatrolPath patrolPath;
+        // REMOVED: public int currentWaypointIndex;
     }
 }

@@ -4,10 +4,8 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
-
-using Global = DarkTowerTron.Core.Services.Services; 
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy
 {

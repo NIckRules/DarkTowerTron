@@ -1,6 +1,7 @@
 using UnityEngine;
 using DarkTowerTron.AI.Pluggable.Core;
 using DarkTowerTron.Enemy;
+using DarkTowerTron.Enemy.Modules;
 
 namespace DarkTowerTron.AI.Utils
 {
@@ -58,14 +59,18 @@ namespace DarkTowerTron.AI.Utils
                     Gizmos.DrawLine(pos, controller.blackboard.Target.position);
                 }
                 // Patrol Target
-                else if (controller.blackboard.patrolPath != null && controller.blackboard.patrolPath.waypoints.Count > 0)
+                else
                 {
-                    var wp = controller.blackboard.patrolPath.waypoints[controller.blackboard.currentWaypointIndex];
-                    if (wp != null)
+                    var patrol = controller.GetComponent<EnemyPatrolModule>();
+                    if (patrol != null)
                     {
-                        Gizmos.color = new Color(1, 0.5f, 0); // Orange
-                        Gizmos.DrawLine(pos, wp.transform.position);
-                        Gizmos.DrawWireSphere(wp.transform.position, 0.5f);
+                        Transform wp = patrol.GetCurrentWaypointTarget();
+                        if (wp != null)
+                        {
+                            Gizmos.color = new Color(1, 0.5f, 0); // Orange
+                            Gizmos.DrawLine(pos, wp.position);
+                            Gizmos.DrawWireSphere(wp.position, 0.5f);
+                        }
                     }
                 }
             }

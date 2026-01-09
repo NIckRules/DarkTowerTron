@@ -16,10 +16,11 @@ namespace DarkTowerTron.Environment
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(GameConstants.TAG_PLAYER))
             {
-                var rig = FindObjectOfType<CameraRig>();
-                if (rig)
+                // FIX: Use service reference instead of FindObjectOfType
+                var rig = GameServices.CameraRig;
+                if (rig != null)
                 {
                     // Pass the center of THIS trigger as the lock position
                     rig.OverrideCamera(targetPitch, targetDistance, lockX, lockZ, transform.position);
@@ -29,10 +30,10 @@ namespace DarkTowerTron.Environment
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(GameConstants.TAG_PLAYER))
             {
-                var rig = FindObjectOfType<CameraRig>();
-                if (rig) rig.ResetToDefault();
+                var rig = GameServices.CameraRig;
+                if (rig != null) rig.ResetToDefault();
             }
         }
 

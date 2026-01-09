@@ -1,6 +1,8 @@
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
+using DarkTowerTron.Environment;
+using DarkTowerTron.Physics;
 using DarkTowerTron.Player.Stats;
 using DarkTowerTron.UI;
 using UnityEngine;
@@ -26,6 +28,7 @@ namespace DarkTowerTron.Managers
 
         private void Awake()
         {
+            GameServices.RegisterSession(this);
             _controls = new GameControls();
             _controls.Gameplay.Pause.performed += ctx => TogglePause();
         }
@@ -146,35 +149,30 @@ namespace DarkTowerTron.Managers
         private void MovePlayerToStart()
         {
             if (GameServices.Player == null) return;
-            var playerTransform = GameServices.Player.transform;
 
-            var points = FindObjectsOfType<DarkTowerTron.Environment.PlayerStart>();
-            Transform targetPoint = null;
-
-            foreach (var p in points)
+            // FIX: Query the Registry
+            Transform targetPoint = PlayerStart.GetSpawnPoint(activeSpawnID);
+            if (targetPoint == null)
             {
-                if (p.spawnID == activeSpawnID) { targetPoint = p.transform; break; }
+                Debug.LogWarning($"[GameSession] Spawn Point '{activeSpawnID}' not found!");
+                return;
             }
 
-            if (targetPoint == null && activeSpawnID != "Start")
+            // Move Logic
+            var uMover = GameServices.Player.GetComponent<UnityCharacterMover>();
+            if (uMover != null)
             {
-                foreach (var p in points) if (p.spawnID == "Start") { targetPoint = p.transform; break; }
+                uMover.Teleport(targetPoint.position);
+            }
+            else
+            {
+                // Back-compat: some setups may still use the custom mover
+                var kMover = GameServices.Player.GetComponent<KinematicMover>();
+                if (kMover != null) kMover.Teleport(targetPoint.position);
+                else GameServices.Player.transform.position = targetPoint.position;
             }
 
-            if (targetPoint != null)
-            {
-                var motor = GameServices.Player.GetComponent<DarkTowerTron.Physics.KinematicMover>();
-                if (motor)
-                {
-                    motor.Teleport(targetPoint.position);
-                    playerTransform.rotation = targetPoint.rotation;
-                }
-                else
-                {
-                    playerTransform.position = targetPoint.position;
-                    playerTransform.rotation = targetPoint.rotation;
-                }
-            }
+            GameServices.Player.transform.rotation = targetPoint.rotation;
         }
     }
 }
