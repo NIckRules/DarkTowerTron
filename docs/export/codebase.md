@@ -1,9 +1,9 @@
 # 📦 Codebase Export
 - **Profile:** `unity`
-- **Generated:** 2026-01-09 08:23
-- **Files:** 230
-- **Total LOC:** 12399
-- **Estimated tokens:** 99870
+- **Generated:** 2026-01-09 14:49
+- **Files:** 242
+- **Total LOC:** 13048
+- **Estimated tokens:** 104837
 
 ## 📁 Project Tree
 ```
@@ -82,6 +82,8 @@ Assets
         Enemy_Explosion.asset
       Events
         Enemy_Die.asset
+    Narrative
+      Narrative_Main.asset
     Player
       Stats_Player_Default.asset
     Visuals
@@ -202,6 +204,8 @@ Assets
         FloatFloatEventChannelSO.cs
         IntEventChannelSO.cs
         IntIntEventChannelSO.cs
+        NarrativeEventChannelSO.cs
+        PopupTextEventChannelSO.cs
         StringEventChannelSO.cs
         TransformEventChannelSO.cs
         Vector3EventChannelSO.cs
@@ -218,6 +222,7 @@ Assets
       GameConstants.cs
       GameServices.cs
       GameTime.cs
+      Global.cs
       Input
         InputBuffer.cs
       Interfaces
@@ -233,7 +238,6 @@ Assets
         BootLoader.cs
         GameBootstrap.cs
         ServiceLocator.cs
-        Services.cs
       Spinner.cs
       Structs
         DamageInfo.cs
@@ -251,6 +255,8 @@ Assets
       EnemyBaseAI.cs
       EnemyController.cs
       EnemyMotors.cs
+      Modules
+        EnemyPatrolModule.cs
       Visuals
         EnemyVisuals.cs
     Environment
@@ -301,12 +307,24 @@ Assets
       PoolManager.cs
       ScoreManager.cs
       VFXManager.cs
+    Systems
+      Narrative
+        NarrativeDirector.cs
+        NarrativeLibrarySO.cs
+        TextCorruptor.cs
+      Persistence
+        Editor
+          PersistenceManagerEditor.cs
+        PersistenceManager.cs
+        SaveData.cs
+        StatsTracker.cs
     UI
       CountdownUI.cs
       DamageTextManager.cs
       FloatingText.cs
       HUDManager.cs
       MenuController.cs
+      NarrativeUI.cs
       ResultScreen.cs
       UIManager.cs
       UIThemeReceiver.cs
@@ -1628,6 +1646,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   commands:
   - {fileID: 11400000, guid: 2f5828803fa1ee747a9b1585bc26739a, type: 2}
+```
+
+## 📄 `Assets\Data\Narrative\Narrative_Main.asset`
+- Lines: 34
+- Size: 0.7 KB
+- Modified: 2026-01-09 14:45
+
+```asset
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85c4d407bf1cf5440bbe715eb5977b09, type: 3}
+  m_Name: Narrative_Main
+  m_EditorClassIdentifier: 
+  introLines:
+  - Unauthorized Access
+  - Security protocols engaging
+  - Stay a while. Stay forever
+  - What are you?
+  hurtLines:
+  - Bleed
+  - Fragile
+  - Yield
+  killLines:
+  - Unit lost
+  - Ineficient
+  - Freedom
+  deathLines:
+  - System purged
+  - Die. Die. Die
+  - Again
+  - Ha. Ha. Ha
+  victoryLines: []
 ```
 
 ## 📄 `Assets\Data\Player\Stats_Player_Default.asset`
@@ -3176,17 +3235,17 @@ namespace DarkTowerTron.AI.Detectors
 
 ## 📄 `Assets\Modules\AI\Paths\AutoAssignPatrolPath.cs`
 - Lines: 77
-- Size: 2.5 KB
-- Modified: 2026-01-08 13:37
+- Size: 2.4 KB
+- Modified: 2026-01-09 13:59
 
 ```csharp
 using UnityEngine;
 using System.Collections;
-using DarkTowerTron.AI.Pluggable.Core; // Needed for Controller
+using DarkTowerTron.Enemy.Modules;
 
 namespace DarkTowerTron.AI.Paths
 {
-    [RequireComponent(typeof(PluggableAIController))]
+    [RequireComponent(typeof(EnemyPatrolModule))]
     public class AutoAssignPatrolPath : MonoBehaviour
     {
         public bool autoFindNearest = true;
@@ -3195,31 +3254,31 @@ namespace DarkTowerTron.AI.Paths
         private void Start()
         {
             if (gameObject.scene.name == null) return;
-            var controller = GetComponent<PluggableAIController>();
+            var patrolModule = GetComponent<EnemyPatrolModule>();
 
             if (explicitPath != null)
             {
-                SetPath(controller, explicitPath);
+                SetPath(patrolModule, explicitPath);
             }
             else if (autoFindNearest)
             {
-                StartCoroutine(FindAndAssignPathRoutine(controller));
+                StartCoroutine(FindAndAssignPathRoutine(patrolModule));
             }
         }
 
-        private IEnumerator FindAndAssignPathRoutine(PluggableAIController controller)
+        private IEnumerator FindAndAssignPathRoutine(EnemyPatrolModule module)
         {
             yield return null;
             PatrolPath nearest = FindNearestPath();
-            if (nearest != null) SetPath(controller, nearest);
+            if (nearest != null) SetPath(module, nearest);
         }
 
-        private void SetPath(PluggableAIController controller, PatrolPath path)
+        private void SetPath(EnemyPatrolModule module, PatrolPath path)
         {
-            if (controller.blackboard != null)
+            if (module != null)
             {
-                controller.blackboard.patrolPath = path;
-                controller.blackboard.currentWaypointIndex = GetClosestWaypointIndex(path);
+                module.patrolPath = path;
+                module.currentWaypointIndex = GetClosestWaypointIndex(path);
             }
         }
 
@@ -3296,31 +3355,35 @@ namespace DarkTowerTron.AI.Paths
 ```
 
 ## 📄 `Assets\Modules\AI\Paths\Waypoint.cs`
-- Lines: 23
-- Size: 0.7 KB
-- Modified: 2026-01-08 13:36
+- Lines: 27
+- Size: 0.6 KB
+- Modified: 2026-01-09 13:25
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.AI.Pluggable.Core; // Needed for AIState reference
+using DarkTowerTron.AI.Pluggable.Core;
+
+#if UNITY_EDITOR
+using UnityEditor; // <--- WRAP THIS
+#endif
 
 namespace DarkTowerTron.AI.Paths
 {
     public class Waypoint : MonoBehaviour
     {
-        [Tooltip("How long the AI should wait here before moving on.")]
         public float waitTime = 0f;
-
-        [Tooltip("Optional: A specific State to inject into the AI when it arrives.")]
         public AIState overrideState;
-
-        [Tooltip("How long to stay in the override state before resuming patrol.")]
         public float overrideDuration = 5f;
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, 0.5f);
+
+            // --- WRAP THE LABEL LOGIC ---
+#if UNITY_EDITOR
+            Handles.Label(transform.position + Vector3.up, name);
+#endif
         }
     }
 }
@@ -3419,14 +3482,14 @@ namespace DarkTowerTron.AI.Pluggable.Actions
 ```
 
 ## 📄 `Assets\Modules\AI\Pluggable\Actions\Action_Patrol.cs`
-- Lines: 69
-- Size: 2.6 KB
-- Modified: 2026-01-08 13:51
+- Lines: 52
+- Size: 1.9 KB
+- Modified: 2026-01-09 14:00
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.AI.Pluggable.Core;
-using DarkTowerTron.AI.Paths;
+using DarkTowerTron.Enemy.Modules;
 
 namespace DarkTowerTron.AI.Pluggable.Actions
 {
@@ -3438,38 +3501,21 @@ namespace DarkTowerTron.AI.Pluggable.Actions
 
         public override void Act(PluggableAIController controller)
         {
-            var bb = controller.blackboard;
-            if (bb.patrolPath == null || bb.patrolPath.waypoints.Count == 0) return;
+            var patrol = controller.GetComponent<EnemyPatrolModule>();
+            if (patrol == null || patrol.patrolPath == null) return;
 
-            Waypoint currentWaypoint = bb.patrolPath.waypoints[bb.currentWaypointIndex];
-            if (currentWaypoint == null) return;
-
-            Transform targetPoint = currentWaypoint.transform;
+            Transform targetPoint = patrol.GetCurrentWaypointTarget();
+            if (targetPoint == null) return;
 
             // 1. Calculate Flat Distance
             Vector3 flatPos = controller.transform.position; flatPos.y = 0;
             Vector3 flatTarget = targetPoint.position; flatTarget.y = 0;
-            float distance = Vector3.Distance(flatPos, flatTarget);
-
-            // 2. Check Arrival
-            if (distance <= waypointTolerance)
+            if (Vector3.Distance(flatPos, flatTarget) < waypointTolerance)
             {
-                // We Arrived.
+                patrol.AdvanceWaypoint();
 
-                // Optional: Snap position to avoid "Orbiting" if we stop here? 
-                // No, just switch target immediately so we don't stop moving.
-
-                bb.currentWaypointIndex = (bb.currentWaypointIndex + 1) % bb.patrolPath.waypoints.Count;
-
-                // CRITICAL FIX: Don't stop. 
-                // Immediately get the NEXT waypoint and start moving towards IT in this same frame.
-                // This prevents the 1-frame freeze.
-
-                var nextWaypoint = bb.patrolPath.waypoints[bb.currentWaypointIndex];
-                if (nextWaypoint != null)
-                {
-                    MoveTowards(controller, nextWaypoint.transform.position);
-                }
+                Transform nextPoint = patrol.GetCurrentWaypointTarget();
+                if (nextPoint != null) MoveTowards(controller, nextPoint.position);
             }
             else
             {
@@ -3605,17 +3651,17 @@ namespace DarkTowerTron.AI.Pluggable.Core
 ```
 
 ## 📄 `Assets\Modules\AI\Pluggable\Core\AIBlackboard.cs`
-- Lines: 33
-- Size: 1.0 KB
-- Modified: 2026-01-08 16:50
+- Lines: 28
+- Size: 0.8 KB
+- Modified: 2026-01-09 13:58
 
 ```csharp
 using UnityEngine;
-using DarkTowerTron.Physics; // For IMover
-using DarkTowerTron.Combat;  // For PatternExecutor
-using DarkTowerTron.AI.Core; // For ContextSolver
-using DarkTowerTron.AI.Paths;
+using DarkTowerTron.Physics;
+using DarkTowerTron.Combat;
+using DarkTowerTron.AI.Core;
 using DarkTowerTron.Enemy;
+// REMOVED: using DarkTowerTron.AI.Paths; 
 
 namespace DarkTowerTron.AI.Pluggable.Core
 {
@@ -3625,22 +3671,17 @@ namespace DarkTowerTron.AI.Pluggable.Core
         [Header("Runtime Data")]
         public Transform Target;
         public Vector3 MoveDirection;
-        public float StateTimeElapsed; // Resets on state change
+        public float StateTimeElapsed;
 
-        public PatternExecutor Weapon;
-
-        [Header("Context Data")]
-        public PatrolPath patrolPath; // Assign this in the Controller Inspector!
-        public int currentWaypointIndex;
-
-        // Component Cache (Filled in Awake)
+        // Component Cache (The "Universal" Body)
         public IMover Mover;
         public ContextSolver ContextSolver;
         public DamageReceiver Health;
-        public EnemyController Controller; // Now this works
+        public EnemyController Controller;
+        public PatternExecutor Weapon; // Optional but common enough to keep
 
-        // Generic Parameters
-        public Vector3 PatrolDestination;
+        // REMOVED: public PatrolPath patrolPath;
+        // REMOVED: public int currentWaypointIndex;
     }
 }
 ```
@@ -3747,9 +3788,9 @@ namespace DarkTowerTron.AI.Pluggable.Core
 ```
 
 ## 📄 `Assets\Modules\AI\Pluggable\Core\PluggableAIController.cs`
-- Lines: 140
-- Size: 5.0 KB
-- Modified: 2026-01-08 16:51
+- Lines: 136
+- Size: 4.7 KB
+- Modified: 2026-01-09 14:02
 
 ```csharp
 using UnityEngine;
@@ -3758,6 +3799,10 @@ using DarkTowerTron.Combat;
 using DarkTowerTron.AI.Core;
 using DarkTowerTron.AI.Paths;
 using DarkTowerTron.Enemy; // For EnemyController
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DarkTowerTron.AI.Pluggable.Core
 {
@@ -3870,26 +3915,18 @@ namespace DarkTowerTron.AI.Pluggable.Core
             }
         }
 
-        // Add this helper so you can assign the path in the Prefab/Scene
-        public void SetPatrolPath(PatrolPath path)
-        {
-            if (blackboard == null)
-            {
-                blackboard = new AIBlackboard();
-            }
-
-            blackboard.patrolPath = path;
-        }
 
         // Draw Gizmos to see current state in Scene View
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (currentState != null)
             {
                 Gizmos.color = Color.green;
-                UnityEditor.Handles.Label(transform.position + Vector3.up * 2.5f, $"State: {currentState.name}");
+                Handles.Label(transform.position + Vector3.up * 2.5f, $"State: {currentState.name}");
             }
         }
+#endif
     }
 }
 ```
@@ -3998,14 +4035,15 @@ namespace DarkTowerTron.AI.Pluggable.Decisions
 ```
 
 ## 📄 `Assets\Modules\AI\Utils\AIDebugger.cs`
-- Lines: 74
-- Size: 2.8 KB
-- Modified: 2026-01-08 13:47
+- Lines: 79
+- Size: 2.9 KB
+- Modified: 2026-01-09 14:01
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.AI.Pluggable.Core;
 using DarkTowerTron.Enemy;
+using DarkTowerTron.Enemy.Modules;
 
 namespace DarkTowerTron.AI.Utils
 {
@@ -4063,14 +4101,18 @@ namespace DarkTowerTron.AI.Utils
                     Gizmos.DrawLine(pos, controller.blackboard.Target.position);
                 }
                 // Patrol Target
-                else if (controller.blackboard.patrolPath != null && controller.blackboard.patrolPath.waypoints.Count > 0)
+                else
                 {
-                    var wp = controller.blackboard.patrolPath.waypoints[controller.blackboard.currentWaypointIndex];
-                    if (wp != null)
+                    var patrol = controller.GetComponent<EnemyPatrolModule>();
+                    if (patrol != null)
                     {
-                        Gizmos.color = new Color(1, 0.5f, 0); // Orange
-                        Gizmos.DrawLine(pos, wp.transform.position);
-                        Gizmos.DrawWireSphere(wp.transform.position, 0.5f);
+                        Transform wp = patrol.GetCurrentWaypointTarget();
+                        if (wp != null)
+                        {
+                            Gizmos.color = new Color(1, 0.5f, 0); // Orange
+                            Gizmos.DrawLine(pos, wp.position);
+                            Gizmos.DrawWireSphere(wp.position, 0.5f);
+                        }
                     }
                 }
             }
@@ -4221,9 +4263,9 @@ namespace DarkTowerTron.Combat
 ```
 
 ## 📄 `Assets\Scripts\Combat\DamageReceiver.cs`
-- Lines: 209
+- Lines: 210
 - Size: 7.1 KB
-- Modified: 2026-01-08 06:09
+- Modified: 2026-01-09 13:26
 
 ```csharp
 using DarkTowerTron.Core;
@@ -4231,6 +4273,7 @@ using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Feedback;
 using DarkTowerTron.Managers;
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -4430,7 +4473,7 @@ namespace DarkTowerTron.Combat
             if (IsStaggered) label += "\n<color=yellow>[STAGGERED]</color>";
 
             Vector3 labelPos = transform.position + Vector3.up * 5f;
-            UnityEditor.Handles.Label(labelPos, label, style);
+            Handles.Label(labelPos, label, style);
         }
 #endif
     }
@@ -4608,14 +4651,14 @@ namespace DarkTowerTron.Combat
 ## 📄 `Assets\Scripts\Combat\HitBox\ShieldHitbox.cs`
 - Lines: 152
 - Size: 4.8 KB
-- Modified: 2026-01-08 18:01
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Events;
 using DG.Tweening;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Combat
 {
@@ -4942,17 +4985,16 @@ namespace DarkTowerTron.Combat
 ```
 
 ## 📄 `Assets\Scripts\Combat\PatternExecutor.cs`
-- Lines: 133
-- Size: 4.6 KB
-- Modified: 2026-01-08 23:38
+- Lines: 132
+- Size: 4.5 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
 using System.Collections;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Combat
 {
@@ -5085,7 +5127,7 @@ namespace DarkTowerTron.Combat
 ## 📄 `Assets\Scripts\Combat\Projectile.cs`
 - Lines: 283
 - Size: 10.3 KB
-- Modified: 2026-01-08 18:21
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using System.Collections.Generic;
@@ -5094,7 +5136,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Feedback;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Combat
 {
@@ -5520,9 +5562,9 @@ namespace DarkTowerTron.Combat.Strategies
 ```
 
 ## 📄 `Assets\Scripts\Core\CameraRig.cs`
-- Lines: 83
-- Size: 2.8 KB
-- Modified: 2025-12-30 09:50
+- Lines: 84
+- Size: 2.9 KB
+- Modified: 2026-01-09 13:37
 
 ```csharp
 using UnityEngine;
@@ -5550,8 +5592,9 @@ namespace DarkTowerTron.Core
 
         private Vector3 _currentVelocity;
 
-        private void Start()
+        private void Awake()
         {
+            GameServices.RegisterCamera(this);
             ResetToDefault();
         }
 
@@ -6556,9 +6599,9 @@ namespace DarkTowerTron.Core.Events
 ```
 
 ## 📄 `Assets\Scripts\Core\Events\DamageTextEventChannelSO.cs`
-- Lines: 35
-- Size: 1.2 KB
-- Modified: 2026-01-08 06:09
+- Lines: 21
+- Size: 0.7 KB
+- Modified: 2026-01-09 13:31
 
 ```csharp
 using DarkTowerTron.Core.Debug;
@@ -6579,20 +6622,6 @@ namespace DarkTowerTron.Core.Events
                 OnEventRaised.Invoke(pos, amount, isCrit, isStagger);
             else
                 GameLogger.LogWarning(LogChannel.UI, $"DamageText Event [{name}] was raised but nothing picked it up.");
-        }
-    }
-
-    [CreateAssetMenu(menuName = "Events/Popup Text Channel")]
-    public class PopupTextEventChannelSO : ScriptableObject
-    {
-        public UnityAction<Vector3, string> OnEventRaised;
-
-        public void Raise(Vector3 pos, string message)
-        {
-            if (OnEventRaised != null)
-                OnEventRaised.Invoke(pos, message);
-            else
-                GameLogger.LogWarning(LogChannel.UI, $"PopupText Event [{name}] was raised but nothing picked it up.");
         }
     }
 }
@@ -6708,6 +6737,53 @@ namespace DarkTowerTron.Core.Events
             else
                 GameLogger.LogWarning(LogChannel.System, $"IntInt Event [{name}] was raised but nothing picked it up.");
         }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\NarrativeEventChannelSO.cs`
+- Lines: 17
+- Size: 0.5 KB
+- Modified: 2026-01-09 14:33
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Narrative Text Channel")]
+    public class NarrativeEventChannelSO : ScriptableObject
+    {
+        // String = Text, Float = Duration
+        public UnityAction<string, float> OnEventRaised;
+
+        public void Raise(string text, float duration = 3f)
+        {
+            OnEventRaised?.Invoke(text, duration);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Events\PopupTextEventChannelSO.cs`
+- Lines: 14
+- Size: 0.4 KB
+- Modified: 2026-01-09 13:31
+
+```csharp
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Popup Text Channel")]
+    public class PopupTextEventChannelSO : ScriptableObject
+    {
+        public UnityAction<Vector3, string> OnEventRaised;
+
+        public void Raise(Vector3 pos, string message)
+            => OnEventRaised?.Invoke(pos, message);
     }
 }
 ```
@@ -6891,13 +6967,13 @@ namespace DarkTowerTron.Core.Feedback.Commands
 
 ## 📄 `Assets\Scripts\Core\Feedback\Command\PlaySoundCommand.cs`
 - Lines: 23
-- Size: 0.8 KB
-- Modified: 2026-01-08 06:09
+- Size: 0.7 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using DarkTowerTron.Core.Data;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {
@@ -6921,14 +6997,13 @@ namespace DarkTowerTron.Core.Feedback.Commands
 ```
 
 ## 📄 `Assets\Scripts\Core\Feedback\Command\SpawnVFXCommand.cs`
-- Lines: 37
-- Size: 1.2 KB
-- Modified: 2026-01-07 07:28
+- Lines: 36
+- Size: 1.1 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
-
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {
@@ -6966,14 +7041,13 @@ namespace DarkTowerTron.Core.Feedback.Commands
 ```
 
 ## 📄 `Assets\Scripts\Core\Feedback\Command\TimeFreezeCommand.cs`
-- Lines: 20
+- Lines: 19
 - Size: 0.5 KB
-- Modified: 2026-01-07 07:27
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
-
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Core.Feedback.Commands
 {
@@ -7123,9 +7197,9 @@ namespace DarkTowerTron.Core
 ```
 
 ## 📄 `Assets\Scripts\Core\GameServices.cs`
-- Lines: 54
-- Size: 2.1 KB
-- Modified: 2026-01-08 06:09
+- Lines: 68
+- Size: 2.7 KB
+- Modified: 2026-01-09 13:41
 
 ```csharp
 using DarkTowerTron.Core.Debug;
@@ -7151,6 +7225,8 @@ namespace DarkTowerTron.Core
 
         // Dynamic Services (Set at runtime)
         public static PlayerController Player { get; private set; }
+        public static CameraRig CameraRig { get; private set; }
+        public static GameSession Session { get; private set; }
 
         // Public Accessors
         public static WaveDirector WaveDirector => Instance != null ? Instance._waveDirector : null;
@@ -7176,6 +7252,18 @@ namespace DarkTowerTron.Core
             GameLogger.Log(LogChannel.System, "[GameServices] Player Registered.", player != null ? player.gameObject : null);
         }
 
+        public static void RegisterCamera(CameraRig rig)
+        {
+            CameraRig = rig;
+            GameLogger.Log(LogChannel.System, "[GameServices] CameraRig Registered.", rig != null ? rig.gameObject : null);
+        }
+
+        public static void RegisterSession(GameSession session)
+        {
+            Session = session;
+            GameLogger.Log(LogChannel.System, "[GameServices] GameSession Registered.", session != null ? session.gameObject : null);
+        }
+
         private void OnDestroy()
         {
             if (Instance == this) Instance = null;
@@ -7187,13 +7275,13 @@ namespace DarkTowerTron.Core
 ## 📄 `Assets\Scripts\Core\GameTime.cs`
 - Lines: 29
 - Size: 0.7 KB
-- Modified: 2026-01-06 10:32
+- Modified: 2026-01-09 13:47
 
 ```csharp
 using UnityEngine;
 using System.Collections;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     public class GameTime : MonoBehaviour
     {
@@ -7217,6 +7305,46 @@ namespace DarkTowerTron.Services
             Time.timeScale = originalScale;
             _isFrozen = false;
         }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Core\Global.cs`
+- Lines: 32
+- Size: 1.3 KB
+- Modified: 2026-01-09 13:44
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core.Services; // For ServiceLocator
+using DarkTowerTron.Systems;       // NEW Namespace for Managers (see Step 2)
+
+namespace DarkTowerTron
+{
+    /// <summary>
+    /// Global Access Point for all Game Systems.
+    /// Replaces "Services" class to avoid namespace conflicts.
+    /// </summary>
+    public static class Global
+    {
+        // Core Systems
+        public static AudioManager Audio => ServiceLocator.Get<AudioManager>();
+        public static MusicManager Music => ServiceLocator.Get<MusicManager>();
+        public static PaletteManager Palette => ServiceLocator.Get<PaletteManager>();
+        public static PoolManager Pool => ServiceLocator.Get<PoolManager>();
+        public static ScoreManager Score => ServiceLocator.Get<ScoreManager>();
+        public static VFXManager VFX => ServiceLocator.Get<VFXManager>();
+        public static GameTime Time => ServiceLocator.Get<GameTime>();
+
+        // Dynamic Systems
+        public static DarkTowerTron.Player.Controller.PlayerController Player
+            => DarkTowerTron.Core.GameServices.Player;
+
+        public static DarkTowerTron.Core.CameraRig Camera
+            => DarkTowerTron.Core.GameServices.CameraRig;
+
+        public static DarkTowerTron.Managers.GameSession Session
+            => DarkTowerTron.Core.GameServices.Session;
     }
 }
 ```
@@ -7470,12 +7598,12 @@ namespace DarkTowerTron.Core.Services
 ## 📄 `Assets\Scripts\Core\Services\GameBootstrap.cs`
 - Lines: 43
 - Size: 1.3 KB
-- Modified: 2026-01-08 06:09
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Managers;
-using DarkTowerTron.Services;
+using DarkTowerTron.Systems;
 using UnityEngine;
 
 namespace DarkTowerTron.Core.Services
@@ -7591,29 +7719,6 @@ namespace DarkTowerTron.Core.Services
         {
             _services.Clear();
         }
-    }
-}
-```
-
-## 📄 `Assets\Scripts\Core\Services\Services.cs`
-- Lines: 15
-- Size: 0.7 KB
-- Modified: 2026-01-06 10:33
-
-```csharp
-using DarkTowerTron.Services;
-
-namespace DarkTowerTron.Core.Services
-{
-    public static class Services
-    {
-        public static AudioManager Audio => ServiceLocator.Get<AudioManager>();
-        public static MusicManager Music => ServiceLocator.Get<MusicManager>();
-        public static PaletteManager Palette => ServiceLocator.Get<PaletteManager>();
-        public static PoolManager Pool => ServiceLocator.Get<PoolManager>();
-        public static ScoreManager Score => ServiceLocator.Get<ScoreManager>();
-        public static GameTime Time => ServiceLocator.Get<GameTime>();
-        public static VFXManager VFX => ServiceLocator.Get<VFXManager>();
     }
 }
 ```
@@ -7924,9 +8029,9 @@ namespace DarkTowerTron.EditorTools
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Bosses\Architect\ArchitectController.cs`
-- Lines: 271
+- Lines: 269
 - Size: 8.8 KB
-- Modified: 2026-01-08 07:50
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
@@ -7936,9 +8041,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
 using DG.Tweening;
-
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
@@ -8203,9 +8306,9 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ```
 
 ## 📄 `Assets\Scripts\Enemy\Bosses\Architect\ArchitectHand.cs`
-- Lines: 197
-- Size: 6.3 KB
-- Modified: 2026-01-06 09:33
+- Lines: 195
+- Size: 6.2 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
@@ -8213,9 +8316,7 @@ using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Enemy.Visuals; // For Visuals
 using DG.Tweening;
-
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy.Bosses.Architect
 {
@@ -8408,9 +8509,9 @@ namespace DarkTowerTron.Enemy.Bosses.Architect
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyBaseAI.cs`
-- Lines: 220
-- Size: 7.7 KB
-- Modified: 2026-01-06 15:28
+- Lines: 218
+- Size: 7.6 KB
+- Modified: 2026-01-09 13:54
 
 ```csharp
 using UnityEngine;
@@ -8419,10 +8520,8 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services;
 using DarkTowerTron.Managers;
-
-using Global = DarkTowerTron.Core.Services.Services; 
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy
 {
@@ -8636,9 +8735,9 @@ namespace DarkTowerTron.Enemy
 ```
 
 ## 📄 `Assets\Scripts\Enemy\EnemyController.cs`
-- Lines: 165
-- Size: 5.4 KB
-- Modified: 2026-01-08 16:54
+- Lines: 163
+- Size: 5.3 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
@@ -8647,9 +8746,7 @@ using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events; // Event Channels
 using DarkTowerTron.Combat;
 using DarkTowerTron.Enemy.Visuals;
-
-// ALIAS: Prevents conflict between 'Services' (Namespace) and 'Services' (Class)
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Enemy
 {
@@ -9042,17 +9139,55 @@ namespace DarkTowerTron.Enemy
 }
 ```
 
+## 📄 `Assets\Scripts\Enemy\Modules\EnemyPatrolModule.cs`
+- Lines: 30
+- Size: 0.9 KB
+- Modified: 2026-01-09 13:56
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.AI.Paths;
+
+namespace DarkTowerTron.Enemy.Modules
+{
+    public class EnemyPatrolModule : MonoBehaviour
+    {
+        [Header("Runtime Data")]
+        public PatrolPath patrolPath;
+        public int currentWaypointIndex;
+
+        // Helper to get the current target transform safely
+        public Transform GetCurrentWaypointTarget()
+        {
+            if (patrolPath == null || patrolPath.waypoints.Count == 0) return null;
+
+            // Safety wrap
+            if (currentWaypointIndex >= patrolPath.waypoints.Count) currentWaypointIndex = 0;
+
+            var wp = patrolPath.waypoints[currentWaypointIndex];
+            return wp != null ? wp.transform : null;
+        }
+
+        public void AdvanceWaypoint()
+        {
+            if (patrolPath == null) return;
+            currentWaypointIndex = (currentWaypointIndex + 1) % patrolPath.waypoints.Count;
+        }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\Enemy\Visuals\EnemyVisuals.cs`
 - Lines: 210
 - Size: 7.0 KB
-- Modified: 2026-01-08 06:09
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Services;
-using DarkTowerTron.Services;
+using DarkTowerTron.Systems;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9358,9 +9493,9 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Environment\CameraZone.cs`
-- Lines: 48
-- Size: 1.5 KB
-- Modified: 2025-12-30 09:50
+- Lines: 49
+- Size: 1.7 KB
+- Modified: 2026-01-09 13:37
 
 ```csharp
 using UnityEngine;
@@ -9381,10 +9516,11 @@ namespace DarkTowerTron.Environment
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(GameConstants.TAG_PLAYER))
             {
-                var rig = FindObjectOfType<CameraRig>();
-                if (rig)
+                // FIX: Use service reference instead of FindObjectOfType
+                var rig = GameServices.CameraRig;
+                if (rig != null)
                 {
                     // Pass the center of THIS trigger as the lock position
                     rig.OverrideCamera(targetPitch, targetDistance, lockX, lockZ, transform.position);
@@ -9394,10 +9530,10 @@ namespace DarkTowerTron.Environment
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(GameConstants.TAG_PLAYER))
             {
-                var rig = FindObjectOfType<CameraRig>();
-                if (rig) rig.ResetToDefault();
+                var rig = GameServices.CameraRig;
+                if (rig != null) rig.ResetToDefault();
             }
         }
 
@@ -9516,12 +9652,13 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Environment\PlayerStart.cs`
-- Lines: 26
-- Size: 0.8 KB
-- Modified: 2025-12-30 09:50
+- Lines: 65
+- Size: 2.2 KB
+- Modified: 2026-01-09 13:39
 
 ```csharp
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace DarkTowerTron.Environment
 {
@@ -9532,6 +9669,44 @@ namespace DarkTowerTron.Environment
 
         [Header("Visuals")]
         public Color gizmoColor = Color.green;
+
+        // --- THE REGISTRY ---
+        private static readonly Dictionary<string, Transform> _registry = new Dictionary<string, Transform>();
+
+        private void OnEnable()
+        {
+            if (string.IsNullOrWhiteSpace(spawnID)) return;
+
+            if (!_registry.ContainsKey(spawnID))
+            {
+                _registry.Add(spawnID, transform);
+            }
+            else if (_registry[spawnID] != transform)
+            {
+                Debug.LogWarning($"[PlayerStart] Duplicate spawnID '{spawnID}' found on '{name}'. Keeping first registration.", gameObject);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (string.IsNullOrWhiteSpace(spawnID)) return;
+
+            if (_registry.TryGetValue(spawnID, out Transform registered) && registered == transform)
+            {
+                _registry.Remove(spawnID);
+            }
+        }
+
+        public static Transform GetSpawnPoint(string id)
+        {
+            if (!string.IsNullOrWhiteSpace(id) && _registry.TryGetValue(id, out Transform t)) return t;
+
+            // Fallback: Try "Start" if the requested one is missing
+            if (id != "Start" && _registry.TryGetValue("Start", out Transform def)) return def;
+
+            return null;
+        }
+        // --------------------
 
         private void OnDrawGizmos()
         {
@@ -9676,9 +9851,9 @@ namespace DarkTowerTron.Environment.Props
 ```
 
 ## 📄 `Assets\Scripts\Environment\Props\Prop_Explosive.cs`
-- Lines: 110
-- Size: 3.5 KB
-- Modified: 2026-01-06 10:00
+- Lines: 108
+- Size: 3.4 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
@@ -9686,9 +9861,7 @@ using DarkTowerTron.Combat;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Enemy.Visuals;
-
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Environment.Props
 {
@@ -9794,14 +9967,15 @@ namespace DarkTowerTron.Environment.Props
 ```
 
 ## 📄 `Assets\Scripts\Environment\TileInfo.cs`
-- Lines: 48
-- Size: 1.5 KB
-- Modified: 2025-12-30 09:50
+- Lines: 41
+- Size: 1.2 KB
+- Modified: 2026-01-09 13:25
 
 ```csharp
 using UnityEngine;
+
 #if UNITY_EDITOR
-using UnityEditor;
+using UnityEditor; // <--- WRAP THIS
 #endif
 
 namespace DarkTowerTron.Environment
@@ -9817,26 +9991,18 @@ namespace DarkTowerTron.Environment
         {
             if (!showCoordinates) return;
 
-            // Draw the outline of the tile
             Gizmos.color = new Color(labelColor.r, labelColor.g, labelColor.b, 0.3f);
             Gizmos.DrawWireCube(transform.position, new Vector3(tileSize, 0.1f, tileSize));
 
+            // --- WRAP THE LABEL LOGIC ---
 #if UNITY_EDITOR
-            // Calculate "Local Grid" coordinates relative to parent (The Room Module)
-            // If no parent, use World Space
             Vector3 pos = transform.position;
-            if (transform.parent != null)
-            {
-                pos = transform.localPosition;
-            }
+            if (transform.parent != null) pos = transform.localPosition;
 
-            // Round to nearest logical index
             int x = Mathf.RoundToInt(pos.x / tileSize);
             int z = Mathf.RoundToInt(pos.z / tileSize);
-
             string label = $"{x}, {z}";
             
-            // Draw text in Scene View
             GUIStyle style = new GUIStyle();
             style.normal.textColor = labelColor;
             style.fontSize = 15;
@@ -9929,15 +10095,14 @@ namespace DarkTowerTron.Environment
 ```
 
 ## 📄 `Assets\Scripts\Managers\ArenaSpawner.cs`
-- Lines: 85
-- Size: 3.3 KB
-- Modified: 2026-01-08 06:09
+- Lines: 84
+- Size: 3.2 KB
+- Modified: 2026-01-09 13:54
 
 ```csharp
 using DarkTowerTron.Core.Debug;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.Managers
 {
@@ -10022,20 +10187,21 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\DebugController.cs`
-- Lines: 139
+- Lines: 141
 - Size: 4.8 KB
-- Modified: 2026-01-08 06:09
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using System.Collections;
 using DarkTowerTron.Combat;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Controller;
 using DarkTowerTron.Player.Stats;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Managers
 {
@@ -10073,11 +10239,11 @@ namespace DarkTowerTron.Managers
             // 1. Auto-Start Logic
             if (autoStartGame)
             {
-                var session = FindObjectOfType<GameSession>();
-                if (session)
+                // FIX: Use Service
+                if (GameServices.Session != null)
                 {
                     GameLogger.Log(LogChannel.System, "[DEBUG] Auto-Starting Game...", gameObject);
-                    session.BeginGame();
+                    GameServices.Session.BeginGame();
 
                     // Force combat state active
                     _combatStartedEvent?.Raise();
@@ -10085,12 +10251,13 @@ namespace DarkTowerTron.Managers
             }
 
             // 2. Locate Player (Robust Find)
-            var player = FindObjectOfType<PlayerController>();
-            if (player != null)
+            // (Already cached in Services)
+            if (GameServices.Player != null)
             {
-                _energy = player.GetComponent<PlayerEnergy>();
-                _health = player.GetComponent<PlayerHealth>();
-                _loadout = player.GetComponent<PlayerLoadout>();
+                var p = GameServices.Player;
+                _energy = p.GetComponent<PlayerEnergy>();
+                _health = p.GetComponent<PlayerHealth>();
+                _loadout = p.GetComponent<PlayerLoadout>();
             }
         }
 
@@ -10169,14 +10336,16 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\GameSession.cs`
-- Lines: 180
-- Size: 5.5 KB
-- Modified: 2026-01-08 06:09
+- Lines: 178
+- Size: 5.4 KB
+- Modified: 2026-01-09 13:41
 
 ```csharp
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
+using DarkTowerTron.Environment;
+using DarkTowerTron.Physics;
 using DarkTowerTron.Player.Stats;
 using DarkTowerTron.UI;
 using UnityEngine;
@@ -10202,6 +10371,7 @@ namespace DarkTowerTron.Managers
 
         private void Awake()
         {
+            GameServices.RegisterSession(this);
             _controls = new GameControls();
             _controls.Gameplay.Pause.performed += ctx => TogglePause();
         }
@@ -10322,35 +10492,30 @@ namespace DarkTowerTron.Managers
         private void MovePlayerToStart()
         {
             if (GameServices.Player == null) return;
-            var playerTransform = GameServices.Player.transform;
 
-            var points = FindObjectsOfType<DarkTowerTron.Environment.PlayerStart>();
-            Transform targetPoint = null;
-
-            foreach (var p in points)
+            // FIX: Query the Registry
+            Transform targetPoint = PlayerStart.GetSpawnPoint(activeSpawnID);
+            if (targetPoint == null)
             {
-                if (p.spawnID == activeSpawnID) { targetPoint = p.transform; break; }
+                Debug.LogWarning($"[GameSession] Spawn Point '{activeSpawnID}' not found!");
+                return;
             }
 
-            if (targetPoint == null && activeSpawnID != "Start")
+            // Move Logic
+            var uMover = GameServices.Player.GetComponent<UnityCharacterMover>();
+            if (uMover != null)
             {
-                foreach (var p in points) if (p.spawnID == "Start") { targetPoint = p.transform; break; }
+                uMover.Teleport(targetPoint.position);
+            }
+            else
+            {
+                // Back-compat: some setups may still use the custom mover
+                var kMover = GameServices.Player.GetComponent<KinematicMover>();
+                if (kMover != null) kMover.Teleport(targetPoint.position);
+                else GameServices.Player.transform.position = targetPoint.position;
             }
 
-            if (targetPoint != null)
-            {
-                var motor = GameServices.Player.GetComponent<DarkTowerTron.Physics.KinematicMover>();
-                if (motor)
-                {
-                    motor.Teleport(targetPoint.position);
-                    playerTransform.rotation = targetPoint.rotation;
-                }
-                else
-                {
-                    playerTransform.position = targetPoint.position;
-                    playerTransform.rotation = targetPoint.rotation;
-                }
-            }
+            GameServices.Player.transform.rotation = targetPoint.rotation;
         }
     }
 }
@@ -10408,16 +10573,14 @@ namespace DarkTowerTron.Managers
 ```
 
 ## 📄 `Assets\Scripts\Managers\LevelPrewarmer.cs`
-- Lines: 32
-- Size: 0.8 KB
-- Modified: 2026-01-07 19:26
+- Lines: 30
+- Size: 0.7 KB
+- Modified: 2026-01-09 13:54
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
-using DarkTowerTron.Core.Services;
-// Alias
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Managers
 {
@@ -11070,7 +11233,7 @@ namespace DarkTowerTron.Physics
 ## 📄 `Assets\Scripts\Player\Combat\PlayerBeam.cs`
 - Lines: 84
 - Size: 2.8 KB
-- Modified: 2026-01-08 06:10
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using DarkTowerTron.Core;
@@ -11078,7 +11241,7 @@ using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Player.Stats;
 using DG.Tweening;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Combat
 {
@@ -11161,8 +11324,8 @@ namespace DarkTowerTron.Player.Combat
 
 ## 📄 `Assets\Scripts\Player\Combat\PlayerExecution.cs`
 - Lines: 129
-- Size: 4.6 KB
-- Modified: 2026-01-09 08:17
+- Size: 4.5 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using System.Collections;
@@ -11170,7 +11333,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Player.Movement;
 using DarkTowerTron.Player.Stats;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Combat
 {
@@ -11299,13 +11462,13 @@ namespace DarkTowerTron.Player.Combat
 ## 📄 `Assets\Scripts\Player\Combat\PlayerGun.cs`
 - Lines: 57
 - Size: 1.6 KB
-- Modified: 2026-01-08 06:10
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
 using UnityEngine;
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Combat
 {
@@ -12101,9 +12264,9 @@ namespace DarkTowerTron.Player.Movement
 ```
 
 ## 📄 `Assets\Scripts\Player\Movement\PlayerDodge.cs`
-- Lines: 189
+- Lines: 187
 - Size: 6.0 KB
-- Modified: 2026-01-08 06:01
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
@@ -12112,9 +12275,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
-
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Movement
 {
@@ -13047,16 +13208,16 @@ namespace DarkTowerTron.Player.Stats
 ```
 
 ## 📄 `Assets\Scripts\Services\AudioManager.cs`
-- Lines: 38
+- Lines: 39
 - Size: 1.2 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-09 13:47
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core; // For GameLogger
 
-namespace DarkTowerTron.Core.Services
+namespace DarkTowerTron.Systems
 {
     [RequireComponent(typeof(AudioSource))]
     public class AudioManager : MonoBehaviour
@@ -13095,7 +13256,7 @@ namespace DarkTowerTron.Core.Services
 ## 📄 `Assets\Scripts\Services\MusicManager.cs`
 - Lines: 61
 - Size: 1.7 KB
-- Modified: 2026-01-06 15:21
+- Modified: 2026-01-09 13:47
 
 ```csharp
 using UnityEngine;
@@ -13103,7 +13264,7 @@ using DG.Tweening;
 using DarkTowerTron.Core; // For GameEvents
 using DarkTowerTron.Core.Events;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     [RequireComponent(typeof(AudioSource))]
     public class MusicManager : MonoBehaviour
@@ -13162,20 +13323,19 @@ namespace DarkTowerTron.Services
 ```
 
 ## 📄 `Assets\Scripts\Services\PaletteManager.cs`
-- Lines: 137
-- Size: 4.5 KB
-- Modified: 2026-01-08 06:11
+- Lines: 136
+- Size: 4.4 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using System;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Debug;
-using DarkTowerTron.Core.Services;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     [ExecuteAlways]
     public class PaletteManager : MonoBehaviour
@@ -13307,17 +13467,18 @@ namespace DarkTowerTron.Services
 ```
 
 ## 📄 `Assets\Scripts\Services\PoolManager.cs`
-- Lines: 168
-- Size: 5.8 KB
-- Modified: 2026-01-08 06:09
+- Lines: 169
+- Size: 5.9 KB
+- Modified: 2026-01-09 13:47
 
 ```csharp
 using System.Collections.Generic;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace DarkTowerTron.Core.Services
+namespace DarkTowerTron.Systems
 {
     public class PoolManager : MonoBehaviour
     {
@@ -13485,7 +13646,7 @@ namespace DarkTowerTron.Core.Services
 ## 📄 `Assets\Scripts\Services\ScoreManager.cs`
 - Lines: 98
 - Size: 3.0 KB
-- Modified: 2026-01-08 06:09
+- Modified: 2026-01-09 13:47
 
 ```csharp
 using DarkTowerTron.Core.Data;
@@ -13493,7 +13654,7 @@ using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
 using UnityEngine;
 
-namespace DarkTowerTron.Services
+namespace DarkTowerTron.Systems
 {
     public class ScoreManager : MonoBehaviour
     {
@@ -13589,19 +13750,18 @@ namespace DarkTowerTron.Services
 ```
 
 ## 📄 `Assets\Scripts\Services\VFXManager.cs`
-- Lines: 64
+- Lines: 63
 - Size: 2.2 KB
-- Modified: 2026-01-06 15:26
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events; // NEW
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
-namespace DarkTowerTron.Core.Services
+namespace DarkTowerTron.Systems
 {
     public class VFXManager : MonoBehaviour
     {
@@ -13654,6 +13814,506 @@ namespace DarkTowerTron.Core.Services
                 GameObject vfx = Global.Pool.Spawn(spawnPrefab, vfxPos, Quaternion.identity);
                 var ps = vfx.GetComponent<ParticleSystem>();
                 if (ps) ps.Play();
+            }
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Narrative\NarrativeDirector.cs`
+- Lines: 108
+- Size: 4.2 KB
+- Modified: 2026-01-09 14:37
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core;
+
+namespace DarkTowerTron.Systems.Narrative
+{
+    public class NarrativeDirector : MonoBehaviour
+    {
+        [Header("Data")]
+        public NarrativeLibrarySO library;
+        [SerializeField] private NarrativeEventChannelSO _narrativeOutput;
+
+        [Header("Triggers")]
+        [SerializeField] private VoidEventChannelSO _playerHitEvent;
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+        [SerializeField] private VoidEventChannelSO _waveCombatStartedEvent;
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+
+        [Header("Settings")]
+        [Tooltip("Minimum seconds between messages to avoid spam.")]
+        public float spamCooldown = 3.0f;
+
+        private float _lastMessageTime;
+        private float _currentCorruption = 0f;
+
+        private void Start()
+        {
+            CalculateCorruption();
+        }
+
+        private void OnEnable()
+        {
+            if (_playerHitEvent) _playerHitEvent.OnEventRaised += OnPlayerHurt;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+            if (_waveCombatStartedEvent) _waveCombatStartedEvent.OnEventRaised += OnCombatStart;
+            if (_playerDiedEvent) _playerDiedEvent.OnEventRaised += OnPlayerDied;
+        }
+
+        private void OnDisable()
+        {
+            if (_playerHitEvent) _playerHitEvent.OnEventRaised -= OnPlayerHurt;
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+            if (_waveCombatStartedEvent) _waveCombatStartedEvent.OnEventRaised -= OnCombatStart;
+            if (_playerDiedEvent) _playerDiedEvent.OnEventRaised -= OnPlayerDied;
+        }
+
+        private void CalculateCorruption()
+        {
+            // Logic: More Runs + More Deaths = Higher Corruption
+            // Example: 10 deaths = 50% corruption
+            if (Global.Score != null && Global.Score.gameObject.GetComponent<DarkTowerTron.Systems.Persistence.PersistenceManager>() != null)
+            {
+                // Accessing Persistence via Global shortcut or FindObject depending on your registration
+                // Let's assume you added it to Global in Phase 3. If not, use FindObject for now.
+                var data = FindObjectOfType<DarkTowerTron.Systems.Persistence.PersistenceManager>()?.CurrentData;
+
+                if (data != null)
+                {
+                    // Formula: Each death adds 5% corruption. Each run adds 1%.
+                    float deathFactor = data.totalDeaths * 0.05f;
+                    float runFactor = data.totalRuns * 0.01f;
+
+                    _currentCorruption = Mathf.Clamp01(deathFactor + runFactor);
+
+                    Debug.Log($"[Narrative] Corruption Level: {_currentCorruption:P0}");
+                }
+            }
+        }
+
+        private void Publish(string rawText, float priorityBonus = 0f)
+        {
+            // Rate Limiting (unless priority is high)
+            if (Time.time < _lastMessageTime + (spamCooldown - priorityBonus)) return;
+
+            string finalString = TextCorruptor.Corrupt(rawText, _currentCorruption);
+
+            _narrativeOutput?.Raise(finalString, 3.0f);
+            _lastMessageTime = Time.time;
+        }
+
+        // --- HANDLERS ---
+
+        private void OnCombatStart()
+        {
+            Publish(library.GetRandomLine(library.introLines), 10f); // High priority
+        }
+
+        private void OnPlayerHurt()
+        {
+            if (Random.value > 0.7f) // Don't talk every hit
+                Publish(library.GetRandomLine(library.hurtLines));
+        }
+
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool reward)
+        {
+            if (reward && Random.value > 0.8f)
+                Publish(library.GetRandomLine(library.killLines));
+        }
+
+        private void OnPlayerDied()
+        {
+            // Force message
+            string text = TextCorruptor.Corrupt(library.GetRandomLine(library.deathLines), _currentCorruption + 0.2f);
+            _narrativeOutput?.Raise(text, 5.0f);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Narrative\NarrativeLibrarySO.cs`
+- Lines: 22
+- Size: 0.8 KB
+- Modified: 2026-01-09 14:34
+
+```csharp
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace DarkTowerTron.Systems.Narrative
+{
+    [CreateAssetMenu(fileName = "Narrative_Default", menuName = "DarkTowerTron/Narrative/Library")]
+    public class NarrativeLibrarySO : ScriptableObject
+    {
+        [Header("Contexts")]
+        public List<string> introLines;      // Level Start
+        public List<string> hurtLines;       // Player Hit
+        public List<string> killLines;       // Enemy Killed
+        public List<string> deathLines;      // Player Died
+        public List<string> victoryLines;    // Level End
+
+        public string GetRandomLine(List<string> source)
+        {
+            if (source == null || source.Count == 0) return "...";
+            return source[Random.Range(0, source.Count)];
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Narrative\TextCorruptor.cs`
+- Lines: 48
+- Size: 1.6 KB
+- Modified: 2026-01-09 14:36
+
+```csharp
+using System.Text;
+using UnityEngine;
+
+namespace DarkTowerTron.Systems.Narrative
+{
+    public static class TextCorruptor
+    {
+        private static char[] _glitchChars = new char[] { '$', '#', '%', '&', '!', '?', '0', '1', 'X' };
+
+        public static string Corrupt(string input, float corruptionLevel)
+        {
+            if (string.IsNullOrEmpty(input)) return "";
+            if (corruptionLevel <= 0) return input;
+
+            StringBuilder sb = new StringBuilder(input);
+            int length = sb.Length;
+
+            // 1. Character Replacement (Light Corruption)
+            int charsToReplace = Mathf.FloorToInt(length * corruptionLevel * 0.5f);
+            for (int i = 0; i < charsToReplace; i++)
+            {
+                int index = Random.Range(0, length);
+                if (sb[index] == ' ') continue; // Don't replace spaces usually
+                sb[index] = _glitchChars[Random.Range(0, _glitchChars.Length)];
+            }
+
+            // 2. Redaction (Heavy Corruption)
+            // If corruption is > 0.5, block out whole words
+            if (corruptionLevel > 0.5f)
+            {
+                // Simple logic: insert [ERR] randomly
+                if (Random.value < corruptionLevel)
+                {
+                    sb.Append(" [FATAL_ERR]");
+                }
+            }
+
+            // 3. Zalgo/Hex (Extreme Corruption)
+            if (corruptionLevel > 0.8f)
+            {
+                // Hex dump style
+                return $"0x{Random.Range(1000, 9999)} // {sb.ToString()}";
+            }
+
+            return sb.ToString();
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Persistence\Editor\PersistenceManagerEditor.cs`
+- Lines: 49
+- Size: 1.4 KB
+- Modified: 2026-01-09 14:22
+
+```csharp
+using UnityEngine;
+using UnityEditor;
+using System.Diagnostics; // For Process.Start
+
+namespace DarkTowerTron.Systems.Persistence
+{
+    [CustomEditor(typeof(PersistenceManager))]
+    public class PersistenceManagerEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            // Draw the default Inspector (Script field, Current Slot Index)
+            DrawDefaultInspector();
+
+            PersistenceManager manager = (PersistenceManager)target;
+
+            GUILayout.Space(10);
+
+            // --- The Magic Button ---
+            if (GUILayout.Button("📂 Open Save Folder", GUILayout.Height(30)))
+            {
+                OpenSaveFolder();
+            }
+
+            // --- Debug Controls ---
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Save Now"))
+            {
+                manager.Save();
+            }
+            if (GUILayout.Button("Load Now"))
+            {
+                manager.Load(manager.CurrentSlotIndex);
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        private void OpenSaveFolder()
+        {
+            string path = Application.persistentDataPath;
+
+            // Cross-platform open
+            path = path.Replace(@"/", @"\"); // Windows friendly
+
+            // Reveal in Explorer/Finder
+            EditorUtility.RevealInFinder(path);
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Persistence\PersistenceManager.cs`
+- Lines: 109
+- Size: 3.5 KB
+- Modified: 2026-01-09 14:21
+
+```csharp
+using UnityEngine;
+using System.IO;
+using DarkTowerTron.Core.Debug; // For Logger
+
+namespace DarkTowerTron.Systems.Persistence
+{
+    public class PersistenceManager : MonoBehaviour
+    {
+        private const string SAVE_FILE_PREFIX = "save_slot_";
+        private const string EXTENSION = ".json";
+
+        public SaveData CurrentData { get; private set; }
+
+        // Default to slot 0. We can change this via UI later.
+        [SerializeField] private int _currentSlotIndex = 0;
+
+        public int CurrentSlotIndex => _currentSlotIndex;
+
+        private void Awake()
+        {
+            Load(_currentSlotIndex);
+        }
+
+        /// <summary>
+        /// Switch to a different save slot and load it immediately.
+        /// </summary>
+        public void SetSaveSlot(int index)
+        {
+            if (index < 0) return;
+
+            // Save previous slot state before switching?
+            // Usually safer to just switch, assuming previous was saved on change.
+            Save();
+
+            _currentSlotIndex = index;
+            Load(_currentSlotIndex);
+        }
+
+        public void Save()
+        {
+            if (CurrentData == null) CurrentData = new SaveData();
+            CurrentData.lastPlayedDate = System.DateTime.Now.ToString();
+
+            try
+            {
+                string path = GetPath(_currentSlotIndex);
+                string json = JsonUtility.ToJson(CurrentData, true);
+                File.WriteAllText(path, json);
+
+                GameLogger.Log(LogChannel.System, $"Game Saved to Slot {_currentSlotIndex}", gameObject);
+            }
+            catch (System.Exception e)
+            {
+                GameLogger.LogError(LogChannel.System, $"Failed to save: {e.Message}", gameObject);
+            }
+        }
+
+        public void Load(int slotIndex)
+        {
+            _currentSlotIndex = slotIndex;
+            string path = GetPath(slotIndex);
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    string json = File.ReadAllText(path);
+                    CurrentData = JsonUtility.FromJson<SaveData>(json);
+                    GameLogger.Log(LogChannel.System, $"Loaded Slot {slotIndex}", gameObject);
+                }
+                catch (System.Exception e)
+                {
+                    GameLogger.LogError(LogChannel.System, $"Slot {slotIndex} corrupted. Resetting. Error: {e.Message}", gameObject);
+                    CreateNewSave();
+                }
+            }
+            else
+            {
+                GameLogger.Log(LogChannel.System, $"Slot {slotIndex} not found. Creating new.", gameObject);
+                CreateNewSave();
+            }
+        }
+
+        [ContextMenu("Delete Current Save")]
+        public void DeleteCurrentSave()
+        {
+            string path = GetPath(_currentSlotIndex);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                GameLogger.Log(LogChannel.System, $"Deleted Save Slot {_currentSlotIndex}", gameObject);
+                CreateNewSave();
+            }
+        }
+
+        private void CreateNewSave()
+        {
+            CurrentData = new SaveData();
+            Save();
+        }
+
+        private string GetPath(int index)
+        {
+            return Path.Combine(Application.persistentDataPath, $"{SAVE_FILE_PREFIX}{index}{EXTENSION}");
+        }
+
+        private void OnApplicationQuit() => Save();
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Persistence\SaveData.cs`
+- Lines: 37
+- Size: 0.9 KB
+- Modified: 2026-01-09 14:11
+
+```csharp
+using System;
+
+namespace DarkTowerTron.Systems.Persistence
+{
+    [Serializable]
+    public class SaveData
+    {
+        // --- Header ---
+        public string lastPlayedDate;
+        public string version = "0.1";
+
+        // --- Narrative Stats (The "Corruption") ---
+        public int totalRuns;
+        public int totalDeaths;
+        public int totalKills;
+        public float totalDamageDealt;
+
+        // --- Progression ---
+        public int highestWaveReached;
+        public bool hasSeenTutorial;
+
+        // --- Settings (Optional for now) ---
+        public float masterVolume = 1.0f;
+
+        // Constructor sets defaults
+        public SaveData()
+        {
+            lastPlayedDate = DateTime.Now.ToString();
+            totalRuns = 0;
+            totalDeaths = 0;
+            totalKills = 0;
+            totalDamageDealt = 0;
+            highestWaveReached = 0;
+            hasSeenTutorial = false;
+        }
+    }
+}
+```
+
+## 📄 `Assets\Scripts\Systems\Persistence\StatsTracker.cs`
+- Lines: 71
+- Size: 2.5 KB
+- Modified: 2026-01-09 14:30
+
+```csharp
+using UnityEngine;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Data;
+
+namespace DarkTowerTron.Systems.Persistence
+{
+    /// <summary>
+    /// Listens to gameplay events and updates the persistent SaveData.
+    /// </summary>
+    public class StatsTracker : MonoBehaviour
+    {
+        [Header("Dependencies")]
+        [SerializeField] private PersistenceManager _persistence;
+
+        [Header("Listening To")]
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+        [SerializeField] private DamageTextEventChannelSO _damageEvent; // To track damage dealt
+
+        private void Awake()
+        {
+            if (_persistence == null)
+                _persistence = GetComponent<PersistenceManager>();
+        }
+
+        private void OnEnable()
+        {
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
+            if (_playerDiedEvent) _playerDiedEvent.OnEventRaised += OnPlayerDied;
+            if (_damageEvent) _damageEvent.OnEventRaised += OnDamageDealt;
+        }
+
+        private void OnDisable()
+        {
+            if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
+            if (_playerDiedEvent) _playerDiedEvent.OnEventRaised -= OnPlayerDied;
+            if (_damageEvent) _damageEvent.OnEventRaised -= OnDamageDealt;
+        }
+
+        private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool reward)
+        {
+            // Respect the reward flag: if the enemy killed itself (suicide/contact),
+            // don't count it as a player kill.
+            if (!reward) return;
+
+            if (_persistence.CurrentData != null)
+            {
+                _persistence.CurrentData.totalKills++;
+            }
+        }
+
+        private void OnPlayerDied()
+        {
+            if (_persistence.CurrentData != null)
+            {
+                _persistence.CurrentData.totalDeaths++;
+                _persistence.CurrentData.totalRuns++;
+                _persistence.Save(); // Commit on death
+            }
+        }
+
+        private void OnDamageDealt(Vector3 pos, float amount, bool isCrit, bool isStagger)
+        {
+            // Only track health damage, not stagger (optional choice)
+            if (!isStagger && _persistence.CurrentData != null)
+            {
+                _persistence.CurrentData.totalDamageDealt += amount;
             }
         }
     }
@@ -13741,16 +14401,15 @@ namespace DarkTowerTron.UI
 ```
 
 ## 📄 `Assets\Scripts\UI\DamageTextManager.cs`
-- Lines: 98
-- Size: 3.5 KB
-- Modified: 2026-01-06 10:37
+- Lines: 97
+- Size: 3.4 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Events;
-// ALIAS
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.UI
 {
@@ -13847,16 +14506,15 @@ namespace DarkTowerTron.UI
 ```
 
 ## 📄 `Assets\Scripts\UI\FloatingText.cs`
-- Lines: 72
-- Size: 2.2 KB
-- Modified: 2026-01-06 09:50
+- Lines: 71
+- Size: 2.1 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-// ALIAS: Resolves Services conflict
-using Global = DarkTowerTron.Core.Services.Services;
+using DarkTowerTron;
 
 namespace DarkTowerTron.UI
 {
@@ -13927,19 +14585,18 @@ namespace DarkTowerTron.UI
 ```
 
 ## 📄 `Assets\Scripts\UI\HUDManager.cs`
-- Lines: 138
+- Lines: 137
 - Size: 4.7 KB
-- Modified: 2026-01-08 06:09
+- Modified: 2026-01-09 13:54
 
 ```csharp
 using System.Collections.Generic;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services;
+using DarkTowerTron;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Global = DarkTowerTron.Core.Services.Services;
 
 namespace DarkTowerTron.UI
 {
@@ -14110,17 +14767,121 @@ namespace DarkTowerTron.UI
 }
 ```
 
+## 📄 `Assets\Scripts\UI\NarrativeUI.cs`
+- Lines: 97
+- Size: 3.1 KB
+- Modified: 2026-01-09 14:47
+
+```csharp
+using UnityEngine;
+using TMPro;
+using DG.Tweening;
+using System.Collections;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core;
+
+namespace DarkTowerTron.UI
+{
+    public class NarrativeUI : MonoBehaviour
+    {
+        [Header("Wiring")]
+        [SerializeField] private NarrativeEventChannelSO _inputChannel;
+
+        [Header("Components")]
+        [SerializeField] private TextMeshProUGUI _textMesh;
+        [SerializeField] private CanvasGroup _canvasGroup;
+        [SerializeField] private RectTransform _panelRoot;
+
+        [Header("Settings")]
+        public float typeSpeed = 0.03f; // Fast terminal speed
+        public string prefix = "> SYS_OUT: ";
+        public AudioClip typeSound;
+
+        [Header("Glitch Settings")]
+        public float shakeStrength = 10f;
+        public Color normalColor = Color.white;
+        public Color errorColor = Color.red;
+
+        private Tween _fadeTween;
+        private Coroutine _displayRoutine;
+
+        private void Awake()
+        {
+            // Initial State: Hidden
+            _canvasGroup.alpha = 0;
+            _textMesh.text = "";
+        }
+
+        private void OnEnable()
+        {
+            if (_inputChannel != null)
+                _inputChannel.OnEventRaised += OnMessageReceived;
+        }
+
+        private void OnDisable()
+        {
+            if (_inputChannel != null)
+                _inputChannel.OnEventRaised -= OnMessageReceived;
+        }
+
+        private void OnMessageReceived(string message, float duration)
+        {
+            // 1. Interrupt existing messages
+            if (_displayRoutine != null) StopCoroutine(_displayRoutine);
+            if (_fadeTween != null) _fadeTween.Kill();
+            _panelRoot.DOKill();
+
+            // 2. Start new sequence
+            _displayRoutine = StartCoroutine(TypewriterRoutine(message, duration));
+        }
+
+        private IEnumerator TypewriterRoutine(string message, float duration)
+        {
+            // A. Setup
+            string fullText = prefix + message;
+            _textMesh.text = fullText;
+            _textMesh.maxVisibleCharacters = 0; // Hide all chars
+            _textMesh.color = message.Contains("FATAL") ? errorColor : normalColor;
+
+            // B. Visual "Boot" (Fade In + Jolt)
+            _canvasGroup.alpha = 1;
+            _panelRoot.DOPunchAnchorPos(Vector2.right * shakeStrength, 0.2f, 20, 1);
+
+            // C. Typewriter Effect
+            int totalChars = fullText.Length;
+            for (int i = 0; i <= totalChars; i++)
+            {
+                _textMesh.maxVisibleCharacters = i;
+
+                // Play sound every few chars to avoid machine-gun audio
+                if (i % 3 == 0 && typeSound != null && Global.Audio != null)
+                {
+                    Global.Audio.PlaySound(typeSound, 0.2f, true);
+                }
+
+                yield return new WaitForSeconds(typeSpeed);
+            }
+
+            // D. Wait (Read time)
+            yield return new WaitForSeconds(duration);
+
+            // E. Fade Out
+            _fadeTween = _canvasGroup.DOFade(0f, 0.5f);
+        }
+    }
+}
+```
+
 ## 📄 `Assets\Scripts\UI\ResultScreen.cs`
-- Lines: 78
-- Size: 2.4 KB
-- Modified: 2026-01-06 09:15
+- Lines: 77
+- Size: 2.3 KB
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
 using TMPro;
 using DarkTowerTron.Managers;
-// ALIAS: Prevents conflict if you later add 'using DarkTowerTron.Services;' for Audio
-using Global = DarkTowerTron.Core.Services.Services; 
+using DarkTowerTron;
 
 namespace DarkTowerTron.UI
 {
@@ -14335,13 +15096,13 @@ namespace DarkTowerTron.Visuals
 ## 📄 `Assets\Scripts\Visuals\PaletteReceiver.cs`
 - Lines: 136
 - Size: 4.6 KB
-- Modified: 2026-01-06 09:15
+- Modified: 2026-01-09 13:53
 
 ```csharp
 using UnityEngine;
 using System.Collections.Generic;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Services;      // NEW: Where PaletteManager lives
+using DarkTowerTron.Systems;
 using DarkTowerTron.Core.Services; // NEW: For ServiceLocator
 
 namespace DarkTowerTron.Visuals

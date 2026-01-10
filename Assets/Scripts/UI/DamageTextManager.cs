@@ -74,8 +74,14 @@ namespace DarkTowerTron.UI
             }
             else
             {
-                // Standard Popup (e.g. "REFLECT", "ARMORED")
-                SpawnText(pos, message, critColor, 1.2f, true);
+                // Logic: If the message contains spaces, it's likely a sentence (Narrative).
+                // If it's one word (STAGGER, REFLECT), it's combat info.
+                bool isNarrative = !string.IsNullOrWhiteSpace(message) && message.Contains(" ");
+
+                Color finalColor = isNarrative ? narrativeColor : critColor;
+                float scale = isNarrative ? 0.8f : 1.2f; // Sentences should be smaller to fit
+
+                SpawnText(pos, message, finalColor, scale, true);
             }
         }
 

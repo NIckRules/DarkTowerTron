@@ -4,6 +4,7 @@ using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Services;
 using DarkTowerTron.Systems;
 using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -64,23 +65,25 @@ namespace DarkTowerTron.Enemy.Visuals
             }
 
             // Wait one frame to ensure PaletteReceiver has run (Execution Order usually handles this, but safety first)
+            StartCoroutine(InitializeColorsNextFrame());
+        }
+
+        private IEnumerator InitializeColorsNextFrame()
+        {
+            yield return null;
             InitializeColors();
         }
 
         public void InitializeColors()
         {
-            // 1. Resolve Palette (Override -> Service -> Instance)
+            // 1. Resolve Colors from Palette/Managers
             ColorPaletteSO activePalette = paletteOverride;
-
             if (activePalette == null)
             {
-                if (ServiceLocator.TryGet<PaletteManager>(out var manager))
-                    activePalette = manager.activePalette;
-                else if (PaletteManager.Instance != null)
-                    activePalette = PaletteManager.Instance.activePalette;
+                if (ServiceLocator.TryGet<PaletteManager>(out var manager)) activePalette = manager.activePalette;
+                else if (PaletteManager.Instance != null) activePalette = PaletteManager.Instance.activePalette;
             }
 
-            // 2. Cache Flash Colors
             if (activePalette != null)
             {
                 _staggerColor = activePalette.staggerColor;
@@ -92,8 +95,8 @@ namespace DarkTowerTron.Enemy.Visuals
                 _hitColor = Color.white;
             }
 
-            // 3. Snapshot Base Colors (The "Memory")
-            // We read what is currently on the mesh (set by PaletteReceiver or Material)
+            // 2. Snapshot current state
+            // If PaletteReceiver ran, MPB has the palette color. If not, Material has the default.
             for (int i = 0; i < _renderers.Length; i++)
             {
                 Renderer r = _renderers[i];
@@ -101,19 +104,25 @@ namespace DarkTowerTron.Enemy.Visuals
 
                 r.GetPropertyBlock(_propBlock);
 
-                // If MPB is empty, fall back to material color
-                if (_propBlock.isEmpty || _propBlock.GetColor(_colorPropID) == Color.clear)
-                {
-                    if (r.sharedMaterial != null && r.sharedMaterial.HasProperty(_colorPropID))
-                        _baseColors[i] = r.sharedMaterial.GetColor(_colorPropID);
-                    else
-                        _baseColors[i] = Color.white;
-                }
-                else
+                // Read current color
+                if (!_propBlock.isEmpty && _propBlock.GetColor(_colorPropID) != Color.clear)
                 {
                     _baseColors[i] = _propBlock.GetColor(_colorPropID);
                 }
+                else if (r.sharedMaterial != null && r.sharedMaterial.HasProperty(_colorPropID))
+                {
+                    _baseColors[i] = r.sharedMaterial.GetColor(_colorPropID);
+                }
+                else
+                {
+                    _baseColors[i] = Color.white;
+                }
             }
+
+            // 3. FORCE APPLY (The Fix)
+            // Even if we just read it, re-applying it ensures the MPB is assigned to the renderer
+            // and the state is consistent.
+            ResetVisuals();
         }
 
         // --- VISUAL FX METHODS ---

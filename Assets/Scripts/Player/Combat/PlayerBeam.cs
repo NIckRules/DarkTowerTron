@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+using DarkTowerTron.Combat;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Player.Stats;
+using DarkTowerTron.Systems.Stats;
 using DG.Tweening;
 using UnityEngine;
 using DarkTowerTron;
@@ -11,7 +15,7 @@ namespace DarkTowerTron.Player.Combat
     {
         [Header("Beam Specifics")]
         public float range = 7f;
-        public float beamRadius = 0.5f;
+        public float beamRadius = 1.0f;
         public float selfRecoil = 15f;
         public GameObject beamVisualPrefab;
 
@@ -54,15 +58,64 @@ namespace DarkTowerTron.Player.Combat
                 _movement.ApplyKnockback(-fireDir * selfRecoil);
             }
 
-            // 3. Hit Detection
-            // Use Mask from Constants
-            int mask = GameConstants.MASK_WALLS | (1 << GameConstants.LAYER_ENEMY);
+            // 3. Hit Detection (Projectiles + Enemies, blocked by Walls)
+            int mask = GameConstants.MASK_PROJECTILE_COLLISION | (1 << GameConstants.LAYER_PROJECTILE);
 
-            if (UnityEngine.Physics.SphereCast(firePoint.position, beamRadius, fireDir, out RaycastHit hit, range, mask))
+            RaycastHit[] hits = UnityEngine.Physics.SphereCastAll(
+                firePoint.position,
+                beamRadius,
+                fireDir,
+                range,
+                mask,
+                QueryTriggerInteraction.Collide
+            );
+
+            if (hits == null || hits.Length == 0) return;
+
+            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            var damaged = new HashSet<IDamageable>();
+            var parried = new HashSet<Projectile>();
+
+            foreach (var hit in hits)
             {
-                IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
+                if (hit.collider == null) continue;
 
-                if (target != null)
+                // Ignore self / child colliders (weapon/player)
+                if (hit.collider.transform.IsChildOf(transform)) continue;
+
+                // Stop at walls
+                int hitLayer = hit.collider.gameObject.layer;
+                if (hitLayer == GameConstants.LAYER_WALL || hitLayer == GameConstants.LAYER_DEFAULT)
+                {
+                    break;
+                }
+
+                // A) Parry hostile projectiles
+                Projectile incomingProj = hit.collider.GetComponentInParent<Projectile>();
+                if (incomingProj != null)
+                {
+                    // NEW: Parry is a perk/ability.
+                    if (_stats == null || !_stats.HasAbility(AbilityType.Melee_Parry))
+                    {
+                        continue;
+                    }
+
+                    if (incomingProj.isHostile && !parried.Contains(incomingProj))
+                    {
+                        // Aim-based parry (more deterministic than relying on projectile rotation)
+                        Vector3 deflectDir = fireDir;
+                        if (incomingProj.TryParry(deflectDir, gameObject))
+                        {
+                            parried.Add(incomingProj);
+                        }
+                    }
+                    continue;
+                }
+
+                // B) Damage enemies in the beam path (avoid double-hits from multiple colliders)
+                IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
+                if (target != null && damaged.Add(target))
                 {
                     DamageInfo info = new DamageInfo
                     {
@@ -75,8 +128,6 @@ namespace DarkTowerTron.Player.Combat
                     };
 
                     target.TakeDamage(info);
-
-                    // Optional: Call Global.Audio.PlaySound(hitSound) here
                 }
             }
         }

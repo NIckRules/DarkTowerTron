@@ -8,10 +8,15 @@ using DarkTowerTron;
 
 namespace DarkTowerTron.Combat
 {
+    public enum ProjectileWeight { Light, Heavy, Unstoppable }
+
     [RequireComponent(typeof(SphereCollider))]
     [RequireComponent(typeof(Rigidbody))]
     public class Projectile : MonoBehaviour, IReflectable, IPoolable
     {
+        [Header("Classification")]
+        public ProjectileWeight weight = ProjectileWeight.Light;
+
         [Header("Ballistics")]
         public float speed = 25f;
         public float lifetime = 5f;
@@ -30,6 +35,11 @@ namespace DarkTowerTron.Combat
         public Renderer meshRenderer; 
         public Material friendlyMaterial; 
         public Material hostileMaterial; 
+        public Material parryableMaterial;
+
+        [Header("Parry Logic")]
+        public float parrySpeedMultiplier = 2.0f;
+        public FeedbackConfigurationSO parryFeedback;
 
         private Vector3 _direction; 
         private GameObject _source;
@@ -41,10 +51,23 @@ namespace DarkTowerTron.Combat
         private bool _wasDeflectedThisFrame = false;
         private List<Collider> _ignoredColliders = new List<Collider>();
 
+        private float _baseSpeed;
+        private float _baseLifetime;
+
+        private void Awake()
+        {
+            _baseSpeed = speed;
+            _baseLifetime = lifetime;
+        }
+
         public void OnSpawn()
         {
             // LOG 1: Check initial state coming out of pool
             GameLogger.Log(LogChannel.Combat, $"[PROJ] OnSpawn - Pos: {transform.position} | Active: {gameObject.activeSelf}", gameObject);
+
+            // Pool safety: ensure runtime modifications (Redirect/Parry) don't accumulate across reuse
+            speed = _baseSpeed;
+            lifetime = _baseLifetime;
 
             // 1. SAFE PHYSICS RESET
             if (TryGetComponent(out Rigidbody rb))
@@ -87,6 +110,38 @@ namespace DarkTowerTron.Combat
             _movementStrategy = null; 
             _source = null;
             isHostile = true; // Reset default hostility
+
+            // Restore base tuning values for pooled reuse
+            speed = _baseSpeed;
+            lifetime = _baseLifetime;
+        }
+
+        // --- NEW: The Parry Logic ---
+        public bool TryParry(Vector3 deflectDirection, GameObject newOwner)
+        {
+            if (weight == ProjectileWeight.Unstoppable) return false;
+
+            // 1. Ownership Change
+            SetSource(newOwner);
+            isHostile = false; // Now it hurts enemies
+            _isRedirected = true;
+
+            // 2. Trajectory / Speed
+            speed = _baseSpeed * parrySpeedMultiplier;
+            _direction = deflectDirection.normalized;
+
+            // 3. Visuals / Feedback
+            UpdateVisuals();
+            if (parryFeedback != null) parryFeedback.Play(gameObject, transform.position);
+
+            // 4. Refresh Movement Strategy (restart trajectory)
+            if (_movementStrategy == null) SetStrategy(new LinearMovement());
+            _movementStrategy.Initialize(transform, _direction, speed);
+
+            // 5. Reset Timer (give it time to hit the enemy)
+            _lifeTimer = lifetime;
+
+            return true;
         }
 
         public void Initialize(Vector3 dir)
@@ -267,8 +322,23 @@ namespace DarkTowerTron.Combat
         private void UpdateVisuals()
         {
             // CRITICAL FIX: Use sharedMaterial to respect the Palette Manager
-            if (meshRenderer) 
-                meshRenderer.sharedMaterial = isHostile ? hostileMaterial : friendlyMaterial;
+            if (meshRenderer == null) return;
+
+            if (!isHostile)
+            {
+                meshRenderer.sharedMaterial = friendlyMaterial;
+                return;
+            }
+
+            // Hostile: show a distinct material for heavy/parryable projectiles.
+            if (weight == ProjectileWeight.Heavy && parryableMaterial != null)
+            {
+                meshRenderer.sharedMaterial = parryableMaterial;
+            }
+            else
+            {
+                meshRenderer.sharedMaterial = hostileMaterial;
+            }
         }
 
         private void Despawn()

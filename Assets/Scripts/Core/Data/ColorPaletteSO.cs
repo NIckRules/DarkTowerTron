@@ -48,6 +48,7 @@ namespace DarkTowerTron.Core.Data
         [Header("Combat & FX")]
         public SurfaceDefinition projectileHostile;
         public SurfaceDefinition projectileFriendly;
+        public SurfaceDefinition projectileParryable;
         public SurfaceDefinition beamAttack;
         public SurfaceDefinition blitzReady;
         public SurfaceDefinition blitzCooldown;

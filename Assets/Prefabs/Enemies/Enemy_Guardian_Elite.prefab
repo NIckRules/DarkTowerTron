@@ -22,6 +22,9 @@ GameObject:
   - component: {fileID: 6066575662729381990}
   - component: {fileID: 2112531041017317397}
   - component: {fileID: 284030073823743875}
+  - component: {fileID: 8954800709168835256}
+  - component: {fileID: 174060120518688272}
+  - component: {fileID: 3248032234245101314}
   m_Layer: 7
   m_Name: Enemy_Guardian_Elite
   m_TagString: Enemy
@@ -243,19 +246,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43368e2dd9e48bd48b0d575a2237cc69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: {fileID: 11400000, guid: 88b63b7e3004c5e46bf1b70e838965dc, type: 2}
+  currentState: {fileID: 11400000, guid: 5c8e00c250c6c7a428bb704077954631, type: 2}
   remainState: {fileID: 11400000, guid: d996aa5731d315f4297290ff5661f6b6, type: 2}
+  specificWeapon: {fileID: 0}
   aiActive: 1
   blackboard:
     Target: {fileID: 0}
     MoveDirection: {x: 0, y: 0, z: 0}
     StateTimeElapsed: 0
-    patrolPath: {fileID: 0}
-    currentWaypointIndex: 0
     ContextSolver: {fileID: 0}
     Health: {fileID: 0}
     Controller: {fileID: 0}
-    PatrolDestination: {x: 0, y: 0, z: 0}
+    Weapon: {fileID: 0}
 --- !u!114 &284030073823743875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,6 +272,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   autoFindNearest: 1
   explicitPath: {fileID: 0}
+--- !u!114 &8954800709168835256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60f72e9773162e5459185df867a38171, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patrolPath: {fileID: 0}
+  currentWaypointIndex: 0
+--- !u!114 &174060120518688272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8647affb56a9a104ea9713084dc8d4ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showGizmos: 1
+  lineScale: 3
+  controller: {fileID: 2112531041017317397}
+  motor: {fileID: 4055007547804138338}
+--- !u!114 &3248032234245101314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4608774935982201577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d558570723de654498a09f560c44cc66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 20
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  showGizmos: 0
 --- !u!1 &4627178880318046138
 GameObject:
   m_ObjectHideFlags: 0
@@ -279,7 +328,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2727545481032966752}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315,7 +364,7 @@ GameObject:
   - component: {fileID: 7750972262857401665}
   - component: {fileID: 3049953027818980408}
   - component: {fileID: 7476665315558890938}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Body
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -434,7 +483,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4551bf74c0bd1458057a1697802711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _receiver: {fileID: 123217976715369142}
   damageMultiplier: 1
 --- !u!1 &5792554547814395914
 GameObject:
@@ -449,7 +497,7 @@ GameObject:
   - component: {fileID: 3108040752348881355}
   - component: {fileID: 7241364067446088334}
   - component: {fileID: 5476268891801099821}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Shield_Visual
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -533,7 +581,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: decad77a4ac8a0941aa9a63ae8248a0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _receiver: {fileID: 123217976715369142}
   maxHeat: 100
   coolDownRate: 2
   staggerToHeatMultiplier: 10
@@ -574,7 +621,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8911227397392263500}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Guardian_Art
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -608,7 +655,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7869777713734754780}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: AimTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}

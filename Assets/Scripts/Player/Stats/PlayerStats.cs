@@ -1,79 +1,172 @@
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Debug;
 using UnityEngine;
+using System.Collections.Generic;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Systems.Stats; // NEW Namespace
 
 namespace DarkTowerTron.Player.Stats
 {
     public class PlayerStats : MonoBehaviour
     {
-        [Header("Base Configuration")]
-        public PlayerStatsSO baseStats;
+        [Header("Configuration")]
+        public PlayerStatsSO baseStats; // The Template
 
-        public bool IsOverdrive { get; private set; }
+        // --- The Dynamic Stats ---
+        private Dictionary<StatType, ModifiableStat> _stats = new Dictionary<StatType, ModifiableStat>();
+        private HashSet<AbilityType> _unlockedAbilities = new HashSet<AbilityType>();
 
-        // Helper property to shorten null checks
-        private PlayerStatsSO Base => baseStats;
+        // Event for UI (e.g. Health bar needs to grow)
+        public event System.Action OnStatsChanged;
 
         private void Awake()
         {
-            if (baseStats == null)
-            {
-                GameLogger.LogError(LogChannel.Player,
-                    $"[PlayerStats] CRITICAL: Missing PlayerStatsSO on {name}! Drag 'Stats_Player_Default' into the inspector.",
-                    gameObject);
-            }
+            InitializeStats();
         }
 
-        // --- MOVEMENT & PHYSICS ---
-        public float MoveSpeed => IsOverdrive
-            ? (Base?.moveSpeed ?? 12f) * (Base?.overdriveSpeedMult ?? 1f)
-            : (Base?.moveSpeed ?? 12f);
-        public float Acceleration => Base?.acceleration ?? 60f;
-        public float Deceleration => Base?.deceleration ?? 40f;
-        public float RotationSpeed => Base?.rotationSpeed ?? 25f;
-        public float Gravity => Base?.gravity ?? 20f;
-        public float WallRepulsion => Base?.wallRepulsionForce ?? 5f;
-        public float ActionHangTime => Base?.actionHangTime ?? 0.2f;
+        private void InitializeStats()
+        {
+            if (baseStats == null) return;
 
-        // --- SCANNER ---
-        public float ScanRange => Base?.scanRange ?? 25f;
-        public float ScanRadius => Base?.scanRadius ?? 2f;
+            // Initialize from SO
+            _stats[StatType.MoveSpeed] = new ModifiableStat(baseStats.moveSpeed);
+            _stats[StatType.Acceleration] = new ModifiableStat(baseStats.acceleration);
+            _stats[StatType.DashCooldown] = new ModifiableStat(baseStats.dashCooldown);
+            _stats[StatType.MaxGrit] = new ModifiableStat(baseStats.maxGrit);
+            _stats[StatType.GunDamage] = new ModifiableStat(baseStats.gunDamage);
+            _stats[StatType.BeamDamage] = new ModifiableStat(baseStats.beamDamage);
+            // Add others...
+        }
 
-        // --- ABILITIES ---
-        public float DashCost => Base?.dashCost ?? 0f;
-        public float DashDistance => Base?.dashDistance ?? 0f;
-        public float DashDuration => Base?.dashCooldown ?? 0f;
+        // --- PUBLIC ACCESSORS (The "Facade") ---
+        // Keeps the rest of your code working without changes
 
-        // --- WEAPON: GUN ---
-        public float GunDamage => IsOverdrive
-            ? (Base?.gunDamage ?? 1f) * (Base?.overdriveDamageMult ?? 1f)
-            : (Base?.gunDamage ?? 1f);
-        public int GunStagger => Base?.gunStagger ?? 0;
-        // Rate: Lower is faster. If OverdriveMult is 1.5 (Faster), we divide the delay.
-        public float GunRate => IsOverdrive
-            ? (Base?.gunFireRate ?? 0.2f) / (Base?.overdriveFireRateMult ?? 1f)
-            : (Base?.gunFireRate ?? 0.2f);
+        // --- MISSING SCANNER PROPS ---
+        public float ScanRange => baseStats.scanRange;
+        public float ScanRadius => baseStats.scanRadius;
 
-        // --- WEAPON: BEAM ---
-        public float BeamDamage => IsOverdrive
-            ? (Base?.beamDamage ?? 1f) * (Base?.overdriveDamageMult ?? 1f)
-            : (Base?.beamDamage ?? 1f);
-        public int BeamStagger => Base?.beamStagger ?? 0;
-        public float BeamRate => IsOverdrive
-            ? (Base?.beamFireRate ?? 0.2f) / (Base?.overdriveFireRateMult ?? 1f)
-            : (Base?.beamFireRate ?? 0.2f);
-
-        // --- RESOURCES ---
-        public int MaxGrit => Base?.maxGrit ?? 3;
-        public float MaxFocus => Base?.maxFocus ?? 100f;
-        
-        // Future proofing: Modifiers could change these later
-        public float FocusDecayRate => Base?.focusDecayRate ?? 5f; 
-        public float BaseFocusOnKill => Base?.baseFocusOnKill ?? 20f;
+        // --- MISSING OVERDRIVE LOGIC ---
+        public bool IsOverdrive { get; private set; }
 
         public void SetOverdrive(bool state)
         {
             IsOverdrive = state;
         }
+
+        // --- UPDATED ACCESSORS (With Overdrive Math) ---
+
+        public float MoveSpeed
+        {
+            get
+            {
+                float val = GetValue(StatType.MoveSpeed);
+                if (IsOverdrive) val *= baseStats.overdriveSpeedMult;
+                return val;
+            }
+        }
+        public float Acceleration => GetValue(StatType.Acceleration);
+        public float Deceleration => baseStats.deceleration; // Some don't change
+        public float RotationSpeed => baseStats.rotationSpeed;
+        public float Gravity => baseStats.gravity;
+        public float WallRepulsion => baseStats.wallRepulsionForce;
+        public float ActionHangTime => baseStats.actionHangTime;
+
+        // Abilities
+        public float DashCost => baseStats.dashCost;
+        public float DashDistance => baseStats.dashDistance;
+        public float DashDuration => GetValue(StatType.DashCooldown); // Reusing variable concept
+
+        // Combat
+        public float GunDamage
+        {
+            get
+            {
+                float val = GetValue(StatType.GunDamage);
+                if (IsOverdrive) val *= baseStats.overdriveDamageMult;
+                return val;
+            }
+        }
+
+        // Rate is inverted (Lower is Faster)
+        public float GunRate
+        {
+            get
+            {
+                float val = baseStats.gunFireRate;
+                // If Overdrive makes it faster, we DIVIDE the delay
+                if (IsOverdrive) val /= baseStats.overdriveFireRateMult;
+                return val;
+            }
+        }
+        public int GunStagger => baseStats.gunStagger;
+
+        public float BeamDamage
+        {
+            get
+            {
+                float val = GetValue(StatType.BeamDamage);
+                if (IsOverdrive) val *= baseStats.overdriveDamageMult;
+                return val;
+            }
+        }
+
+        public float BeamRate
+        {
+            get
+            {
+                float val = baseStats.beamFireRate;
+                if (IsOverdrive) val /= baseStats.overdriveFireRateMult;
+                return val;
+            }
+        }
+        public int BeamStagger => baseStats.beamStagger;
+
+        public int MaxGrit => Mathf.RoundToInt(GetValue(StatType.MaxGrit));
+        public float MaxFocus => baseStats.maxFocus; // Could mod this
+        public float FocusDecayRate => baseStats.focusDecayRate;
+        public float BaseFocusOnKill => baseStats.baseFocusOnKill;
+
+
+        // --- PERK SYSTEM ---
+
+        // Tracks perks applied during the current session/run.
+        public List<PerkSO> ActivePerks { get; private set; } = new List<PerkSO>();
+
+        public void ApplyPerk(PerkSO perk)
+        {
+            if (perk == null) return;
+
+            ActivePerks.Add(perk);
+
+            // 1. Apply Stats
+            foreach (var mod in perk.statModifiers)
+            {
+                if (_stats.TryGetValue(mod.targetStat, out var stat))
+                {
+                    if (mod.type == ModifierType.Additive) stat.AddModifier(mod.value);
+                    else stat.AddMultiplier(mod.value);
+                }
+            }
+
+            // 2. Unlock Abilities
+            foreach (var ability in perk.abilitiesToUnlock)
+            {
+                _unlockedAbilities.Add(ability);
+            }
+
+            OnStatsChanged?.Invoke();
+        }
+
+        public bool HasAbility(AbilityType ability)
+        {
+            return _unlockedAbilities.Contains(ability);
+        }
+
+        // Helper
+        private float GetValue(StatType type)
+        {
+            if (_stats.TryGetValue(type, out var stat)) return stat.Value;
+            return 0f;
+        }
+
+        // Overdrive is handled in accessors above.
     }
 }

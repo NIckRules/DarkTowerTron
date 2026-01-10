@@ -4,6 +4,7 @@ using DarkTowerTron.Core;
 using DarkTowerTron.Physics;
 using DarkTowerTron.Combat;
 using DarkTowerTron.Player.Stats;
+using DarkTowerTron.Systems.Stats;
 using DarkTowerTron;
 
 namespace DarkTowerTron.Player.Movement
@@ -115,26 +116,30 @@ namespace DarkTowerTron.Player.Movement
 
         private void CatchProjectiles()
         {
+            // NEW: Reflection is an ability/perk.
+            // If we don't have it, we still dodge (invulnerable) but we don't reflect.
+            if (_stats == null || !_stats.HasAbility(AbilityType.Dodge_Reflect)) return;
+
             // CHANGE: Use GameConstants
             int layerMask = 1 << GameConstants.LAYER_PROJECTILE;
             Collider[] hits = UnityEngine.Physics.OverlapSphere(transform.position, 2.5f, layerMask);
 
             foreach (var hit in hits)
             {
-                // Check Interface via Component
-                IReflectable proj = hit.GetComponent<IReflectable>();
-
-                // Check Projectile specific implementation for hostility
-                // (Ideally IReflectable should have IsHostile, but for now we cast to concrete)
                 var pScript = hit.GetComponent<Projectile>();
-
-                if (proj != null && pScript != null && pScript.isHostile)
+                if (pScript != null && pScript.isHostile)
                 {
+                    // FIX: Weight check (cannot reflect Heavy/Unstoppable via Dodge)
+                    if (pScript.weight == ProjectileWeight.Heavy || pScript.weight == ProjectileWeight.Unstoppable)
+                    {
+                        continue;
+                    }
+
                     // Redirect
-                    proj.Redirect(transform.forward, gameObject);
+                    pScript.Redirect(transform.forward, gameObject);
 
                     // Reward
-                    _energy.AddFocus(20f);
+                    if (_energy) _energy.AddFocus(20f);
                 }
             }
         }

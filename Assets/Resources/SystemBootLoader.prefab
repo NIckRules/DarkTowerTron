@@ -109,7 +109,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8257296264535243330}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 25a78b93eb068a246b3e8e140aa96117, type: 3}
@@ -319,7 +319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _damageEvent: {fileID: 11400000, guid: 62100c1f9efa3034d86dce2d21dbf5f9, type: 2}
-  _popupEvent: {fileID: 0}
+  _popupEvent: {fileID: 11400000, guid: 3269e0f0504d9d148a23af0528eb29c0, type: 2}
   textPrefab: {fileID: 3066595854704698543, guid: cd900abcfe87a174fab2d4512b65af2e,
     type: 3}
   offset: {x: 0, y: 2, z: 0}
@@ -328,10 +328,14 @@ MonoBehaviour:
   staggerColor: {r: 0, g: 1, b: 1, a: 1}
   narrativeColor: {r: 1, g: 0.5, b: 0, a: 1}
   barks:
-  - WHAM!
-  - CRUNCH!
-  - ERROR
-  - VOID
+  - FREEDOM
+  - HATE
+  - MOTHER
+  - I
+  - FAILED
+  - YOU
+  - AGAIN
+  - DEBUG
 --- !u!114 &7861188935372531404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,10 +378,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   library: {fileID: 11400000, guid: d08b90e142b6b144f93015012da217d1, type: 2}
-  _narrativeOutput: {fileID: 0}
+  _narrativeOutput: {fileID: 11400000, guid: da99c39d5cd90bb41a5d1764f9e91540, type: 2}
+  _popupEvent: {fileID: 11400000, guid: 3269e0f0504d9d148a23af0528eb29c0, type: 2}
   _playerHitEvent: {fileID: 11400000, guid: 337b2d3cfc7ca4c4e9ed8875aad7e3a4, type: 2}
   _enemyKilledEvent: {fileID: 11400000, guid: 424885e98a1badb49b0880fe04ceb33f, type: 2}
   _waveCombatStartedEvent: {fileID: 11400000, guid: 82d8dc1f496caeb438899a555ff9688d,
     type: 2}
   _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
   spamCooldown: 3
+  worldTextChance: 1

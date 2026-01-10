@@ -5,6 +5,7 @@ using DarkTowerTron.Core.Debug;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Player.Controller;
 using DarkTowerTron.Player.Stats;
+using DarkTowerTron.Systems.Stats; // For PerkSO
 using UnityEngine;
 using UnityEngine.InputSystem;
 using DarkTowerTron;
@@ -30,12 +31,15 @@ namespace DarkTowerTron.Managers
         public GameObject[] enemiesToSpawn;
 
         [Header("Perk Testing")]
+        public PerkSO testPerk1; // Assign Mirror Engine
+        public PerkSO testPerk2; // Assign Kinetic Deflector
         public GameObject homingPrefab;
         public GameObject explosiveDecoyPrefab;
 
         private PlayerEnergy _energy;
         private PlayerHealth _health;
         private PlayerLoadout _loadout;
+        private PlayerStats _stats;
 
         private IEnumerator Start()
         {
@@ -64,6 +68,7 @@ namespace DarkTowerTron.Managers
                 _energy = p.GetComponent<PlayerEnergy>();
                 _health = p.GetComponent<PlayerHealth>();
                 _loadout = p.GetComponent<PlayerLoadout>();
+                _stats = p.GetComponent<PlayerStats>();
             }
         }
 
@@ -124,6 +129,19 @@ namespace DarkTowerTron.Managers
             {
                 _loadout.EquipDecoy(explosiveDecoyPrefab);
                 GameLogger.Log(LogChannel.Player, "Equipped Explosive Decoy");
+            }
+
+            // [P / O] Apply Perks
+            if (Keyboard.current.pKey.wasPressedThisFrame && _stats && testPerk1)
+            {
+                _stats.ApplyPerk(testPerk1);
+                GameLogger.Log(LogChannel.System, $"Applied Perk: {testPerk1.perkName}");
+            }
+
+            if (Keyboard.current.oKey.wasPressedThisFrame && _stats && testPerk2)
+            {
+                _stats.ApplyPerk(testPerk2);
+                GameLogger.Log(LogChannel.System, $"Applied Perk: {testPerk2.perkName}");
             }
         }
 

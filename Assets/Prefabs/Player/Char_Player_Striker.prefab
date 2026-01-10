@@ -1318,8 +1318,8 @@ MonoBehaviour:
   isAutomatic: 1
   fireFeedback: {fileID: 0}
   inputBufferTime: 0.2
-  range: 7
-  beamRadius: 0.5
+  range: 3.5
+  beamRadius: 0.3
   selfRecoil: 15
   beamVisualPrefab: {fileID: 787095901406166969, guid: ca3c409d6d1f9224eb80fcb2594a72ea,
     type: 3}
