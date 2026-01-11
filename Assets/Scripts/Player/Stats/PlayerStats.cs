@@ -39,11 +39,11 @@ namespace DarkTowerTron.Player.Stats
         // --- PUBLIC ACCESSORS (The "Facade") ---
         // Keeps the rest of your code working without changes
 
-        // --- MISSING SCANNER PROPS ---
+        // Scanner
         public float ScanRange => baseStats.scanRange;
         public float ScanRadius => baseStats.scanRadius;
 
-        // --- MISSING OVERDRIVE LOGIC ---
+        // Overdrive
         public bool IsOverdrive { get; private set; }
 
         public void SetOverdrive(bool state)
@@ -72,7 +72,8 @@ namespace DarkTowerTron.Player.Stats
         // Abilities
         public float DashCost => baseStats.dashCost;
         public float DashDistance => baseStats.dashDistance;
-        public float DashDuration => GetValue(StatType.DashCooldown); // Reusing variable concept
+        public float DashDuration => baseStats.dashCooldown; // Duration is base; cooldown mods affect frequency
+        public float DashCooldown => GetValue(StatType.DashCooldown);
 
         // Combat
         public float GunDamage

@@ -8,16 +8,16 @@ namespace DarkTowerTron.Systems.Stats
         MaxGrit,
         GunDamage,
         BeamDamage,
-        // Add more as needed
+        // Add more here as needed (e.g., FireRate, Luck)
     }
 
     public enum AbilityType
     {
         None,
-        Dodge_Reflect,
-        Dodge_ExplosiveDecoy,
-        Melee_Parry,
-        Passive_HoverDrive
+        Dodge_Reflect,         // Mirror Engine
+        Melee_Parry,           // Kinetic Deflector
+        Dodge_ExplosiveDecoy,  // (Future)
+        Passive_HoverDrive     // (Future)
     }
 
     public enum ModifierType
