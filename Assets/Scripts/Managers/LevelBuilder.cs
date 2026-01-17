@@ -9,7 +9,7 @@ namespace DarkTowerTron.Managers
     public class LevelBuilder : MonoBehaviour
     {
         [Header("Build Configuration")]
-        public List<LevelModule> rooms;
+        public List<Zone> rooms;
 
         [Header("Actions")]
         public bool snapNow = false;
@@ -18,26 +18,35 @@ namespace DarkTowerTron.Managers
         {
             if (snapNow)
             {
-                SnapRooms();
                 snapNow = false;
+                SnapRooms();
             }
         }
 
         public void SnapRooms()
         {
-            if (rooms == null || rooms.Count < 2) return;
+            if (rooms == null || rooms.Count == 0) return;
 
-            for (int i = 1; i < rooms.Count; i++)
+            Vector3 nextPosition = Vector3.zero;
+
+            foreach (var room in rooms)
             {
-                LevelModule previous = rooms[i - 1];
-                LevelModule current = rooms[i];
+                if (room == null) continue;
 
-                if (previous != null && current != null && previous.exitPoint != null)
+                room.transform.position = nextPosition;
+
+                if (room.ExitPoint != null)
                 {
-                    current.SnapTo(previous.exitPoint);
+                    nextPosition = room.ExitPoint.position;
+                }
+                else
+                {
+                    nextPosition += new Vector3(0, 0, 50);
                 }
             }
-            GameLogger.Log(LogChannel.System, "Level Snapped!", gameObject);
+
+            // FIX: Use LogChannel.System instead of string
+            GameLogger.Log(LogChannel.System, $"[LevelBuilder] Aligned {rooms.Count} Zones.");
         }
     }
 }

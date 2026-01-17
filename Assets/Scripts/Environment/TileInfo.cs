@@ -1,41 +1,46 @@
 using UnityEngine;
-
-#if UNITY_EDITOR
-using UnityEditor; // <--- WRAP THIS
-#endif
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DarkTowerTron.Environment
 {
-    [ExecuteAlways]
     public class TileInfo : MonoBehaviour
     {
-        public float tileSize = 4f;
-        public Color labelColor = Color.cyan;
-        public bool showCoordinates = true;
+        [Header("Building Data")]
+        public List<TileSocket> sockets = new List<TileSocket>();
+
+        [Header("Debug")]
+        public bool showGizmos = true;
+
+        // Defines "Orange" manually
+        private Color colorOrange = new Color(1.0f, 0.5f, 0.0f);
+
+        /// <summary>
+        /// Generates a short, unique ID based on the tile's local grid position.
+        /// Example: A tile at x=10, z=-5 becomes "T[2,-1]"
+        /// </summary>
+        public string GetGridID(float gridSize)
+        {
+            int x = Mathf.RoundToInt(transform.localPosition.x / gridSize);
+            int z = Mathf.RoundToInt(transform.localPosition.z / gridSize);
+            return $"T[{x},{z}]";
+        }
+
+        [ContextMenu("Find Sockets in Children")]
+        public void FindSockets()
+        {
+            sockets = GetComponentsInChildren<TileSocket>().ToList();
+        }
 
         private void OnDrawGizmos()
         {
-            if (!showCoordinates) return;
+            if (!showGizmos) return;
 
-            Gizmos.color = new Color(labelColor.r, labelColor.g, labelColor.b, 0.3f);
-            Gizmos.DrawWireCube(transform.position, new Vector3(tileSize, 0.1f, tileSize));
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.color = new Color(0, 1, 1, 0.1f);
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(5, 0.1f, 5));
 
-            // --- WRAP THE LABEL LOGIC ---
-#if UNITY_EDITOR
-            Vector3 pos = transform.position;
-            if (transform.parent != null) pos = transform.localPosition;
-
-            int x = Mathf.RoundToInt(pos.x / tileSize);
-            int z = Mathf.RoundToInt(pos.z / tileSize);
-            string label = $"{x}, {z}";
-            
-            GUIStyle style = new GUIStyle();
-            style.normal.textColor = labelColor;
-            style.fontSize = 15;
-            style.alignment = TextAnchor.MiddleCenter;
-            
-            Handles.Label(transform.position + Vector3.up * 0.5f, label, style);
-#endif
+            // (Socket drawing handled by TileSocket gizmos mostly, but we can keep simple lines)
         }
     }
 }
