@@ -84,7 +84,7 @@ namespace DarkTowerTron.Gameplay.Player
 
             // 2. Audio (Service Locator)
             if (_audioService != null && dashClip)
-                _audioService.PlaySound(dashClip, 1f, true);
+                _audioService.PlaySound(dashClip, transform.position, 1f);
 
             // 3. Decoy Spawn
             if (_loadout && _loadout.currentDecoy)

@@ -2,26 +2,39 @@ using UnityEngine;
 
 namespace DarkTowerTron.Gameplay.Combat
 {
+
     [System.Serializable]
     public struct DamageInfo
     {
-        public float amount;
-        public float staggerAmount; // Added to support StaggerModule
-        public bool isCritical;
-        public bool isRedirected;   // Added to support Reflection mechanics
-        public Vector3 hitPoint;
-        public Vector3 hitDirection;
-        public GameObject source;
+        // Primary stats
+        public float damageAmount;
+        public int staggerAmount;
 
-        public DamageInfo(float amount, bool isCritical = false, GameObject source = null)
+        // Physics / Knockback
+        public Vector3 pushDirection;
+        public float pushForce;
+
+        // Context
+        public GameObject source;
+        public bool isRedirected;
+        public DamageType damageType;
+        public bool isCritical; // Fixed CS1061 in BaseHitbox
+
+        /// <summary>
+        /// Helper constructor for simple damage events
+        /// </summary>
+        public DamageInfo(float amount, GameObject source = null, DamageType type = DamageType.Generic)
         {
-            this.amount = amount;
-            this.staggerAmount = amount > 0 ? 1 : 0; // Default stagger = 1 if damage > 0
-            this.isCritical = isCritical;
-            this.isRedirected = false;
+            this.damageAmount = amount;
             this.source = source;
-            this.hitPoint = Vector3.zero;
-            this.hitDirection = Vector3.zero;
+            this.damageType = type;
+
+            // Defaults
+            this.staggerAmount = 0;
+            this.pushDirection = Vector3.zero;
+            this.pushForce = 0;
+            this.isRedirected = false;
+            this.isCritical = false;
         }
     }
 }

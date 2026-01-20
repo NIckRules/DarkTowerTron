@@ -1,6 +1,6 @@
 using UnityEngine;
-using DarkTowerTron.Core.Services;
-using DarkTowerTron.Core.Patterns;
+using DarkTowerTron.Core.Services; 
+using DarkTowerTron.Core.Patterns; 
 
 namespace DarkTowerTron.Systems.VFX
 {
@@ -15,16 +15,48 @@ namespace DarkTowerTron.Systems.VFX
 
         // --- IVFXService Implementation ---
 
-        public void SpawnVFX(GameObject vfxPrefab, Vector3 position, Quaternion rotation)
+        // 1. Signature from Error CS0535
+        public void SpawnVFX(GameObject prefab, Vector3 position, Quaternion rotation)
         {
-            if (vfxPrefab == null || _pool == null) return;
-            _pool.Spawn(vfxPrefab, position, rotation);
+            Spawn(prefab, position, rotation, 0f);
         }
 
-        public void SpawnVFX(GameObject vfxPrefab, Transform parent, Vector3 localOffset)
+        // 2. Signature from Error CS0535
+        public void SpawnVFX(GameObject prefab, Transform parent, Vector3 offset)
         {
-            if (vfxPrefab == null || _pool == null) return;
-            _pool.Spawn(vfxPrefab, parent.position + localOffset, Quaternion.identity, parent);
+            if (prefab == null) return;
+            EnsurePool();
+
+            // Calculate world position
+            Vector3 pos = (parent != null) ? parent.position + parent.TransformDirection(offset) : offset;
+            Quaternion rot = (parent != null) ? parent.rotation : Quaternion.identity;
+
+            GameObject instance = _pool.Spawn(prefab, pos, rot);
+            
+            // Optional: Parent it if it's meant to stick (like a status effect)
+            if (parent != null && instance != null)
+            {
+                instance.transform.SetParent(parent);
+            }
+        }
+
+        // 3. The "Spawn" method we fixed previously (Wrapper / Main Logic)
+        public void Spawn(GameObject prefab, Vector3 position, Quaternion rotation, float duration = 0f)
+        {
+            if (prefab == null) return;
+            EnsurePool();
+
+            GameObject instance = _pool.Spawn(prefab, position, rotation);
+
+            if (instance != null && duration > 0f)
+            {
+                _pool.Despawn(instance, duration);
+            }
+        }
+
+        private void EnsurePool()
+        {
+            if (_pool == null) _pool = ServiceLocator.Get<IPoolService>();
         }
     }
 }

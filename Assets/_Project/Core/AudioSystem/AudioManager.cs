@@ -19,18 +19,13 @@ namespace DarkTowerTron.Core.AudioSystem
         private void Awake()
         {
             InitializePool();
-
-            if (_musicManager == null)
-                _musicManager = GetComponentInChildren<MusicManager>();
+            if (_musicManager == null) _musicManager = GetComponentInChildren<MusicManager>();
         }
 
         private void InitializePool()
         {
             _sfxPool = new List<AudioSource>();
-            for (int i = 0; i < _initialPoolSize; i++)
-            {
-                CreateNewSource();
-            }
+            for (int i = 0; i < _initialPoolSize; i++) CreateNewSource();
         }
 
         private AudioSource CreateNewSource()
@@ -43,22 +38,50 @@ namespace DarkTowerTron.Core.AudioSystem
 
         private AudioSource GetFreeSource()
         {
-            foreach (var source in _sfxPool)
-            {
-                if (!source.gameObject.activeInHierarchy) return source;
-            }
+            foreach (var s in _sfxPool) if (!s.gameObject.activeInHierarchy) return s;
             return CreateNewSource();
         }
 
         // --- IAudioService Implementation ---
 
+        // 1. The Bridge Method (Fixes CS1061)
+        public void PlaySound(Object soundDef, Vector3 position = default, float volume = 1f)
+        {
+            if (soundDef == null) return;
+
+            if (soundDef is SoundDef def)
+            {
+                PlaySFX(def, position);
+            }
+            else if (soundDef is AudioClip clip)
+            {
+                PlaySFX(clip, position, volume);
+            }
+        }
+
+        // 2. SoundDef Specific (Uses Pitch/Volume from SO)
         public void PlaySFX(SoundDef sound, Vector3 position)
         {
             if (sound == null) return;
-            // FIX: Use GetClip() instead of .clip
-            PlaySFX(sound.GetClip(), position, sound.volume);
+
+            AudioClip clip = sound.GetClip();
+            if (clip == null) return;
+
+            var source = GetFreeSource();
+            source.transform.position = position;
+            source.clip = clip;
+
+            // Apply SoundDef Settings
+            source.volume = sound.volume;
+            source.pitch = sound.GetPitch(); // CRITICAL: Uses your randomization logic
+
+            source.gameObject.SetActive(true);
+            source.Play();
+
+            StartCoroutine(DisableSourceDelayed(source, clip.length / source.pitch)); // Adjust delay for pitch
         }
 
+        // 3. Raw AudioClip fallback
         public void PlaySFX(AudioClip clip, Vector3 position, float volume = 1f)
         {
             if (clip == null) return;
@@ -67,13 +90,14 @@ namespace DarkTowerTron.Core.AudioSystem
             source.transform.position = position;
             source.clip = clip;
             source.volume = volume;
+            source.pitch = 1f; // Reset pitch for raw clips
+
             source.gameObject.SetActive(true);
             source.Play();
 
             StartCoroutine(DisableSourceDelayed(source, clip.length));
         }
 
-        // Forwarding to MusicManager (Now valid)
         public void PlayMusic(AudioClip musicClip, float fadeDuration = 1f)
             => _musicManager?.PlayMusic(musicClip, fadeDuration);
 
@@ -85,7 +109,8 @@ namespace DarkTowerTron.Core.AudioSystem
 
         private System.Collections.IEnumerator DisableSourceDelayed(AudioSource source, float delay)
         {
-            yield return new WaitForSeconds(delay);
+            // Safety buffer
+            yield return new WaitForSeconds(delay + 0.1f);
             source.gameObject.SetActive(false);
         }
     }

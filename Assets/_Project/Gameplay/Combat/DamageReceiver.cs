@@ -1,8 +1,9 @@
 using UnityEngine;
 using System;
+using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Events; // For Event Channels if needed
-using DarkTowerTron.Core.Feedback; // Keep if Feedback system exists, otherwise remove
+using DarkTowerTron.Core.Feedback;
+using DarkTowerTron.Core.Patterns; // For IPoolable
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,17 +11,18 @@ using UnityEditor;
 
 namespace DarkTowerTron.Gameplay.Combat
 {
-
     [RequireComponent(typeof(VitalityModule))]
     [RequireComponent(typeof(StaggerModule))]
-    public class DamageReceiver : MonoBehaviour, IDamageable, IAimTarget
+    public class DamageReceiver : MonoBehaviour, IDamageable, IAimTarget, IPoolable, ICombatTarget
     {
-        // --- EVENTS (New Architecture Requirement) ---
-        public event Action OnDeath;
+        // --- EVENTS ---
+        // Restored for compatibility with ArchitectHand / Props
+        public event Action<DamageInfo> OnHitProcessed;
         public event Action<DamageInfo> OnTakeDamage;
-
-        // --- OLD EVENTS (Kept for backward compat, but mapped to new ones) ---
         public event Action<EnemyStatsSO, bool> OnDeathProcessed;
+
+        // New event from refactor (kept for future use)
+        public event Action OnDeath;
 
         [Header("Debug")]
         public static bool EnableDebugGizmos = false;
@@ -34,6 +36,10 @@ namespace DarkTowerTron.Gameplay.Combat
         [SerializeField] private Transform _aimTarget;
         [SerializeField] private float _magnetismRadius = 0.75f;
 
+        [Header("Execution Settings")]
+        // Restored for EnemyController
+        [SerializeField] private bool _keepPlayerGrounded = true;
+
         [Header("Feedback")]
         [SerializeField] private FeedbackConfigurationSO _hitFeedback;
         [SerializeField] private FeedbackConfigurationSO _deathFeedback;
@@ -46,8 +52,14 @@ namespace DarkTowerTron.Gameplay.Combat
         // --- PROPERTIES ---
         public float CurrentHealth => _vitality != null ? _vitality.CurrentHealth : 0f;
         public float MaxHealth => _vitality != null ? _vitality.MaxHealth : 0f;
+
+        // IDamageable Implementation
         public bool IsDead => _vitality != null && _vitality.IsDead;
+
         public bool IsStaggered => _stagger != null && _stagger.IsStaggered;
+
+        // ICombatTarget Implementation
+        public bool KeepPlayerGrounded => _keepPlayerGrounded;
 
         // Module Accessors
         public VitalityModule Vitality => _vitality;
@@ -95,83 +107,77 @@ namespace DarkTowerTron.Gameplay.Combat
         {
             // Reset state for pooling
             if (_stagger) _stagger.ResetStagger();
-            if (_vitality) _vitality.Initialize(MaxHealth);
+            if (_vitality) _vitality.Initialize(MaxHealth > 0 ? MaxHealth : 10);
         }
 
-        public void OnDespawn() { }
+        public void OnDespawn()
+        {
+            if (_stagger) _stagger.ResetStagger();
+        }
 
-        // --- INTERFACE IMPLEMENTATION ---
+        // --- LOGIC PIPELINE ---
 
-        public virtual void TakeDamage(DamageInfo info)
+        public void TakeDamage(DamageInfo info)
         {
             if (IsDead) return;
 
-            // 1. Logic Pipeline
+            // 1. Logic
             if (IsStaggered)
             {
-                // Critical Hit or Execution Logic
-                if (info.amount > 0)
+                // Logic: Staggered enemies take lethal damage or start execution
+                if (info.damageAmount > 0)
                 {
-                    // Instant Kill on Staggered? Or Double Damage?
-                    // info.amount *= 2f; 
-                    // For now, let's execute:
-                    Kill(false);
-                    return;
+                    Kill(true);
                 }
             }
             else
             {
-                // Apply Stagger & Health Damage
-                // Note: You need to decide where Stagger Amount comes from.
-                // Assuming DamageInfo needs a 'staggerAmount' field added, 
-                // or we derive it from damage.
-                float staggerAmt = info.amount > 0 ? 1 : 0; // Simplified
-
-                _stagger.AddStagger(staggerAmt);
-                _vitality.TakeDamage(info.amount);
+                // Logic: Apply normal damage and stagger
+                _stagger.AddStagger(info.staggerAmount);
+                _vitality.TakeDamage(info.damageAmount);
             }
 
             // 2. Feedback
             if (_hitFeedback != null) _hitFeedback.Play(gameObject, transform.position);
 
-            // 3. Notifications
+            // 3. Events
+            OnHitProcessed?.Invoke(info);
             OnTakeDamage?.Invoke(info);
         }
 
-        public void Kill(bool immediate)
+        public void Kill(bool rewardPlayer)
         {
             if (IsDead) return;
 
-            // Feedback
-            if (_deathFeedback != null && !immediate)
+            if (_deathFeedback != null)
                 _deathFeedback.Play(gameObject, transform.position);
 
-            // Events
             OnDeath?.Invoke();
-            OnDeathProcessed?.Invoke(_stats, true);
+            OnDeathProcessed?.Invoke(_stats, rewardPlayer);
 
-            // Force Vitality State
+            // Force Vitality death
             _vitality.TakeDamage(99999f);
-
-            // Cleanup
-            if (immediate) Destroy(gameObject);
-            else Destroy(gameObject, 0.1f);
         }
 
         // Helper Overload for simple float calls
         public void TakeDamage(float amount)
         {
-            TakeDamage(new DamageInfo(amount, false, null));
+            // FIX: Using correct arguments for DamageInfo struct
+            // (amount, source, type)
+            TakeDamage(new DamageInfo(amount, null, DamageType.Generic));
         }
 
         private void HandleVitalityDeath()
         {
             // Triggered when HP hits 0 naturally
-            Kill(false);
+            OnDeathProcessed?.Invoke(_stats, true);
+            OnDeath?.Invoke();
         }
 
-        // --- AIM TARGET IMPLEMENTATION ---
+        // --- ICombatTarget Implementation ---
+        public void OnExecutionHit() => Kill(true);
 
+        // --- IAimTarget Implementation ---
         public Vector3 AimPoint
         {
             get
@@ -184,7 +190,6 @@ namespace DarkTowerTron.Gameplay.Combat
         public float TargetRadius => _magnetismRadius;
 
         // --- DEBUG ---
-
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {

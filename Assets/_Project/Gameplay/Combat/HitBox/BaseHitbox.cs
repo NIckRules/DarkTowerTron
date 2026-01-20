@@ -9,6 +9,7 @@ namespace DarkTowerTron.Gameplay.Combat
 
         [Header("Settings")]
         [SerializeField] protected float _damageMultiplier = 1.0f;
+        [SerializeField] protected float _staggerMultiplier = 1.0f;
         [SerializeField] protected bool _isCriticalPoint = false;
 
         protected virtual void Awake()
@@ -26,12 +27,12 @@ namespace DarkTowerTron.Gameplay.Combat
             if (_mainReceiver == null) return;
 
             // Apply Hitbox Modifiers (Headshots, Limbs)
-            info.amount *= _damageMultiplier;
+            info.damageAmount *= _damageMultiplier;
 
             if (_isCriticalPoint)
             {
                 info.isCritical = true;
-                info.staggerAmount *= 1.5f;
+                info.staggerAmount = (int)(info.damageAmount * _staggerMultiplier);
             }
 
             // Forward to Main Health

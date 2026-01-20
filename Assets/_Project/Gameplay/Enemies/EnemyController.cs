@@ -2,9 +2,10 @@ using UnityEngine;
 using DarkTowerTron.Core;
 using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services; // Access ServiceLocator
-using DarkTowerTron.Core.Patterns; // Access IPoolable, IPoolService
+using DarkTowerTron.Core.Services;
+using DarkTowerTron.Core.Patterns; 
 using DarkTowerTron.Gameplay.Combat;
+using DarkTowerTron.Core.AudioSystem;
 
 namespace DarkTowerTron.Gameplay.Enemies
 {
@@ -129,7 +130,7 @@ namespace DarkTowerTron.Gameplay.Enemies
             // Audio via Service Locator
             var audio = ServiceLocator.Get<IAudioService>();
             if (audio != null && staggerClip)
-                audio.PlaySound(staggerClip, 1f, true);
+                audio.PlaySound(staggerClip, transform.position, 1f);
 
             _visuals.StartStaggerEffect();
         }
@@ -153,10 +154,11 @@ namespace DarkTowerTron.Gameplay.Enemies
         }
 
         // --- Interface Implementation ---
-        public bool TakeDamage(DamageInfo info) => _receiver.TakeDamage(info);
+        public void TakeDamage(DamageInfo info) => _receiver.TakeDamage(info);
         public void Kill(bool instant) => _receiver.Kill(true);
         public void SelfDestruct() => _receiver.Kill(false);
         public void OnExecutionHit() => _receiver.Kill(true);
         public bool KeepPlayerGrounded => _receiver.KeepPlayerGrounded;
+        public bool IsDead => _receiver.IsDead;
     }
 }

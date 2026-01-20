@@ -15,10 +15,10 @@ namespace DarkTowerTron.Gameplay.Combat
             // If the shield is "Active" (optional check), reduce damage.
 
             // Example: Block logic
-            info.amount *= _damageReduction;
+            info.damageAmount *= _damageReduction;
 
             // Example: If damage is 0 (fully blocked), we might want to spawn sparks here
-            if (info.amount <= 0)
+            if (info.damageAmount <= 0)
             {
                 // Play Block Sound/VFX
                 return;

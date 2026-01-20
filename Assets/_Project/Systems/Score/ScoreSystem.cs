@@ -10,34 +10,35 @@ namespace DarkTowerTron.Systems.Score
     public class ScoreSystem : MonoBehaviour, IScoreService
     {
         [Header("Listening (Inputs)")]
-        // Keep these! It decouples the system. 
-        // The system reacts to the world events.
         [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
         [SerializeField] private VoidEventChannelSO _playerHitEvent;
 
         [Header("Broadcasting (Outputs)")]
-        // Optional: Keep this if you have UI prefabs relying strictly on SOs.
-        // If not, prefer the C# event below.
         [SerializeField] private IntIntEventChannelSO _uiScoreEvent;
 
         [Header("Settings")]
         [SerializeField] private int _baseScorePerKill = 100;
-        [SerializeField] private int _gloryKillBonus = 500;
         [SerializeField] private int _maxMultiplier = 5;
 
-        // --- IScoreService State ---
+        // --- IScoreService Implementation ---
         public int TotalScore { get; private set; }
         public int CurrentMultiplier { get; private set; } = 1;
+        public float GameTime { get; private set; } // Implemented Timer
+
         public event Action<int, int> OnScoreChanged;
 
         // Internal State
         private bool _isTracking = false;
+
+        // --- Lifecycle ---
 
         private void OnEnable()
         {
             if (_enemyKilledEvent) _enemyKilledEvent.OnEventRaised += OnEnemyKilled;
             if (_playerHitEvent) _playerHitEvent.OnEventRaised += OnPlayerHit;
 
+            // Auto-start on scene load
+            ResetScore();
             _isTracking = true;
         }
 
@@ -47,7 +48,15 @@ namespace DarkTowerTron.Systems.Score
             if (_playerHitEvent) _playerHitEvent.OnEventRaised -= OnPlayerHit;
         }
 
-        // --- IScoreService Implementation ---
+        private void Update()
+        {
+            if (_isTracking)
+            {
+                GameTime += Time.deltaTime;
+            }
+        }
+
+        // --- Methods ---
 
         public void AddScore(int amount)
         {
@@ -57,14 +66,27 @@ namespace DarkTowerTron.Systems.Score
             NotifyChange();
         }
 
+        public void AddScore(int amount, Vector3 position)
+        {
+            // Simple overload redirection
+            AddScore(amount);
+        }
+
         public void ResetScore()
         {
             TotalScore = 0;
             CurrentMultiplier = 1;
+            GameTime = 0f;
+            _isTracking = true;
             NotifyChange();
         }
 
-        // --- Internal Logic (From Old Manager) ---
+        public void StopTracking()
+        {
+            _isTracking = false;
+        }
+
+        // --- Internal Logic ---
 
         private void OnEnemyKilled(Vector3 pos, EnemyStatsSO stats, bool rewardPlayer)
         {
@@ -72,10 +94,10 @@ namespace DarkTowerTron.Systems.Score
 
             int scoreValue = (stats != null) ? stats.scoreValue : _baseScorePerKill;
 
-            // Logic: Add score based on current multiplier
+            // Add Score with Multiplier
             AddScore(scoreValue * CurrentMultiplier);
 
-            // Logic: Increase Multiplier
+            // Increment Multiplier
             if (CurrentMultiplier < _maxMultiplier)
             {
                 CurrentMultiplier++;
@@ -88,17 +110,13 @@ namespace DarkTowerTron.Systems.Score
             if (CurrentMultiplier > 1)
             {
                 CurrentMultiplier = 1;
-                // Optional: Play a "Combo Broken" sound via IAudioService here
                 NotifyChange();
             }
         }
 
         private void NotifyChange()
         {
-            // 1. Notify Code Listeners (The new way)
             OnScoreChanged?.Invoke(TotalScore, CurrentMultiplier);
-
-            // 2. Notify Asset Listeners (The old/hybrid way)
             _uiScoreEvent?.RaiseEvent(TotalScore, CurrentMultiplier);
         }
     }

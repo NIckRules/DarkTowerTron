@@ -63,7 +63,7 @@ namespace DarkTowerTron.Gameplay.Enemies.Bosses
             }
 
             // Example: Boss flinch logic could go here
-            // if (info.amount > 50) PlayStaggerAnimation();
+            // if (info.damageAmount > 50) PlayStaggerAnimation();
         }
 
         private void HandleDeath()

@@ -111,12 +111,12 @@ namespace DarkTowerTron.Gameplay.Player
 
             // 5. Audio & Rewards
             if (executeClip && _audioService != null)
-                _audioService.PlaySound(executeClip, 1f);
+                _audioService.PlaySound(executeClip, transform.position, 1f);
 
             _energy.AddFocus(killRewardFocus);
 
             if (_scoreService != null)
-                _scoreService.AddScore(killScoreAmount, "Glory Kill");
+                _scoreService.AddScore(killScoreAmount, transform.position);
 
             // 6. Juice (Time Stop & Shake)
             StartCoroutine(HitStopRoutine(0.1f));

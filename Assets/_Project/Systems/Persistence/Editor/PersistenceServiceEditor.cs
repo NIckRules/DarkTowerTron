@@ -1,18 +1,18 @@
 using UnityEngine;
 using UnityEditor;
-using System.Diagnostics; // For Process.Start
 
 namespace DarkTowerTron.Systems.Persistence
 {
-    [CustomEditor(typeof(PersistenceManager))]
-    public class PersistenceManagerEditor : Editor
+    [CustomEditor(typeof(PersistenceService))]
+    public class PersistenceServiceEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             // Draw the default Inspector (Script field, Current Slot Index)
             DrawDefaultInspector();
 
-            PersistenceManager manager = (PersistenceManager)target;
+            // Cast the target to the correct type
+            PersistenceService manager = (PersistenceService)target; // Renamed variable to match your logic
 
             GUILayout.Space(10);
 
@@ -30,7 +30,15 @@ namespace DarkTowerTron.Systems.Persistence
             }
             if (GUILayout.Button("Load Now"))
             {
-                manager.Load(manager.CurrentSlotIndex);
+                // We need access to the private field _currentSlotIndex logic via public API 
+                // Since _currentSlotIndex is serialized, we can read it, or just reload current.
+                // Assuming Load() handles internal state:
+
+                // Hack: If you can't access CurrentSlotIndex property, 
+                // you might need to make it public or SerializeField exposes it.
+                // Assuming the serialized field is editable in inspector:
+                SerializedProperty slotProp = serializedObject.FindProperty("_currentSlotIndex");
+                manager.Load(slotProp.intValue);
             }
             GUILayout.EndHorizontal();
         }
@@ -38,11 +46,7 @@ namespace DarkTowerTron.Systems.Persistence
         private void OpenSaveFolder()
         {
             string path = Application.persistentDataPath;
-
-            // Cross-platform open
             path = path.Replace(@"/", @"\"); // Windows friendly
-
-            // Reveal in Explorer/Finder
             EditorUtility.RevealInFinder(path);
         }
     }

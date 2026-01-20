@@ -92,7 +92,7 @@ namespace DarkTowerTron.Systems.UI
                 // Play sound every few chars to avoid machine-gun audio
                 if (i % 3 == 0 && typeSound != null && _audioService != null)
                 {
-                    _audioService.PlaySound(typeSound, 0.2f, true);
+                    _audioService.PlaySound(typeSound, Vector3.zero, 0.2f);
                 }
 
                 yield return new WaitForSeconds(typeSpeed);

@@ -3,6 +3,7 @@ using DarkTowerTron.Core.Data;
 using DarkTowerTron.Core.Debugging;
 using DarkTowerTron.Core.Events;
 using DarkTowerTron.Core.Feedback;
+using DarkTowerTron.Core.Physics;
 using DarkTowerTron.Gameplay.Combat;
 using UnityEngine;
 
@@ -17,25 +18,28 @@ namespace DarkTowerTron.Gameplay.Player
         public bool startWithHull = true;
 
         [Header("Aiming")]
-        [SerializeField] private Transform _aimTarget; // Assign 'CameraTarget' or 'Visuals/Spine'
+        [SerializeField] private Transform _aimTarget;
 
         [Header("Juice")]
         [SerializeField] private FeedbackConfigurationSO _damageFeedback;
         [SerializeField] private FeedbackConfigurationSO _deathFeedback;
 
         [Header("Broadcasting")]
-        [SerializeField] private IntIntEventChannelSO _gritEvent;      // Replaces OnGritChanged
-        [SerializeField] private BoolEventChannelSO _hullEvent;        // Replaces OnHullStateChanged
-        [SerializeField] private VoidEventChannelSO _playerHitEvent;   // Replaces OnPlayerHit
-        [SerializeField] private VoidEventChannelSO _playerDiedEvent;  // Replaces OnPlayerDied
+        [SerializeField] private IntIntEventChannelSO _gritEvent;
+        [SerializeField] private BoolEventChannelSO _hullEvent;
+        [SerializeField] private VoidEventChannelSO _playerHitEvent;
+        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
 
         [Header("Listening")]
-        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent; // Replaces OnEnemyKilled
+        [SerializeField] private EnemyKilledEventChannelSO _enemyKilledEvent;
 
         private int _currentGrit;
         private bool _hasHull;
         private bool _isDead;
-        
+
+        // INTERFACE IMPLEMENTATION (Fix for CS0535)
+        public bool IsDead => _isDead;
+
         private PlayerMotor _movement;
         private PlayerDodge _dodge;
         private PlayerStats _stats;
@@ -64,10 +68,12 @@ namespace DarkTowerTron.Gameplay.Player
             if (_enemyKilledEvent != null) _enemyKilledEvent.OnEventRaised -= OnEnemyKilled;
         }
 
-        public bool TakeDamage(DamageInfo info)
+        // INTERFACE IMPLEMENTATION (Fix for CS0738)
+        // Changed return type from 'bool' to 'void'
+        public void TakeDamage(DamageInfo info)
         {
-            if (_isDead) return false;
-            if (_dodge != null && _dodge.IsInvulnerable) return false;
+            if (_isDead) return;
+            if (_dodge != null && _dodge.IsInvulnerable) return;
 
             int dmg = Mathf.Max(1, Mathf.RoundToInt(info.damageAmount));
 
@@ -78,7 +84,6 @@ namespace DarkTowerTron.Gameplay.Player
                 _currentGrit -= dmg;
                 if (_currentGrit < 0) _currentGrit = 0;
 
-                // NEW: Raise Void Event for FX/Camera Shake
                 _playerHitEvent?.RaiseEvent();
                 _damageFeedback?.Play(gameObject, transform.position);
             }
@@ -93,23 +98,22 @@ namespace DarkTowerTron.Gameplay.Player
                 Kill(false);
             }
 
-            if (!_isDead && _movement) 
+            if (!_isDead && _movement)
                 _movement.ApplyKnockback(info.pushDirection * info.pushForce);
 
             GameLogger.Log(LogChannel.Player, $"[PlayerHealth] Post-Damage State. Grit: {_currentGrit}, HasHull: {_hasHull}", gameObject);
 
             UpdateUI();
-            return true;
         }
 
         public void TakeVoidDamage()
         {
             if (_isDead) return;
-            
+
             if (_movement)
             {
                 _movement.ResetVelocity();
-                var motor = GetComponent<DarkTowerTron.Core.Physics.KinematicMover>();
+                var motor = GetComponent<KinematicMover>();
                 if (motor) motor.Teleport(_movement.LastSafePosition);
                 else transform.position = _movement.LastSafePosition;
             }
@@ -121,14 +125,14 @@ namespace DarkTowerTron.Gameplay.Player
         public void Kill(bool instant)
         {
             if (_isDead) return;
-            
+
             _deathFeedback?.Play(gameObject, transform.position);
-            
+
             _isDead = true;
             _currentGrit = 0;
             _hasHull = false;
             UpdateUI();
-            
+
             GameLogger.Log(LogChannel.Player, "PLAYER DEAD", gameObject);
             _playerDiedEvent?.RaiseEvent();
         }
@@ -145,19 +149,15 @@ namespace DarkTowerTron.Gameplay.Player
         {
             if (!rewardPlayer) return;
 
-            // Case A: Stats exist (Standard Enemy)
             if (stats != null)
             {
                 if (stats.healsGrit)
                 {
                     HealGrit(stats.gritRewardAmount);
                 }
-                // If !healsGrit, do nothing. Correct.
             }
-            // Case B: No Stats (Debug Enemy / Test Dummy)
             else
             {
-                // Fallback: Default behavior for untyped enemies
                 HealGrit(1);
             }
         }
@@ -167,8 +167,6 @@ namespace DarkTowerTron.Gameplay.Player
         private void UpdateUI()
         {
             int max = _stats ? _stats.MaxGrit : 2;
-            
-            // NEW: Raise Typed Events
             _gritEvent?.RaiseEvent(_currentGrit, max);
             _hullEvent?.RaiseEvent(_hasHull);
         }

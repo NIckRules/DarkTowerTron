@@ -1,10 +1,15 @@
+using UnityEngine;
+
 namespace DarkTowerTron.Gameplay.Combat
 {
     public enum DamageType
     {
-        Physical,
-        Energy,
-        Explosive,
+        Generic,
+        Projectile,
+        Melee,
+        //Physical,
+        //Energy,
+        Explosion,
         Environment,
         Void
     }
