@@ -1,0 +1,20 @@
+using DarkTowerTron.Core.Debugging;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace DarkTowerTron.Core.Events
+{
+    [CreateAssetMenu(menuName = "Events/Float Float Event Channel")]
+    public class FloatFloatEventChannelSO : ScriptableObject
+    {
+        public UnityAction<float, float> OnEventRaised;
+
+        public void RaiseEvent(float current, float max)
+        {
+            if (OnEventRaised != null)
+                OnEventRaised.Invoke(current, max);
+            else
+                GameLogger.LogWarning(LogChannel.System, $"FloatFloat Event [{name}] was raised but nothing picked it up.");
+        }
+    }
+}
