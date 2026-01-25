@@ -3,41 +3,50 @@ using System.Collections.Generic;
 
 namespace DarkTowerTron.Core.Data
 {
-    [System.Serializable]
-    public class WaveEntry
+    public enum EncounterType
     {
-        public GameObject enemyPrefab;
-        public int count = 1;
-        public float rate = 1.0f;
-        public int spawnPointIndex = -1;
+        Elimination, // Standard: Kill everything spawned.
+        Reinforcement // Complex: Grunts respawn until VIPs (Essentials) are dead.
     }
 
-    [CreateAssetMenu(fileName = "NewWave", menuName = "DarkTowerTron/Wave Definition")]
+    [CreateAssetMenu(menuName = "DarkTowerTron/Waves/Wave Definition")]
     public class WaveDefinitionSO : ScriptableObject
     {
-        [Header("Wave Info")]
+        [Header("Meta")]
         public string waveName = "Wave 1";
+        public EncounterType type = EncounterType.Elimination;
 
-        [Header("Main Force (Essential)")]
+        [Header("Main Force")]
+        [Tooltip("The core enemies for this wave. In Reinforcement mode, these are the VIPs.")]
         public List<WaveEntry> entries;
 
-        [Header("Grunt Support (Fodder)")]
+        [Header("Reinforcements (Grunts)")]
+        [Tooltip("Infinite spawns if Type = Reinforcement. One-time spawn if Type = Elimination.")]
         public GameObject[] gruntPrefabs;
         public int maxGrunts = 0;
-        public float gruntSpawnRate = 5f;
+        public float gruntSpawnRate = 3f;
 
-        // --- ADDED THIS PROPERTY ---
-        public int TotalEnemyCount
+        // Helper Property
+        public int TotalMainEnemyCount
         {
             get
             {
-                int total = 0;
+                int count = 0;
                 if (entries != null)
                 {
-                    foreach (var entry in entries) total += entry.count;
+                    foreach (var e in entries) count += e.count;
                 }
-                return total;
+                return count;
             }
         }
+    }
+
+    [System.Serializable]
+    public struct WaveEntry
+    {
+        public GameObject enemyPrefab;
+        public int count;
+        public float rate;
+        public int spawnPointIndex;
     }
 }

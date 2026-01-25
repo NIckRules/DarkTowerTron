@@ -17,7 +17,14 @@ namespace DarkTowerTron.Systems.Persistence
 
         private void Awake()
         {
+            ServiceLocator.Register<IPersistenceService>(this);
             Load(_currentSlotIndex);
+        }
+
+        private void OnDestroy()
+        {
+            ServiceLocator.Unregister<IPersistenceService>(this);
+            Save();
         }
 
         private void OnApplicationQuit() => Save();

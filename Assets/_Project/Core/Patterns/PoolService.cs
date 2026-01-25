@@ -20,10 +20,17 @@ namespace DarkTowerTron.Core.Patterns
 
         private void Awake()
         {
+            ServiceLocator.Register<IPoolService>(this);
             // Create a clean container so the Hierarchy doesn't get messy
             GameObject rootObj = new GameObject("Pool_Container");
             _poolRoot = rootObj.transform;
             DontDestroyOnLoad(rootObj);
+        }
+
+        private void OnDestroy()
+        {
+            ServiceLocator.Unregister<IPoolService>(this);
+            SceneManager.activeSceneChanged -= OnSceneChanged;
         }
 
         private void OnEnable() => SceneManager.activeSceneChanged += OnSceneChanged;

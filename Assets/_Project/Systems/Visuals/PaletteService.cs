@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using DarkTowerTron.Core.Data;
-using DarkTowerTron.Core.Debugging;
-using DarkTowerTron.Core.Services;
 using UnityEngine;
+using DarkTowerTron.Core.Data;
+using DarkTowerTron.Core.Services;
 
 namespace DarkTowerTron.Systems.Visuals
 {
     [ExecuteAlways]
     public class PaletteService : MonoBehaviour, IPaletteService
     {
-        // Singleton for Editor Mode ONLY
+        // Singleton for Editor Mode Preview ONLY
         public static PaletteService EditorInstance { get; private set; }
 
         public event Action OnPaletteChanged;
@@ -19,6 +18,7 @@ namespace DarkTowerTron.Systems.Visuals
         [SerializeField] private PaletteDefinitionSO _activePalette;
         [SerializeField] private string _activeVariant = "";
 
+        // --- IPaletteService Implementation ---
         public PaletteDefinitionSO ActivePalette => _activePalette;
         public string ActiveVariant => _activeVariant;
 
@@ -35,13 +35,19 @@ namespace DarkTowerTron.Systems.Visuals
         [Header("Debug")]
         public bool refreshNow = false;
 
-        private void OnEnable()
+        private void Awake()
         {
+            // Only register in Runtime
             if (Application.isPlaying)
             {
                 ServiceLocator.Register<IPaletteService>(this);
             }
-            else
+        }
+
+        private void OnEnable()
+        {
+            // Handle Editor Preview Instance
+            if (!Application.isPlaying)
             {
                 EditorInstance = this;
             }
@@ -51,7 +57,6 @@ namespace DarkTowerTron.Systems.Visuals
         {
             if (Application.isPlaying)
             {
-                // FIX: Used to be Deregister, now Unregister (or the alias handles it)
                 ServiceLocator.Unregister<IPaletteService>(this);
             }
             else
@@ -95,9 +100,6 @@ namespace DarkTowerTron.Systems.Visuals
         {
             if (_activePalette == null) return;
 
-            // Only log if we have the logger, avoiding circular dependencies in early init
-            // GameLogger.Log(LogChannel.VFX, ...); 
-
             foreach (var binding in bindings)
             {
                 if (binding.collection == null) continue;
@@ -121,6 +123,9 @@ namespace DarkTowerTron.Systems.Visuals
 
         public static void ApplyDefinitionToMaterial(Material mat, SurfaceDefinition def)
         {
+            if (mat == null) return;
+
+            // Universal Render Pipeline / Standard Shader Support
             if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", def.mainColor);
             else if (mat.HasProperty("_Color")) mat.SetColor("_Color", def.mainColor);
 
@@ -128,11 +133,6 @@ namespace DarkTowerTron.Systems.Visuals
             {
                 mat.SetColor("_EmissionColor", def.emissionColor);
                 mat.EnableKeyword("_EMISSION");
-            }
-            else if (mat.HasProperty("_GlowColor"))
-            {
-                Color hdrGlow = def.emissionColor * Mathf.LinearToGammaSpace(def.emissionIntensity > 0 ? def.emissionIntensity : 1f);
-                mat.SetColor("_GlowColor", hdrGlow);
             }
 
             if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", def.smoothness);

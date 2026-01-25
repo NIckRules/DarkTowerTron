@@ -8,9 +8,19 @@ namespace DarkTowerTron.Systems.VFX
     {
         private IPoolService _pool;
 
+        private void Awake()
+        {
+            ServiceLocator.Register<IVFXService>(this);
+        }
+
         private void Start()
         {
             _pool = ServiceLocator.Get<IPoolService>();
+        }
+
+        private void OnDestroy()
+        {
+            ServiceLocator.Unregister<IVFXService>(this);
         }
 
         // --- IVFXService Implementation ---

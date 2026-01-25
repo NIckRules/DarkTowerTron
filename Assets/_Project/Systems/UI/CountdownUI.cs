@@ -8,18 +8,32 @@ namespace DarkTowerTron.Systems.UI
     public class CountdownUI : MonoBehaviour
     {
         [Header("Listening")]
-        [SerializeField] private IntEventChannelSO _announceEvent;
+        [Tooltip("Receives strings like 'Wave 1' or 'BOSS FIGHT'")]
+        [SerializeField] private StringEventChannelSO _announceEvent;
+
+        [Tooltip("Receives countdown strings like '3', '2', '1', ''")]
         [SerializeField] private StringEventChannelSO _countdownEvent;
 
         [Header("UI References")]
-        public TextMeshProUGUI waveTitleText; // "WAVE 1"
-        public TextMeshProUGUI countdownText; // "3"
+        public TextMeshProUGUI waveTitleText;
+        public TextMeshProUGUI countdownText;
+
+        [Header("Settings")]
+        [SerializeField] private float _titleDuration = 3f; // How long title stays visible
 
         private void Awake()
         {
-            // Hide by default
-            if (waveTitleText) waveTitleText.gameObject.SetActive(false);
-            if (countdownText) countdownText.gameObject.SetActive(false);
+            // Reset State
+            if (waveTitleText)
+            {
+                waveTitleText.alpha = 0f;
+                waveTitleText.gameObject.SetActive(false);
+            }
+            if (countdownText)
+            {
+                countdownText.text = "";
+                countdownText.gameObject.SetActive(false);
+            }
         }
 
         private void OnEnable()
@@ -34,17 +48,24 @@ namespace DarkTowerTron.Systems.UI
             if (_countdownEvent != null) _countdownEvent.OnEventRaised -= UpdateCountdown;
         }
 
-        private void ShowWaveTitle(int waveIndex)
+        private void ShowWaveTitle(string titleText)
         {
             if (waveTitleText)
             {
-                waveTitleText.text = $"WAVE {waveIndex}";
+                // Reset State
+                waveTitleText.DOKill();
                 waveTitleText.gameObject.SetActive(true);
+                waveTitleText.text = titleText;
 
-                // Animation: Scale Up and Fade In
+                // Animation Sequence: Pop In -> Wait -> Fade Out
                 waveTitleText.transform.localScale = Vector3.zero;
-                waveTitleText.transform.DOScale(1f, 0.5f).SetEase(Ease.OutBack);
                 waveTitleText.alpha = 1f;
+
+                Sequence seq = DOTween.Sequence();
+                seq.Append(waveTitleText.transform.DOScale(1f, 0.5f).SetEase(Ease.OutBack));
+                seq.AppendInterval(_titleDuration);
+                seq.Append(waveTitleText.DOFade(0f, 0.5f));
+                seq.OnComplete(() => waveTitleText.gameObject.SetActive(false));
             }
         }
 
@@ -52,18 +73,19 @@ namespace DarkTowerTron.Systems.UI
         {
             if (countdownText)
             {
-                // If text is empty, hide everything
+                // Logic: Empty string means "Hide/Done"
                 if (string.IsNullOrEmpty(text))
                 {
                     countdownText.gameObject.SetActive(false);
-                    if (waveTitleText) waveTitleText.DOFade(0, 0.5f); // Fade out title
                     return;
                 }
 
+                // Ensure Active
                 countdownText.gameObject.SetActive(true);
                 countdownText.text = text;
 
-                // Punch Animation for every number
+                // Punch Animation
+                countdownText.transform.DOKill(); // Stop previous punch
                 countdownText.transform.localScale = Vector3.one;
                 countdownText.transform.DOPunchScale(Vector3.one * 0.5f, 0.2f);
             }

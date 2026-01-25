@@ -118,9 +118,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &132469315884303213
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,9 +313,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &903790897884177619
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,9 +466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &2746639469467315660
 GameObject:
   m_ObjectHideFlags: 0
@@ -620,9 +617,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &3070126363185842342
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,9 +737,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &3159802517948119298
 GameObject:
   m_ObjectHideFlags: 0
@@ -753,6 +748,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6375750063332978211}
+  - component: {fileID: 6138875026047038624}
   m_Layer: 0
   m_Name: AR2_ArenaTrigger
   m_TagString: Untagged
@@ -776,6 +772,34 @@ Transform:
   - {fileID: 481643802636718460}
   m_Father: {fileID: 1277231504782555764}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &6138875026047038624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3159802517948119298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18457c20692f78e4eb9512f18786ced3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _waves:
+  - {fileID: 11400000, guid: 1dbe729a6a6268e47854cd68ff81dba9, type: 2}
+  - {fileID: 11400000, guid: 215eae7368636074e99bcd9f6b67b235, type: 2}
+  _spawnPoints:
+  - {fileID: 233292699473419118}
+  - {fileID: 5180871469120569823}
+  - {fileID: 6414641290941906178}
+  - {fileID: 8373690531838274949}
+  _useCountdown: 1
+  _countdownDuration: 3
+  _delayBetweenWaves: 2
+  _gates:
+  - {fileID: 1061389209271018092}
+  - {fileID: 6244700384614881965}
+  _announcementEvent: {fileID: 11400000, guid: 0236a833a2bb8cb4b9df709f650b6ddc, type: 2}
+  _countdownEvent: {fileID: 11400000, guid: 2c2b186e035406b42841963934e1fb8d, type: 2}
 --- !u!1 &3756032822862749782
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,9 +986,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &4430907633231178948
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,9 +1106,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &4606944838341287003
 GameObject:
   m_ObjectHideFlags: 0
@@ -1205,9 +1227,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &5282759707020977701
 GameObject:
   m_ObjectHideFlags: 0
@@ -1233,7 +1254,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5282759707020977701}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 29.51587, y: 16.122042, z: -47.329727}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1260,10 +1281,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48e8d1e638e276146b8f64fccf5b5c5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entryPoint: {fileID: 3803250683953008233}
-  exitPoint: {fileID: 4471654563509479180}
-  gizmoColor: {r: 0, g: 1, b: 1, a: 1}
-  roomSize: {x: 70, y: 10, z: 70}
+  zoneID: 
+  palette: {fileID: 0}
+  tileSize: 5
+  wallPrefabs: []
+  _entryPoint: {fileID: 0}
+  _exitPoint: {fileID: 0}
+  _bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 12.5, y: 5, z: 12.5}
 --- !u!1 &5365114362109996820
 GameObject:
   m_ObjectHideFlags: 0
@@ -1383,9 +1409,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &5497471030606698208
 GameObject:
   m_ObjectHideFlags: 0
@@ -1581,9 +1606,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &6101604347859994112
 GameObject:
   m_ObjectHideFlags: 0
@@ -1624,8 +1648,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 481643802636718460}
-  - component: {fileID: 7915810797356022022}
   - component: {fileID: 209468019916225245}
+  - component: {fileID: 352900865733175004}
   m_Layer: 0
   m_Name: VisualTrigger
   m_TagString: Untagged
@@ -1648,30 +1672,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6375750063332978211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7915810797356022022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6945436688019814009}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a4ec278bbb39fc4ba23f11725f565b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wavesForThisRoom:
-  - {fileID: 11400000, guid: 3333e83ba89c8eb4d9e9519193cee72b, type: 2}
-  - {fileID: 11400000, guid: 1dbe729a6a6268e47854cd68ff81dba9, type: 2}
-  - {fileID: 11400000, guid: 215eae7368636074e99bcd9f6b67b235, type: 2}
-  spawnPointsForThisRoom:
-  - {fileID: 233292699473419118}
-  - {fileID: 5180871469120569823}
-  - {fileID: 6414641290941906178}
-  - {fileID: 8373690531838274949}
-  gatesToClose:
-  - {fileID: 1061389209271018092}
-  - {fileID: 6244700384614881965}
 --- !u!65 &209468019916225245
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1693,6 +1693,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 7, y: 7, z: 0.2}
   m_Center: {x: 1, y: 2, z: 0}
+--- !u!114 &352900865733175004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6945436688019814009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b51212ae34e243945b82723abd0c4035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controller: {fileID: 6138875026047038624}
+  _oneShot: 1
 --- !u!1 &7225129046022698175
 GameObject:
   m_ObjectHideFlags: 0
@@ -1847,9 +1861,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28256e08d97b5b64c912ee8ceccfe3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 4
-  labelColor: {r: 0, g: 1, b: 1, a: 1}
-  showCoordinates: 1
+  sockets: []
+  showGizmos: 1
 --- !u!1 &7635334373456002960
 GameObject:
   m_ObjectHideFlags: 0
@@ -2058,6 +2071,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6640671413898015075, guid: 71873e0cd586775429e60292c6b57f5f,
+        type: 3}
+      propertyPath: _openLocalPos.y
+      value: -3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2610,6 +2628,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6640671413898015075, guid: 71873e0cd586775429e60292c6b57f5f,
+        type: 3}
+      propertyPath: _openLocalPos.y
+      value: -3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

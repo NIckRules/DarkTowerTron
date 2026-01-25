@@ -8,13 +8,20 @@ namespace DarkTowerTron.Systems.Waves
 {
     public interface IWaveService : IGameService
     {
-        bool IsWaveActive { get; }
-        
         /// <summary>
-        /// Starts a wave sequence using the provided spawn points.
+        /// Is the service currently processing a wave?
         /// </summary>
-        void StartWave(WaveDefinitionSO waveData, List<Transform> spawnPoints, Action onWaveComplete);
-        
-        void CancelCurrentWave();
+        bool IsWaveActive { get; }
+
+        /// <summary>
+        /// Starts a specific wave using the provided spawn points.
+        /// </summary>
+        /// <param name="wave">The wave data to run.</param>
+        /// <param name="spawnPoints">List of valid spawn transforms for this encounter.</param>
+        /// <param name="onComplete">Callback when all enemies are dead.</param>
+        /// <returns>False if service was already busy.</returns>
+        bool StartWave(WaveDefinitionSO wave, List<Transform> spawnPoints, Action onComplete);
+
+        void CancelWave();
     }
 }

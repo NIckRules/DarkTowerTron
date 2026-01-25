@@ -3,50 +3,98 @@ using System.Collections;
 
 namespace DarkTowerTron.Gameplay.Environment
 {
-    public class ArenaGate : MonoBehaviour
+    public class ArenaGate : MonoBehaviour, ILockable
     {
-        [Header("Settings")]
-        [SerializeField] private Vector3 _closedPosition;
-        [SerializeField] private Vector3 _openPosition;
-        [SerializeField] private float _speed = 2f;
+        private enum GateState { Open, Closed }
 
-        private Vector3 _targetPosition;
-        private bool _isClosed = false;
+        [Header("References")]
+        [Tooltip("Assign the object that should slide (e.g. Wall_Pivot). Do NOT assign the Root.")]
+        [SerializeField] private Transform _movingPart;
+
+        [Header("Configuration")]
+        [SerializeField] private Vector3 _openLocalPos;
+        [SerializeField] private Vector3 _closedLocalPos;
+        [SerializeField] private float _speed = 5f;
+        [SerializeField] private GateState _startState = GateState.Open;
+
+        private bool _isLocked;
+        private Coroutine _moveRoutine;
+
+        public bool IsLocked => _isLocked;
 
         private void Start()
         {
-            // Assume start position is the open position unless otherwise set
-            if (_openPosition == Vector3.zero) _openPosition = transform.position;
-            
-            // Assume we want to close downwards or whatever implies "closed"
-            if (_closedPosition == Vector3.zero) _closedPosition = transform.position + Vector3.up * 3f;
+            // Safety Check
+            if (_movingPart == null)
+            {
+                Debug.LogError($"[ArenaGate] '{name}' is missing the '_movingPart' reference! Assign the visual child.", gameObject);
+                return;
+            }
 
-            _targetPosition = _openPosition;
+            // Snap to initial state
+            if (_startState == GateState.Open)
+            {
+                _movingPart.localPosition = _openLocalPos;
+                _isLocked = false;
+            }
+            else
+            {
+                _movingPart.localPosition = _closedLocalPos;
+                _isLocked = true;
+            }
         }
 
-        private void Update()
-        {
-            // Simple slide animation
-            transform.position = Vector3.Lerp(transform.position, _targetPosition, Time.deltaTime * _speed);
-        }
+        public void Lock() => Close();
+        public void Unlock() => Open();
 
-        // --- PUBLIC API ---
-
-        public void Close()
-        {
-            if (_isClosed) return;
-            _isClosed = true;
-            _targetPosition = _closedPosition;
-        }
-
+        [ContextMenu("Open Gate")]
         public void Open()
         {
-            if (!_isClosed) return;
-            _isClosed = false;
-            _targetPosition = _openPosition;
+            if (!_isLocked || _movingPart == null) return;
+            _isLocked = false;
+
+            if (_moveRoutine != null) StopCoroutine(_moveRoutine);
+            _moveRoutine = StartCoroutine(MoveToTarget(_openLocalPos));
         }
 
-        // Keep legacy method just in case
-        public void ForceClose() => Close();
+        [ContextMenu("Close Gate")]
+        public void Close()
+        {
+            if (_isLocked || _movingPart == null) return;
+            _isLocked = true;
+
+            if (_moveRoutine != null) StopCoroutine(_moveRoutine);
+            _moveRoutine = StartCoroutine(MoveToTarget(_closedLocalPos));
+        }
+
+        private IEnumerator MoveToTarget(Vector3 targetLocalPos)
+        {
+            while (Vector3.Distance(_movingPart.localPosition, targetLocalPos) > 0.01f)
+            {
+                _movingPart.localPosition = Vector3.MoveTowards(
+                    _movingPart.localPosition,
+                    targetLocalPos,
+                    _speed * Time.deltaTime
+                );
+                yield return null;
+            }
+            _movingPart.localPosition = targetLocalPos;
+        }
+
+        // --- Editor Helpers ---
+
+        [ContextMenu("Capture Open Position")]
+        private void CaptureOpen()
+        {
+            if (_movingPart) _openLocalPos = _movingPart.localPosition;
+            else Debug.LogWarning("Assign _movingPart first!");
+        }
+
+        [ContextMenu("Capture Closed Position")]
+        private void CaptureClosed()
+        {
+            if (_movingPart) _closedLocalPos = _movingPart.localPosition;
+            else Debug.LogWarning("Assign _movingPart first!");
+        }
     }
 }

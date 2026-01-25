@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using DarkTowerTron.Core.Debugging;
-using DarkTowerTron.Core.Events;
-using DarkTowerTron.Core.Services; // Access ServiceLocator
-using DarkTowerTron.Systems.Score; // Access IScoreService
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using DarkTowerTron.Core.Events;
+using DarkTowerTron.Core.Services; // Access ServiceLocator
+using DarkTowerTron.Core.Debugging;
+using DarkTowerTron.Systems.Score; // For IScoreService
 
 namespace DarkTowerTron.Systems.UI
 {
@@ -45,39 +45,48 @@ namespace DarkTowerTron.Systems.UI
 
         private void Start()
         {
-            // Cache the service for the Update loop
+            // 1. Get Score Service (Guaranteed by GlobalSystems)
             _scoreService = ServiceLocator.Get<IScoreService>();
+
+            // 2. Initial UI Refresh
+            if (_scoreService != null)
+            {
+                UpdateScoreUI(_scoreService.TotalScore, _scoreService.CurrentMultiplier);
+            }
         }
 
         private void OnEnable()
         {
-            if (_focusEvent != null) _focusEvent.OnEventRaised += UpdateFocus;
-            if (_gritEvent != null) _gritEvent.OnEventRaised += UpdateGrit;
-            if (_hullEvent != null) _hullEvent.OnEventRaised += UpdateHull;
-            if (_scoreEvent != null) _scoreEvent.OnEventRaised += UpdateScoreUI;
+            if (_focusEvent) _focusEvent.OnEventRaised += UpdateFocus;
+            if (_gritEvent) _gritEvent.OnEventRaised += UpdateGrit;
+            if (_hullEvent) _hullEvent.OnEventRaised += UpdateHull;
+            if (_scoreEvent) _scoreEvent.OnEventRaised += UpdateScoreUI;
         }
 
         private void OnDisable()
         {
-            if (_focusEvent != null) _focusEvent.OnEventRaised -= UpdateFocus;
-            if (_gritEvent != null) _gritEvent.OnEventRaised -= UpdateGrit;
-            if (_hullEvent != null) _hullEvent.OnEventRaised -= UpdateHull;
-            if (_scoreEvent != null) _scoreEvent.OnEventRaised -= UpdateScoreUI;
+            if (_focusEvent) _focusEvent.OnEventRaised -= UpdateFocus;
+            if (_gritEvent) _gritEvent.OnEventRaised -= UpdateGrit;
+            if (_hullEvent) _hullEvent.OnEventRaised -= UpdateHull;
+            if (_scoreEvent) _scoreEvent.OnEventRaised -= UpdateScoreUI;
         }
 
         private void Update()
         {
-            // Update Timer from Service
+            // Poll for Timer (less expensive than event for every second)
             if (timerText && _scoreService != null)
             {
                 float t = _scoreService.GameTime;
                 int minutes = Mathf.FloorToInt(t / 60f);
                 int seconds = Mathf.FloorToInt(t % 60f);
+
+                // Optimization: Only update string if second changed? 
+                // For now, per frame is acceptable for HUD text.
                 timerText.text = $"{minutes:00}:{seconds:00}";
             }
         }
 
-        // --- EVENT HANDLERS ---
+        // --- HANDLERS ---
 
         private void UpdateFocus(float current, float max)
         {
@@ -85,18 +94,20 @@ namespace DarkTowerTron.Systems.UI
 
             if (focusFillImage)
             {
-                bool isFull = current >= (max * 0.8f);
+                bool isFull = current >= (max * 0.95f);
                 focusFillImage.color = isFull ? fullFocusColor : normalFocusColor;
             }
         }
 
         private void UpdateGrit(int currentGrit, int maxGrit)
         {
+            // Rebuild if max changed
             if (_spawnedPips.Count != maxGrit)
             {
                 RebuildGritLayout(maxGrit);
             }
 
+            // Update states
             for (int i = 0; i < _spawnedPips.Count; i++)
             {
                 if (_spawnedPips[i] == null) continue;
@@ -106,15 +117,9 @@ namespace DarkTowerTron.Systems.UI
 
         private void UpdateHull(bool hasHull)
         {
-            GameLogger.Log(LogChannel.UI, $"[HUD] Hull Event: {hasHull}", gameObject);
-
             if (hullIcon)
             {
                 hullIcon.color = hasHull ? hullActiveColor : hullBrokenColor;
-            }
-            else
-            {
-                GameLogger.LogError(LogChannel.UI, "[HUDManager] Hull Icon reference is missing!", gameObject);
             }
         }
 
@@ -123,8 +128,6 @@ namespace DarkTowerTron.Systems.UI
             if (scoreText) scoreText.text = score.ToString("N0");
             if (multiplierText) multiplierText.text = $"x{multiplier}";
         }
-
-        // --- HELPERS ---
 
         private void RebuildGritLayout(int max)
         {

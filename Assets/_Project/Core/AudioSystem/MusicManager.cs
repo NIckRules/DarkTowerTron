@@ -1,5 +1,5 @@
 using UnityEngine;
-using DG.Tweening;
+using DG.Tweening; // Ensure you have DOTween installed/referenced
 using DarkTowerTron.Core.Events;
 
 namespace DarkTowerTron.Core.AudioSystem
@@ -12,19 +12,13 @@ namespace DarkTowerTron.Core.AudioSystem
 
         private AudioSource _source;
         private float _originalPitch;
-        private float _originalVolume;
+        private float _originalVolume = 1f;
 
         private void Awake()
         {
             _source = GetComponent<AudioSource>();
             _originalPitch = _source.pitch;
             _originalVolume = _source.volume;
-        }
-
-        private void Start()
-        {
-            if (!_source.isPlaying && _source.clip != null)
-                _source.Play();
         }
 
         private void OnEnable()
@@ -37,8 +31,6 @@ namespace DarkTowerTron.Core.AudioSystem
             if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= OnDeath;
         }
 
-        // --- NEW METHODS (Fixes Error CS1061) ---
-
         public void PlayMusic(AudioClip clip, float fadeDuration)
         {
             if (clip == null) return;
@@ -48,7 +40,7 @@ namespace DarkTowerTron.Core.AudioSystem
 
             if (_source.isPlaying)
             {
-                // Crossfade: Fade Out -> Swap -> Fade In
+                // Crossfade
                 _source.DOFade(0f, fadeDuration * 0.5f).OnComplete(() =>
                 {
                     _source.clip = clip;
@@ -58,7 +50,7 @@ namespace DarkTowerTron.Core.AudioSystem
             }
             else
             {
-                // Just Fade In
+                // Fade In
                 _source.clip = clip;
                 _source.volume = 0f;
                 _source.Play();
@@ -72,25 +64,17 @@ namespace DarkTowerTron.Core.AudioSystem
             _source.DOFade(0f, fadeDuration).OnComplete(() => _source.Stop());
         }
 
-        // ----------------------------------------
+        public void SetVolume(float volume)
+        {
+            _originalVolume = volume;
+            _source.DOFade(volume, 0.5f);
+        }
 
         private void OnDeath()
         {
+            // Warren Spector / Deus Ex style death pitch shift
             _source.DOPitch(_originalPitch * 0.5f, 1.0f).SetUpdate(true);
             _source.DOFade(_originalVolume * 0.5f, 1.0f).SetUpdate(true);
-        }
-
-        public void ResetMusic()
-        {
-            _source.DOKill();
-            _source.pitch = _originalPitch;
-            _source.volume = _originalVolume;
-        }
-
-        public void SetVolume(float volume)
-        {
-            _source.volume = volume;
-            _originalVolume = volume; // Update "Original" so fades return to this level
         }
     }
 }
