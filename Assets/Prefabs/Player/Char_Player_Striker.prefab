@@ -1303,7 +1303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8608103599068932834}
   isAutomatic: 1
-  fireFeedback: {fileID: 0}
+  fireFeedback: {fileID: 11400000, guid: acddcf7ae76659c489c9387f95392000, type: 2}
   inputBufferTime: 0.2
   bulletSpeed: 25
 --- !u!114 &4400474212300462037

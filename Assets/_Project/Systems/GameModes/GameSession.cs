@@ -6,6 +6,8 @@ using DarkTowerTron.Core.Physics; // For UnityCharacterMover
 using DarkTowerTron.Gameplay.Environment; // For PlayerStart
 using DarkTowerTron.Gameplay.Player; // For PlayerController
 using DarkTowerTron.Systems.UI;
+using DarkTowerTron.Core.Services;
+using DarkTowerTron.Core.AudioSystem;
 
 namespace DarkTowerTron.Systems.GameModes
 {
@@ -17,6 +19,11 @@ namespace DarkTowerTron.Systems.GameModes
 
         [Header("Manager References")]
         public UIManager uiManager;
+
+        [Header("Music")]
+        [SerializeField] private MusicProfileSO _mainCombatTheme;
+        // NEW: Fallback music profile if the zone has none
+        [SerializeField] private MusicProfileSO _defaultMusicTheme;
 
         [Header("Debug")]
         public string activeSpawnID = "Start";
@@ -66,6 +73,13 @@ namespace DarkTowerTron.Systems.GameModes
             if (uiManager) uiManager.ShowStartMenu();
 
             MovePlayerToStart();
+
+            // --- AUDIO TRIGGER ---
+            var audio = ServiceLocator.Get<IAudioService>();
+            if (audio != null && _mainCombatTheme != null)
+            {
+                audio.PlayMusicProfile(_mainCombatTheme);
+            }
             
             // Lock input until game begins
             if (_player) _player.ToggleInput(false);
@@ -163,7 +177,7 @@ namespace DarkTowerTron.Systems.GameModes
         {
             if (_player == null) return;
 
-            // Access the PlayerStart registry (Core/Environment)
+            // 1. Find Spawn Point
             Transform targetPoint = PlayerStart.GetSpawnPoint(activeSpawnID);
             if (targetPoint == null)
             {
@@ -171,7 +185,7 @@ namespace DarkTowerTron.Systems.GameModes
                 return;
             }
 
-            // Robust Teleport Logic
+            // 2. Teleport Player
             var mover = _player.GetComponent<UnityCharacterMover>();
             if (mover != null)
             {
@@ -181,8 +195,25 @@ namespace DarkTowerTron.Systems.GameModes
             {
                 _player.transform.position = targetPoint.position;
             }
-
             _player.transform.rotation = targetPoint.rotation;
+
+            // --- 3. NEW: Resolve Music Context ---
+            // Check if this spawn point belongs to a specific Zone
+            Zone parentZone = targetPoint.GetComponentInParent<Zone>();
+            var audio = ServiceLocator.Get<IAudioService>();
+            if (audio != null)
+            {
+                if (parentZone != null && parentZone.zoneMusicProfile != null)
+                {
+                    // Zone has specific profile? Play it.
+                    audio.PlayMusicProfile(parentZone.zoneMusicProfile);
+                }
+                else if (_defaultMusicTheme != null)
+                {
+                    // No Zone / No Profile? Play Default.
+                    audio.PlayMusicProfile(_defaultMusicTheme);
+                }
+            }
         }
     }
 }

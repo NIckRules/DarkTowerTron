@@ -22,7 +22,7 @@ public class ZoneEditor : Editor
 
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Bake Walls (Stable)"))
+        if (GUILayout.Button("Bake Walls"))
         {
             BakeWalls(zone);
         }
@@ -39,13 +39,6 @@ public class ZoneEditor : Editor
     {
         ClearWalls(zone);
 
-        if (zone.wallPrefabs == null || zone.wallPrefabs.Count == 0)
-        {
-            Debug.LogError("[Zone] No Wall Prefabs assigned!");
-            return;
-        }
-
-        GameObject wallPrefab = zone.wallPrefabs[0];
         TileInfo[] tiles = zone.GetComponentsInChildren<TileInfo>();
         List<GameObject> createdWalls = new List<GameObject>();
         int globalWallCount = 0;
@@ -57,15 +50,7 @@ public class ZoneEditor : Editor
         foreach (var tile in tiles)
         {
             Vector2Int coord = GetGridCoordinate(tile.transform.position, gridSize);
-
-            if (!tileMap.ContainsKey(coord))
-            {
-                tileMap.Add(coord, tile);
-            }
-            else
-            {
-                Debug.LogWarning($"[Zone] Overlapping tiles at {coord}. Check {tile.name}");
-            }
+            if (!tileMap.ContainsKey(coord)) tileMap.Add(coord, tile);
         }
 
         // --- STEP 2: ITERATE SOCKETS ---
@@ -79,53 +64,57 @@ public class ZoneEditor : Editor
             foreach (var socket in tile.sockets)
             {
                 if (socket == null) continue;
-                if (socket.type == SocketType.Connector) continue;
 
-                // --- THE FIX: ROBUST DIRECTION CALCULATION ---
-                // Instead of using socket.forward (which changes if you rotate visuals),
-                // we calculate the vector from Tile Center to Socket Position.
-                // This ALWAYS points towards the neighbor.
+                // FIX 1: Use the new category enum
+                if (socket.category == SocketCategory.Open_Connector) continue;
 
+                // Robust Direction Calculation (Center to Socket)
                 Vector3 dirVector = socket.transform.position - tile.transform.position;
-
-                // Determine direction based on largest axis
                 Vector2Int direction = Vector2Int.zero;
-                if (Mathf.Abs(dirVector.z) > Mathf.Abs(dirVector.x))
-                    direction = new Vector2Int(0, (dirVector.z > 0) ? 1 : -1); // North/South
-                else
-                    direction = new Vector2Int((dirVector.x > 0) ? 1 : -1, 0); // East/West
 
-                // (Optional) Diagonal check for Triangle tiles
-                // If both components are significant (e.g. > 1.0m), treat as diagonal
+                if (Mathf.Abs(dirVector.z) > Mathf.Abs(dirVector.x))
+                    direction = new Vector2Int(0, (dirVector.z > 0) ? 1 : -1);
+                else
+                    direction = new Vector2Int((dirVector.x > 0) ? 1 : -1, 0);
+
+                // Diagonal Check
                 if (Mathf.Abs(dirVector.x) > 1.5f && Mathf.Abs(dirVector.z) > 1.5f)
                 {
-                    direction = new Vector2Int(
-                        (dirVector.x > 0) ? 1 : -1,
-                        (dirVector.z > 0) ? 1 : -1
-                    );
+                    direction = new Vector2Int((dirVector.x > 0) ? 1 : -1, (dirVector.z > 0) ? 1 : -1);
                 }
 
                 Vector2Int neighborCoord = myCoord + direction;
-
-                // --- STEP 3: CHECK NEIGHBOR ---
                 bool hasNeighbor = tileMap.ContainsKey(neighborCoord);
 
+                // If no neighbor exists, we need a wall!
                 if (!hasNeighbor)
                 {
-                    // Spawn Wall
-                    GameObject newWall = (GameObject)PrefabUtility.InstantiatePrefab(wallPrefab, zone.transform);
+                    GameObject wallPrefab = null;
 
-                    // Uses the Socket's exact transform (so your visual rotation is preserved!)
-                    newWall.transform.position = socket.transform.position;
-                    newWall.transform.rotation = socket.transform.rotation;
+                    // FIX 2: Check for specific override first
+                    if (socket.specificPrefabOverride != null)
+                    {
+                        wallPrefab = socket.specificPrefabOverride;
+                    }
+                    else
+                    {
+                        // FIX 3: Ask Zone for prefab based on Category
+                        wallPrefab = zone.GetWallPrefab(socket.category);
+                    }
 
-                    // Naming
-                    string socketID = socket.name.Replace("Socket_", "");
-                    globalWallCount++;
-                    newWall.name = $"Wall_{tileID}_{socketID}_{globalWallCount:000}";
+                    if (wallPrefab != null)
+                    {
+                        GameObject newWall = (GameObject)PrefabUtility.InstantiatePrefab(wallPrefab, zone.transform);
+                        newWall.transform.position = socket.transform.position;
+                        newWall.transform.rotation = socket.transform.rotation;
 
-                    createdWalls.Add(newWall);
-                    socket.isOccupied = true;
+                        globalWallCount++;
+                        string socketID = socket.name.Replace("Socket_", "");
+                        newWall.name = $"Wall_{tileID}_{socketID}_{globalWallCount:000}";
+
+                        createdWalls.Add(newWall);
+                        socket.isOccupied = true;
+                    }
                 }
                 else
                 {
@@ -134,7 +123,7 @@ public class ZoneEditor : Editor
             }
         }
 
-        Debug.Log($"<color=green>[Zone]</color> Baked {createdWalls.Count} walls using Center-to-Socket logic.");
+        Debug.Log($"<color=green>[Zone]</color> Baked {createdWalls.Count} walls.");
     }
 
     private Vector2Int GetGridCoordinate(Vector3 pos, float size)

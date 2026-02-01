@@ -14,10 +14,11 @@ profiles:
   unity:
     # Root folders scanned (relative to project root)
     roots:
-      - Assets\Scripts
+      #- Assets\Scripts
       #- Assets\Prefabs
-      - Assets\Data
-      - Assets\Modules  
+      #- Assets\Data
+      #- Assets\Modules  
+      - Assets\_Project
 
     # Source files only
     include_extensions:

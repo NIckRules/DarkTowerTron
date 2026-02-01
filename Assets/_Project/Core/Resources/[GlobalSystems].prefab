@@ -185,7 +185,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf97d9429aec5a41a949b95cec52d49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerDiedEvent: {fileID: 11400000, guid: 28f8343a43fb4c7409fe54eacd72f1b1, type: 2}
+  _musicMixerGroup: {fileID: 0}
+  _crossfadeDuration: 2
 --- !u!1 &1718035396501018832
 GameObject:
   m_ObjectHideFlags: 0

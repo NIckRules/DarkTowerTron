@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SFX_Player_Shoot
   m_EditorClassIdentifier: 
   clips:
-  - {fileID: 8300000, guid: f16c082ad078e8943990c633ba1ea8b4, type: 3}
-  volume: 1
-  pitch: 1
+  - {fileID: 8300000, guid: d2aee65530eed7a44846bdfbb2b610aa, type: 3}
+  volume: 0.5
+  pitch: 0.9
   randomizePitch: 1
-  randomPitchRange: 0.1
+  randomPitchRange: 0.2

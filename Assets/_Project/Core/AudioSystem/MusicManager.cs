@@ -1,80 +1,78 @@
 using UnityEngine;
-using DG.Tweening; // Ensure you have DOTween installed/referenced
-using DarkTowerTron.Core.Events;
+using UnityEngine.Audio;
+using DG.Tweening;
 
 namespace DarkTowerTron.Core.AudioSystem
 {
-    [RequireComponent(typeof(AudioSource))]
     public class MusicManager : MonoBehaviour
     {
-        [Header("Listening")]
-        [SerializeField] private VoidEventChannelSO _playerDiedEvent;
+        [Header("Configuration")]
+        [SerializeField] private AudioMixerGroup _musicMixerGroup;
 
-        private AudioSource _source;
-        private float _originalPitch;
-        private float _originalVolume = 1f;
+        private AudioSource[] _stemSources;
+        private MusicProfileSO _currentProfile; // CHANGED from ThemeSO
 
-        private void Awake()
+        private void Awake() => InitializeStemSources();
+
+        private void InitializeStemSources()
         {
-            _source = GetComponent<AudioSource>();
-            _originalPitch = _source.pitch;
-            _originalVolume = _source.volume;
-        }
+            foreach (Transform child in transform) Destroy(child.gameObject);
 
-        private void OnEnable()
-        {
-            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised += OnDeath;
-        }
+            int layerCount = 4;
+            _stemSources = new AudioSource[layerCount];
 
-        private void OnDisable()
-        {
-            if (_playerDiedEvent != null) _playerDiedEvent.OnEventRaised -= OnDeath;
-        }
-
-        public void PlayMusic(AudioClip clip, float fadeDuration)
-        {
-            if (clip == null) return;
-            if (_source.clip == clip && _source.isPlaying) return;
-
-            _source.DOKill();
-
-            if (_source.isPlaying)
+            for (int i = 0; i < layerCount; i++)
             {
-                // Crossfade
-                _source.DOFade(0f, fadeDuration * 0.5f).OnComplete(() =>
-                {
-                    _source.clip = clip;
-                    _source.Play();
-                    _source.DOFade(_originalVolume, fadeDuration * 0.5f);
-                });
-            }
-            else
-            {
-                // Fade In
-                _source.clip = clip;
-                _source.volume = 0f;
-                _source.Play();
-                _source.DOFade(_originalVolume, fadeDuration);
+                GameObject child = new GameObject($"Stem_Source_{((MusicLayer)i)}");
+                child.transform.SetParent(transform);
+
+                AudioSource source = child.AddComponent<AudioSource>();
+                source.outputAudioMixerGroup = _musicMixerGroup;
+                source.loop = true;
+                source.playOnAwake = false;
+                source.volume = 0f;
+                source.spatialBlend = 0f;
+
+                _stemSources[i] = source;
             }
         }
 
-        public void StopMusic(float fadeDuration)
+        // 1. Load the Clips
+        public void PlayProfile(MusicProfileSO profile)
         {
-            _source.DOKill();
-            _source.DOFade(0f, fadeDuration).OnComplete(() => _source.Stop());
+            if (profile == null || profile == _currentProfile) return;
+            _currentProfile = profile;
+
+            // Stop, Swap, Sync-Play
+            for (int i = 0; i < _stemSources.Length; i++)
+            {
+                _stemSources[i].Stop();
+                _stemSources[i].clip = profile.GetClip(i);
+            }
+
+            // Sync Play
+            for (int i = 0; i < _stemSources.Length; i++)
+            {
+                if (_stemSources[i].clip != null) _stemSources[i].Play();
+            }
         }
 
-        public void SetVolume(float volume)
+        // 2. Apply Volumes (Called every frame by AudioService)
+        public void SyncVolumes(float[] targetVolumes)
         {
-            _originalVolume = volume;
-            _source.DOFade(volume, 0.5f);
+            if (targetVolumes.Length != _stemSources.Length) return;
+
+            for (int i = 0; i < _stemSources.Length; i++)
+            {
+                // Smooth lerp to avoid popping if intensity jumps
+                _stemSources[i].volume = Mathf.Lerp(_stemSources[i].volume, targetVolumes[i], Time.deltaTime * 3f);
+            }
         }
 
-        private void OnDeath()
+        public void StopMusic(float duration)
         {
-            // Warren Spector / Deus Ex style death pitch shift
-            _source.DOPitch(_originalPitch * 0.5f, 1.0f).SetUpdate(true);
-            _source.DOFade(_originalVolume * 0.5f, 1.0f).SetUpdate(true);
+            foreach (var source in _stemSources)
+                source.DOFade(0f, duration).OnComplete(() => source.Stop());
         }
     }
 }
